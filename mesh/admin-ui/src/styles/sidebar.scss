@@ -1,0 +1,320 @@
+@use 'variables' as *;
+
+#app {
+
+  .main-container {
+    min-height: 100%;
+    transition: margin-left .28s;
+    margin-left: $sideBarWidth;
+    position: relative;
+  }
+
+  .sidebar-container {
+    -webkit-transition: width .28s;
+    transition: width 0.28s;
+    width: $sideBarWidth !important;
+    background-color: var(--rail-bg);
+    border-right: 1px solid var(--rail-border);
+    height: 100%;
+    position: fixed;
+    font-size: 0px;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1001;
+    overflow: hidden;
+    box-shadow: var(--rail-shadow);
+
+    .horizontal-collapse-transition {
+      transition: 0s width ease-in-out, 0s padding-left ease-in-out, 0s padding-right ease-in-out;
+    }
+
+    .scrollbar-wrapper {
+      overflow-x: hidden !important;
+    }
+
+    .el-scrollbar__bar.is-vertical {
+      right: 0px;
+    }
+
+    .el-scrollbar {
+      height: 100%;
+    }
+
+    &.has-logo {
+      .el-scrollbar {
+        height: calc(100% - var(--ga-header-h));
+      }
+    }
+
+    .is-horizontal {
+      display: none;
+    }
+
+    // A bare `a` rule used to sit here, from the template this sidebar started
+    // as, where every menu row was wrapped in a link. Element Plus renders rows
+    // as <li>, so the only anchor left in the sidebar is the logo link -- and
+    // because this whole file is nested under #app, `display: inline-block` beat
+    // the scoped `display: flex` the logo is laid out with (an id outranks any
+    // number of classes). The logo link is absolutely positioned, which
+    // blockifies inline-block, so it computed to `block`, `align-items` and
+    // `justify-content` went inert, and the 28px image was dropped onto the
+    // baseline of a 64px line box and clipped in half by the header's
+    // overflow: hidden. What the rule was there for is covered elsewhere:
+    // external links carry .sidebar-external-link with its own display: block,
+    // and .el-menu-item sets overflow: hidden !important below.
+
+    .svg-icon {
+      margin-right: 16px;
+    }
+
+    // A row is a flex container. The icon used to shrink with everything else,
+    // so a title too long for the rail squashed it to nothing before the text
+    // was touched ("Department Management" lost its icon in English).
+    .el-menu-item .svg-icon,
+    .el-sub-menu__title .svg-icon {
+      flex-shrink: 0;
+    }
+
+    // The ellipsis declared on .el-menu-item below never applied: the title was
+    // bare text, an anonymous flex item, and text-overflow does not reach those.
+    // With its own element it can shrink and truncate, and the full title is on
+    // hover.
+    .el-menu-item .menu-title {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    // A parent row's title is a direct <span> child of the title, which the
+    // collapsed rail depends on (see .el-menu--collapse below), so it is styled
+    // in place instead of being wrapped.
+    .el-sub-menu__title > span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    // Nothing sits to the right of a menu row, so the 20px of right padding only
+    // takes room from the title. 8px back keeps "Menu Management" from being
+    // cut one pixel short.
+    .el-menu-item {
+      padding-right: 12px !important;
+    }
+
+    .el-menu {
+      border: none;
+      height: 100%;
+      width: 100% !important;
+      --el-menu-bg-color: var(--rail-bg);
+      background-color: var(--rail-bg) !important;
+      border-right: none !important;
+    }
+
+    // External-link rows are carried by an <a> that takes no part in routing;
+    // this layer must not affect the menu's own layout or colour.
+    .sidebar-external-link {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    // One row height throughout: Element Plus 2.x defaults to 56px, which is
+    // tall for a dense admin menu.
+    .el-menu-item,
+    .el-sub-menu__title,
+    .el-submenu__title {
+      height: 50px !important;
+      line-height: 50px !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+      color: var(--rail-text) !important;
+    }
+
+    // Top-level rows paint the rail behind themselves: Element Plus leaves
+    // them transparent, which shows the scrollbar track through.
+    .el-menu-item {
+      background-color: var(--rail-bg) !important;
+
+      &:hover {
+        background-color: var(--rail-hover) !important;
+      }
+
+      &.is-active {
+        background-color: var(--rail-active-bg) !important;
+        color: var(--rail-active-text) !important;
+      }
+    }
+
+    // Rows inside an expanded submenu sit on the recessed surface.
+    .el-sub-menu .el-menu-item,
+    .el-submenu .el-menu-item {
+      background-color: var(--rail-bg-sub) !important;
+      color: var(--rail-text) !important;
+      min-width: $sideBarWidth !important;
+
+      &:hover {
+        background-color: var(--rail-hover) !important;
+      }
+
+      &.is-active {
+        background-color: var(--rail-active-bg) !important;
+        color: var(--rail-active-text) !important;
+      }
+    }
+
+    // Nested submenu titles.
+    .nest-menu .el-sub-menu > .el-sub-menu__title,
+    .nest-menu .el-submenu > .el-submenu__title {
+      background-color: var(--rail-bg-sub) !important;
+      color: var(--rail-text) !important;
+      min-width: $sideBarWidth !important;
+
+      &:hover {
+        background-color: var(--rail-hover) !important;
+      }
+    }
+
+    // Hover on a row that opens a submenu.
+    .submenu-title-noDropdown,
+    .el-sub-menu__title,
+    .el-submenu__title {
+      &:hover {
+        background-color: var(--rail-hover) !important;
+      }
+    }
+
+    .is-active > .el-sub-menu__title,
+    .is-active > .el-submenu__title {
+      color: var(--rail-active-text) !important;
+    }
+  }
+
+  .hideSidebar {
+    .sidebar-container {
+      width: 54px !important;
+    }
+
+    .main-container {
+      margin-left: 54px;
+    }
+
+    .submenu-title-noDropdown {
+      padding: 0 !important;
+      position: relative;
+
+      // 折叠时 Element Plus 会把菜单项内容包进 .el-menu-tooltip__trigger，
+      // 该容器自带 0 20px 内边距，54px 宽仅余 14px 内容区；图标 14px 连同
+      // 16px 右外边距共需 30px，被 flex 压缩为 0 宽，表现为图标整个消失。
+      // 原规则写的是 .el-tooltip，那是 Element UI 的旧类名，从未匹配到。
+      .el-menu-tooltip__trigger {
+        padding: 0 !important;
+
+        .svg-icon {
+          margin-right: 0;
+          margin-left: 20px;
+        }
+      }
+    }
+
+    .el-sub-menu,
+    .el-submenu {
+      overflow: hidden;
+
+      > .el-sub-menu__title,
+      > .el-submenu__title {
+        padding: 0 !important;
+
+        .svg-icon {
+          margin-left: 20px;
+        }
+      }
+    }
+
+    .el-menu--collapse {
+      .el-sub-menu,
+      .el-submenu {
+        > .el-sub-menu__title,
+        > .el-submenu__title {
+          > span {
+            height: 0;
+            width: 0;
+            overflow: hidden;
+            visibility: hidden;
+            display: inline-block;
+          }
+        }
+      }
+    }
+  }
+
+  .el-menu--collapse .el-menu .el-sub-menu,
+  .el-menu--collapse .el-menu .el-submenu {
+    min-width: $sideBarWidth !important;
+  }
+
+  // mobile responsive
+  .mobile {
+    .main-container {
+      margin-left: 0px;
+    }
+
+    .sidebar-container {
+      transition: transform .28s;
+      width: $sideBarWidth !important;
+    }
+
+    &.hideSidebar {
+      .sidebar-container {
+        pointer-events: none;
+        transition-duration: 0.3s;
+        transform: translate3d(-$sideBarWidth, 0, 0);
+      }
+    }
+  }
+
+  .withoutAnimation {
+
+    .main-container,
+    .sidebar-container {
+      transition: none;
+    }
+  }
+}
+
+// when menu collapsed
+.el-menu--vertical {
+  > .el-menu {
+    .svg-icon {
+      margin-right: 16px;
+    }
+  }
+
+  .nest-menu .el-sub-menu > .el-sub-menu__title,
+  .nest-menu .el-submenu > .el-submenu__title,
+  .el-menu-item {
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.06) !important;
+    }
+  }
+
+  // the scroll bar appears when the subMenu is too long
+  > .el-menu--popup {
+    max-height: 100vh;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar-track-piece {
+      background: var(--ga-border);
+    }
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--ga-text-3);
+      border-radius: 20px;
+    }
+  }
+}

@@ -1,0 +1,84 @@
+export default {
+  name: 'Name',
+  namePlaceholder: 'Enter parameter name',
+  key: 'Key',
+  keyPlaceholder: 'Enter parameter key',
+  builtIn: 'Built-in',
+  builtInPlaceholder: 'System built-in',
+
+  configId: 'ID',
+  remark: 'Remark',
+  peekValue: 'Value: {value}',
+  // No trailing space: the Chinese full-width colon carries its own, English
+  // takes the one the template already puts before the tag.
+  peekFrontend: 'UI parameter:',
+  yes: 'Yes',
+  no: 'No',
+
+  addTitle: 'Add Parameter',
+  editTitle: 'Edit Parameter',
+  configName: 'Parameter Name',
+  configKey: 'Parameter Key',
+  configValue: 'Parameter Value',
+  configValuePlaceholder: 'Enter parameter value',
+  configType: 'System Built-in',
+  isFrontend: 'Show in Frontend',
+  isFrontendPlaceholder: 'Show in frontend?',
+  remarkPlaceholder: 'Enter content',
+
+  // 'Settings' per the glossary, which reserves 'Parameters' for the menu entry.
+  exportFilename: 'Settings',
+  exportHeader: {
+    configId: 'Parameter ID',
+    configName: 'Parameter Name',
+    configKey: 'Parameter Key',
+    configValue: 'Parameter Value',
+    remark: 'Remark',
+    createdAt: 'Created At'
+  },
+
+  rules: {
+    configName: 'Parameter name is required',
+    configKey: 'Parameter key is required',
+    configValue: 'Parameter value is required',
+    isFrontend: 'Show in frontend is required'
+  },
+
+  set: {
+    sidebarTitle: 'System Settings',
+    sidebarSub: 'Basic information and appearance',
+    basic: 'Basic Information',
+    basicSub: 'Name, logo, password',
+    appearance: 'Appearance',
+    appearanceSub: 'Skin and theme',
+
+    basicTitle: 'Basic System Information',
+    basicDesc: 'Set the system name, the logo and the default user password',
+    logoName: 'System Logo',
+    logoPlaceholder: 'Enter the logo URL',
+    appName: 'System Name',
+    appNamePlaceholder: 'Enter system name',
+    initPassword: 'Initial User Password',
+    initPasswordPlaceholder: 'Enter initial password',
+
+    appearanceDesc: 'Adjust the skin and the sidebar theme',
+    skin: 'Skin',
+    skinPlaceholder: 'Select skin',
+    skinBlue: 'Blue',
+    sideTheme: 'Sidebar Theme',
+    sideThemePlaceholder: 'Select sidebar theme',
+    themeHint: 'Click to switch theme',
+    themeDark: 'Dark Theme',
+    themeLight: 'Light Theme',
+
+    save: 'Save Settings',
+    // 'Saved', not 'Updated': the same wording the composables use for a
+    // persisted change.
+    saveOk: 'Saved successfully',
+
+    rules: {
+      appName: 'Please enter system name',
+      initPassword: 'Please enter the initial password'
+    }
+  }
+}

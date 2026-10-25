@@ -1,0 +1,121 @@
+{
+  "name": "go-admin",
+  "version": "3.4.0",
+  "description": "A magical vue admin. An out-of-box UI solution for enterprise applications. Newest development stack of vue. Lots of awesome features",
+  "author": "https://github.com/wenjianzhang",
+  "license": "MIT",
+  "scripts": {
+    "dev": "node scripts/sync-apps.mjs && vite",
+    "build:prod": "node scripts/sync-apps.mjs && vite build",
+    "build:stage": "node scripts/sync-apps.mjs && vite build --mode staging",
+    "preview": "vite preview",
+    "lint": "eslint src tests",
+    "type-check": "vue-tsc --noEmit && tsc -p tsconfig.node.json",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "e2e": "playwright test --project=mocked",
+    "e2e:live": "playwright test --project=live",
+    "e2e:shots": "playwright test --project=shots",
+    "test:ci": "pnpm lint && pnpm type-check && pnpm test:unit",
+    "svgo": "svgo -f src/icons/svg --config=src/icons/svgo.config.mjs",
+    "new": "plop",
+    "prepare": "husky || true",
+    "check:size": "node scripts/check-first-paint.mjs"
+  },
+  "lint-staged": {
+    "src/**/*.{js,ts,vue}": [
+      "eslint --fix"
+    ]
+  },
+  "keywords": [
+    "vue",
+    "admin",
+    "go-admin",
+    "go-admin-ui",
+    "dashboard",
+    "element-ui",
+    "boilerplate",
+    "admin-template",
+    "management-system"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/go-admin-team/go-admin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/go-admin-team/go-admin/issues"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.2",
+    "axios": "^1.20.0",
+    "codemirror": "^6.0.2",
+    "core-js": "^3.50.0",
+    "echarts": "^6.1.0",
+    "element-plus": "^2.14.4",
+    "fuse.js": "6.6.2",
+    "js-cookie": "3.0.8",
+    "moment": "^2.31.0",
+    "normalize.css": "8.0.1",
+    "nprogress": "0.2.0",
+    "path-to-regexp": "6.3.0",
+    "pinia": "^4.0.3",
+    "remixicon": "^2.5.0",
+    "screenfull": "5.2.0",
+    "vue": "^3.5.41",
+    "vue-codemirror": "^6.1.1",
+    "vue-count-to": "1.0.13",
+    "vue-cropper": "^1.1.4",
+    "vue-i18n": "^11.4.10",
+    "vue-router": "^4.6.4",
+    "write-excel-file": "^4.1.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@playwright/test": "^1.62.1",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/js-cookie": "^3.0.6",
+    "@types/node": "^26.2.0",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "@vitest/coverage-v8": "^4.1.10",
+    "@vue/compiler-sfc": "^3.5.41",
+    "@vue/test-utils": "^2.4.11",
+    "beautifier": "^0.1.7",
+    "chalk": "4.1.2",
+    "connect": "3.7.0",
+    "eslint": "9.39.5",
+    "eslint-plugin-vue": "^10.10.0",
+    "fast-glob": "^3.3.3",
+    "globals": "^17.11.0",
+    "husky": "9.1.7",
+    "jsdom": "^29.1.1",
+    "jszip": "^3.10.1",
+    "lint-staged": "17.3.0",
+    "path-browserify": "^1.0.1",
+    "plop": "4.0.5",
+    "sass": "^1.102.0",
+    "svgo": "4.1.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.67.0",
+    "vite": "^8.2.1",
+    "vite-plugin-compression2": "^2.5.3",
+    "vitest": "^4.1.11",
+    "vue-eslint-parser": "^10.4.1",
+    "vue-tsc": "^3.3.10"
+  },
+  "packageManager": "pnpm@9.15.1",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=9"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ],
+  "pnpm": {
+    "overrides": {
+      "glob@<10.5.0": ">=10.5.0"
+    }
+  }
+}

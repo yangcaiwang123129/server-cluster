@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="go build server-cluster/node/game" type="GoApplicationRunConfiguration" factoryName="Go Application" nameIsGenerated="true">
+    <module name="server-cluster" />
+    <working_directory value="$PROJECT_DIR$/node/game" />
+    <kind value="PACKAGE" />
+    <package value="server-cluster/node/game" />
+    <directory value="$PROJECT_DIR$" />
+    <auto_managed_config_id value="$PROJECT_DIR$/node/game" />
+    <method v="2" />
+  </configuration>
+</component>

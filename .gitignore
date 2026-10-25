@@ -1,0 +1,19 @@
+# IDE
+.idea/
+.vscode/
+
+# Go 编译产物
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# 日志与临时文件
+*.log
+*.trae
+logs/
+tmp/
+

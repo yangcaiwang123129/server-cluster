@@ -1,0 +1,213 @@
+// ══════════════════════════════════════════════════════════════════
+//  全局业务样式 — 布局、表单搜索、工具类
+// ══════════════════════════════════════════════════════════════════
+
+// ── 间距工具类 ─────────────────────────────────────────────────
+.pt5  { padding-top: 5px; }
+.pr5  { padding-right: 5px; }
+.pb5  { padding-bottom: 5px; }
+.mt5  { margin-top: 5px; }
+.mr5  { margin-right: 5px; }
+.mb5  { margin-bottom: 5px; }
+.mb8  { margin-bottom: 8px; }
+.ml5  { margin-left: 5px; }
+.mt10 { margin-top: 10px; }
+.mr10 { margin-right: 10px; }
+.mb10 { margin-bottom: 10px; }
+.mt20 { margin-top: 20px; }
+.mr20 { margin-right: 20px; }
+.mb20 { margin-bottom: 20px; }
+
+// ── Secondary detail inside a popover ────────────────────────────
+// One line per supplementary field in a list page's el-popover (location,
+// latency, config value...). Three pages had each copied the same three
+// declarations.
+.peek-line {
+  margin: 4px 0;
+  font-size: 13px;
+  color: var(--ga-text-2);
+}
+
+// ── A row action rendered as an icon ─────────────────────────────
+// The third action in a pinned column, where the words would cost width the
+// scrolling columns need. Keeps the icon on the text baseline of the buttons
+// beside it.
+.row-icon-action {
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+// ── 搜索栏 ─────────────────────────────────────────────────────
+// 业务页面统一使用 .search-form 包裹搜索区域
+.search-form {
+  padding: 14px 16px 6px;
+  background: var(--ga-bg-container);
+  border-radius: 10px;
+  border: 1px solid var(--ga-border-light);
+  margin-bottom: 12px;
+  box-shadow: var(--ga-shadow-sm);
+
+  .el-form-item {
+    margin-bottom: 10px;
+  }
+
+  .el-input__wrapper,
+  .el-select .el-input__wrapper {
+    background: var(--ga-bg-subtle);
+  }
+}
+
+// ── 操作按钮行 .mb8 ─────────────────────────────────────────────
+// 兼容原有 el-row :gutter="10" class="mb8" 写法
+.el-row.mb8 {
+  padding: 0 2px;
+}
+
+// ── 表格容器 ───────────────────────────────────────────────────
+.el-table {
+  .el-table__header-wrapper,
+  .el-table__fixed-header-wrapper {
+    th {
+      word-break: break-word;
+    }
+  }
+
+  .el-table__body-wrapper {
+    .el-button [class*="el-icon-"] + span { margin-left: 1px; }
+  }
+
+  // 操作列按钮
+  .el-button.is-link + .el-divider--vertical + .el-button.is-link {
+    margin-left: 0;
+  }
+}
+
+// ── 分页容器 ──────────────────────────────────────────────────
+.pagination-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 16px;
+  padding: 8px 4px;
+}
+
+// ── 表单分区标题 .form-header ────────────────────────────────
+.form-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ga-text-1);
+  border-bottom: 2px solid var(--el-color-primary-light-9);
+  margin: 8px 0 20px;
+  padding-bottom: 10px;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 16px;
+    background: linear-gradient(135deg, var(--ga-brand), var(--el-color-primary-light-3));
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+}
+
+// ── 卡片容器 .card-box ──────────────────────────────────────
+.card-box {
+  padding-right: 12px;
+  padding-left: 12px;
+  margin-bottom: 12px;
+}
+
+// ── Tree ────────────────────────────────────────────────────
+.tree-border {
+  margin-top: 5px;
+  border: 1px solid var(--ga-border-light);
+  background: var(--ga-bg-container);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+// ── 拖拽排序 ────────────────────────────────────────────────
+.sortable-ghost {
+  opacity: 0.8;
+  color: #fff !important;
+  background: var(--ga-brand) !important;
+  border-radius: 6px;
+}
+
+// ── Drawer ──────────────────────────────────────────────────
+.demo-drawer__content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  form { flex: 1; }
+}
+
+.demo-drawer__footer {
+  display: flex;
+  gap: 8px;
+  padding: 12px 0;
+  button { flex: 1; }
+}
+
+// ── 图片相关 ────────────────────────────────────────────────
+.img-circle { border-radius: 50%; }
+.img-lg { width: 120px; height: 120px; }
+
+// ── 顶部右侧按钮 ────────────────────────────────────────────
+.top-right-btn {
+  position: relative;
+  float: right;
+}
+
+// ── 文字色工具 ──────────────────────────────────────────────
+.text-primary   { color: var(--ga-brand); }
+.text-success   { color: var(--ga-success); }
+.text-warning   { color: var(--ga-warning); }
+.text-danger    { color: var(--ga-danger); }
+.text-info      { color: var(--ga-info); }
+.text-muted     { color: var(--ga-text-3); }
+
+// ── pull-right ──────────────────────────────────────────────
+.pull-right { float: right !important; }
+
+// ── 通用列表组 ──────────────────────────────────────────────
+.list-group {
+  padding-left: 0;
+  list-style: none;
+}
+
+.list-group-item {
+  border-bottom: 1px solid var(--ga-border-light);
+  border-top: 1px solid var(--ga-border-light);
+  margin-bottom: -1px;
+  padding: 10px 0;
+  font-size: 13px;
+  color: var(--ga-text-2);
+}
+
+.list-group-striped > .list-group-item {
+  border-left: 0;
+  border-right: 0;
+  border-radius: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+// ── 子菜单顶部导航栏修正 ──────────────────────────────────
+.el-menu--horizontal > .el-submenu .el-submenu__title {
+  height: 50px !important;
+  line-height: 50px !important;
+}
+
+// ── 操作工具栏（替代 el-row :gutter="10" class="mb8"）──────
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}

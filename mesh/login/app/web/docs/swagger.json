@@ -1,0 +1,195 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "账号注册、登录与区服列表；token 供 game 服验签进入游戏。",
+        "title": "登录服 API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
+    "paths": {
+        "/api/v1/account/login": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "account"
+                ],
+                "summary": "登录账号",
+                "parameters": [
+                    {
+                        "description": "登录参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.LoginReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.LoginResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/account/register": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "account"
+                ],
+                "summary": "注册账号",
+                "parameters": [
+                    {
+                        "description": "注册参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.RegisterReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.RegisterResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/account/servers": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "account"
+                ],
+                "summary": "拉取区服列表",
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ServerListResp"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "dto.LoginReq": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.LoginResp": {
+            "type": "object",
+            "properties": {
+                "expired_at": {
+                    "type": "integer"
+                },
+                "servers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ServerItem"
+                    }
+                },
+                "token": {
+                    "type": "string"
+                },
+                "uid": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.RegisterReq": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 6
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 32,
+                    "minLength": 3
+                }
+            }
+        },
+        "dto.RegisterResp": {
+            "type": "object",
+            "properties": {
+                "uid": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ServerItem": {
+            "type": "object",
+            "properties": {
+                "gate_addr": {
+                    "description": "WebSocket 接入地址，如 ws://127.0.0.1:3553",
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "server_id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "0 维护 1 流畅 2 火爆 3 新服",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ServerListResp": {
+            "type": "object",
+            "properties": {
+                "servers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ServerItem"
+                    }
+                }
+            }
+        }
+    }
+}

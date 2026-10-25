@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="go build server-cluster" type="CompoundRunConfigurationType">
+    <toRun name="go build server-cluster/gate/gate" type="GoApplicationRunConfiguration" />
+    <toRun name="go build server-cluster/mesh/admin" type="GoApplicationRunConfiguration" />
+    <toRun name="go build server-cluster/mesh/login" type="GoApplicationRunConfiguration" />
+    <toRun name="go build server-cluster/node/battle" type="GoApplicationRunConfiguration" />
+    <toRun name="go build server-cluster/node/game" type="GoApplicationRunConfiguration" />
+    <toRun name="go build server-cluster/node/social" type="GoApplicationRunConfiguration" />
+    <method v="2" />
+  </configuration>
+</component>

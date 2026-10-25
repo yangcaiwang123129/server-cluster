@@ -1,0 +1,309 @@
+/*
+ * Design tokens -- the single source of truth for colour, radius and elevation.
+ *
+ * Everything downstream reads from here: Element Plus through its own CSS
+ * variables (bridged at the bottom of this file), Tailwind through @theme in
+ * tailwind.css, and application styles directly.
+ *
+ * Two rules keep this maintainable:
+ *
+ * 1. Only the base colours are literal values. Every tint and shade is derived
+ *    with color-mix, so changing --ga-brand recolours the entire application --
+ *    buttons, links, focus rings, active menu items, the lot.
+ *
+ * 2. Light and dark differ only in the token values at the top. The derivation
+ *    rules are written once and pick up the right values automatically, because
+ *    --ga-mix-toward flips from white to black under .dark.
+ *
+ * Requires color-mix(), which needs Chrome 111+ / Safari 16.4+. Tailwind v4
+ * already sets that floor, so this adds no new constraint.
+ */
+
+:root {
+  /* ── Brand ────────────────────────────────────────────────────────
+   * Change this one value to retheme the application.
+   *
+   * Ant Design's colorPrimary, verified against antd 6.6.1's computed design
+   * tokens rather than copied from a blog post. The palette below follows the
+   * rest of that system too, because this is a framework people build admin
+   * panels on
+   * and the least surprising thing it can look like is the one every Chinese
+   * admin panel already looks like. It is also what index.html's first-paint
+   * loader has always used, so the two finally agree.
+   */
+  --ga-brand: #1677ff;
+
+  /* Direction tints are mixed toward. Flipped under .dark so the single set of
+   * derivation rules below works for both themes. */
+  --ga-mix-toward: #ffffff;
+
+  /* ── Semantic colours ─────────────────────────────────────────
+   * antd 6's success / warning / error seed tokens. Brighter than the Tailwind ramp
+   * they replace, which is the point: a status column is read at a glance and
+   * these separate at small sizes. */
+  --ga-success: #52c41a;
+  --ga-warning: #faad14;
+  --ga-danger:  #ff4d4f;
+  --ga-info:    #8c8c8c;
+
+  /* ── Neutrals ──────────────────────────────────────────────────
+   * antd 6's neutral ramp, which is achromatic: text is black at four
+   * opacities, surfaces are true greys. These used to carry a slight brand tint
+   * so they would "read as chosen"; next to a blue accent that tint is what
+   * made the greys look faintly green instead.
+   */
+  --ga-bg-body:      #f5f5f5;  /* colorBgLayout */
+  --ga-bg-container: #ffffff;  /* colorBgContainer */
+  --ga-bg-elevated:  #ffffff;  /* colorBgElevated */
+  --ga-bg-subtle:    #fafafa;  /* table headers, striped rows */
+  --ga-bg-hover:     rgba(0, 0, 0, 0.04);  /* colorFillTertiary */
+
+  --ga-text-1:        rgba(0, 0, 0, 0.88);
+  --ga-text-2:        rgba(0, 0, 0, 0.65);
+  --ga-text-3:        rgba(0, 0, 0, 0.45);
+  --ga-text-disabled: rgba(0, 0, 0, 0.25);
+  --ga-text-inverse:  #ffffff;
+
+  --ga-border:       #d9d9d9;  /* colorBorder */
+  --ga-border-light: #f0f0f0;  /* colorBorderSecondary */
+
+  /* ── Sidebar ───────────────────────────────────────────────────
+   * Two sets, chosen by the themeStyle setting. The light one is the default
+   * (src/settings.js) and is what Ant Design Pro does: the navigation is a
+   * white plane like the content, separated by a hairline rather than by
+   * inversion, so the page reads as one surface instead of two.
+   *
+   * The dark set stays for deployments that prefer it, and is now navy rather
+   * than the teal it was -- it has to sit under the same blue accent.
+   */
+  --ga-sidebar-bg:        #001529;
+  --ga-sidebar-bg-sub:    #000c17;
+  --ga-sidebar-hover:     #0a2540;
+  --ga-sidebar-text:      rgba(255, 255, 255, 0.65);
+  --ga-sidebar-text-active: #ffffff;
+  --ga-sidebar-title:     #ffffff;
+
+  --ga-sidebar-light-bg:    #ffffff;
+  --ga-sidebar-light-hover: rgba(0, 0, 0, 0.04);
+  --ga-sidebar-light-title: rgba(0, 0, 0, 0.88);
+
+  /* ── Metrics ───────────────────────────────────────────────────
+   * The page header runs across both columns: the navbar on the right and the
+   * sidebar's logo block on the left. They are two elements in two files, and
+   * the seam under them only reads as one line if they are the same height --
+   * which they were not (64px against 50px, so the two rules sat 14px apart).
+   * One number, referenced by both, makes that structural rather than a
+   * coincidence anyone can undo by editing one file.
+   *
+   * The sidebar's scroll area subtracts it too, so the menu still starts right
+   * below the logo. */
+  --ga-header-h: 50px;
+
+  /* ── Shape ─────────────────────────────────────────────────────── */
+  --ga-radius-sm: 4px;
+  --ga-radius:    6px;
+  --ga-radius-lg: 8px;
+
+  /* ── Elevation ─────────────────────────────────────────────────
+   * Deliberately shallow. Admin surfaces are dense; heavy shadows on every
+   * card turn a table page into a relief map.
+   */
+  --ga-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --ga-shadow:    0 1px 2px rgba(0, 0, 0, 0.03), 0 2px 8px rgba(0, 0, 0, 0.04);
+  --ga-shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.dark {
+  /* antd 6's darkAlgorithm output: the same hues, pulled down so they do not
+   * glare on a black ground. */
+  --ga-brand: #1668dc;
+  --ga-mix-toward: #000000;
+
+  --ga-success: #49aa19;
+  --ga-warning: #d89614;
+  --ga-danger:  #dc4446;
+  --ga-info:    #8c8c8c;
+
+  /* Light mode separates the sidebar by inverting it; dark mode cannot, so the
+   * separation has to come from value. These five surfaces climb monotonically
+   * in relative luminance, and the sidebar sits BELOW the page rather than above
+   * it: it is chrome, so it recedes and leaves the content card the brightest
+   * plane. Keep any new surface on the ladder. */
+  /* antd's colorBgLayout is #000000 here. The ladder above needs room *below*
+   * the page for the rail, and pure black leaves none, so this stops one step
+   * short. The only value on this list that is deliberately not antd's. */
+  --ga-bg-body:      #0a0a0a;
+  --ga-bg-container: #141414;  /* colorBgContainer */
+  --ga-bg-elevated:  #1f1f1f;  /* colorBgElevated */
+  /* Lighter than the container here, darker than it in light mode: both mean
+   * "one step off the surface". Also feeds el-fill-color, where a hover in dark
+   * has to lift rather than sink. */
+  --ga-bg-subtle:    #1a1a1a;
+  --ga-bg-hover:     rgba(255, 255, 255, 0.08);
+
+  --ga-text-1:        rgba(255, 255, 255, 0.85);
+  --ga-text-2:        rgba(255, 255, 255, 0.65);
+  --ga-text-3:        rgba(255, 255, 255, 0.45);
+  --ga-text-disabled: rgba(255, 255, 255, 0.25);
+  --ga-text-inverse:  #0a0a0a;
+
+  --ga-border:       #424242;  /* colorBorder */
+  --ga-border-light: #303030;  /* colorBorderSecondary */
+
+  --ga-sidebar-bg:        #000c17;
+  --ga-sidebar-bg-sub:    #000710;
+  --ga-sidebar-hover:     #0a2540;
+  --ga-sidebar-text:      rgba(255, 255, 255, 0.65);
+  --ga-sidebar-text-active: #ffffff;
+  --ga-sidebar-title:     #ffffff;
+
+  --ga-sidebar-light-bg:    #141414;
+  --ga-sidebar-light-hover: rgba(255, 255, 255, 0.08);
+  --ga-sidebar-light-title: rgba(255, 255, 255, 0.85);
+
+  --ga-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.32);
+  --ga-shadow:    0 1px 2px rgba(0, 0, 0, 0.32), 0 2px 8px rgba(0, 0, 0, 0.28);
+  --ga-shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.48);
+}
+
+/*
+ * ── Sidebar rail ───────────────────────────────────────────────────
+ *
+ * The rail comes in two surfaces, chosen by the themeStyle setting, and both
+ * exist in either colour scheme -- a light rail under the dark scheme is a dark
+ * grey plane, not a white one. Rather than have every rule in styles/sidebar.scss
+ * ask which is active, the layout puts `rail-light` or `rail-dark` on the
+ * container and those rules read these variables.
+ *
+ * That indirection is the point. sidebar.scss used to name --ga-sidebar-* (the
+ * dark set) directly, with !important, so switching themeStyle turned the
+ * container white and left the menu inside it dark -- white text on a white
+ * rail. One name per role, resolved here, is what makes both settings render.
+ */
+.rail-dark {
+  --rail-bg:          var(--ga-sidebar-bg);
+  --rail-bg-sub:      var(--ga-sidebar-bg-sub);
+  --rail-hover:       var(--ga-sidebar-hover);
+  --rail-text:        var(--ga-sidebar-text);
+  --rail-text-active: var(--ga-sidebar-text-active);
+  --rail-title:       var(--ga-sidebar-title);
+  --rail-active-bg:   var(--ga-brand);
+  --rail-active-text: #ffffff;
+  --rail-border:      transparent;
+  --rail-shadow:      2px 0 6px rgba(0, 21, 41, 0.35);
+}
+
+.rail-light {
+  --rail-bg:          var(--ga-sidebar-light-bg);
+  --rail-bg-sub:      var(--ga-sidebar-light-bg);
+  --rail-hover:       var(--ga-sidebar-light-hover);
+  --rail-text:        var(--ga-text-2);
+  --rail-text-active: var(--ga-text-1);
+  --rail-title:       var(--ga-sidebar-light-title);
+  /* Ant Design's controlItemBgActive: the selected row is a tint of the accent,
+   * not a fill of it, so the label stays readable and the rail stays quiet. */
+  --rail-active-bg:   color-mix(in oklab, var(--ga-brand), var(--ga-bg-container) 90%);
+  --rail-active-text: var(--ga-brand);
+  --rail-border:      var(--ga-border-light);
+  /* A hairline does the separating; a drop shadow under a white rail on a
+   * near-white page is a smudge, not an edge. */
+  --rail-shadow:      none;
+}
+
+/*
+ * ── Element Plus bridge ────────────────────────────────────────────
+ *
+ * Element Plus is themed entirely through CSS variables, so pointing its
+ * variables at the tokens above replaces what used to be 105 `!important`
+ * overrides of its internal class names.
+ *
+ * The tint scale mirrors Element Plus's own generation rules (mix the base
+ * colour with the background at 30/50/70/80/90%), which is why both themes can
+ * share one set of rules: --ga-mix-toward supplies the right direction.
+ *
+ * The selector is `:root, :root.dark` rather than plain `:root` on purpose:
+ * element-plus/theme-chalk/dark/css-vars.css scopes its overrides to `html.dark`
+ * (specificity 0,1,1), which would outrank a bare `:root` (0,1,0). `:root.dark`
+ * scores 0,2,0 and wins, so the tokens stay authoritative in both themes.
+ */
+:root,
+:root.dark {
+  --el-color-primary:         var(--ga-brand);
+  --el-color-primary-light-3: color-mix(in oklab, var(--ga-brand), var(--ga-mix-toward) 30%);
+  --el-color-primary-light-5: color-mix(in oklab, var(--ga-brand), var(--ga-mix-toward) 50%);
+  --el-color-primary-light-7: color-mix(in oklab, var(--ga-brand), var(--ga-mix-toward) 70%);
+  --el-color-primary-light-8: color-mix(in oklab, var(--ga-brand), var(--ga-mix-toward) 80%);
+  --el-color-primary-light-9: color-mix(in oklab, var(--ga-brand), var(--ga-mix-toward) 90%);
+  --el-color-primary-dark-2:  color-mix(in oklab, var(--ga-brand), #000 20%);
+
+  --el-color-success:         var(--ga-success);
+  --el-color-success-light-3: color-mix(in oklab, var(--ga-success), var(--ga-mix-toward) 30%);
+  --el-color-success-light-5: color-mix(in oklab, var(--ga-success), var(--ga-mix-toward) 50%);
+  --el-color-success-light-7: color-mix(in oklab, var(--ga-success), var(--ga-mix-toward) 70%);
+  --el-color-success-light-8: color-mix(in oklab, var(--ga-success), var(--ga-mix-toward) 80%);
+  --el-color-success-light-9: color-mix(in oklab, var(--ga-success), var(--ga-mix-toward) 90%);
+  --el-color-success-dark-2:  color-mix(in oklab, var(--ga-success), #000 20%);
+
+  --el-color-warning:         var(--ga-warning);
+  --el-color-warning-light-3: color-mix(in oklab, var(--ga-warning), var(--ga-mix-toward) 30%);
+  --el-color-warning-light-5: color-mix(in oklab, var(--ga-warning), var(--ga-mix-toward) 50%);
+  --el-color-warning-light-7: color-mix(in oklab, var(--ga-warning), var(--ga-mix-toward) 70%);
+  --el-color-warning-light-8: color-mix(in oklab, var(--ga-warning), var(--ga-mix-toward) 80%);
+  --el-color-warning-light-9: color-mix(in oklab, var(--ga-warning), var(--ga-mix-toward) 90%);
+  --el-color-warning-dark-2:  color-mix(in oklab, var(--ga-warning), #000 20%);
+
+  --el-color-danger:          var(--ga-danger);
+  --el-color-danger-light-3:  color-mix(in oklab, var(--ga-danger), var(--ga-mix-toward) 30%);
+  --el-color-danger-light-5:  color-mix(in oklab, var(--ga-danger), var(--ga-mix-toward) 50%);
+  --el-color-danger-light-7:  color-mix(in oklab, var(--ga-danger), var(--ga-mix-toward) 70%);
+  --el-color-danger-light-8:  color-mix(in oklab, var(--ga-danger), var(--ga-mix-toward) 80%);
+  --el-color-danger-light-9:  color-mix(in oklab, var(--ga-danger), var(--ga-mix-toward) 90%);
+  --el-color-danger-dark-2:   color-mix(in oklab, var(--ga-danger), #000 20%);
+
+  --el-color-error:           var(--ga-danger);
+  --el-color-error-light-3:   var(--el-color-danger-light-3);
+  --el-color-error-light-5:   var(--el-color-danger-light-5);
+  --el-color-error-light-7:   var(--el-color-danger-light-7);
+  --el-color-error-light-8:   var(--el-color-danger-light-8);
+  --el-color-error-light-9:   var(--el-color-danger-light-9);
+
+  --el-color-info:            var(--ga-info);
+  --el-color-info-light-3:    color-mix(in oklab, var(--ga-info), var(--ga-mix-toward) 30%);
+  --el-color-info-light-5:    color-mix(in oklab, var(--ga-info), var(--ga-mix-toward) 50%);
+  --el-color-info-light-7:    color-mix(in oklab, var(--ga-info), var(--ga-mix-toward) 70%);
+  --el-color-info-light-8:    color-mix(in oklab, var(--ga-info), var(--ga-mix-toward) 80%);
+  --el-color-info-light-9:    color-mix(in oklab, var(--ga-info), var(--ga-mix-toward) 90%);
+  --el-color-info-dark-2:     color-mix(in oklab, var(--ga-info), #000 20%);
+
+  /* Surfaces */
+  --el-bg-color:              var(--ga-bg-container);
+  --el-bg-color-page:         var(--ga-bg-body);
+  --el-bg-color-overlay:      var(--ga-bg-elevated);
+  --el-fill-color:            var(--ga-bg-subtle);
+  --el-fill-color-light:      var(--ga-bg-subtle);
+  --el-fill-color-lighter:    var(--ga-bg-subtle);
+  --el-fill-color-blank:      var(--ga-bg-container);
+
+  /* Text */
+  --el-text-color-primary:     var(--ga-text-1);
+  --el-text-color-regular:     var(--ga-text-2);
+  --el-text-color-secondary:   var(--ga-text-3);
+  --el-text-color-placeholder: var(--ga-text-3);
+  --el-text-color-disabled:    var(--ga-text-disabled);
+
+  /* Borders */
+  --el-border-color:         var(--ga-border);
+  --el-border-color-light:   var(--ga-border-light);
+  --el-border-color-lighter: var(--ga-border-light);
+  --el-border-color-extra-light: var(--ga-border-light);
+
+  /* Shape */
+  --el-border-radius-base:  var(--ga-radius);
+  --el-border-radius-small: var(--ga-radius-sm);
+
+  /* Elevation */
+  --el-box-shadow:       var(--ga-shadow);
+  --el-box-shadow-light: var(--ga-shadow-sm);
+  --el-box-shadow-lighter: var(--ga-shadow-sm);
+  --el-box-shadow-dark:  var(--ga-shadow-lg);
+}

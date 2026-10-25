@@ -1,0 +1,21 @@
+// ══════════════════════════════════════════════════════════════════
+//  Brand colour as a literal value, for the JavaScript that needs one.
+//
+//  Theming itself lives in styles/tokens.css and reaches Element Plus through
+//  CSS variables; this file no longer sets any. It exists only because a few
+//  places need a real colour string rather than a `var(...)` reference:
+//
+//    - the settings store seeds `theme` from it, which the settings drawer
+//      offers as the reset target
+//    - TagsView calls `theme.colorRgb()` to build a translucent hover fill,
+//      which needs actual hex digits to parse
+//
+//  KEEP IN SYNC with --ga-brand in styles/tokens.css. The duplication is
+//  deliberate and contained: everything else derives from the token.
+// ══════════════════════════════════════════════════════════════════
+
+$--el-color-primary: #0d7d9e;
+
+:export {
+  theme: $--el-color-primary;
+}

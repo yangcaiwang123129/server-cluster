@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1001,
+    "name": "Medkit",
+    "type": 2,
+    "price": 50,
+    "desc": "Restores 100 HP"
+  },
+  {
+    "id": 1002,
+    "name": "ArmorPlate",
+    "type": 3,
+    "price": 80,
+    "desc": "Reduces damage taken"
+  },
+  {
+    "id": 1003,
+    "name": "AmmoCrate",
+    "type": 2,
+    "price": 30,
+    "desc": "Refills all weapon ammo"
+  },
+  {
+    "id": 1004,
+    "name": "ScrapMetal",
+    "type": 3,
+    "price": 10,
+    "desc": "Common crafting material"
+  }
+]

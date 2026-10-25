@@ -1,0 +1,38 @@
+[
+  {
+    "id": 2001,
+    "name": "Zombie",
+    "hp": 100,
+    "speed": 60,
+    "damage": 10,
+    "score": 10,
+    "drop_item_id": 1001
+  },
+  {
+    "id": 2002,
+    "name": "Runner",
+    "hp": 60,
+    "speed": 120,
+    "damage": 8,
+    "score": 15,
+    "drop_item_id": 0
+  },
+  {
+    "id": 2003,
+    "name": "Tank",
+    "hp": 800,
+    "speed": 40,
+    "damage": 30,
+    "score": 100,
+    "drop_item_id": 1004
+  },
+  {
+    "id": 2004,
+    "name": "Spitter",
+    "hp": 120,
+    "speed": 60,
+    "damage": 15,
+    "score": 25,
+    "drop_item_id": 1002
+  }
+]

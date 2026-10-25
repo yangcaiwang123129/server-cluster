@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "name": "M1911",
+    "type": 1,
+    "damage": 25,
+    "fire_rate": 4,
+    "magazine": 7,
+    "reload": 1.5,
+    "range": 300,
+    "bullet_id": 1001,
+    "price": 500
+  },
+  {
+    "id": 2,
+    "name": "AK47",
+    "type": 2,
+    "damage": 35,
+    "fire_rate": 10,
+    "magazine": 30,
+    "reload": 2.5,
+    "range": 600,
+    "bullet_id": 1002,
+    "price": 1500
+  },
+  {
+    "id": 3,
+    "name": "M870",
+    "type": 3,
+    "damage": 15,
+    "fire_rate": 1.5,
+    "magazine": 6,
+    "reload": 3,
+    "range": 200,
+    "bullet_id": 1002,
+    "price": 800
+  },
+  {
+    "id": 4,
+    "name": "AWP",
+    "type": 4,
+    "damage": 150,
+    "fire_rate": 0.8,
+    "magazine": 5,
+    "reload": 3.5,
+    "range": 1200,
+    "bullet_id": 1003,
+    "price": 3000
+  }
+]

@@ -1,0 +1,109 @@
+# 玩家逻辑服（node 集群）配置
+# due 自动加载 ./etc/etc.toml；键首段固定为 etc。
+
+# 进程号
+pid = "./run/game.pid"
+# 开发模式。支持模式：debug、test、release
+mode = "debug"
+# 统一时区设置
+timezone = "Local"
+
+[cluster.node]
+    # 实例ID，节点集群中唯一。不填写默认自动生成
+    id = "game-1"
+    # 实例名称
+    name = "game"
+    # 内建RPC服务器监听地址。不填写默认随机监听
+    addr = ":0"
+    # 编解码器。可选：json | proto
+    codec = "json"
+    # RPC调用超时时间
+    timeout = "3s"
+
+[log]
+    file = "./log/due.log"
+    level = "info"
+    format = "text"
+    stdout = true
+    timeFormat = "2006/01/02 15:04:05.000000"
+    stackLevel = "error"
+    fileMaxAge = "7d"
+    fileMaxSize = 100
+    fileCutRule = "day"
+    callerFullPath = true
+    classifiedStorage = false
+
+[packet]
+    byteOrder = "big"
+    routeBytes = 4
+    seqBytes = 4
+    bufferBytes = 5000
+
+[registry.etcd]
+    addrs = ["127.0.0.1:2379"]
+    namespace = "services"
+
+[locate.redis]
+    addrs = ["127.0.0.1:6379"]
+    db = 0
+    username = ""
+    password = ""
+    maxRetries = 3
+    prefix = "due:locate"
+
+[task]
+    # 任务池大小(goroutine)
+    size = 1000
+    # 是否非阻塞
+    nonblocking = true
+    # 是否禁用清除
+    disablePurge = true
+
+[transport.grpc.client]
+    certFile = ""
+    serverName = ""
+
+# MySQL 命名实例（多数据源；dsn 为空则跳过该实例，模板可无 MySQL 启动）
+[[db.mysql.instances]]
+    name = "default"
+    dsn = ""
+    max_open_conns = 50
+    max_idle_conns = 20
+
+# Redis 命名实例（不同业务可按 name 使用不同 db 号）
+[[redis.instances]]
+    name = "default"
+    addrs = ["127.0.0.1:6379"]
+    username = ""
+    password = ""
+    db = 0
+
+# JWT 配置：须与 login 服 secret 一致
+[jwt]
+    secret = "mygame-secret"
+    valid_duration = 7200 # 秒
+
+# 玩家数据存储层（etc.store 段缺席则跳过初始化，模板可无存储启动）。
+# 字段说明见 internal/store/config.go；wal_id 每实例唯一且需持久化，崩溃恢复依赖它定位水位。
+# [store]
+#     wal_id = "game-1"
+#     wal_dir = "./data/wal"
+#     wal_sync_mode = "batch"
+#     wal_batch_sync_interval = "200ms"
+#     [store.local]
+#         mode = "simple"
+#         max_size = 100000
+#         ttl = "60s"
+#     [store.redis]
+#         enabled = false
+#         instance = "default"   # 引用 [[redis.instances]] 中的命名实例
+#         key_prefix = "player"
+#         ttl = "15m"
+#         ttl_jitter = "300s"
+#         invalidate_channel = "player:invalidate"
+#     [store.mysql]
+#         flush_batch_size = 200
+#         flush_interval = "200ms"
+#         shards = ["default"]   # 引用 [[db.mysql.instances]] 中的命名实例
+#     [store.version]
+#         driver = "redis_incr"

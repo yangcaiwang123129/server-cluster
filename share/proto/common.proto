@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "server-cluster/share/pb";
+
+// 系统预留协议（1xxx 号段）。
+
+// 心跳请求（路由 1001）
+message HeartbeatReq {
+  int64 client_time = 1; // 客户端毫秒时间戳，服务端原样回显
+}
+
+// 心跳响应
+message HeartbeatResp {
+  int64 client_time = 1; // 回显客户端时间戳
+  int64 server_time = 2; // 服务器毫秒时间戳
+}
+
+// 系统通知（路由 1901，服务端主动推送）
+message ServerNotify {
+  string kind = 1;    // 通知类型：kick（踢下线）/ maintain（维护）/ broadcast（公告）
+  string content = 2; // 通知内容
+}
+
+// 客户端路由号枚举（唯一定义点，客户端同用）。
+// 号段约定：1xxx 系统预留；2xxx game；3xxx battle；4xxx social；x9xx 为各号段推送位。
+// Go 侧便捷常量由 share/consts/route.go 从本枚举派生；新增路由改此处后执行 deploy\scripts\gen-proto.bat。
+// 枚举值以 ROUTE_CODE_ 前缀避免跨枚举冲突（所有 proto 同属 package pb）。
+enum RouteCode {
+  ROUTE_CODE_UNSPECIFIED = 0;
+  ROUTE_CODE_HEARTBEAT = 1001;            // 心跳
+  ROUTE_CODE_ENTER_GAME = 2001;           // 进入游戏
+  ROUTE_CODE_GET_PLAYER_INFO = 2002;      // 拉取玩家信息
+  ROUTE_CODE_START_BATTLE = 3001;         // 开始战斗
+  ROUTE_CODE_SEND_CHAT = 4001;            // 发送聊天
+  ROUTE_CODE_SERVER_NOTIFY = 1901;        // 系统通知（推送）
+  ROUTE_CODE_BATTLE_RESULT_NOTIFY = 3901; // 战斗结算（推送）
+  ROUTE_CODE_CHAT_MESSAGE_NOTIFY = 4901;  // 聊天消息（推送）
+}
+
+// 业务错误码枚举（唯一定义点，客户端同用）。
+// 号段约定：0 成功；1xxx 通用；2xxx 账号；3xxx 玩家。
+// Go 侧由 share/consts/code.go 从本枚举派生 codes.NewCode。
+enum ErrCode {
+  ERR_CODE_OK = 0; // 成功
+  ERR_CODE_INTERNAL_ERROR = 1000;
+  ERR_CODE_INVALID_PARAMS = 1001;
+  ERR_CODE_UNAUTHORIZED = 1002;
+  ERR_CODE_ACCOUNT_NOT_FOUND = 2000;
+  ERR_CODE_ACCOUNT_EXISTS = 2001;
+  ERR_CODE_PASSWORD_WRONG = 2002;
+  ERR_CODE_TOKEN_INVALID = 2003;
+  ERR_CODE_PLAYER_NOT_FOUND = 3000;
+}

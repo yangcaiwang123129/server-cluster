@@ -1,0 +1,128 @@
+import { defineConfig } from '@playwright/test';
+
+// A developer HTTP proxy in the environment would otherwise intercept requests
+// to the local dev server and answer them with 503.
+process.env.NO_PROXY = [process.env.NO_PROXY, 'localhost,127.0.0.1,::1']
+  .filter(Boolean)
+  .join(',');
+process.env.no_proxy = process.env.NO_PROXY;
+
+/**
+ * Two suites with very different requirements:
+ *
+ * - `mocked` stubs the API at the network layer, so it runs unattended from a
+ *   clean checkout and is the one that guards refactors. This is what
+ *   `pnpm e2e` runs.
+ * - `live` is the pre-existing pair of specs that drive a real Go backend on
+ *   :8001 with a hand-obtained JWT. They stay useful for verifying against a
+ *   real environment, but cannot gate anything automatically, so they are
+ *   opt-in via `pnpm e2e:live`.
+ *
+ * Both need the dev server, which is started automatically below.
+ */
+export default defineConfig({
+  testDir: './tests/e2e',
+  timeout: 30_000,
+
+  /**
+   * Retries in CI, none locally.
+   *
+   * The suite fails in one shape that has nothing to do with the code under
+   * test: a single `page.goto` stalls until it eats the whole 30s test timeout,
+   * on a different test each time, only on the runner. Everything before and
+   * after it finishes in three or four seconds. Observed twice in three runs,
+   * once in app-shell and once in sys-user; the same commits pass locally and
+   * pass on a rerun.
+   *
+   * It was not diagnosed. What was ruled out: the dev server logs no
+   * re-optimisation, no reload and no transform error across a full local run;
+   * the suite takes 8-9 minutes whether it goes red or green, so it is not
+   * running out of some overall budget.
+   *
+   * With `retries: 0` one such stall turns the whole gate red, and a gate that
+   * goes red for reasons nobody can explain is one people learn to re-run
+   * without reading. Retrying does not hide it: Playwright reports a test that
+   * needed a retry as `flaky`, so the rate stays visible in the run output. If
+   * that rate climbs, something real is behind it and this comment is the
+   * starting point.
+   *
+   * Locally the number stays 0, so a test that fails on a developer's machine
+   * fails immediately rather than after three tries.
+   */
+  retries: process.env.CI ? 2 : 0,
+
+  /**
+   * One worker. Every spec drives the same Vite dev server, so the runs compete
+   * for it rather than for CPU -- and measured, the whole suite takes 1.5m
+   * serially against 1.2m in parallel. That 18 seconds buys nothing and costs
+   * determinism: under parallel load a dialog in sys-user.spec intermittently
+   * failed to open, reproducibly in the full suite and never on its own or
+   * serially. A flaky suite is worse than a slightly slower one.
+   */
+  workers: 1,
+  reporter: [['list']],
+
+  use: {
+    baseURL: 'http://localhost:9527',
+    // Pinned, not inherited. The app picks its language from
+    // navigator.language when the visitor has not chosen one, and Playwright's
+    // browsers report en-US by default -- so without this the whole suite runs
+    // against the English interface and every Chinese assertion in it fails.
+    // The suite describes what a Chinese-speaking user sees; the language
+    // detection itself is covered in i18n.spec.ts, which overrides this.
+    locale: 'zh-CN',
+    headless: true,
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+    trace: 'retain-on-failure'
+  },
+
+  webServer: {
+    // `--host` makes vite bind every interface. Without it vite listens on
+    // [::1] only, while the readiness probe resolves localhost to 127.0.0.1,
+    // so startup detection times out.
+    command: 'pnpm dev --host',
+    url: 'http://127.0.0.1:9527',
+    /**
+     * Never reuse whatever happens to be on the port.
+     *
+     * This used to reuse a server the developer already had running, which
+     * saves a few seconds and costs a whole run: with two git worktrees open,
+     * the second suite silently drove the first one's dev server, reported
+     * results for the wrong tree, and collapsed with ERR_CONNECTION_REFUSED
+     * the moment that server restarted. A run that quietly measures the wrong
+     * code is worse than one that takes five seconds longer to start, and the
+     * failure gives no hint of what happened.
+     *
+     * PW_REUSE_SERVER=1 opts back in for anyone who wants the old behaviour
+     * and knows nothing else is on 9527.
+     */
+    reuseExistingServer: process.env.PW_REUSE_SERVER === '1',
+    /*
+     * Cleared, not inherited, for the same reason `locale` above is pinned.
+     * VUE_APP_LOCALE fixes the whole build to one language and removes the
+     * switcher, so a shell that still has it exported from a build -- or a CI
+     * job that sets it for one -- would run the suite against an interface
+     * i18n.spec.ts is not describing, and fail a couple of dozen tests with
+     * nothing on screen to explain why.
+     */
+    env: { VUE_APP_LOCALE: '' },
+    timeout: 120_000
+  },
+
+  projects: [
+    {
+      name: 'mocked',
+      // visual-baseline is a screenshot capture tool, not an assertion suite
+      testMatch: /mocked\/(?!visual-baseline).*\.spec\.ts$/
+    },
+    {
+      name: 'shots',
+      testMatch: /mocked\/visual-baseline\.spec\.ts$/
+    },
+    {
+      name: 'live',
+      testMatch: /e2e\/[^/]*\.spec\.ts$/
+    }
+  ]
+});

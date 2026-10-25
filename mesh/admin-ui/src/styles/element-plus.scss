@@ -1,0 +1,166 @@
+// ══════════════════════════════════════════════════════════════════
+//  Element Plus adjustments
+//
+//  Colour, radius and elevation are NOT set here -- they come from the design
+//  tokens in styles/tokens.css, which drive Element Plus through its own CSS
+//  variables. This file is only for the handful of structural tweaks that no
+//  variable expresses: density, type scale and a few borders element-plus
+//  draws that this layout does not want.
+//
+//  No `!important` anywhere. This stylesheet loads after element-plus's own,
+//  so equal specificity already wins. If a rule seems to need !important, the
+//  usual cause is that it belongs in tokens.css as a variable instead.
+//
+//  It replaced 18KB of hard-coded colour overrides carrying 105 !important
+//  declarations; keep it that way.
+// ══════════════════════════════════════════════════════════════════
+
+// ── Card ──────────────────────────────────────────────────────────
+.el-card {
+  border-color: var(--ga-border-light);
+
+  // No hover elevation: on a table page every card lifting under the cursor
+  // turns the whole screen into a relief map.
+  .el-card__header {
+    padding: 14px 16px;
+    min-height: unset;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .el-card__body {
+    padding: 16px;
+  }
+}
+
+// ── Button ────────────────────────────────────────────────────────
+.el-button {
+  font-weight: 400;
+
+  &--small {
+    padding: 5px 11px;
+  }
+}
+
+// ── Table ─────────────────────────────────────────────────────────
+.el-table {
+  border-radius: var(--ga-radius-lg);
+  overflow: hidden;
+  font-size: 13px;
+  border: 1px solid var(--ga-border-light);
+
+  // element-plus paints a 1px pseudo-element border on the wrapper; the card
+  // around the table already provides that edge.
+  &::before,
+  &::after {
+    display: none;
+  }
+
+  th.el-table__cell {
+    font-weight: 600;
+    font-size: 13px;
+    padding: 10px 0;
+    background: var(--ga-bg-subtle);
+    border-bottom: 1px solid var(--ga-border-light);
+
+    // The nowrap has to sit on .cell, not on the th: .cell is what holds the
+    // label and the sort caret, and it does not inherit through. With it on the
+    // th only, a narrow sortable column wrapped its caret under its label and
+    // made the whole header row double height.
+    .cell {
+      white-space: nowrap;
+    }
+  }
+
+  td.el-table__cell {
+    padding: 9px 0;
+    font-size: 13px;
+  }
+
+  .el-table__row:last-child td.el-table__cell {
+    border-bottom: none;
+  }
+}
+
+// ── Form ──────────────────────────────────────────────────────────
+.el-form-item {
+  margin-bottom: 18px;
+
+  &__label {
+    font-weight: 500;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  &__error {
+    font-size: 12px;
+    padding-top: 2px;
+  }
+}
+
+// ── Dialog ────────────────────────────────────────────────────────
+.el-dialog {
+  overflow: hidden;
+
+  &:not(.is-fullscreen) {
+    margin-top: 6vh;
+  }
+
+  .el-dialog__header {
+    padding: 15px 20px;
+    margin-right: 0;
+    border-bottom: 1px solid var(--ga-border-light);
+  }
+
+  .el-dialog__body {
+    padding: 20px;
+  }
+
+  .el-dialog__footer {
+    padding: 12px 20px;
+    border-top: 1px solid var(--ga-border-light);
+  }
+}
+
+// ── Pagination ────────────────────────────────────────────────────
+.el-pagination {
+  font-weight: 400;
+}
+
+// ── Misc layout fixes ─────────────────────────────────────────────
+// Date range inputs collapse without an explicit inline-flex
+.el-range-editor.el-input__inner {
+  display: inline-flex;
+}
+
+.el-range-separator {
+  box-sizing: content-box;
+}
+
+.el-tree-node__content > .el-checkbox {
+  margin-right: 8px;
+}
+
+// Utility classes used by table columns across several pages
+.cell .el-tag {
+  margin-right: 0;
+}
+
+.small-padding .cell {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.fixed-width .el-button--mini {
+  padding: 7px 10px;
+  width: 60px;
+}
+
+.status-col .cell {
+  padding: 0 10px;
+  text-align: center;
+}
+
+.delete-popconfirm {
+  margin-left: 10px;
+}

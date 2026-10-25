@@ -1,0 +1,33 @@
+// ══════════════════════════════════════════════════════════════════
+//  SCSS variables for the sidebar.
+//
+//  These are thin aliases over the design tokens in styles/tokens.css rather
+//  than literal colours, so the sidebar follows the light/dark switch like
+//  everything else. `background-color: $menuBg` compiles to
+//  `background-color: var(--ga-sidebar-bg)`.
+//
+//  They stay SCSS variables because variables.module.scss re-exports them for
+//  components that build inline styles in JavaScript; a `var(...)` string works
+//  perfectly well there, the browser resolves it at paint time.
+//
+//  Add new colours to tokens.css, not here.
+// ══════════════════════════════════════════════════════════════════
+
+// Dark sidebar (the default themeStyle)
+$menuBg: var(--ga-sidebar-bg);
+$menuHover: var(--ga-sidebar-hover);
+$subMenuBg: var(--ga-sidebar-bg-sub);
+$subMenuHover: var(--ga-sidebar-hover);
+$sidebarTitle: var(--ga-sidebar-title);
+
+// Light sidebar
+$menuLightBg: var(--ga-sidebar-light-bg);
+$menuLightHover: var(--ga-sidebar-light-hover);
+$sidebarLightTitle: var(--ga-sidebar-light-title);
+
+// Active states, shared by both
+$menuActiveText: var(--ga-brand);
+$subMenuActiveText: var(--el-color-primary-light-3);
+
+// Layout metric, not a colour -- a real value, since it is used in calc()
+$sideBarWidth: 210px;

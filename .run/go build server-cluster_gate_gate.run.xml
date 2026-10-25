@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="go build server-cluster/gate/gate" type="GoApplicationRunConfiguration" factoryName="Go Application" nameIsGenerated="true">
+    <module name="server-cluster" />
+    <working_directory value="$PROJECT_DIR$/gate/gate" />
+    <kind value="PACKAGE" />
+    <package value="server-cluster/gate/gate" />
+    <directory value="$PROJECT_DIR$" />
+    <auto_managed_config_id value="$PROJECT_DIR$/gate/gate" />
+    <method v="2" />
+  </configuration>
+</component>

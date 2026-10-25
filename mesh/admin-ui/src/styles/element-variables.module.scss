@@ -1,0 +1,9 @@
+// 供 JS 通过 import 读取主题色，理由同 variables.module.scss
+//
+// 此处用 @import 而非 @use：$--el-* 变量名以 - 开头，在 Sass 模块系统中
+// 属于私有成员，@use ... as * 无法访问，只能通过无模块隔离的 @import 引入。
+@import 'element-variables';
+
+:export {
+  theme: $--el-color-primary;
+}

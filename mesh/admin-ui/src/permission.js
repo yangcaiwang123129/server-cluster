@@ -1,0 +1,129 @@
+import router from './router'
+import { useUserStore } from '@/stores/user'
+import { usePermissionStore } from '@/stores/permission'
+import { ElMessage } from 'element-plus'
+import NProgress from 'nprogress' // progress bar
+import 'nprogress/nprogress.css' // progress bar style
+import { getToken } from '@/utils/auth' // get token from cookie
+import getPageTitle from '@/utils/get-page-title'
+import { trackPageView } from '@/utils/analytics'
+import { watch } from 'vue'
+import { i18n } from '@/lang'
+import { routeTitle } from '@/lang/backend'
+
+NProgress.configure({ showSpinner: false }) // NProgress Configuration
+
+/**
+ * The browser tab follows the language too.
+ *
+ * The guard below only runs on navigation, so switching language would leave
+ * the tab showing the title from whichever language was current when the page
+ * was opened -- the one piece of the interface a user keeps seeing while
+ * working in another tab.
+ */
+watch(() => i18n.global.locale.value, () => {
+  document.title = getPageTitle(routeTitle(router.currentRoute.value))
+})
+
+const whiteList = ['/login'] // no redirect whitelist
+
+router.beforeEach(async(to, from, next) => {
+  // start progress bar
+  NProgress.start()
+
+  // set page title
+  document.title = getPageTitle(routeTitle(to))
+
+  // determine whether the user has logged in
+  const hasToken = getToken()
+
+  if (hasToken) {
+    if (to.path === '/login') {
+      // if is logged in, redirect to the home page
+      next({ path: '/' })
+      NProgress.done()
+    } else {
+      // determine whether the user has obtained his permission roles through getInfo
+      const hasRoles = useUserStore().roles.length > 0
+      if (hasRoles) {
+        next()
+      } else {
+        try {
+          // get user info; roles land on the store rather than being threaded
+          // through, since generateRoutes reads the menu the backend already
+          // filtered for this user
+          await useUserStore().getInfo()
+
+          // generate accessible routes map based on roles
+          const accessRoutes = await usePermissionStore().generateRoutes()
+
+          // dynamically add accessible routes
+          accessRoutes.forEach(route => router.addRoute(route))
+
+          // hack method to ensure that addRoutes is complete
+          // set the replace: true, so the navigation will not leave a history record
+          next({ ...to, replace: true })
+        } catch(error) {
+          // Drop the token before redirecting, or this loops.
+          //
+          // The guard reads a token as "signed in", so leaving it in place after
+          // the lookup failed sends /login straight back to / (see the branch
+          // above), which arrives with no roles, which calls getInfo again. On a
+          // backend returning 502 that is an unbounded stream of requests at
+          // whatever speed the server can refuse them -- and unlike a 401, a 502
+          // carries nothing that would end the session on its own.
+          //
+          // The line was here as a commented-out Vuex dispatch, left behind when
+          // the store was ported.
+          useUserStore().resetToken()
+
+          // Only report what nobody has reported yet. An HTTP failure here has
+          // already produced a toast from the response interceptor; the one
+          // failure this catch knows about on its own is a client-side throw,
+          // such as getInfo's "roles must be a non-null array".
+          //
+          // The message is read off `.message` rather than passed as the error:
+          // ElMessage treats a non-string argument as its options bag, and an
+          // Error's `message` is non-enumerable, so the toast came out empty.
+          if (!error?.reported) {
+            ElMessage.error(error?.message || i18n.global.t('common.unknownError'))
+          }
+          next(`/login?redirect=${to.path}`)
+          NProgress.done()
+        }
+      }
+    }
+  } else {
+    /* has no token*/
+
+    if (whiteList.indexOf(to.path) !== -1) {
+      // in the free login whitelist, go directly
+      next()
+    } else {
+      // other pages that do not have permission to access are redirected to the login page.
+      next(`/login?redirect=${to.path}`)
+      NProgress.done()
+    }
+  }
+})
+
+router.afterEach((to, from, failure) => {
+  // finish progress bar
+  NProgress.done()
+
+  // Report the page view here rather than from the tag, which cannot see a
+  // route change. afterEach runs for every navigation the guard above lets
+  // through, the login page included, and runs after the guard has set
+  // document.title -- so the title reported is the one the user is looking at.
+  //
+  // A failed navigation is not a page view. The case that reaches this is
+  // clicking the sidebar entry for the page you are already on: vue-router
+  // answers that with a duplicated-navigation failure, nothing on screen
+  // changes, and counting it would put whichever page a user sits on at the top
+  // of every report. (A redirect from the guard above does not reach here at
+  // all -- vue-router runs afterEach for the navigation that wins, not for the
+  // one it replaced.)
+  if (!failure) {
+    trackPageView(to.fullPath)
+  }
+})
