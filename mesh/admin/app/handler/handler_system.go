@@ -86,14 +86,14 @@ func handleApiDelete(ctx http.Context) error {
 }
 
 // registerAuth 认证模块路由。
-func registerAuth(public, secure http.Router) {
-	public.Get("/captcha", handleCaptcha)
-	public.Post("/login", handleLogin)
-	public.Get("/app-config", handleAppConfig)
+func registerAuth(router http.Router) {
+	router.Get("/captcha", handleCaptcha)
+	router.Post("/login", handleLogin)
+	router.Get("/app-config", handleAppConfig)
 
-	secure.Post("/logout", handleLogout)
-	secure.Get("/getinfo", handleGetInfo)
-	secure.Get("/menurole", handleMenuRole)
+	router.Post("/logout", handleLogout)
+	router.Get("/getinfo", handleGetInfo)
+	router.Get("/menurole", handleMenuRole)
 }
 
 // handleCaptcha 返回图形验证码。

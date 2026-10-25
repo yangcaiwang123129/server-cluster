@@ -7,18 +7,25 @@ import (
 	"server-cluster/mesh/admin/app/globol"
 )
 
-// Register 注册管理后台路由：公开组与鉴权组各建一次，模块各自挂载。
+// Register 注册管理后台路由。
+//
+// Fiber 的 Group 中间件按前缀对所有 /api/v1 请求生效，因此只建一个组：
+// 公开端点（验证码/登录/品牌配置）由中间件按路径放行。
 func Register(router http.Router) {
-	public := router.Group("/api/v1", globol.RequireDB)
-	// 审计最先进入、最后退出，因此能拿到鉴权后的用户。
-	secure := router.Group("/api/v1", globol.RequireDB, globol.OperaLogMiddleware, globol.AuthMiddleware, globol.PermissionMiddleware)
+	group := router.Group("/api/v1",
+		globol.CORSMiddleware(),
+		globol.RequireDB,
+		globol.OperaLogMiddleware,
+		globol.AuthMiddleware,
+		globol.PermissionMiddleware,
+	)
 
-	registerAuth(public, secure)
-	registerUser(secure)
-	registerRole(secure)
-	registerMenu(secure)
-	registerApi(secure)
-	registerDict(secure)
-	registerConfig(secure)
-	registerLog(secure)
+	registerAuth(group)
+	registerUser(group)
+	registerRole(group)
+	registerMenu(group)
+	registerApi(group)
+	registerDict(group)
+	registerConfig(group)
+	registerLog(group)
 }

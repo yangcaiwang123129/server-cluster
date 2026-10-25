@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/cors"
 
 	"server-cluster/mesh/admin/app/logic"
 	"server-cluster/mesh/admin/app/repo"
@@ -30,6 +31,28 @@ var alwaysAllowed = map[string]struct{}{
 	"/api/v1/user/pwd/set":     {},
 }
 
+// publicPaths 无需登录即可访问的端点。
+var publicPaths = map[string]struct{}{
+	"/api/v1/captcha":    {},
+	"/api/v1/login":      {},
+	"/api/v1/app-config": {},
+}
+
+// isPublic 判断端点是否公开。
+func isPublic(path string) bool {
+	_, ok := publicPaths[path]
+	return ok
+}
+
+// CORSMiddleware 跨域放行（前端与后端分离部署/不同端口，预检请求在这里直接应答）。
+func CORSMiddleware() fiber.Handler {
+	return cors.New(cors.Config{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders: []string{"Origin", "Content-Type", "Accept", "Authorization"},
+	})
+}
+
 // RequireDB 数据库未配置时直接拒绝请求，避免空句柄穿透到业务层。
 func RequireDB(c fiber.Ctx) error {
 	if !repo.R().Available() {
@@ -40,6 +63,9 @@ func RequireDB(c fiber.Ctx) error {
 
 // AuthMiddleware 校验 Authorization Bearer 令牌并注入当前用户/角色。
 func AuthMiddleware(c fiber.Ctx) error {
+	if isPublic(c.Path()) {
+		return c.Next()
+	}
 	token := strings.TrimSpace(strings.TrimPrefix(c.Get("Authorization"), "Bearer "))
 	if token == "" {
 		return errs.FailCtx(c, 401, "未登录或登录已过期")
@@ -55,14 +81,17 @@ func AuthMiddleware(c fiber.Ctx) error {
 
 // PermissionMiddleware 按 casbin_rule 校验接口访问权限；roleKey=admin 全放行。
 func PermissionMiddleware(c fiber.Ctx) error {
+	if isPublic(c.Path()) {
+		return c.Next()
+	}
 	role, ok := c.Locals(localRole).(*model.SysRole)
 	if !ok {
 		return errs.FailCtx(c, 401, "未登录或登录已过期")
 	}
-	if _, skip := alwaysAllowed[c.Route().Path]; skip {
+	if _, skip := alwaysAllowed[c.Path()]; skip {
 		return c.Next()
 	}
-	allowed, err := logic.Allow(role.RoleKey, c.Route().Path, c.Method())
+	allowed, err := logic.Allow(role.RoleKey, c.Path(), c.Method())
 	if err != nil {
 		return errs.FailCtx(c, 500, "权限校验失败")
 	}
@@ -74,16 +103,16 @@ func PermissionMiddleware(c fiber.Ctx) error {
 
 // OperaLogMiddleware 记录写操作审计；挂在校验之后执行，因此能拿到当前用户。
 func OperaLogMiddleware(c fiber.Ctx) error {
-	if c.Method() == fiber.MethodGet {
+	if c.Method() == fiber.MethodGet || isPublic(c.Path()) {
 		return c.Next()
 	}
 	start := time.Now()
 	nextErr := c.Next()
 	entry := &model.SysOperaLog{
-		Title:         businessTitle(c.Method()) + " " + c.Route().Path,
+		Title:         businessTitle(c.Method()) + " " + c.Path(),
 		BusinessType:  businessType(c.Method()),
 		RequestMethod: c.Method(),
-		OperUrl:       c.Route().Path,
+		OperUrl:       c.Path(),
 		OperIp:        c.IP(),
 		Status:        "2",
 		OperTime:      start,

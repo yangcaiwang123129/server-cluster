@@ -11,6 +11,7 @@ require (
 	github.com/dobyte/due/transport/grpc/v2 v2.0.0-20261022054807-a7ed9b4593a2
 	github.com/dobyte/due/v2 v2.6.4
 	github.com/dobyte/jwt v0.1.4
+	github.com/gofiber/fiber/v3 v3.5.0
 	github.com/redis/go-redis/v9 v9.22.0
 	github.com/swaggo/swag v1.16.6
 	github.com/tidwall/wal v1.2.1
@@ -57,7 +58,6 @@ require (
 	github.com/go-openapi/validate v0.26.3 // indirect
 	github.com/go-sql-driver/mysql v1.8.1 // indirect
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
-	github.com/gofiber/fiber/v3 v3.5.0 // indirect
 	github.com/gofiber/schema v1.8.3 // indirect
 	github.com/gofiber/utils/v2 v2.4.1 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.0 // indirect

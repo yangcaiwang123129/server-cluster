@@ -1,15 +1,9 @@
-# 管理后台服（mesh 集群）配置
+# 管理后台服（纯 HTTP 服务）配置
 # due 自动加载 ./etc/etc.toml；键首段固定为 etc。
 
 pid = "./run/admin.pid"
 mode = "debug"
 timezone = "Local"
-
-[cluster.mesh]
-    id = "admin-1"
-    name = "admin"
-    codec = "json"
-    timeout = "3s"
 
 [log]
     file = "./log/due.log"
@@ -31,35 +25,19 @@ timezone = "Local"
     bufferBytes = 5000
     heartbeatTime = true
 
-[registry.etcd]
-    addrs = ["127.0.0.1:2379"]
-    namespace = "services"
-
-[locate.redis]
-    addrs = ["127.0.0.1:6379"]
-    db = 0
-    username = ""
-    password = ""
-    maxRetries = 3
-    prefix = "due:locate"
-
 [task]
     size = 1000
     nonblocking = true
     disablePurge = true
 
-[transport.grpc.client]
-    certFile = ""
-    serverName = ""
-
 # HTTP 监听地址（due http 组件）
 [http]
     addr = ":8081"
 
-# MySQL 命名实例（多数据源；dsn 为空则跳过该实例，模板可无 MySQL 启动）
+# MySQL 命名实例（多数据源；dsn 为空则跳过该实例）
 [[db.mysql.instances]]
     name = "default"
-    dsn = ""
+    dsn = "root:root123@tcp(127.0.0.1:3306)/account?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s&readTimeout=10s&writeTimeout=10s"
     max_open_conns = 50
     max_idle_conns = 20
 
@@ -68,10 +46,10 @@ timezone = "Local"
     name = "default"
     addrs = ["127.0.0.1:6379"]
     username = ""
-    password = ""
+    password = "root123"
     db = 0
 
-# JWT 配置：与 login 服保持一致，后台令牌独立签发
+# JWT 配置：与 login 服 secret 保持一致
 [jwt]
     secret = "mygame-secret"
     valid_duration = 7200 # 秒

@@ -2,6 +2,7 @@ package repo
 
 import (
 	"sort"
+	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -90,15 +91,44 @@ func (r *Repo) DeleteApis(ids []int) error {
 }
 
 // Allow 判断角色是否可访问指定接口；角色标识为 admin 时全部放行。
+// 规则中的路径是路由模板（如 /api/v1/sys-user/:userId），需按模板匹配实际请求路径。
 func (r *Repo) Allow(roleKey, path, method string) (bool, error) {
 	if roleKey == AdminRoleKey {
 		return true, nil
 	}
-	var count int64
-	err := r.db.Model(&model.CasbinRule{}).
-		Where("ptype = ? AND v0 = ? AND v1 = ? AND v2 = ?", "p", roleKey, path, method).
-		Count(&count).Error
-	return count > 0, err
+	var rules []model.CasbinRule
+	if err := r.db.
+		Where("ptype = ? AND v0 = ? AND v2 = ?", "p", roleKey, method).
+		Find(&rules).Error; err != nil {
+		return false, err
+	}
+	for _, rule := range rules {
+		if matchRulePath(rule.V1, path) {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+// matchRulePath 按路由模板匹配实际请求路径，模板中的 :param / * 段匹配任意单段。
+func matchRulePath(pattern, path string) bool {
+	if pattern == path {
+		return true
+	}
+	ps := strings.Split(strings.Trim(pattern, "/"), "/")
+	as := strings.Split(strings.Trim(path, "/"), "/")
+	if len(ps) != len(as) {
+		return false
+	}
+	for i, p := range ps {
+		if strings.HasPrefix(p, ":") || strings.HasPrefix(p, "*") {
+			continue
+		}
+		if p != as[i] {
+			return false
+		}
+	}
+	return true
 }
 
 // CreateLoginLog 写入登录审计。
