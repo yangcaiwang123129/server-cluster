@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-rem Generate swagger docs: mesh\login\app\web\docs
+rem Generate swagger docs: mesh\login\app\handler -> mesh\login\docs
 rem Usage: deploy\scripts\gen-swagger.bat (works from any directory)
 
 cd /d "%~dp0..\.."
@@ -14,7 +14,7 @@ if errorlevel 1 (
 )
 
 echo [gen-swagger] swag init -g mesh/login/main.go
-swag init -g mesh/login/main.go -d ./ --parseInternal -o mesh/login/app/web/docs
+swag init -g mesh/login/main.go -d ./ --parseInternal -o mesh/login/docs
 if errorlevel 1 (
     echo [gen-swagger] generation failed
     pause

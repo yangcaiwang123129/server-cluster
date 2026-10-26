@@ -2,7 +2,6 @@
 package app
 
 import (
-	"context"
 	"server-cluster/share/singleton"
 
 	"github.com/dobyte/due/v2/cluster/node"
@@ -11,13 +10,12 @@ import (
 	"server-cluster/node/social/app/logic"
 	"server-cluster/node/social/app/repo"
 	"server-cluster/node/social/app/service"
-	"server-cluster/share/pb"
 )
 
 // SocialLogic 社交模块业务接口。
 type SocialLogic interface {
 	// SendChat 发送聊天
-	SendChat(ctx context.Context, uid int64, req *pb.SendChatReq) (*pb.SendChatResp, error)
+	//SendChat(ctx context.Context, uid int64, req *pb.SendChatReq) (*pb.SendChatResp, error)
 }
 
 var socialLogic = singleton.NewContainer[SocialLogic]("SocialLogic")

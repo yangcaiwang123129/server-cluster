@@ -8,12 +8,14 @@
 package main
 
 import (
+	"server-cluster/mesh/login/app/handler"
+
 	"github.com/dobyte/due/component/http/v2"
 	"github.com/dobyte/due/v2"
 
-	"github.com/dobyte/due/v2/log"
 	"server-cluster/mesh/login/app"
-	"server-cluster/mesh/login/app/web"
+
+	"github.com/dobyte/due/v2/log"
 )
 
 func main() {
@@ -26,7 +28,7 @@ func main() {
 		log.Fatalf("login init failed: %v", err)
 	}
 	// 注册 HTTP 路由
-	web.Register(httpComponent.Proxy().Router())
+	handler.Register(httpComponent.Proxy().Router())
 	// 添加组件到容器
 	container.Add(httpComponent)
 	// 启动容器

@@ -48,8 +48,6 @@ func ParseToken(token string) (int64, error) {
 type PlayerLogic interface {
 	// EnterGame 进入游戏
 	EnterGame(ctx context.Context, uid int64, req *pb.EnterGameReq) (*pb.EnterGameResp, error)
-	// GetPlayerInfo 拉取玩家信息
-	GetPlayerInfo(ctx context.Context, uid int64) (*pb.GetPlayerInfoResp, error)
 }
 
 var playerLogic = singleton.NewContainer[PlayerLogic]("PlayerLogic")

@@ -50,19 +50,11 @@ func (l *playerLogic) EnterGame(ctx context.Context, uid int64, req *pb.EnterGam
 	}, nil
 }
 
-func (l *playerLogic) GetPlayerInfo(ctx context.Context, uid int64) (*pb.GetPlayerInfoResp, error) {
-	player, err := repo.Player().Load(ctx, uid)
-	if err != nil {
-		return nil, err
-	}
-	return &pb.GetPlayerInfoResp{Base: toPlayerBase(player)}, nil
-}
-
 // toPlayerBase 持久化模型 → wire 基础信息。
 func toPlayerBase(m *model.PlayerModel) *pb.PlayerBase {
 	return &pb.PlayerBase{
-		Uid:   m.UID,
-		Name:  m.Name,
-		Level: m.Level,
+		PlayerId: m.UID,
+		Name:     m.Name,
+		Level:    m.Level,
 	}
 }

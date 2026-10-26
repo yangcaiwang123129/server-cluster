@@ -8,12 +8,12 @@ timezone = "Local"
 [cluster.node]
     id = "social-1"
     name = "social"
-    addr = ":0"
-    codec = "json"
+    addr = "127.0.0.1:"
+    codec = "proto"
     timeout = "3s"
 
 [log]
-    file = "./log/due.log"
+    file = "./log/admin.log"
     level = "info"
     format = "text"
     stdout = true

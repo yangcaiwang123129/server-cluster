@@ -36,7 +36,7 @@ if "!PROTOS!"=="" (
 )
 
 echo [gen-proto] protoc!PROTOS!
-protoc --go_out=. --go_opt=module=server-cluster --go-grpc_out=. --go-grpc_opt=module=server-cluster!PROTOS!
+protoc -I share/proto --go_out=. --go_opt=module=server-cluster --go-grpc_out=. --go-grpc_opt=module=server-cluster!PROTOS!
 if errorlevel 1 (
     echo [gen-proto] generation failed
     pause

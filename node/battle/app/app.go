@@ -2,7 +2,6 @@
 package app
 
 import (
-	"context"
 	"server-cluster/share/singleton"
 
 	"github.com/dobyte/due/v2/cluster/node"
@@ -11,13 +10,12 @@ import (
 	"server-cluster/node/battle/app/logic"
 	"server-cluster/node/battle/app/repo"
 	"server-cluster/node/battle/app/service"
-	"server-cluster/share/pb"
 )
 
 // BattleLogic 战斗模块业务接口。
 type BattleLogic interface {
 	// StartBattle 开始战斗
-	StartBattle(ctx context.Context, uid int64, req *pb.StartBattleReq) (*pb.StartBattleResp, error)
+	//StartBattle(ctx context.Context, uid int64, req *pb.StartBattleReq) (*pb.StartBattleResp, error)
 }
 
 var battleLogic = singleton.NewContainer[BattleLogic]("BattleLogic")

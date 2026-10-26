@@ -3,21 +3,3 @@ syntax = "proto3";
 package pb;
 
 option go_package = "server-cluster/share/pb";
-
-// 开始战斗请求（路由 3001）
-message StartBattleReq {
-  string mode = 1; // pvp / pve
-}
-
-// 开始战斗响应
-message StartBattleResp {
-  int64 battle_id = 1;
-  string status = 2; // matched / created
-}
-
-// 战斗结算通知（路由 3901，服务端主动推送）
-message BattleResultNotify {
-  int64 battle_id = 1;
-  string result = 2;         // win / lose / draw
-  repeated int64 loot_ids = 3; // 结算道具ID列表
-}

@@ -71,7 +71,3 @@ func (l *accountLogic) Login(ctx context.Context, req *dto.LoginReq) (*dto.Login
 		Servers:   l.servers,
 	}, nil
 }
-
-func (l *accountLogic) ServerList(ctx context.Context) (*dto.ServerListResp, error) {
-	return &dto.ServerListResp{Servers: l.servers}, nil
-}

@@ -80,25 +80,6 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "/api/v1/account/servers": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "account"
-                ],
-                "summary": "拉取区服列表",
-                "responses": {
-                    "200": {
-                        "description": "响应包在 {code, message, data} 中",
-                        "schema": {
-                            "$ref": "#/definitions/dto.ServerListResp"
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
@@ -183,17 +164,6 @@ const docTemplate = `{
                 "status": {
                     "description": "0 维护 1 流畅 2 火爆 3 新服",
                     "type": "integer"
-                }
-            }
-        },
-        "dto.ServerListResp": {
-            "type": "object",
-            "properties": {
-                "servers": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.ServerItem"
-                    }
                 }
             }
         }

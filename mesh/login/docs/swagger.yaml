@@ -57,13 +57,6 @@ definitions:
         description: 0 维护 1 流畅 2 火爆 3 新服
         type: integer
     type: object
-  dto.ServerListResp:
-    properties:
-      servers:
-        items:
-          $ref: '#/definitions/dto.ServerItem'
-        type: array
-    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -111,18 +104,6 @@ paths:
           schema:
             $ref: '#/definitions/dto.RegisterResp'
       summary: 注册账号
-      tags:
-      - account
-  /api/v1/account/servers:
-    get:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 响应包在 {code, message, data} 中
-          schema:
-            $ref: '#/definitions/dto.ServerListResp'
-      summary: 拉取区服列表
       tags:
       - account
 swagger: "2.0"

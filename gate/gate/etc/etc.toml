@@ -14,13 +14,13 @@ timezone = "Local"
     # 实例名称
     name = "gate"
     # 内建RPC服务器监听地址。不填写默认随机监听
-    addr = ":0"
+    addr = "127.0.0.1:"
     # RPC调用超时时间
     timeout = "3s"
 
 [log]
     # 日志输出文件
-    file = "./log/due.log"
+    file = "./log/gate.log"
     # 日志输出级别，可选：debug | info | warn | error | fatal | panic
     level = "info"
     # 日志输出格式，可选：text | json
@@ -82,7 +82,7 @@ timezone = "Local"
 
 [network.ws.server]
     # 服务器监听地址（WebSocket 客户端接入地址）
-    addr = ":3553"
+    addr = "127.0.0.1:9000"
     # 客户端连接路径
     path = "/"
     # 服务器最大连接数

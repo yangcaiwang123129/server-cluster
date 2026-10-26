@@ -24,8 +24,6 @@ type AccountLogic interface {
 	Register(ctx context.Context, req *dto.RegisterReq) (*dto.RegisterResp, error)
 	// Login 登录并签发 token
 	Login(ctx context.Context, req *dto.LoginReq) (*dto.LoginResp, error)
-	// ServerList 拉取区服列表
-	ServerList(ctx context.Context) (*dto.ServerListResp, error)
 }
 
 var accountLogic = singleton.NewContainer[AccountLogic]("AccountLogic")

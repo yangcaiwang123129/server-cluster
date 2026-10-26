@@ -5,8 +5,21 @@ pid = "./run/admin.pid"
 mode = "debug"
 timezone = "Local"
 
+[cluster.mesh]
+    # 实例ID，网格集群中唯一。不填写默认自动生成
+    id = "admin-1"
+    # 实例名称
+    name = "admin"
+    # 编解码器。可选：json | proto
+    codec = "json"
+    # RPC调用超时时间
+    timeout = "3s"
+
+# HTTP 监听地址（due http 组件）
+[http]
+    addr = "127.0.0.1:8081"
 [log]
-    file = "./log/due.log"
+    file = "./log/admin.log"
     level = "info"
     format = "text"
     stdout = true
@@ -29,10 +42,6 @@ timezone = "Local"
     size = 1000
     nonblocking = true
     disablePurge = true
-
-# HTTP 监听地址（due http 组件）
-[http]
-    addr = ":8081"
 
 # MySQL 命名实例（多数据源；dsn 为空则跳过该实例）
 [[db.mysql.instances]]

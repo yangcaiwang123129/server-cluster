@@ -7,27 +7,22 @@ import (
 	"server-cluster/share/pb"
 
 	"github.com/dobyte/due/v2/cluster/node"
-	"github.com/dobyte/due/v2/utils/xtime"
 )
 
 // Register 向 node proxy 注册客户端路由（必须在 Run 之前、node Shut 状态下调用）。
 func Register(proxy *node.Proxy) {
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_HEARTBEAT), handleHeartbeat)
+	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_VERIFY), handleVerify)
 	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_ENTER_GAME), handleEnterGame, node.StatefulRoute)
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_GET_PLAYER_INFO), handleGetPlayerInfo, node.StatefulRoute)
 }
 
 // handleHeartbeat 心跳：回显客户端时间戳并附服务器时间。
-func handleHeartbeat(ctx node.Context) {
-	req := &pb.HeartbeatReq{}
+func handleVerify(ctx node.Context) {
+	req := &pb.VerifyReq{}
 	if err := ctx.Parse(req); err != nil {
 		_ = ctx.Response(err)
 		return
 	}
-	_ = ctx.Response(&pb.HeartbeatResp{
-		ClientTime: req.ClientTime,
-		ServerTime: xtime.Now().UnixMilli(),
-	})
+	_ = ctx.Response(&pb.VerifyResp{})
 }
 
 func handleEnterGame(ctx node.Context) {
@@ -53,15 +48,6 @@ func handleEnterGame(ctx node.Context) {
 		return
 	}
 	resp, err := app.Player().EnterGame(ctx.Context(), uid, req)
-	if err != nil {
-		_ = ctx.Response(err)
-		return
-	}
-	_ = ctx.Response(resp)
-}
-
-func handleGetPlayerInfo(ctx node.Context) {
-	resp, err := app.Player().GetPlayerInfo(ctx.Context(), ctx.UID())
 	if err != nil {
 		_ = ctx.Response(err)
 		return

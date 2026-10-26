@@ -14,9 +14,11 @@ timezone = "Local"
     codec = "json"
     # RPC调用超时时间
     timeout = "3s"
-
+# HTTP 监听地址（due http 组件）
+[http]
+    addr = "127.0.0.1:8080"
 [log]
-    file = "./log/due.log"
+    file = "./log/admin.log"
     level = "info"
     format = "text"
     stdout = true
@@ -56,15 +58,11 @@ timezone = "Local"
     certFile = ""
     serverName = ""
 
-# HTTP 监听地址（due http 组件）
-[http]
-    addr = ":8080"
-
 # Swagger 文档（由 swag 生成，due http 组件自动挂载到 /swagger）
 [http.swagger]
     enable = true
     title = "登录服 API"
-    filePath = "app/web/docs/swagger.json"
+    filePath = "docs/swagger.json"
     basePath = "/swagger"
 
 # MySQL 命名实例（多数据源；dsn 为空则跳过该实例，启动后接口返回内部错误）

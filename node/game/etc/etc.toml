@@ -14,14 +14,14 @@ timezone = "Local"
     # 实例名称
     name = "game"
     # 内建RPC服务器监听地址。不填写默认随机监听
-    addr = ":0"
+    addr = "127.0.0.1:"
     # 编解码器。可选：json | proto
-    codec = "json"
+    codec = "proto"
     # RPC调用超时时间
     timeout = "3s"
 
 [log]
-    file = "./log/due.log"
+    file = "./log/admin.log"
     level = "info"
     format = "text"
     stdout = true
