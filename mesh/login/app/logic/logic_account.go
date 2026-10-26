@@ -4,28 +4,31 @@ package logic
 import (
 	"context"
 	"errors"
-
-	"github.com/dobyte/jwt"
-	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
+	"server-cluster/share/util"
 
 	"server-cluster/mesh/login/app/repo"
 	"server-cluster/share/dto"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
+
+	"github.com/dobyte/due/v2/utils/xtime"
+	"github.com/dobyte/jwt"
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
-type accountLogic struct {
-	servers []dto.ServerItem // 区服列表（装配期加载，运行期只读）
-	jwtInst *jwt.JWT         // token 签发器
+const GateAddr = "127.0.0.1:9000"
+
+type AccountLogic struct {
+	jwtInst *jwt.JWT // token 签发器
 }
 
-// NewAccountLogic 构造账号业务实现；servers 为启动期加载的区服列表。
-func NewAccountLogic(servers []dto.ServerItem, jwtInst *jwt.JWT) *accountLogic {
-	return &accountLogic{servers: servers, jwtInst: jwtInst}
+// NewAccountLogic 构造账号业务实现。
+func NewAccountLogic(jwtInst *jwt.JWT) *AccountLogic {
+	return &AccountLogic{jwtInst: jwtInst}
 }
 
-func (l *accountLogic) Register(ctx context.Context, req *dto.RegisterReq) (*dto.RegisterResp, error) {
+func (l *AccountLogic) Register(ctx context.Context, req *dto.RegisterReq) (*dto.RegisterResp, error) {
 	// 检查用户名是否已存在
 	_, err := repo.Account().FindByUsername(ctx, req.Username)
 	if err == nil {
@@ -40,16 +43,38 @@ func (l *accountLogic) Register(ctx context.Context, req *dto.RegisterReq) (*dto
 		return nil, err
 	}
 	m := &model.AccountModel{
-		Username:     req.Username,
-		PasswordHash: string(hash),
+		ID:        util.SnowflakeNode.Next(),
+		PlayerID:  util.SnowflakeNode.Next(),
+		Username:  req.Username,
+		Password:  string(hash),
+		CreatedAt: xtime.Now().UnixMilli(),
 	}
 	if err := repo.Account().Create(ctx, m); err != nil {
 		return nil, err
 	}
-	return &dto.RegisterResp{UID: m.ID, Username: m.Username}, nil
+	// 注册成功后直接自动登录签发 token
+	token, err := l.jwtInst.GenerateToken(jwt.Payload{"player_id": m.ID})
+	if err != nil {
+		return nil, err
+	}
+	return &dto.RegisterResp{Token: token.Token, GateAddr: GateAddr}, nil
 }
 
-func (l *accountLogic) Login(ctx context.Context, req *dto.LoginReq) (*dto.LoginResp, error) {
+func (l *AccountLogic) Login(ctx context.Context, req *dto.LoginReq) (*dto.LoginResp, error) {
+	switch req.LoginType {
+	case 0: // 账号密码登录
+		return l.loginByUsername(ctx, req)
+	case 1: // 手机号登录
+		return nil, errors.New("该登录方式暂不支持")
+	case 2: // 微信授权登录
+		return nil, errors.New("该登录方式暂不支持")
+	default:
+		return nil, errs.ErrInvalidParams
+	}
+}
+
+// loginByUsername 账号密码登录分支。
+func (l *AccountLogic) loginByUsername(ctx context.Context, req *dto.LoginReq) (*dto.LoginResp, error) {
 	m, err := repo.Account().FindByUsername(ctx, req.Username)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -57,17 +82,12 @@ func (l *accountLogic) Login(ctx context.Context, req *dto.LoginReq) (*dto.Login
 		}
 		return nil, err
 	}
-	if err := bcrypt.CompareHashAndPassword([]byte(m.PasswordHash), []byte(req.Password)); err != nil {
+	if err := bcrypt.CompareHashAndPassword([]byte(m.Password), []byte(req.Password)); err != nil {
 		return nil, errs.ErrPasswordWrong
 	}
-	token, err := l.jwtInst.GenerateToken(jwt.Payload{"uid": m.ID})
+	token, err := l.jwtInst.GenerateToken(jwt.Payload{"playerID": m.ID})
 	if err != nil {
 		return nil, err
 	}
-	return &dto.LoginResp{
-		UID:       m.ID,
-		Token:     token.Token,
-		ExpiredAt: token.ExpiredAt.Unix(),
-		Servers:   l.servers,
-	}, nil
+	return &dto.LoginResp{Token: token.Token, GateAddr: GateAddr}, nil
 }

@@ -1,63 +1,39 @@
-basePath: /api/v1
+basePath: /
 definitions:
   dto.LoginReq:
     properties:
+      loginType:
+        description: 登录类型 0账号登录 1手机号登录 2微信授权登录
+        type: integer
       password:
+        type: string
+      phoneNumber:
         type: string
       username:
         type: string
-    required:
-    - password
-    - username
     type: object
   dto.LoginResp:
     properties:
-      expired_at:
-        type: integer
-      servers:
-        items:
-          $ref: '#/definitions/dto.ServerItem'
-        type: array
+      gateAddr:
+        type: string
       token:
         type: string
-      uid:
-        type: integer
     type: object
   dto.RegisterReq:
     properties:
       password:
-        maxLength: 64
-        minLength: 6
         type: string
       username:
-        maxLength: 32
-        minLength: 3
         type: string
-    required:
-    - password
-    - username
     type: object
   dto.RegisterResp:
     properties:
-      uid:
-        type: integer
-      username:
+      gateAddr:
+        type: string
+      token:
         type: string
     type: object
-  dto.ServerItem:
-    properties:
-      gate_addr:
-        description: WebSocket 接入地址，如 ws://127.0.0.1:3553
-        type: string
-      name:
-        type: string
-      server_id:
-        type: integer
-      status:
-        description: 0 维护 1 流畅 2 火爆 3 新服
-        type: integer
-    type: object
-host: localhost:8080
+host: 188.18.23.72:8080
 info:
   contact: {}
   description: 账号注册、登录与区服列表；token 供 game 服验签进入游戏。

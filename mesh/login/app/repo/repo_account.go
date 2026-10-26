@@ -45,9 +45,9 @@ func (r *accountRepoImpl) FindByUsername(ctx context.Context, username string) (
 	if err != nil {
 		return nil, gorm.ErrInvalidDB
 	}
-	var m model.AccountModel
+	var m *model.AccountModel
 	if err := db.WithContext(ctx).Where("username = ?", username).First(&m).Error; err != nil {
 		return nil, err
 	}
-	return &m, nil
+	return m, nil
 }

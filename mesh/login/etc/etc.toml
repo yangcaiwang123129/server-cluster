@@ -16,7 +16,7 @@ timezone = "Local"
     timeout = "3s"
 # HTTP 监听地址（due http 组件）
 [http]
-    addr = "127.0.0.1:8080"
+    addr = "188.18.23.72:8080"
 [log]
     file = "./log/admin.log"
     level = "info"
@@ -47,7 +47,7 @@ timezone = "Local"
     username = ""
     password = "root123"
     maxRetries = 3
-    prefix = "due:locate"
+    prefix = "cluster:locate"
 
 [task]
     size = 1000
@@ -82,12 +82,5 @@ timezone = "Local"
 
 # JWT 配置：game 服验签需使用相同 secret
 [jwt]
-    secret = "mygame-secret"
+    secret = "cluster-secret"
     valid_duration = 7200 # 秒
-
-# 区服列表：登录与区服接口共同返回
-[[login.servers]]
-    server_id = 1
-    name = "一区·王者"
-    gate_addr = "ws://127.0.0.1:3553"
-    status = 1 # 0 维护 1 流畅 2 火爆 3 新服

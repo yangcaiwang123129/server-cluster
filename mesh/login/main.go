@@ -3,8 +3,8 @@
 // @title 登录服 API
 // @version 1.0
 // @description 账号注册、登录与区服列表；token 供 game 服验签进入游戏。
-// @host localhost:8080
-// @BasePath /api/v1
+// @host 188.18.23.72:8080
+// @BasePath /
 package main
 
 import (

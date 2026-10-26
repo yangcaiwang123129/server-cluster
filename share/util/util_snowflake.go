@@ -24,12 +24,15 @@ type Node struct {
 	seq  int64
 }
 
+var SnowflakeNode *Node
+
 // NewNode 构造节点；nodeID ∈ [0, 1023]。
-func NewNode(nodeID int64) (*Node, error) {
+func NewNode(nodeID int64) error {
 	if nodeID < 0 || nodeID > maxNodeID {
-		return nil, fmt.Errorf("idgen: node id %d out of range [0, %d]", nodeID, maxNodeID)
+		return fmt.Errorf("idgen: node id %d out of range [0, %d]", nodeID, maxNodeID)
 	}
-	return &Node{node: nodeID}, nil
+	SnowflakeNode = &Node{node: nodeID}
+	return nil
 }
 
 // Next 生成下一个 ID。

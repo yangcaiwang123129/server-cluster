@@ -86,9 +86,9 @@ func (e LootItem) Value() (driver.Value, error) { return ValueJSON(e) }
 
 // PlayerModel 玩家表模型（gorm）。
 type PlayerModel struct {
-	UID   int64  `gorm:"primaryKey;column:uid" json:"uid"`
-	Name  string `gorm:"column:name"        json:"name"`
-	Level int32  `gorm:"column:level"       json:"level"`
+	PlayerID int64  `gorm:"primaryKey;column:player_id" json:"playerID"`
+	Name     string `gorm:"column:name"        json:"name"`
+	Level    int32  `gorm:"column:level"       json:"level"`
 }
 
 // TableName 指定表名。

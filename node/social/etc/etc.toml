@@ -41,7 +41,7 @@ timezone = "Local"
     username = ""
     password = "root123"
     maxRetries = 3
-    prefix = "due:locate"
+    prefix = "cluster:locate"
 
 [task]
     size = 1000

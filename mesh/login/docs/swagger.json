@@ -6,8 +6,8 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:8080",
-    "basePath": "/api/v1",
+    "host": "188.18.23.72:8080",
+    "basePath": "/",
     "paths": {
         "/api/v1/account/login": {
             "post": {
@@ -79,12 +79,15 @@
     "definitions": {
         "dto.LoginReq": {
             "type": "object",
-            "required": [
-                "password",
-                "username"
-            ],
             "properties": {
+                "loginType": {
+                    "description": "登录类型 0账号登录 1手机号登录 2微信授权登录",
+                    "type": "integer"
+                },
                 "password": {
+                    "type": "string"
+                },
+                "phoneNumber": {
                     "type": "string"
                 },
                 "username": {
@@ -95,69 +98,33 @@
         "dto.LoginResp": {
             "type": "object",
             "properties": {
-                "expired_at": {
-                    "type": "integer"
-                },
-                "servers": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.ServerItem"
-                    }
+                "gateAddr": {
+                    "type": "string"
                 },
                 "token": {
                     "type": "string"
-                },
-                "uid": {
-                    "type": "integer"
                 }
             }
         },
         "dto.RegisterReq": {
             "type": "object",
-            "required": [
-                "password",
-                "username"
-            ],
             "properties": {
                 "password": {
-                    "type": "string",
-                    "maxLength": 64,
-                    "minLength": 6
+                    "type": "string"
                 },
                 "username": {
-                    "type": "string",
-                    "maxLength": 32,
-                    "minLength": 3
+                    "type": "string"
                 }
             }
         },
         "dto.RegisterResp": {
             "type": "object",
             "properties": {
-                "uid": {
-                    "type": "integer"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.ServerItem": {
-            "type": "object",
-            "properties": {
-                "gate_addr": {
-                    "description": "WebSocket 接入地址，如 ws://127.0.0.1:3553",
+                "gateAddr": {
                     "type": "string"
                 },
-                "name": {
+                "token": {
                     "type": "string"
-                },
-                "server_id": {
-                    "type": "integer"
-                },
-                "status": {
-                    "description": "0 维护 1 流畅 2 火爆 3 新服",
-                    "type": "integer"
                 }
             }
         }

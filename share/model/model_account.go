@@ -7,12 +7,13 @@ import (
 	"server-cluster/share/enum"
 )
 
-// AccountModel 账号表模型（gorm）。
+// AccountModel 账号表模型。
 type AccountModel struct {
-	ID           int64  `gorm:"primaryKey;column:id"                 json:"id"`
-	Username     string `gorm:"column:username;size:64;uniqueIndex:uk_username" json:"username"`
-	PasswordHash string `gorm:"column:password_hash"                 json:"-"`
-	CreatedAt    int64  `gorm:"column:created_at"                    json:"created_at"`
+	ID        int64  `gorm:"primaryKey;column:id" json:"id"`
+	PlayerID  int64  `gorm:"column:playerId" json:"player_id"`
+	Username  string `gorm:"column:username;size:64" json:"username"`
+	Password  string `gorm:"column:password;size:256" json:"password"`
+	CreatedAt int64  `gorm:"column:created_at" json:"created_at"`
 }
 
 // TableName 指定表名。

@@ -4,6 +4,7 @@ package app
 import (
 	"context"
 	"server-cluster/share/singleton"
+	"server-cluster/share/util"
 
 	"github.com/dobyte/due/v2/etc"
 	"github.com/dobyte/jwt"
@@ -17,6 +18,9 @@ import (
 )
 
 var jwtInst *jwt.JWT
+
+// gateAddr 登录成功后返回给客户端的网关接入地址；装配期从 etc.login.gate_addr 读取。
+var gateAddr string
 
 // AccountLogic 账号模块业务接口。
 type AccountLogic interface {
@@ -36,6 +40,9 @@ func Account() AccountLogic { return accountLogic.MustGet() }
 
 // Init 初始化应用：svc（DB/Redis）→ 自动建表 → jwt → wire（注册实现）。
 func Init() error {
+	if err := util.NewNode(1); err != nil {
+		return err
+	}
 	if err := svc.Init(); err != nil {
 		return err
 	}
@@ -69,19 +76,8 @@ func Destroy() {
 // 注意依赖方向：app -> logic/repo，反向只允许依赖接口，避免循环引用。
 func wire() {
 	repo.RegisterAccount(repo.NewAccountRepo())
-	RegisterAccountLogic(logic.NewAccountLogic(loadServers(), jwtInst))
+	RegisterAccountLogic(logic.NewAccountLogic(jwtInst))
 }
 
-// loadServers 装配期从 etc.login.servers 加载区服列表（缺省时回退默认区服，保证客户端可连接）。
-func loadServers() []dto.ServerItem {
-	var servers []dto.ServerItem
-	if err := etc.Get("etc.login.servers").Scan(&servers); err != nil || len(servers) == 0 {
-		return []dto.ServerItem{{
-			ServerID: 1,
-			Name:     "默认区",
-			GateAddr: "ws://127.0.0.1:3553",
-			Status:   1,
-		}}
-	}
-	return servers
-}
+// GateAddr 登录成功后返回给客户端的网关接入地址。
+func GateAddr() string { return gateAddr }

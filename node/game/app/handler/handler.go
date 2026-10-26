@@ -32,22 +32,22 @@ func handleEnterGame(ctx node.Context) {
 		return
 	}
 	// 校验 login 服签发的 JWT
-	uid, err := app.ParseToken(req.Token)
+	playerID, err := app.ParseToken(req.Token)
 	if err != nil {
 		_ = ctx.Response(errs.ErrTokenInvalid)
 		return
 	}
 	// 绑定网关连接与 uid（后续按 uid 推送经此连接下发）
-	if err := ctx.BindGate(uid); err != nil {
+	if err := ctx.BindGate(playerID); err != nil {
 		_ = ctx.Response(err)
 		return
 	}
 	// 绑定当前 game 节点与 uid（用于跨节点路由到玩家所在节点）
-	if err := ctx.BindNode(uid); err != nil {
+	if err := ctx.BindNode(playerID); err != nil {
 		_ = ctx.Response(err)
 		return
 	}
-	resp, err := app.Player().EnterGame(ctx.Context(), uid, req)
+	resp, err := app.Player().EnterGame(ctx.Context(), playerID, req)
 	if err != nil {
 		_ = ctx.Response(err)
 		return

@@ -14,7 +14,7 @@ timezone = "Local"
     # 实例名称
     name = "gate"
     # 内建RPC服务器监听地址。不填写默认随机监听
-    addr = "127.0.0.1:"
+    addr = "188.18.23.72:"
     # RPC调用超时时间
     timeout = "3s"
 
@@ -66,7 +66,7 @@ timezone = "Local"
     # 最大重试次数
     maxRetries = 3
     # key前缀
-    prefix = "due:locate"
+    prefix = "cluster:locate"
 
 [registry.etcd]
     # 服务器地址
@@ -82,7 +82,7 @@ timezone = "Local"
 
 [network.ws.server]
     # 服务器监听地址（WebSocket 客户端接入地址）
-    addr = "127.0.0.1:9000"
+    addr = "188.18.23.72:9000"
     # 客户端连接路径
     path = "/"
     # 服务器最大连接数

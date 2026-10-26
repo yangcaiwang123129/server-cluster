@@ -33,7 +33,7 @@ func ParseToken(token string) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	v, ok := payload["uid"]
+	v, ok := payload["player_id"]
 	if !ok {
 		return 0, fmt.Errorf("missing uid in token")
 	}

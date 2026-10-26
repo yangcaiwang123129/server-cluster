@@ -4,39 +4,28 @@ package dto
 
 // RegisterReq 注册请求。
 type RegisterReq struct {
-	Username string `json:"username" validate:"required,min=3,max=32"`
-	Password string `json:"password" validate:"required,min=6,max=64"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 // RegisterResp 注册响应。
 type RegisterResp struct {
-	UID      int64  `json:"uid"`
-	Username string `json:"username"`
+	Token    string `json:"token"`
+	GateAddr string `json:"gateAddr"`
 }
 
 // LoginReq 登录请求。
 type LoginReq struct {
-	Username string `json:"username" validate:"required"`
-	Password string `json:"password" validate:"required"`
-}
+	LoginType int32 `json:"loginType"` // 登录类型 0账号登录 1手机号登录 2微信授权登录
 
-// ServerItem 区服信息。
-type ServerItem struct {
-	ServerID int32  `json:"server_id"`
-	Name     string `json:"name"`
-	GateAddr string `json:"gate_addr"` // WebSocket 接入地址，如 ws://127.0.0.1:3553
-	Status   int32  `json:"status"`    // 0 维护 1 流畅 2 火爆 3 新服
+	Username string `json:"username"`
+	Password string `json:"password"`
+
+	PhoneNumber string `json:"phoneNumber"`
 }
 
 // LoginResp 登录响应。
 type LoginResp struct {
-	UID       int64        `json:"uid"`
-	Token     string       `json:"token"`
-	ExpiredAt int64        `json:"expired_at"`
-	Servers   []ServerItem `json:"servers"`
-}
-
-// ServerListResp 区服列表响应。
-type ServerListResp struct {
-	Servers []ServerItem `json:"servers"`
+	Token    string `json:"token"`
+	GateAddr string `json:"gateAddr"`
 }
