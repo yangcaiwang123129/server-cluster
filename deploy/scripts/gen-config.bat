@@ -1,68 +1,62 @@
 @echo off
-rem Generate Luban config tables: Go code (go-json) + JSON data.
-rem Output: share/cfg (package cfg) + share/cfg/data/*.json
-rem
-rem Note: Luban cleans outputCodeDir (deletes any file it did not generate),
-rem so hand-written files live in cfg\tpl and are copied back after generation.
-setlocal
+setlocal enabledelayedexpansion
+
+rem Generate config Go structs + JSON data from Excel via Luban.
+rem Usage: deploy\scripts\gen-config.bat (works from any directory)
+
 cd /d "%~dp0..\.."
 
-set "DOTNET=%USERPROFILE%\.dotnet\dotnet.exe"
-set LUBAN_DLL=deploy\tools\Luban\Luban\Luban.dll
+set "LUBAN_DLL=deploy\tools\Luban\Luban\Luban.dll"
+set "CONF=cfg\luban.conf"
+set "CODE_OUT=tmp_luban_code"
+set "DATA_OUT=share\cfg\data"
+set "CFG_DIR=share\cfg"
+set "TPL_DIR=deploy\tools\Luban\templates"
 
-if not exist "%DOTNET%" (
-    echo [ERROR] dotnet not found: %DOTNET%
-    echo         please install .NET 8 SDK first
-    pause
-    exit /b 1
-)
 if not exist "%LUBAN_DLL%" (
-    echo [ERROR] Luban.dll not found: %LUBAN_DLL%
+    echo [gen-config] Luban.dll not found: %LUBAN_DLL%
     pause
     exit /b 1
 )
 
-rem Step 1: code only (code target cleans share/cfg, so it runs first)
-"%DOTNET%" "%LUBAN_DLL%" ^
-    -t server ^
-    -c go-json ^
-    --conf cfg\luban.conf ^
-    -x outputCodeDir=share/cfg ^
-    -x lubanGoModule=server-cluster/share/cfg
+echo [gen-config] generating Go structs...
+dotnet "%LUBAN_DLL%" -t server -c go-json --conf "%CONF%" -x outputCodeDir="%CODE_OUT%" -x lubanGoModule=server-cluster/share/cfg --customTemplateDir "%TPL_DIR%"
 if errorlevel 1 (
-    echo [ERROR] luban code generation failed
+    echo [gen-config] code generation failed
     pause
     exit /b 1
 )
 
-rem Step 2: data only (runs after code cleanup so JSON files survive)
-"%DOTNET%" "%LUBAN_DLL%" ^
-    -t server ^
-    -d json ^
-    --conf cfg\luban.conf ^
-    -x outputDataDir=share/cfg/data
+echo [gen-config] generating JSON data...
+dotnet "%LUBAN_DLL%" -t server -d json --conf "%CONF%" -x outputDataDir="%DATA_OUT%"
 if errorlevel 1 (
-    echo [ERROR] luban data generation failed
+    echo [gen-config] data generation failed
     pause
     exit /b 1
 )
 
-rem Step 3: merge generated files by table -> item.go (Item + TbItem), weapon.go ... + tables.go
-go run ./deploy/tools/cfgmerge share\cfg
-if errorlevel 1 (
-    echo [ERROR] merge generated config files failed
-    pause
-    exit /b 1
+echo [gen-config] copying struct files to %CFG_DIR%...
+for %%f in ("%CODE_OUT%\*.go") do (
+    set "name=%%~nxf"
+    rem skip Tb*.go and Tables.go (only keep bean structs)
+    echo !name! | findstr /b /i "Tb" >nul
+    if errorlevel 1 (
+        if /i not "!name!"=="Tables.go" (
+            copy /y "%%f" "%CFG_DIR%\" >nul
+        )
+    )
 )
 
-rem Step 4: restore hand-written files (loader entry + package doc + smoke test)
-copy /y cfg\tpl\cfg.go.txt share\cfg\cfg.go >nul
-copy /y cfg\tpl\doc.go.txt share\cfg\doc.go >nul
-copy /y cfg\tpl\cfg_smoke_test.go.txt share\cfg\cfg_smoke_test.go >nul
+echo [gen-config] gofmt...
+where gofmt >nul 2>nul
+if not errorlevel 1 (
+    gofmt -w "%CFG_DIR%"
+) else (
+    echo [gen-config] gofmt not found, skipping
+)
 
-rem Step 5: format generated Go code
-gofmt -w share\cfg 2>nul
+echo [gen-config] cleaning up temp dir...
+if exist "%CODE_OUT%" rmdir /s /q "%CODE_OUT%"
 
-echo [OK] config generated: share/cfg (Go code + data/*.json)
+echo [gen-config] done
 pause
-endlocal

@@ -17,11 +17,11 @@ type PlayerCore struct {
 	Version  uint64 `gorm:"column:version"              json:"version"`
 }
 
-func (e *PlayerCore) Marshal() ([]byte, error)    { return json.Marshal(e) }
-func (e *PlayerCore) Unmarshal(data []byte) error { return json.Unmarshal(data, e) }
-func (e *PlayerCore) Scan(src any) error          { return ScanJSON(src, e) }
-func (e PlayerCore) Value() (driver.Value, error) { return ValueJSON(e) }
-func (PlayerCore) TableName() string              { return enum.TablePlayerCore.String() }
+func (this *PlayerCore) Marshal() ([]byte, error)    { return json.Marshal(this) }
+func (this *PlayerCore) Unmarshal(data []byte) error { return json.Unmarshal(data, this) }
+func (this *PlayerCore) Scan(src any) error          { return ScanJSON(src, this) }
+func (this PlayerCore) Value() (driver.Value, error) { return ValueJSON(this) }
+func (PlayerCore) TableName() string                 { return enum.TablePlayerCore.String() }
 
 // CorePatch 核心数据补丁；nil 字段表示不修改，值为绝对覆盖。
 type CorePatch struct {
@@ -39,11 +39,11 @@ type PlayerAsset struct {
 	Version   uint64 `gorm:"column:version"               json:"version"`
 }
 
-func (e *PlayerAsset) Marshal() ([]byte, error)    { return json.Marshal(e) }
-func (e *PlayerAsset) Unmarshal(data []byte) error { return json.Unmarshal(data, e) }
-func (e *PlayerAsset) Scan(src any) error          { return ScanJSON(src, e) }
-func (e PlayerAsset) Value() (driver.Value, error) { return ValueJSON(e) }
-func (PlayerAsset) TableName() string              { return enum.TablePlayerAssets.String() }
+func (this *PlayerAsset) Marshal() ([]byte, error)    { return json.Marshal(this) }
+func (this *PlayerAsset) Unmarshal(data []byte) error { return json.Unmarshal(data, this) }
+func (this *PlayerAsset) Scan(src any) error          { return ScanJSON(src, this) }
+func (this PlayerAsset) Value() (driver.Value, error) { return ValueJSON(this) }
+func (PlayerAsset) TableName() string                 { return enum.TablePlayerAssets.String() }
 
 // AssetChange 资产变更；Amount 为增量（正增负减），结算/扣减统一入口。
 type AssetChange struct {
@@ -60,11 +60,11 @@ type PlayerProfile struct {
 	Version      uint64 `gorm:"column:version"              json:"version"`
 }
 
-func (e *PlayerProfile) Marshal() ([]byte, error)    { return json.Marshal(e) }
-func (e *PlayerProfile) Unmarshal(data []byte) error { return json.Unmarshal(data, e) }
-func (e *PlayerProfile) Scan(src any) error          { return ScanJSON(src, e) }
-func (e PlayerProfile) Value() (driver.Value, error) { return ValueJSON(e) }
-func (PlayerProfile) TableName() string              { return enum.TablePlayerProfile.String() }
+func (this *PlayerProfile) Marshal() ([]byte, error)    { return json.Marshal(this) }
+func (this *PlayerProfile) Unmarshal(data []byte) error { return json.Unmarshal(data, this) }
+func (this *PlayerProfile) Scan(src any) error          { return ScanJSON(src, this) }
+func (this PlayerProfile) Value() (driver.Value, error) { return ValueJSON(this) }
+func (PlayerProfile) TableName() string                 { return enum.TablePlayerProfile.String() }
 
 // ProfilePatch 档案补丁；nil 字段表示不修改。
 type ProfilePatch struct {
@@ -79,10 +79,10 @@ type LootItem struct {
 	Count  int64 `json:"count"`
 }
 
-func (e *LootItem) Marshal() ([]byte, error)    { return json.Marshal(e) }
-func (e *LootItem) Unmarshal(data []byte) error { return json.Unmarshal(data, e) }
-func (e *LootItem) Scan(src any) error          { return ScanJSON(src, e) }
-func (e LootItem) Value() (driver.Value, error) { return ValueJSON(e) }
+func (this *LootItem) Marshal() ([]byte, error)    { return json.Marshal(this) }
+func (this *LootItem) Unmarshal(data []byte) error { return json.Unmarshal(data, this) }
+func (this *LootItem) Scan(src any) error          { return ScanJSON(src, this) }
+func (this LootItem) Value() (driver.Value, error) { return ValueJSON(this) }
 
 // PlayerModel 玩家表模型（gorm）。
 type PlayerModel struct {
@@ -94,7 +94,7 @@ type PlayerModel struct {
 // TableName 指定表名。
 func (PlayerModel) TableName() string { return enum.TablePlayer.String() }
 
-func (e *PlayerModel) Marshal() ([]byte, error)    { return json.Marshal(e) }
-func (e *PlayerModel) Unmarshal(data []byte) error { return json.Unmarshal(data, e) }
-func (e *PlayerModel) Scan(src any) error          { return ScanJSON(src, e) }
-func (e PlayerModel) Value() (driver.Value, error) { return ValueJSON(e) }
+func (this *PlayerModel) Marshal() ([]byte, error)    { return json.Marshal(this) }
+func (this *PlayerModel) Unmarshal(data []byte) error { return json.Unmarshal(data, this) }
+func (this *PlayerModel) Scan(src any) error          { return ScanJSON(src, this) }
+func (this PlayerModel) Value() (driver.Value, error) { return ValueJSON(this) }

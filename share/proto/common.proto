@@ -49,3 +49,13 @@ message PlayerBase {
   int64 gold = 5;    // 金币
   int64 diamond = 6; // 钻石
 }
+
+// 玩家容器
+message PlayerContainer {
+  int64 player_id = 1;     // 玩家ID
+  string name = 2;   // 昵称
+  int32 level = 3;   // 等级
+  int64 exp = 4;     // 经验
+  int64 gold = 5;    // 金币
+  int64 diamond = 6; // 钻石
+}

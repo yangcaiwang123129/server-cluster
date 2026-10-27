@@ -19,20 +19,20 @@ func NewContainer[T any](name string) *Container[T] {
 }
 
 // Register 注册实例
-func (c *Container[T]) Register(inst T) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	c.inst = inst
+func (this *Container[T]) Register(inst T) {
+	this.mu.Lock()
+	defer this.mu.Unlock()
+	this.inst = inst
 }
 
 // MustGet 获取实例，未注册或注入 nil 直接 panic
-func (c *Container[T]) MustGet() T {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
+func (this *Container[T]) MustGet() T {
+	this.mu.RLock()
+	defer this.mu.RUnlock()
 
 	// 使用 reflect 检查是否为空（兼容接口和指针）
-	if reflect.ValueOf(c.inst).IsZero() || any(c.inst) == nil {
-		panic(fmt.Errorf("[registry] dependency '%s' is not registered or is nil. Check your app.Init()", c.name))
+	if reflect.ValueOf(this.inst).IsZero() || any(this.inst) == nil {
+		panic(fmt.Errorf("[registry] dependency '%s' is not registered or is nil. Check your app.Init()", this.name))
 	}
-	return c.inst
+	return this.inst
 }

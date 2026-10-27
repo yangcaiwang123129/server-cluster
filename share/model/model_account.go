@@ -19,7 +19,7 @@ type AccountModel struct {
 // TableName 指定表名。
 func (AccountModel) TableName() string { return enum.TableAccount.String() }
 
-func (e *AccountModel) Marshal() ([]byte, error)    { return json.Marshal(e) }
-func (e *AccountModel) Unmarshal(data []byte) error { return json.Unmarshal(data, e) }
-func (e *AccountModel) Scan(src any) error          { return ScanJSON(src, e) }
-func (e AccountModel) Value() (driver.Value, error) { return ValueJSON(e) }
+func (this *AccountModel) Marshal() ([]byte, error)    { return json.Marshal(this) }
+func (this *AccountModel) Unmarshal(data []byte) error { return json.Unmarshal(data, this) }
+func (this *AccountModel) Scan(src any) error          { return ScanJSON(src, this) }
+func (this AccountModel) Value() (driver.Value, error) { return ValueJSON(this) }

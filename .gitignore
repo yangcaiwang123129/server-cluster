@@ -5,7 +5,6 @@
 # Go 编译产物
 *.exe
 *.exe~
-*.dll
 *.so
 *.dylib
 *.test

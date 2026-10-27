@@ -13,7 +13,7 @@ main 函数遵循官方示例 [due-chat](https://github.com/dobyte/due-chat) 风
         │ 注册/发现      │ 定位/缓存           │ 持久化
         │                │                     │
  Client │ WS      ┌──────┴──────┐   gRPC mesh  │
- ──────┼────────>│  gate:3553  │──────────────┤
+ ──────┼────────>│  gate:9000  │──────────────┤
         │        │  纯转发      │              ▼
         │        └─────────────┘   ┌────────────────────┐
         │                │ 按路由号 │  node（有状态）     │
@@ -30,7 +30,7 @@ main 函数遵循官方示例 [due-chat](https://github.com/dobyte/due-chat) 风
 
 | 服务 | 类型 | 端口 | 职责 |
 | --- | --- | --- | --- |
-| gate/gate | gate（无状态接入） | WS :3553 | 按路由号纯转发客户端消息到 node |
+| gate/gate | gate（无状态接入） | WS :9000 | 按路由号纯转发客户端消息到 node |
 | node/game | node（有状态） | - | 玩家逻辑：心跳/进入游戏（JWT 验签 + 绑定网关/节点）/玩家信息；路由号段 2xxx |
 | node/battle | node（有状态） | - | 战斗逻辑（骨架）；路由号段 3xxx |
 | node/social | node（有状态） | - | 社交逻辑（骨架）；路由号段 4xxx |
@@ -101,12 +101,12 @@ project-root/
 │   │   ├── battle.proto           # 3xxx：战斗
 │   │   ├── social.proto           # 4xxx：聊天
 │   ├── pb/                        # protoc 生成代码（消息 + grpc.ServiceDesc），勿手改；deploy\scripts\gen-proto.bat 生成
-│   ├── cfg/                       # Luban 配置表：生成代码 + 内嵌 JSON 数据（单包 package cfg）
-│   │   ├── doc.go                 # 包说明与目录约定（手写，模板 cfg/tpl/doc.go.txt）
-│   │   ├── cfg.go                 # 加载入口：go:embed data → Load() → 全局 T()（手写，模板 cfg/tpl/cfg.go.txt）
-│   │   ├── item.go / weapon.go 等  # 生成：每张表一个文件（记录结构 + 表类），勿手改
-│   │   ├── tables.go              # 生成：汇总表 Tables / NewTables / JsonLoader，勿手改
-│   │   └── data/                  # 生成的 JSON 数据（go:embed 内嵌进二进制）
+│   ├── cfg/                       # 配置表：手写 struct + 内嵌 JSON 数据（单包 package cfg）
+│   │   ├── table.go               # 泛型 Table[T] 加载器（Get / GetDataList / GetDataMap）
+│   │   ├── cfg.go                 # Tables 容器 + Load() / T()
+│   │   ├── item.go / weapon.go 等  # 各表 struct 定义（手写，带 json tag）
+│   │   ├── doc.go                 # 包说明
+│   │   └── data/                  # JSON 数据文件（go:embed 内嵌进二进制）
 │   ├── dto/                       # HTTP API 出入参（Data Transfer Object）；只放结构体
 │   ├── model/                     # 表模型与业务模型：统一实现 Serializable（JSON + gorm Scan/Value）
 │   │   ├── model.go               # Serializable/Model 接口 + ScanJSON/ValueJSON 通用实现
@@ -119,25 +119,12 @@ project-root/
 │   ├── singleton/                 # 泛型单例容器 Container[T]
 │   └── util/                      # 通用工具（snowflake 紧凑雪花 ID：41bit ms + 10bit node + 12bit seq）
 │
-├── cfg/                           # Luban 配置表工作区（luban.conf + excel/*.xlsx）
-│   ├── luban.conf                 # 配置表描述：groups / schemaFiles / targets
-│   ├── tpl/                       # 手写文件模板（生成后拷回 share/cfg）
-│   └── excel/                     # 数据表（Excel 编辑，##var/##type 头行 + 数据行）
-│       ├── __tables__.xlsx        # 定义有哪些数据表
-│       ├── item.xlsx              # 道具表
-│       ├── weapon.xlsx            # 武器表（俯视角射击：伤害/射速/弹匣/换弹/射程/子弹引用）
-│       ├── bullet.xlsx            # 子弹表（速度/伤害修正/穿透/命中半径）
-│       └── enemy.xlsx             # 敌人表（生命/移速/伤害/分数/掉落道具引用）
-│
 └── deploy/                        # 部署层
     ├── env/                       # 各环境配置（test / release / prod，按服务分目录）
     ├── cicd/                      # CI/CD 流水线（test / release / prod）
     ├── scripts/                   # 工程脚本
     │   ├── gen-proto.bat          # share/proto/*.proto → share/pb/*.pb.go
-    │   ├── gen-swagger.bat        # mesh/login swagger 文档生成
-    │   └── gen-config.bat         # cfg → share/cfg（package cfg）+ share/cfg/data（Luban go-json）
-    └── tools/                     # 第三方工具本体
-        └── Luban/                 # Luban 5.1.0 release（dotnet 运行）
+    │   └── gen-swagger.bat        # mesh/login swagger 文档生成
 ```
 
 ## 分层职责与依赖方向
@@ -190,50 +177,35 @@ Client                Gate                Login(HTTP)              Game(Node)
 - **配置驱动**：`etc.store` 段缺席则跳过（模板可无存储启动）；启用时 MySQL 分片引用 `[[db.mysql.instances]]` 的实例名，Redis 引用 `[[redis.instances]]` 的实例名；`wal_id` 每实例唯一并持久化（崩溃恢复经 `player_wal_meta` 水位定位，样例见 `node/game/etc/etc.toml` 注释段）。
 - **建表**：启用存储的相关表已纳入 game 服 `app.Init` 的 `AutoMigrate` 列表，无需手工执行 DDL。
 
-## 配置表（Luban）
+## 配置表
 
-项目接入 [Luban](https://github.com/focus-creative-games/luban) v5.1.0 作为配置表工作流：策划维护 Excel 数据表 → 生成 Go 代码 + JSON 数据 → 服务启动期一次性加载。当前示例为俯视角射击游戏：item（道具）/ weapon（武器）/ bullet（子弹）/ enemy（敌人）四张表。
+配置表采用 **Luban 生成 struct + JSON 数据** 的方案：Excel 源表放在 `cfg/excel/`，通过 `deploy/scripts/gen-config.bat` 调用 Luban 生成 Go struct（`share/cfg/*.go`）和 JSON 数据（`share/cfg/data/*.json`），服务启动时一次性加载。当前表为 `ItemCfg`（道具）。
 
-- **工作区**：`cfg/`（`luban.conf` + `excel/*.xlsx`）。新增表时在 `cfg/excel/__tables__.xlsx` 登记一行（full_name / value_type / input 等），再添加数据表文件（第1行 `##var` 字段名、第2行 `##type` 类型、第3行 `##` 注释，A 列为标签列、数据行留空）。`output` 列指定导出的数据文件名：本工程填模块名（得到 `data/weapon.json`），留空则按默认 `<模块>_<表类名>` 命名。
-- **生成**：执行 `deploy\scripts\gen-config.bat`（三步：先 `-c go-json` 出代码，再 `-d json` 出数据——Luban 代码目标会清空 `outputCodeDir`；最后 `go run ./deploy/tools/cfgmerge` 按表合并），产物：
-  - `share/cfg/item.go`、`weapon.go`…：每张表一个文件，内含记录结构（`Item`）与表类（`TbItem`），带 `<auto-generated>` 头，勿手改；
-  - `share/cfg/tables.go`：汇总表 `Tables` / `NewTables` / `JsonLoader`；
-  - `share/cfg/cfg.go`、`doc.go`、`cfg_smoke_test.go`：手写文件，源文件在 `cfg/tpl/*.go.txt`，每次生成后自动拷回；
-  - `share/cfg/data/*.json`：JSON 数据，由 `cfg.go` 通过 `go:embed` 内嵌进二进制。
-- **运行时零依赖**：`go-json` 目标生成的代码只用标准库（`encoding/json` + `errors`），无需 vendor Luban 运行时。
-- **加载与访问**：game 服 `app.Init` 中 `cfg.Load()`（失败终止启动）；业务侧 `cfg.T().TbWeapon.Get(id)`、`cfg.T().TbEnemy.Get(id)` 等访问配置。
-- **前置环境**：需要 .NET 8 SDK（默认 `%USERPROFILE%\.dotnet\dotnet.exe`）；Luban 工具本体在 `deploy/tools/Luban/`。
+- **源表**：`cfg/excel/ItemCfg.xlsx`（字段定义 + 数据），表结构在 `cfg/excel/__tables__.xlsx` 中声明。
+- **结构定义**：`share/cfg/item.go` 由 Luban 生成，字段带 `json` tag。
+- **数据文件**：`share/cfg/data/itemCfg.json`，数组格式，每个元素对应一行记录。
+- **加载与访问**：game 服 `app.Init` 中 `cfg.Load()`（失败终止启动）；业务侧 `cfg.T().Item.Get(id)` 访问配置。
+- **重新生成**：修改 Excel 后运行 `deploy\scripts\gen-config.bat`。
 
-### 新增表命名规范（定稿，不再调整）
+### 新增表
 
-在 `cfg/excel/__tables__.xlsx` 登记一行时，三列固定这样填（以武器表为例）：
+1. 在 `cfg/excel/` 新建 Excel 源表，并在 `__tables__.xlsx` 中声明；
+2. 运行 `deploy\scripts\gen-config.bat` 生成 struct 与 JSON；
+3. 在 `cfg.go` 的 `Tables` 结构体中加字段，并在 `Load()` 中调用 `LoadTable`。
 
-| 列 | 填写规则 | 示例 | 说明 |
-|---|---|---|---|
-| full_name | `Tb` + 记录名，**不带模块前缀** | `TbWeapon` | 决定表类名，带模块前缀会生成 `WeaponTbWeapon` 这类重复名 |
-| value_type | 裸类型名 | `Weapon` | 决定记录结构名 |
-| output | 模块名（不含扩展名） | `weapon` | 决定数据文件名 `data/weapon.json`；留空则默认 `<full_name>.json` |
-
-生成后的固定形态（按表合并，一表一文件 + 一个汇总）：
+目录结构：
 
 ```text
 share/cfg/
-├── item.go          # Item 记录结构 + TbItem 表类
-├── weapon.go        # Weapon + TbWeapon
-├── bullet.go        # Bullet + TbBullet
-├── enemy.go         # Enemy + TbEnemy
-├── tables.go        # Tables / NewTables / JsonLoader
-├── cfg.go           # 手写：Load() / T() / jsonLoader
-├── doc.go           # 手写：包说明
-├── cfg_smoke_test.go
-└── data/*.json      # 每张表一个数据文件
+├── table.go           # 泛型 Table[T] 加载器（Get / GetDataList / GetDataMap）
+├── cfg.go             # Tables 容器 + Load() / T()
+├── item.go            # Item struct（Luban 生成）
+├── doc.go             # 包说明
+├── cfg_smoke_test.go  # 冒烟测试
+└── data/*.json        # 每张表一个数据文件
 ```
 
-访问：`cfg.T().TbWeapon.Get(2)` 返回 `*cfg.Weapon`；遍历用 `cfg.T().TbWeapon.GetDataList()`。
-
-**为什么平铺不拆子包**：`cfg.T().TbXxx` 一次到位，新增表不改任何 import；表数量在几十张以内、无需按表独立加载/热更时，子包只会增加样板代码。当出现「按模块独立加载」「单表热更」或单包文件数过百时，再按模块拆子包（`cfg/item`、`cfg/weapon`）并用顶层类型别名聚合。
-
-**文件命名规则**：Luban 逐表输出 PascalCase 文件（`Item.go` / `TbItem.go` / `Tables.go`），`deploy/tools/cfgmerge` 用 go/parser 按表合并为 `item.go`（记录 + 表类）与汇总 `tables.go`，并去重 import，无需手工干预。
+访问：`cfg.T().Item.Get(1)` 返回 `*cfg.Item`；遍历用 `cfg.T().Item.GetDataList()`。
 
 ## 快速开始
 
@@ -270,9 +242,6 @@ deploy\scripts\gen-proto.bat
 
 # 重新生成登录服 swagger 文档（修改 handler 注解后执行，app/web/docs/ 勿手改）
 deploy\scripts\gen-swagger.bat
-
-# 重新生成配置表（cfg/ → share/cfg + share/cfg/data）
-deploy\scripts\gen-config.bat
 ```
 
 ## due 关键约定（实现时已核实）

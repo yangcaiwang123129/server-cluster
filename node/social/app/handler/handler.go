@@ -17,7 +17,7 @@ func Register(proxy *node.Proxy) {
 //		_ = ctx.Response(err)
 //		return
 //	}
-//	resp, err := app.Social().SendChat(ctx.Context(), ctx.UID(), req)
+//	resp, err := logic.Social().SendChat(ctx.Context(), ctx.UID(), req)
 //	if err != nil {
 //		_ = ctx.Response(err)
 //		return

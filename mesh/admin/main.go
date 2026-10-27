@@ -6,7 +6,7 @@ import (
 	"github.com/dobyte/due/v2"
 	"github.com/dobyte/due/v2/log"
 
-	"server-cluster/mesh/admin/app"
+	"server-cluster/mesh/admin/app/global"
 	"server-cluster/mesh/admin/app/handler"
 )
 
@@ -16,7 +16,7 @@ func main() {
 	// 创建 HTTP 组件（监听地址由 etc.http.addr 配置驱动）
 	httpComponent := http.NewServer(http.WithName("admin"))
 	// 初始化应用（基础设施 + 建表 + 种子数据）
-	if err := app.Init(); err != nil {
+	if err := global.Init(); err != nil {
 		log.Fatalf("admin init failed: %v", err)
 	}
 	// 注册 HTTP 路由
@@ -26,5 +26,5 @@ func main() {
 	// 启动容器
 	container.Serve()
 	// 释放资源
-	app.Destroy()
+	global.Destroy()
 }

@@ -1,10 +1,10 @@
-package handler
+﻿package handler
 
 import (
 	"github.com/dobyte/due/component/http/v2"
 	"github.com/gofiber/fiber/v3"
 
-	"server-cluster/mesh/admin/app/globol"
+	"server-cluster/mesh/admin/app/global"
 	"server-cluster/mesh/admin/app/logic"
 	"server-cluster/share/dto"
 	"server-cluster/share/errs"
@@ -120,12 +120,12 @@ func handleLogout(ctx http.Context) error { return errs.OKMsg(ctx, "注销成功
 
 // handleGetInfo 返回当前登录用户的角色、权限与资料。
 func handleGetInfo(ctx http.Context) error {
-	return errs.OK(ctx, logic.GetInfo(globol.CurrentUser(ctx), globol.CurrentRole(ctx)))
+	return errs.OK(ctx, logic.GetInfo(global.CurrentUser(ctx), global.CurrentRole(ctx)))
 }
 
 // handleMenuRole 当前用户的动态路由菜单树。
 func handleMenuRole(ctx http.Context) error {
-	menus, err := logic.MenuRole(globol.CurrentRole(ctx))
+	menus, err := logic.MenuRole(global.CurrentRole(ctx))
 	if err != nil {
 		return errs.FailErr(ctx, err)
 	}
@@ -772,10 +772,10 @@ func handleUserResetPwd(ctx http.Context) error {
 // handleUserProfile 当前登录用户的资料。
 func handleUserProfile(ctx http.Context) error {
 	roleName := ""
-	if role := globol.CurrentRole(ctx); role != nil {
+	if role := global.CurrentRole(ctx); role != nil {
 		roleName = role.RoleName
 	}
-	return errs.OK(ctx, dto.UserProfileResp{User: globol.CurrentUser(ctx), RoleName: roleName})
+	return errs.OK(ctx, dto.UserProfileResp{User: global.CurrentUser(ctx), RoleName: roleName})
 }
 
 // handleUserProfileUpdate 修改当前登录用户的资料。
@@ -784,7 +784,7 @@ func handleUserProfileUpdate(ctx http.Context) error {
 	if err := bindBody(ctx, &req); err != nil {
 		return errs.Fail(ctx, 400, "请求参数错误")
 	}
-	m, err := logic.UserUpdateProfile(globol.CurrentUser(ctx).UserId, req)
+	m, err := logic.UserUpdateProfile(global.CurrentUser(ctx).UserId, req)
 	if err != nil {
 		return errs.FailErr(ctx, err)
 	}
@@ -797,7 +797,7 @@ func handleUserPwdSet(ctx http.Context) error {
 	if err := bindBody(ctx, &req); err != nil {
 		return errs.Fail(ctx, 400, "请求参数错误")
 	}
-	if err := logic.UserSetPassword(globol.CurrentUser(ctx), req); err != nil {
+	if err := logic.UserSetPassword(global.CurrentUser(ctx), req); err != nil {
 		return errs.FailErr(ctx, err)
 	}
 	return errs.OKMsg(ctx, "密码修改成功")

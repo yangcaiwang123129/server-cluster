@@ -25,3 +25,11 @@ message EnterGameResp {
   PlayerBase base = 1;   // 玩家基础信息
   int64 server_time = 2; // 服务器毫秒时间戳
 }
+
+// 离开游戏请求（路由 10002）
+message LeaveGameReq {
+}
+
+// 离开游戏响应
+message LeaveGameResp {
+}

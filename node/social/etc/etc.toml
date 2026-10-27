@@ -1,7 +1,7 @@
 ﻿# 社交逻辑服（node 集群）配置
-# due 自动加载 ./etc/etc.toml；键首段固定为 etc。
+# due 自动加载 ./etc/etc.toml。
 
-pid = "./run/social.pid"
+pid = "../../pid/social.pid"
 mode = "debug"
 timezone = "Local"
 
@@ -10,20 +10,20 @@ timezone = "Local"
     name = "social"
     addr = "127.0.0.1:"
     codec = "proto"
-    timeout = "3s"
+    [cluster.node.linker]
+        callTimeout = "3s"
 
 [log]
-    file = "./log/admin.log"
     level = "info"
-    format = "text"
-    stdout = true
     timeFormat = "2006/01/02 15:04:05.000000"
     stackLevel = "error"
-    fileMaxAge = "7d"
-    fileMaxSize = 100
-    fileCutRule = "day"
-    callerFullPath = true
-    classifiedStorage = false
+    [log.file]
+        path = "../../log/social.log"
+        format = "text"
+        maxAge = "7d"
+        maxSize = 100
+        rotate = "day"
+    callFullPath = true
 
 [packet]
     byteOrder = "big"
@@ -49,7 +49,7 @@ timezone = "Local"
     disablePurge = true
 
 [transport.grpc.client]
-    certFile = ""
+    caFile = ""
     serverName = ""
 
 # MySQL 命名实例（多数据源；dsn 为空则跳过该实例，模板可无 MySQL 启动）

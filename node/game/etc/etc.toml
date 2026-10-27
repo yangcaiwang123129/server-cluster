@@ -1,8 +1,8 @@
 ﻿# 玩家逻辑服（node 集群）配置
-# due 自动加载 ./etc/etc.toml；键首段固定为 etc。
+# due 自动加载 ./etc/etc.toml。
 
 # 进程号
-pid = "./run/game.pid"
+pid = "../../pid/game.pid"
 # 开发模式。支持模式：debug、test、release
 mode = "debug"
 # 统一时区设置
@@ -17,21 +17,21 @@ timezone = "Local"
     addr = "127.0.0.1:"
     # 编解码器。可选：json | proto
     codec = "proto"
-    # RPC调用超时时间
-    timeout = "3s"
+    [cluster.node.linker]
+        # RPC调用超时时间
+        callTimeout = "3s"
 
 [log]
-    file = "./log/admin.log"
     level = "info"
-    format = "text"
-    stdout = true
     timeFormat = "2006/01/02 15:04:05.000000"
     stackLevel = "error"
-    fileMaxAge = "7d"
-    fileMaxSize = 100
-    fileCutRule = "day"
-    callerFullPath = true
-    classifiedStorage = false
+    [log.file]
+        path = "../../log/game.log"
+        format = "text"
+        maxAge = "7d"
+        maxSize = 100
+        rotate = "day"
+    callFullPath = true
 
 [packet]
     byteOrder = "big"
@@ -60,7 +60,7 @@ timezone = "Local"
     disablePurge = true
 
 [transport.grpc.client]
-    certFile = ""
+    caFile = ""
     serverName = ""
 
 # MySQL 命名实例（多数据源；dsn 为空则跳过该实例，模板可无 MySQL 启动）
@@ -80,7 +80,7 @@ timezone = "Local"
 
 # JWT 配置：须与 login 服 secret 一致
 [jwt]
-    secret = "mygame-secret"
+    secret = "cluster-secret"
     valid_duration = 7200 # 秒
 
 # 玩家数据存储层（etc.store 段缺席则跳过初始化，模板可无存储启动）。

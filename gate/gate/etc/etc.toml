@@ -1,8 +1,8 @@
 ﻿# 网关服（gate 集群）配置
-# due 自动加载 ./etc/etc.toml；键首段固定为 etc。
+# due 自动加载 ./etc/etc.toml。
 
 # 进程号
-pid = "./run/gate.pid"
+pid = "../../pid/gate.pid"
 # 开发模式。支持模式：debug、test、release
 mode = "debug"
 # 统一时区设置
@@ -14,33 +14,31 @@ timezone = "Local"
     # 实例名称
     name = "gate"
     # 内建RPC服务器监听地址。不填写默认随机监听
-    addr = "188.18.23.72:"
-    # RPC调用超时时间
-    timeout = "3s"
+    addr = "127.0.0.1:"
+    [cluster.gate.linker]
+        # RPC调用超时时间
+        callTimeout = "3s"
 
 [log]
-    # 日志输出文件
-    file = "./log/gate.log"
     # 日志输出级别，可选：debug | info | warn | error | fatal | panic
     level = "info"
-    # 日志输出格式，可选：text | json
-    format = "text"
-    # 是否输出到终端
-    stdout = true
     # 时间格式，标准库时间格式
     timeFormat = "2006/01/02 15:04:05.000000"
     # 堆栈的最低输出级别
     stackLevel = "error"
-    # 文件最大留存时间
-    fileMaxAge = "7d"
-    # 文件最大尺寸限制，单位（MB）
-    fileMaxSize = 100
-    # 文件切割方式
-    fileCutRule = "day"
     # 是否启用调用文件全路径
-    callerFullPath = true
-    # 是否启用分级存储
-    classifiedStorage = false
+    callFullPath = true
+    [log.file]
+        # 日志输出文件
+        path = "../../log/gate.log"
+        # 日志输出格式，可选：text | json
+        format = "text"
+        # 文件最大留存时间
+        maxAge = "7d"
+        # 文件最大尺寸限制，单位（MB）
+        maxSize = 100
+        # 文件切割方式
+        rotate = "day"
 
 [packet]
     # 字节序，可选：little | big
@@ -75,8 +73,8 @@ timezone = "Local"
     namespace = "services"
 
 [transport.grpc.client]
-    # 证书文件
-    certFile = ""
+    # CA证书文件
+    caFile = ""
     # 证书域名
     serverName = ""
 
@@ -89,8 +87,6 @@ timezone = "Local"
     maxConnNum = 5000
     # 跨域检测，空数组时不允许任何连接升级成websocket，未设置此参数时允许所有的链接升级成websocket
     origins = ["*"]
-    # 握手超时时间
-    handshakeTimeout = "10s"
     # 心跳检测间隔时间。设置为0则不启用心跳检测
     heartbeatInterval = "10s"
     # 心跳机制：resp 响应式心跳 | tick 定时主推心跳

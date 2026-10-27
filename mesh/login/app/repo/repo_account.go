@@ -21,8 +21,10 @@ type AccountRepo interface {
 
 var accountRepo = singleton.NewContainer[AccountRepo]("AccountRepo")
 
-// RegisterAccount 装配期注册实现。
-func RegisterAccount(r AccountRepo) { accountRepo.Register(r) }
+// init 装配期自注册实现。
+func init() {
+	accountRepo.Register(NewAccountRepo())
+}
 
 // Account 获取账号数据访问单例。
 func Account() AccountRepo { return accountRepo.MustGet() }

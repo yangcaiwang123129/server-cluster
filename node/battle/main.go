@@ -9,7 +9,7 @@ import (
 	"github.com/dobyte/due/v2/cluster/node"
 
 	"github.com/dobyte/due/v2/log"
-	"server-cluster/node/battle/app"
+	"server-cluster/node/battle/app/global"
 	"server-cluster/node/battle/app/handler"
 )
 
@@ -29,7 +29,7 @@ func main() {
 		node.WithTransporter(transporter),
 	)
 	// 初始化应用（基础设施 + 依赖装配）
-	if err := app.Init(component.Proxy()); err != nil {
+	if err := global.Init(component.Proxy()); err != nil {
 		log.Fatalf("battle init failed: %v", err)
 	}
 	// 注册客户端路由（必须在 Serve 之前、node Shut 状态下调用）
@@ -39,5 +39,5 @@ func main() {
 	// 启动容器
 	container.Serve()
 	// 释放资源
-	app.Destroy()
+	global.Destroy()
 }

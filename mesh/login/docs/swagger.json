@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "账号注册、登录与区服列表；token 供 game 服验签进入游戏。",
+        "description": "账号注册，登录。",
         "title": "登录服 API",
         "contact": {},
         "version": "1.0"

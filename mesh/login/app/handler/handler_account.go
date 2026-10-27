@@ -2,7 +2,7 @@
 package handler
 
 import (
-	"server-cluster/mesh/login/app"
+	"server-cluster/mesh/login/app/logic"
 	"server-cluster/share/dto"
 	"server-cluster/share/errs"
 
@@ -29,7 +29,7 @@ func register(ctx http.Context) error {
 	if err := ctx.Bind().Body(req); err != nil {
 		return ctx.Failure(errs.ErrInvalidParams)
 	}
-	data, err := app.Account().Register(ctx.Context(), req)
+	data, err := logic.Account().Register(ctx.Context(), req)
 	if err != nil {
 		return ctx.Failure(err)
 	}
@@ -49,7 +49,7 @@ func login(ctx http.Context) error {
 	if err := ctx.Bind().Body(req); err != nil {
 		return ctx.Failure(errs.ErrInvalidParams)
 	}
-	data, err := app.Account().Login(ctx.Context(), req)
+	data, err := logic.Account().Login(ctx.Context(), req)
 	if err != nil {
 		return ctx.Failure(err)
 	}

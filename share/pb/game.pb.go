@@ -201,6 +201,80 @@ func (x *EnterGameResp) GetServerTime() int64 {
 	return 0
 }
 
+// 离开游戏请求（路由 10002）
+type LeaveGameReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LeaveGameReq) Reset() {
+	*x = LeaveGameReq{}
+	mi := &file_game_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LeaveGameReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LeaveGameReq) ProtoMessage() {}
+
+func (x *LeaveGameReq) ProtoReflect() protoreflect.Message {
+	mi := &file_game_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LeaveGameReq.ProtoReflect.Descriptor instead.
+func (*LeaveGameReq) Descriptor() ([]byte, []int) {
+	return file_game_proto_rawDescGZIP(), []int{4}
+}
+
+// 离开游戏响应
+type LeaveGameResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LeaveGameResp) Reset() {
+	*x = LeaveGameResp{}
+	mi := &file_game_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LeaveGameResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LeaveGameResp) ProtoMessage() {}
+
+func (x *LeaveGameResp) ProtoReflect() protoreflect.Message {
+	mi := &file_game_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LeaveGameResp.ProtoReflect.Descriptor instead.
+func (*LeaveGameResp) Descriptor() ([]byte, []int) {
+	return file_game_proto_rawDescGZIP(), []int{5}
+}
+
 var File_game_proto protoreflect.FileDescriptor
 
 const file_game_proto_rawDesc = "" +
@@ -216,7 +290,9 @@ const file_game_proto_rawDesc = "" +
 	"\rEnterGameResp\x12\"\n" +
 	"\x04base\x18\x01 \x01(\v2\x0e.pb.PlayerBaseR\x04base\x12\x1f\n" +
 	"\vserver_time\x18\x02 \x01(\x03R\n" +
-	"serverTimeB\x19Z\x17server-cluster/share/pbb\x06proto3"
+	"serverTime\"\x0e\n" +
+	"\fLeaveGameReq\"\x0f\n" +
+	"\rLeaveGameRespB\x19Z\x17server-cluster/share/pbb\x06proto3"
 
 var (
 	file_game_proto_rawDescOnce sync.Once
@@ -230,16 +306,18 @@ func file_game_proto_rawDescGZIP() []byte {
 	return file_game_proto_rawDescData
 }
 
-var file_game_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_game_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_game_proto_goTypes = []any{
 	(*VerifyReq)(nil),     // 0: pb.VerifyReq
 	(*VerifyResp)(nil),    // 1: pb.VerifyResp
 	(*EnterGameReq)(nil),  // 2: pb.EnterGameReq
 	(*EnterGameResp)(nil), // 3: pb.EnterGameResp
-	(*PlayerBase)(nil),    // 4: pb.PlayerBase
+	(*LeaveGameReq)(nil),  // 4: pb.LeaveGameReq
+	(*LeaveGameResp)(nil), // 5: pb.LeaveGameResp
+	(*PlayerBase)(nil),    // 6: pb.PlayerBase
 }
 var file_game_proto_depIdxs = []int32{
-	4, // 0: pb.EnterGameResp.base:type_name -> pb.PlayerBase
+	6, // 0: pb.EnterGameResp.base:type_name -> pb.PlayerBase
 	1, // [1:1] is the sub-list for method output_type
 	1, // [1:1] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
@@ -259,7 +337,7 @@ func file_game_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_proto_rawDesc), len(file_game_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

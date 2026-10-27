@@ -16,7 +16,7 @@ func Register(proxy *node.Proxy) {
 //		_ = ctx.Response(err)
 //		return
 //	}
-//	resp, err := app.Battle().StartBattle(ctx.Context(), ctx.UID(), req)
+//	resp, err := logic.Battle().StartBattle(ctx.Context(), ctx.UID(), req)
 //	if err != nil {
 //		_ = ctx.Response(err)
 //		return

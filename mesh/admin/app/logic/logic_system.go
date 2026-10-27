@@ -12,7 +12,7 @@ import (
 
 	"github.com/dobyte/jwt"
 
-	"server-cluster/mesh/admin/app"
+	"server-cluster/internal/svc"
 	"server-cluster/mesh/admin/app/repo"
 	"server-cluster/share/dto"
 	"server-cluster/share/errs"
@@ -196,7 +196,7 @@ func Login(req dto.AdminLoginReq, ip, ua string) (string, error) {
 		RecordLogin(req.Username, ip, ua, false, "角色已停用")
 		return "", errs.NewError(400, "角色已停用")
 	}
-	token, err := app.JWT().GenerateToken(jwt.Payload{"uid": user.UserId})
+	token, err := svc.JWT().GenerateToken(jwt.Payload{"uid": user.UserId})
 	if err != nil {
 		return "", errs.NewError(500, "令牌签发失败")
 	}
@@ -206,7 +206,7 @@ func Login(req dto.AdminLoginReq, ip, ua string) (string, error) {
 
 // Authenticate 解析令牌并加载用户与角色，供鉴权中间件使用。
 func Authenticate(token string) (*model.SysUser, *model.SysRole, error) {
-	payload, err := app.JWT().ExtractPayload(token)
+	payload, err := svc.JWT().ExtractPayload(token)
 	if err != nil {
 		return nil, nil, errs.NewError(401, "未登录或登录已过期")
 	}

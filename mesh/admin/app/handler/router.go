@@ -1,10 +1,10 @@
-// Package handler HTTP 层：每个模块一个文件，内含路由注册与处理函数。
+﻿// Package handler HTTP 层：每个模块一个文件，内含路由注册与处理函数。
 package handler
 
 import (
 	"github.com/dobyte/due/component/http/v2"
 
-	"server-cluster/mesh/admin/app/globol"
+	"server-cluster/mesh/admin/app/global"
 )
 
 // Register 注册管理后台路由。
@@ -13,11 +13,11 @@ import (
 // 公开端点（验证码/登录/品牌配置）由中间件按路径放行。
 func Register(router http.Router) {
 	group := router.Group("/api/v1",
-		globol.CORSMiddleware(),
-		globol.RequireDB,
-		globol.OperaLogMiddleware,
-		globol.AuthMiddleware,
-		globol.PermissionMiddleware,
+		global.CORSMiddleware(),
+		global.RequireDB,
+		global.OperaLogMiddleware,
+		global.AuthMiddleware,
+		global.PermissionMiddleware,
 	)
 
 	registerAuth(group)

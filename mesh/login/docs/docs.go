@@ -144,7 +144,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "登录服 API",
-	Description:      "账号注册、登录与区服列表；token 供 game 服验签进入游戏。",
+	Description:      "账号注册，登录。",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
