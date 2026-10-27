@@ -242,7 +242,7 @@ definitions:
 host: 188.18.23.72:8081
 info:
   contact: {}
-  description: 后台系统管理：用户、角色、菜单、接口、配置、字典、日志。
+  description: 后台系统管理
   title: 管理后台 API
   version: "1.0"
 paths:
@@ -848,6 +848,45 @@ paths:
           schema:
             $ref: '#/definitions/dto.Resp'
       summary: 清空操作日志
+      tags:
+      - system
+  /api/v1/player:
+    get:
+      parameters:
+      - default: 1
+        description: 页码
+        in: query
+        name: pageIndex
+        type: integer
+      - default: 10
+        description: 每页条数
+        in: query
+        name: pageSize
+        type: integer
+      - description: 账号
+        in: query
+        name: username
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 响应包在 {code, message, data} 中
+          schema:
+            $ref: '#/definitions/dto.Resp'
+      summary: 玩家列表
+      tags:
+      - system
+  /api/v1/player/online:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 响应包在 {code, message, data} 中
+          schema:
+            $ref: '#/definitions/dto.Resp'
+      summary: 在线玩家
       tags:
       - system
   /api/v1/role:

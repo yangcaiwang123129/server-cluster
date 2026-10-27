@@ -6,6 +6,7 @@ import dict from './dict'
 import sysApi from './sys-api'
 import sysOperLog from './sys-oper-log'
 import sysLoginLog from './sys-login-log'
+import player from './player'
 
 export default {
   sysUser,
@@ -15,5 +16,6 @@ export default {
   dict,
   sysApi,
   sysOperLog,
-  sysLoginLog
+  sysLoginLog,
+  player
 }

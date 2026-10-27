@@ -9,6 +9,7 @@ import (
 	"github.com/dobyte/due/v2/cluster/node"
 	"github.com/dobyte/due/v2/log"
 
+	"server-cluster/internal/svc"
 	"server-cluster/node/game/app/global"
 	"server-cluster/node/game/app/handler"
 )
@@ -32,9 +33,13 @@ func main() {
 	if err := global.Init(); err != nil {
 		log.Fatalf("game init failed: %v", err)
 	}
+	// 注入组件代理（服务间 RPC 用）
+	svc.SetNodeProxy(component.Proxy())
 	// 注册客户端路由
 	handler.RegisterPlayer(component.Proxy())
 	handler.RegisterPlayerContainer(component.Proxy())
+	// 注册服务间 RPC provider（admin 服经 mesh 调用）
+	handler.RegisterInternal(component.Proxy())
 	// 添加节点组件
 	container.Add(component)
 	// 启动容器

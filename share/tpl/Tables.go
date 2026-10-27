@@ -22,22 +22,22 @@ type Table[T any] struct {
 }
 
 // Get 按 id 查询，不存在返回 nil。
-func (t *Table[T]) Get(id int32) *T { return t.dataMap[id] }
+func (this *Table[T]) Get(id int32) *T { return this.dataMap[id] }
 
 // Has 判断 id 是否存在。
-func (t *Table[T]) Has(id int32) bool {
-	_, ok := t.dataMap[id]
+func (this *Table[T]) Has(id int32) bool {
+	_, ok := this.dataMap[id]
 	return ok
 }
 
 // Len 返回记录数。
-func (t *Table[T]) Len() int { return len(t.dataMap) }
+func (this *Table[T]) Len() int { return len(this.dataMap) }
 
 // GetDataMap 返回全部记录的 id→记录 map。
-func (t *Table[T]) GetDataMap() map[int32]*T { return t.dataMap }
+func (this *Table[T]) GetDataMap() map[int32]*T { return this.dataMap }
 
 // GetDataList 返回按文件顺序排列的全部记录。
-func (t *Table[T]) GetDataList() []*T { return t.dataList }
+func (this *Table[T]) GetDataList() []*T { return this.dataList }
 
 // LoadTable 读取内嵌的 <file>.json 加载一张表，keyFn 从记录中提取主键。
 func LoadTable[T any](file string, keyFn func(*T) int32) (*Table[T], error) {
@@ -102,8 +102,8 @@ func MustLoad() {
 	}
 }
 
-// T 获取全局配置表；须先 Load 成功，否则 panic。
-func T() *Tables {
+// GetTables 获取全局配置表；须先 Load 成功，否则 panic。
+func GetTables() *Tables {
 	if tables == nil {
 		panic("cfg: T() called before Load()/MustLoad()")
 	}

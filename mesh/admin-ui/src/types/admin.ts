@@ -210,3 +210,23 @@ export interface SysOperaLog {
   latencyTime?: string
   createdAt?: string
 }
+
+/** Filters the player list accepts. */
+export interface PlayerQuery {
+  username?: string
+}
+
+/** A player account row from player_base. Timestamps are unix milliseconds. */
+export interface Player {
+  playerId?: number
+  username?: string
+  zone?: number
+  phoneNumber?: number
+  createdAt?: number
+}
+
+/** A player currently online, as reported by the game node. */
+export interface OnlinePlayer {
+  playerId?: number
+  enterTime?: number
+}

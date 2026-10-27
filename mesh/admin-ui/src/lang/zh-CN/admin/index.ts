@@ -6,6 +6,7 @@ import dict from './dict'
 import sysApi from './sys-api'
 import sysOperLog from './sys-oper-log'
 import sysLoginLog from './sys-login-log'
+import player from './player'
 
 /**
  * The admin section, one module per page under src/views/admin.
@@ -25,5 +26,6 @@ export default {
   dict,
   sysApi,
   sysOperLog,
-  sysLoginLog
+  sysLoginLog,
+  player
 }

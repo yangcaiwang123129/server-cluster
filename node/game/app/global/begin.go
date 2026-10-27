@@ -19,7 +19,7 @@ func Init() error {
 	if err := tpl.Load(); err != nil {
 		return err
 	}
-	log.Infof("cfg: tables loaded, items=%d", len(tpl.T().Item.GetDataList()))
+	log.Infof("cfg: tables loaded, items=%d", len(tpl.GetTables().Item.GetDataList()))
 	// 自动建表（玩家相关表）
 	if inst, err := svc.Ctx().MySQL.Default(); err == nil {
 		if err = svc.AutoMigrate(inst.Gorm(),

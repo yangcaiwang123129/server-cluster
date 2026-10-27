@@ -2,6 +2,8 @@
 package svc
 
 import (
+	"github.com/dobyte/due/component/http/v2"
+	"github.com/dobyte/due/v2/cluster/node"
 	"github.com/dobyte/due/v2/etc"
 	"github.com/dobyte/due/v2/log"
 	"github.com/dobyte/jwt"
@@ -14,6 +16,8 @@ type Context struct {
 	Redis     *RedisManager // 命名 Redis 实例（不同业务可用不同 db 号）
 	JWT       *jwt.JWT      // 令牌签发/校验器；etc.jwt.secret 未配置的服务为 nil
 	Snowflake *Snowflake    // 雪花 ID 生成器
+	HTTP      *http.Proxy   // HTTP 组件代理；须由 http 服在组件创建后注入
+	Node      *node.Proxy   // 节点组件代理；须由 node 服在组件创建后注入
 }
 
 var ctx *Context
@@ -78,6 +82,30 @@ func (c *Context) DB() (*gorm.DB, error) {
 
 // NextID 生成下一个雪花 ID。
 func NextID() int64 { return Ctx().Snowflake.Next() }
+
+// SetHTTPProxy 注入 HTTP 组件代理（http 服在组件创建后调用）。
+func SetHTTPProxy(p *http.Proxy) { Ctx().HTTP = p }
+
+// HTTPProxy 获取 HTTP 组件代理；未注入直接 panic。
+func HTTPProxy() *http.Proxy {
+	p := Ctx().HTTP
+	if p == nil {
+		panic("svc: http proxy is not injected")
+	}
+	return p
+}
+
+// SetNodeProxy 注入节点组件代理（node 服在组件创建后调用）。
+func SetNodeProxy(p *node.Proxy) { Ctx().Node = p }
+
+// NodeProxy 获取节点组件代理；未注入直接 panic。
+func NodeProxy() *node.Proxy {
+	p := Ctx().Node
+	if p == nil {
+		panic("svc: node proxy is not injected")
+	}
+	return p
+}
 
 // Close 释放资源，进程退出前调用。
 func Close() error {

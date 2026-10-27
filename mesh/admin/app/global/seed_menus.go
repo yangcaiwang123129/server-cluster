@@ -98,6 +98,18 @@ var defaultMenus = []seedMenu{
 		},
 	},
 	{
+		Menu: model.SysMenu{MenuName: "Player", Title: "玩家管理", Path: "/player", MenuType: "M", Component: "Layout", Sort: 3, Visible: "0", IsFrame: "1"},
+		Children: []seedMenu{
+			{
+				Menu: model.SysMenu{MenuName: "PlayerManage", Title: "玩家列表", Path: "/player/player/index", Component: "/admin/player/index", MenuType: "C", Permission: "game:player:list", Sort: 1, Visible: "0", IsFrame: "1"},
+				Apis: []seedAPI{
+					{"玩家列表", "/api/v1/player", "GET"},
+					{"在线玩家", "/api/v1/player/online", "GET"},
+				},
+			},
+		},
+	},
+	{
 		Menu: model.SysMenu{MenuName: "Log", Title: "日志管理", Path: "/log", MenuType: "M", Component: "Layout", Sort: 2, Visible: "0", IsFrame: "1"},
 		Children: []seedMenu{
 			{

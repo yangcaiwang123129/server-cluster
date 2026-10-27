@@ -1,4 +1,4 @@
-// 管理后台服：提供运维/GM HTTP 接口（纯 HTTP 服务，不对外提供 gRPC）。
+// 管理后台服：提供运维/GM HTTP 接口，并经 mesh 调用 game 服内部 RPC。
 //
 // @title 管理后台 API
 // @version 1.0
@@ -9,24 +9,41 @@ package main
 
 import (
 	"github.com/dobyte/due/component/http/v2"
+	"github.com/dobyte/due/registry/etcd/v2"
+	"github.com/dobyte/due/transport/grpc/v2"
 	"github.com/dobyte/due/v2"
 	"github.com/dobyte/due/v2/log"
 
+	"server-cluster/internal/svc"
 	"server-cluster/mesh/admin/app/global"
 	"server-cluster/mesh/admin/app/handler"
+	"server-cluster/mesh/admin/app/logic"
 )
 
 func main() {
 	// 创建容器
 	container := due.NewContainer()
+	// 创建服务注册发现（admin 经 etcd 发现 game 节点）
+	registry := etcd.NewRegistry()
+	// 创建RPC传输器（服务间 gRPC 客户端）
+	transporter := grpc.NewTransporter()
 	// 创建 HTTP 组件（监听地址由 etc.http.addr 配置驱动）
-	httpComponent := http.NewServer(http.WithName("admin"))
+	httpComponent := http.NewServer(
+		http.WithName("admin"),
+		http.WithRegistry(registry),
+		http.WithTransporter(transporter),
+	)
 	// 初始化应用（基础设施 + 建表 + 种子数据）
 	if err := global.Init(); err != nil {
 		log.Fatalf("admin init failed: %v", err)
 	}
+	// 注入组件代理（服务间 RPC 用）
+	svc.SetHTTPProxy(httpComponent.Proxy())
+	// 注册业务实现（避免 global ↔ logic 循环依赖）
+	global.RegisterPlayerLogic(logic.NewPlayer())
 	// 注册 HTTP 路由
 	handler.RegisterSys(httpComponent.Proxy().Router())
+	handler.RegisterPlayer(httpComponent.Proxy().Router())
 	// 添加组件到容器
 	container.Add(httpComponent)
 	// 启动容器

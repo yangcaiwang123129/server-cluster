@@ -949,6 +949,66 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/player": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "玩家列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "页码",
+                        "name": "pageIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "每页条数",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "账号",
+                        "name": "username",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/player/online": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "在线玩家",
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/role": {
             "get": {
                 "produces": [
@@ -2355,7 +2415,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "管理后台 API",
-	Description:      "后台系统管理：用户、角色、菜单、接口、配置、字典、日志。",
+	Description:      "后台系统管理",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

@@ -59,6 +59,11 @@ timezone = "Local"
     # 是否禁用清除
     disablePurge = true
 
+# gRPC 传输服务端（node 对外提供内部 RPC；单机部署固定回环地址，
+# 默认 ":0" 会自动探测私网 IP，本机网卡为公网段 IP 时探测失败）
+[transport.grpc.server]
+    addr = "127.0.0.1:0"
+
 [transport.grpc.client]
     caFile = ""
     serverName = ""

@@ -51,6 +51,16 @@ timezone = "Local"
     nonblocking = true
     disablePurge = true
 
+# 服务注册发现（admin 经 etcd 发现 game 节点）
+[registry.etcd]
+    addrs = ["127.0.0.1:2379"]
+    namespace = "services"
+
+# gRPC 传输客户端（服务间 RPC）
+[transport.grpc.client]
+    caFile = ""
+    serverName = ""
+
 # MySQL 命名实例（多数据源；dsn 为空则跳过该实例）
 [[db.mysql.instances]]
     name = "default"

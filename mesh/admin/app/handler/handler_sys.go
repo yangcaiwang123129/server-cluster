@@ -10,7 +10,7 @@ import (
 	"server-cluster/share/errs"
 )
 
-// RegisterSys 注册管理后台路由。
+// RegisterSys 注册管理后台权限管理路由。
 func RegisterSys(router http.Router) {
 	groupRouter := router.Group("/api/v1",
 		global.CORSMiddleware(),
@@ -94,6 +94,10 @@ func RegisterSys(router http.Router) {
 	groupRouter.Get("/sys-opera-log", handleOperaLogList)
 	groupRouter.Delete("/sys-opera-log", handleOperaLogDelete)
 	groupRouter.Delete("/operlog/clean", handleOperaLogClean)
+
+	// registerPlayer 玩家管理路由。
+	groupRouter.Get("/player", handlePlayerList)
+	groupRouter.Get("/player/online", handlePlayerOnline)
 }
 
 // handleApiList 接口分页列表。

@@ -3,11 +3,13 @@
 package model
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"server-cluster/share/enum"
+	"server-cluster/share/tpl"
 	"sort"
+	"strconv"
+	"strings"
 	"sync"
 	"sync/atomic"
 )
@@ -16,22 +18,21 @@ import (
 const (
 	TypeBackpack = 1 // 背包（局内随身，死亡掉落）
 	TypeStash    = 2 // 仓库（局外固定，不掉落）
-	TypeSecure   = 3 // 保险箱（局内随身，不掉落，AllowSecure=true 才可放）
+	TypeSecure   = 3 // 保险箱（局内随身，不掉落）
 )
 
 var (
-	ErrItemNotFound        = errors.New("item not found in container")
-	ErrPositionConflict    = errors.New("position conflict")
-	ErrCannotPlaceInSecure = errors.New("item cannot be placed in secure container")
+	ErrItemNotFound     = errors.New("item not found in container")
+	ErrPositionConflict = errors.New("position conflict")
 )
 
 // PlayerContainer 玩家容器集合：一个玩家 3 个容器，每容器一列 JSON。
 type PlayerContainer struct {
-	PlayerID int64      `gorm:"primaryKey;column:player_id"              json:"player_id"`
+	PlayerID int64      `gorm:"primaryKey;column:player_id"               json:"player_id"`
 	Backpack *Container `gorm:"column:backpack;type:json;serializer:json" json:"backpack"`
-	Stash    *Container `gorm:"column:stash;type:json;serializer:json"   json:"stash"`
-	Secure   *Container `gorm:"column:secure;type:json;serializer:json"  json:"secure"`
-	Version  int64      `gorm:"column:version"                           json:"version"`
+	Stash    *Container `gorm:"column:stash;type:json;serializer:json"    json:"stash"`
+	Secure   *Container `gorm:"column:secure;type:json;serializer:json"   json:"secure"`
+	Version  int64      `gorm:"column:version"                            json:"version"`
 }
 
 // TableName 指定表名。
@@ -97,64 +98,62 @@ func (p *PlayerContainer) Rebuild() {
 	}
 }
 
-// ItemDef 物品模板（尺寸/堆叠/保险箱准入），已上线 defId 的 W/H 永不修改。
-type ItemDef struct {
-	ID          int32  `json:"id"`
-	Name        string `json:"name"`
-	W           int32  `json:"w"`
-	H           int32  `json:"h"`
-	StackMax    int32  `json:"stackMax"`
-	AllowSecure bool   `json:"allowSecure"`
-}
-
 // itemDefStore 配置快照，整体替换。
 var itemDefStore atomic.Value
 
-// LoadItemDefs 从 JSON 字节加载物品配置（整体替换）。
-func LoadItemDefs(data []byte) error {
-	var defs map[int32]*ItemDef
-	if err := json.Unmarshal(data, &defs); err != nil {
-		return err
-	}
-	itemDefStore.Store(defs)
-	return nil
-}
-
-// LoadItemDefsFromMap 直接从 map 加载（供测试/硬编码配置）。
-func LoadItemDefsFromMap(defs map[int32]*ItemDef) {
-	itemDefStore.Store(defs)
-}
-
-// GetDef 按 defId 查配置；不存在返回 nil。
-func GetDef(defId int32) *ItemDef {
+// GetItemCfgById 按 id 查配置；不存在返回 nil。
+func GetItemCfgById(itemCfgID int32) *tpl.ItemCfg {
 	v := itemDefStore.Load()
 	if v == nil {
 		return nil
 	}
-	return v.(map[int32]*ItemDef)[defId]
+
+	return tpl.GetTables().Item.GetDataMap()[itemCfgID]
+}
+
+// itemSize 解析配置占格 "W,H"，异常时退回 1x1。
+func itemSize(def *tpl.ItemCfg) (int32, int32) {
+	parts := strings.SplitN(def.Size, ",", 2)
+	if len(parts) != 2 {
+		return 1, 1
+	}
+	w, errW := strconv.Atoi(strings.TrimSpace(parts[0]))
+	h, errH := strconv.Atoi(strings.TrimSpace(parts[1]))
+	if errW != nil || errH != nil || w <= 0 || h <= 0 {
+		return 1, 1
+	}
+	return int32(w), int32(h)
+}
+
+// GetWHByItemCfgId 按配置 id 取占格宽高；配置缺失返回 0,0。
+func GetWHByItemCfgId(itemCfgID int32) (int32, int32) {
+	def := GetItemCfgById(itemCfgID)
+	if def == nil {
+		return 0, 0
+	}
+	return itemSize(def)
 }
 
 // Item 容器中的物品实例（不含 w/h，查 ItemDef 计算）。
 type Item struct {
-	UID     int64 `json:"uid"`     // 物品唯一实例 ID
-	DefID   int32 `json:"defId"`   // 物品配置 ID
-	Count   int32 `json:"count"`   // 堆叠数量
-	X       int32 `json:"x"`       // 网格 X（左上角）
-	Y       int32 `json:"y"`       // 网格 Y（左上角）
-	Rotated bool  `json:"rotated"` // 是否旋转（w/h 对调）
+	ItemID    int64 `json:"itemID"`    // 物品唯一实例 ID
+	ItemCfgID int32 `json:"itemCfgID"` // 物品配置 ID
+	Count     int32 `json:"count"`     // 堆叠数量
+	GridX     int32 `json:"gridX"`     // 网格 GridX（左上角）
+	GridY     int32 `json:"gridY"`     // 网格 GridY（左上角）
+	Rotated   bool  `json:"rotated"`   // 是否旋转（w/h 对调）
 }
 
 // Container 网格容器：背包/仓库/保险箱通用结构。
 // Type/GridW/GridH/Version/Items 持久化；mu/index 仅内存。
 type Container struct {
-	Type    int32  `json:"type"`
-	GridW   int32  `json:"gridW"`
-	GridH   int32  `json:"gridH"`
-	Version int32  `json:"version"` // 每次修改 +1
-	Items   []Item `json:"items"`
-
-	mu    sync.Mutex      `json:"-"`
-	index map[int64]*Item `json:"-"` // uid → Item，加载/重排时构建
+	mu       sync.Mutex      `json:"-"`
+	Type     int32           `json:"type"`
+	GridW    int32           `json:"gridW"`
+	GridH    int32           `json:"gridH"`
+	Version  int32           `json:"version"` // 每次修改 +1
+	Items    []Item          `json:"items"`
+	indexMap map[int64]*Item `json:"-"` // uid → Item，加载/重排时构建
 }
 
 // NewContainer 构造空容器。
@@ -171,22 +170,23 @@ func NewContainer(typ, gridW, gridH int32) *Container {
 
 // buildIndex 重建 uid → Item 映射。
 func (c *Container) buildIndex() {
-	c.index = make(map[int64]*Item, len(c.Items))
+	c.indexMap = make(map[int64]*Item, len(c.Items))
 	for i := range c.Items {
-		c.index[c.Items[i].UID] = &c.Items[i]
+		c.indexMap[c.Items[i].ItemID] = &c.Items[i]
 	}
 }
 
 // sizeOf 返回物品当前朝向的尺寸。
 func (c *Container) sizeOf(it *Item) (w, h int32) {
-	def := GetDef(it.DefID)
+	def := GetItemCfgById(it.ItemCfgID)
 	if def == nil {
-		panic(fmt.Sprintf("model: missing ItemDef for defId=%d", it.DefID))
+		panic(fmt.Sprintf("model: missing ItemDef for defId=%d", it.ItemCfgID))
 	}
+	w, h = itemSize(def)
 	if it.Rotated {
-		return def.H, def.W
+		return h, w
 	}
-	return def.W, def.H
+	return w, h
 }
 
 // buildOccupied 构建一维占用表：occ[y*GridW+x] = uid，0 为空。临时构建，不落库。
@@ -197,25 +197,22 @@ func (c *Container) buildOccupied() []int64 {
 		w, h := c.sizeOf(it)
 		for dx := int32(0); dx < w; dx++ {
 			for dy := int32(0); dy < h; dy++ {
-				occ[(it.Y+dy)*c.GridW+(it.X+dx)] = it.UID
+				occ[(it.GridY+dy)*c.GridW+(it.GridX+dx)] = it.ItemID
 			}
 		}
 	}
 	return occ
 }
 
-// canPlace 检查物品能否放在 (x,y)（朝向 rotated）：保险箱准入、边界、碰撞（排除自己）。
+// canPlace 检查物品能否放在 (x,y)（朝向 rotated）：边界、碰撞（排除自己）。
 func (c *Container) canPlace(occ []int64, it *Item, x, y int32, rotated bool) bool {
-	def := GetDef(it.DefID)
+	def := GetItemCfgById(it.ItemCfgID)
 	if def == nil {
 		return false
 	}
-	if c.Type == TypeSecure && !def.AllowSecure {
-		return false
-	}
-	w, h := def.W, def.H
+	w, h := itemSize(def)
 	if rotated {
-		w, h = def.H, def.W
+		w, h = h, w
 	}
 	if x < 0 || y < 0 || x+w > c.GridW || y+h > c.GridH {
 		return false
@@ -223,7 +220,7 @@ func (c *Container) canPlace(occ []int64, it *Item, x, y int32, rotated bool) bo
 	for dx := int32(0); dx < w; dx++ {
 		for dy := int32(0); dy < h; dy++ {
 			owner := occ[(y+dy)*c.GridW+(x+dx)]
-			if owner != 0 && owner != it.UID {
+			if owner != 0 && owner != it.ItemID {
 				return false
 			}
 		}
@@ -236,7 +233,7 @@ func (c *Container) MoveItem(uid int64, toX, toY int32, rotated bool) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	it, ok := c.index[uid]
+	it, ok := c.indexMap[uid]
 	if !ok {
 		return ErrItemNotFound
 	}
@@ -245,7 +242,7 @@ func (c *Container) MoveItem(uid int64, toX, toY int32, rotated bool) error {
 		return ErrPositionConflict
 	}
 
-	it.X, it.Y, it.Rotated = toX, toY, rotated
+	it.GridX, it.GridY, it.Rotated = toX, toY, rotated
 	c.Version++
 	return nil
 }
@@ -255,13 +252,13 @@ func (c *Container) RotateItem(uid int64) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	it, ok := c.index[uid]
+	it, ok := c.indexMap[uid]
 	if !ok {
 		return ErrItemNotFound
 	}
 	occ := c.buildOccupied()
 	newRot := !it.Rotated
-	if !c.canPlace(occ, it, it.X, it.Y, newRot) {
+	if !c.canPlace(occ, it, it.GridX, it.GridY, newRot) {
 		return ErrPositionConflict
 	}
 
@@ -275,13 +272,13 @@ func (c *Container) RemoveItem(uid int64) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	if _, ok := c.index[uid]; !ok {
+	if _, ok := c.indexMap[uid]; !ok {
 		return ErrItemNotFound
 	}
 
 	newItems := make([]Item, 0, len(c.Items)-1)
 	for i := range c.Items {
-		if c.Items[i].UID != uid {
+		if c.Items[i].ItemID != uid {
 			newItems = append(newItems, c.Items[i])
 		}
 	}
@@ -302,41 +299,44 @@ func (c *Container) AutoSort() error {
 
 	// 面积降序，同面积按 defId/uid 稳定排序
 	sort.SliceStable(c.Items, func(i, j int) bool {
-		di, dj := GetDef(c.Items[i].DefID), GetDef(c.Items[j].DefID)
+		di, dj := GetItemCfgById(c.Items[i].ItemCfgID), GetItemCfgById(c.Items[j].ItemCfgID)
 		if di == nil || dj == nil {
 			return false
 		}
-		ai, aj := di.W*di.H, dj.W*dj.H
+		wi, hi := itemSize(di)
+		wj, hj := itemSize(dj)
+		ai, aj := wi*hi, wj*hj
 		if ai != aj {
 			return ai > aj
 		}
-		if c.Items[i].DefID != c.Items[j].DefID {
-			return c.Items[i].DefID < c.Items[j].DefID
+		if c.Items[i].ItemCfgID != c.Items[j].ItemCfgID {
+			return c.Items[i].ItemCfgID < c.Items[j].ItemCfgID
 		}
-		return c.Items[i].UID < c.Items[j].UID
+		return c.Items[i].ItemID < c.Items[j].ItemID
 	})
 
 	for i := range c.Items {
-		c.Items[i].X, c.Items[i].Y, c.Items[i].Rotated = 0, 0, false
+		c.Items[i].GridX, c.Items[i].GridY, c.Items[i].Rotated = 0, 0, false
 	}
 
 	occ := make([]int64, c.GridW*c.GridH)
 
 	for i := range c.Items {
 		it := &c.Items[i]
-		def := GetDef(it.DefID)
+		def := GetItemCfgById(it.ItemCfgID)
 		if def == nil {
 			c.Items = oldItems
 			c.buildIndex()
-			return fmt.Errorf("model: missing ItemDef for defId=%d", it.DefID)
+			return fmt.Errorf("model: missing ItemDef for defId=%d", it.ItemCfgID)
 		}
 		placed := false
 
 		// 双朝向扫描（先原朝向，再旋转）
+		baseW, baseH := itemSize(def)
 		for _, rot := range []bool{false, true} {
-			w, h := def.W, def.H
+			w, h := baseW, baseH
 			if rot {
-				w, h = def.H, def.W
+				w, h = baseH, baseW
 			}
 			for y := int32(0); y <= c.GridH-h && !placed; y++ {
 				for x := int32(0); x <= c.GridW-w && !placed; x++ {
@@ -349,10 +349,10 @@ func (c *Container) AutoSort() error {
 						}
 					}
 					if free {
-						it.X, it.Y, it.Rotated = x, y, rot
+						it.GridX, it.GridY, it.Rotated = x, y, rot
 						for dx := int32(0); dx < w; dx++ {
 							for dy := int32(0); dy < h; dy++ {
-								occ[(y+dy)*c.GridW+(x+dx)] = it.UID
+								occ[(y+dy)*c.GridW+(x+dx)] = it.ItemID
 							}
 						}
 						placed = true
@@ -379,10 +379,10 @@ func (c *Container) AutoSort() error {
 func (c *Container) GetItem(uid int64) *Item {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	if c.index == nil {
+	if c.indexMap == nil {
 		c.buildIndex()
 	}
-	return c.index[uid]
+	return c.indexMap[uid]
 }
 
 // ItemsCopy 返回物品列表的浅拷贝（供外部遍历）。

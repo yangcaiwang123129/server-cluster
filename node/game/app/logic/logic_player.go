@@ -40,6 +40,7 @@ func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.
 	} else if err != nil {
 		return nil, err
 	}
+	Online().Enter(playerID)
 
 	return &pb.EnterGameResp{
 		Base:       toPlayerBase(&core),
@@ -49,6 +50,7 @@ func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.
 
 // LeaveGame 离开游戏：数据经缓存异步落库，无需同步保存。
 func (this *playerLogic) LeaveGame(ctx context.Context, playerID int64, req *pb.LeaveGameReq) (*pb.LeaveGameResp, error) {
+	Online().Leave(playerID)
 	return &pb.LeaveGameResp{}, nil
 }
 

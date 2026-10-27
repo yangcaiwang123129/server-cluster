@@ -48,11 +48,11 @@ func containerToSnapshot(c *model.Container) *pb.ContainerSnapshot {
 	pbItems := make([]*pb.ContainerItem, 0, len(items))
 	for i := range items {
 		pbItems = append(pbItems, &pb.ContainerItem{
-			Uid:     items[i].UID,
-			DefId:   items[i].DefID,
+			Uid:     items[i].ItemID,
+			DefId:   items[i].ItemCfgID,
 			Count:   items[i].Count,
-			X:       items[i].X,
-			Y:       items[i].Y,
+			X:       items[i].GridX,
+			Y:       items[i].GridY,
 			Rotated: items[i].Rotated,
 		})
 	}
