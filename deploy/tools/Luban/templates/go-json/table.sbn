@@ -1,0 +1,3 @@
+{{~if ___top_module != ''~}}
+package {{__top_module}}
+{{~end~}}

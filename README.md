@@ -179,11 +179,11 @@ Client                Gate                Login(HTTP)              Game(Node)
 
 ## 配置表
 
-配置表采用 **Luban 生成 struct + JSON 数据** 的方案：Excel 源表放在 `cfg/excel/`，通过 `deploy/scripts/gen-config.bat` 调用 Luban 生成 Go struct（`share/cfg/*.go`）和 JSON 数据（`share/cfg/data/*.json`），服务启动时一次性加载。当前表为 `ItemCfg`（道具）。
+配置表采用 **Luban 生成 struct + JSON 数据** 的方案：Excel 源表放在 `cfg/excel/`，通过 `deploy/scripts/gen-config.bat` 调用 Luban 生成 Go struct（`share/cfg/*.go`）和 JSON 数据（`cfg/data`），服务启动时一次性加载。当前表为 `ItemCfg`（道具）。
 
 - **源表**：`cfg/excel/ItemCfg.xlsx`（字段定义 + 数据），表结构在 `cfg/excel/__tables__.xlsx` 中声明。
 - **结构定义**：`share/cfg/item.go` 由 Luban 生成，字段带 `json` tag。
-- **数据文件**：`share/cfg/data/itemCfg.json`，数组格式，每个元素对应一行记录。
+- **数据文件**：`cfg/data`，数组格式，每个元素对应一行记录。
 - **加载与访问**：game 服 `app.Init` 中 `cfg.Load()`（失败终止启动）；业务侧 `cfg.T().Item.Get(id)` 访问配置。
 - **重新生成**：修改 Excel 后运行 `deploy\scripts\gen-config.bat`。
 

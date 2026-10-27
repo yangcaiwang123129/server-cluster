@@ -5,23 +5,45 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"sync"
 
 	"server-cluster/share/enum"
 )
 
 // BackpackItem 背包格子中的物品。
-type BackpackItem struct {
-	ItemID int64 `json:"item_id"`
-	Count  int64 `json:"count"`
+type ItemModel struct {
+	ItemID    int64 `json:"itemID"`
+	ItemCfgID int32 `json:"itemCfgID"`
+	Count     int32 `json:"count"`
+	X         int32 `json:"x"`
+	Y         int32 `json:"y"`
+	Rotated   bool  `json:"rotated"`
+}
+
+const (
+	TypeBackpack = 1
+	TypeStash    = 2
+	TypeSecure   = 3
+)
+
+type Container struct {
+	Type    int32        `json:"type"` // 容器类型：0仓库 1背包 2保险箱
+	GridW   int32        `json:"gridW"`
+	GridH   int32        `json:"gridH"`
+	Version int32        `json:"version"`
+	Items   []*ItemModel `json:"items"`
+
+	mu    sync.Mutex           `json:"-"`
+	index map[int64]*ItemModel `json:"-"`
 }
 
 // Backpack 背包实体（对应 player_backpack 表，整包 JSON 序列化后落库/缓存）。
 // 数组格子方式：Slots 下标即格子ID（bag slot id），nil 表示空格子；
 // index 为 itemID -> 格子下标 的内存映射表，反序列化后自动重建，不随 JSON 落盘。
 type Backpack struct {
-	PlayerID int64           `json:"player_id"`
-	Slots    []*BackpackItem `json:"slots"`
-	Version  uint64          `json:"version"`
+	PlayerID      int64        `json:"player_id"`
+	ContainerList []*Container `json:"containers"`
+	Version       uint64       `json:"version"`
 
 	index map[int64]int // itemID -> 格子下标（内存态）
 }
@@ -63,7 +85,7 @@ func (BackpackRow) TableName() string { return enum.TablePlayerBackpack.String()
 // RebuildIndex 按 Slots 重建 itemID -> 格子下标 映射表（加载后或外部直接改 Slots 后调用）。
 func (this *Backpack) RebuildIndex() {
 	this.index = make(map[int64]int, len(this.Slots))
-	for slot, item := range this.Slots {
+	for slot, item := range this.ContainerList {
 		if item != nil {
 			this.index[item.ItemID] = slot
 		}

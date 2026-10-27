@@ -1,4 +1,4 @@
-﻿// Package handler HTTP 层：每个模块一个文件，内含路由注册与处理函数。
+﻿﻿// Package handler HTTP 层：每个模块一个文件，内含路由注册与处理函数。
 package handler
 
 import (
