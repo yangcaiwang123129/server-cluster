@@ -9,7 +9,7 @@ import (
 	"server-cluster/share/model"
 )
 
-// Init 初始化应用：svc（DB/Redis/雪花ID/JWT）→ 配置表 → 自动建表 → store（存储层）。
+// Init 初始化应用：svc（DB/Redis/雪花ID/JWT）→ 配置表 → 自动建表。
 // 须在注册路由前调用。
 func Init() error {
 	if err := svc.Init(); err != nil {
@@ -20,23 +20,24 @@ func Init() error {
 		return err
 	}
 	log.Infof("cfg: tables loaded, items=%d", len(tpl.T().Item.GetDataList()))
-	// 自动构建表（玩家相关表 + 背包）；默认实例未配置（dsn 留空）时跳过
+	// 自动建表（玩家相关表）
 	if inst, err := svc.Ctx().MySQL.Default(); err == nil {
-		if err := svc.AutoMigrate(inst.Gorm(),
-			&model.PlayerModel{},
+		if err = svc.AutoMigrate(inst.Gorm(),
+			&model.PlayerBase{},
 			&model.PlayerCore{},
+			&model.PlayerExtra{},
 			&model.PlayerAsset{},
-			&model.PlayerProfile{},
-			&model.BackpackRow{},
+			&model.PlayerHero{},
+			&model.PlayerContainer{},
 		); err != nil {
 			return err
 		}
 	}
-	return initStore()
+	return nil
 }
 
-// Destroy 进程退出后释放存储层、DB / Redis 等资源。
+// Destroy 进程退出后释放缓存刷盘、DB / Redis 等资源。
 func Destroy() {
-	closeStore()
+	CloseCaches()
 	_ = svc.Close()
 }

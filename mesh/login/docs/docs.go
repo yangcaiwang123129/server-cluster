@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/account/login": {
+        "/api/v1/player/login": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -26,7 +26,7 @@ const docTemplate = `{
                 "tags": [
                     "account"
                 ],
-                "summary": "登录账号",
+                "summary": "登录",
                 "parameters": [
                     {
                         "description": "登录参数",
@@ -34,7 +34,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.LoginReq"
+                            "$ref": "#/definitions/dto.PlayerLoginReq"
                         }
                     }
                 ],
@@ -42,13 +42,13 @@ const docTemplate = `{
                     "200": {
                         "description": "响应包在 {code, message, data} 中",
                         "schema": {
-                            "$ref": "#/definitions/dto.LoginResp"
+                            "$ref": "#/definitions/dto.PlayerLoginResp"
                         }
                     }
                 }
             }
         },
-        "/api/v1/account/register": {
+        "/api/v1/player/register": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -59,7 +59,7 @@ const docTemplate = `{
                 "tags": [
                     "account"
                 ],
-                "summary": "注册账号",
+                "summary": "注册",
                 "parameters": [
                     {
                         "description": "注册参数",
@@ -67,7 +67,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.RegisterReq"
+                            "$ref": "#/definitions/dto.PlayerRegisterReq"
                         }
                     }
                 ],
@@ -75,7 +75,7 @@ const docTemplate = `{
                     "200": {
                         "description": "响应包在 {code, message, data} 中",
                         "schema": {
-                            "$ref": "#/definitions/dto.RegisterResp"
+                            "$ref": "#/definitions/dto.PlayerRegisterResp"
                         }
                     }
                 }
@@ -83,7 +83,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "dto.LoginReq": {
+        "dto.PlayerLoginReq": {
             "type": "object",
             "properties": {
                 "loginType": {
@@ -98,10 +98,13 @@ const docTemplate = `{
                 },
                 "username": {
                     "type": "string"
+                },
+                "zone": {
+                    "type": "string"
                 }
             }
         },
-        "dto.LoginResp": {
+        "dto.PlayerLoginResp": {
             "type": "object",
             "properties": {
                 "gateAddr": {
@@ -112,7 +115,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.RegisterReq": {
+        "dto.PlayerRegisterReq": {
             "type": "object",
             "properties": {
                 "password": {
@@ -123,7 +126,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.RegisterResp": {
+        "dto.PlayerRegisterResp": {
             "type": "object",
             "properties": {
                 "gateAddr": {

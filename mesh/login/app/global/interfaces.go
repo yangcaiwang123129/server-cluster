@@ -9,10 +9,10 @@ import (
 	"server-cluster/share/dto"
 )
 
-// AccountLogic 账号模块业务接口。
-type AccountLogic interface {
-	// Register 注册账号
-	Register(ctx context.Context, req *dto.RegisterReq) (*dto.RegisterResp, error)
-	// Login 登录并签发 token
-	Login(ctx context.Context, req *dto.LoginReq) (*dto.LoginResp, error)
+// PlayerLogic 玩家模块业务接口。
+type PlayerLogic interface {
+	// PlayerRegister 玩家注册账号
+	PlayerRegister(ctx context.Context, req *dto.PlayerRegisterReq) (*dto.PlayerRegisterResp, error)
+	// PlayerLogin 登录登录并签发 token
+	PlayerLogin(ctx context.Context, req *dto.PlayerLoginReq) (*dto.PlayerLoginResp, error)
 }

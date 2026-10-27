@@ -28,7 +28,7 @@ func main() {
 		log.Fatalf("login init failed: %v", err)
 	}
 	// 注册 HTTP 路由
-	handler.Register(httpComponent.Proxy().Router())
+	handler.RegisterPlayer(httpComponent.Proxy().Router())
 	// 添加组件到容器
 	container.Add(httpComponent)
 	// 启动容器

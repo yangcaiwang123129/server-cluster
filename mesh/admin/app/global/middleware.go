@@ -79,7 +79,7 @@ func AuthMiddleware(c fiber.Ctx) error {
 	return c.Next()
 }
 
-// PermissionMiddleware 按 casbin_rule 校验接口访问权限；roleKey=admin 全放行。
+// PermissionMiddleware 按 sys_casbin_rule 校验接口访问权限；roleKey=admin 全放行。
 func PermissionMiddleware(c fiber.Ctx) error {
 	if isPublic(c.Path()) {
 		return c.Next()

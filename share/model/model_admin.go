@@ -176,8 +176,8 @@ type SysOperaLog struct {
 // TableName 表名。
 func (SysOperaLog) TableName() string { return enum.TableSysOperaLog.String() }
 
-// CasbinRule 放行规则：ptype=p 时 v0=roleKey v1=path v2=method。
-type CasbinRule struct {
+// SysCasbinRule 放行规则：ptype=p 时 v0=roleKey v1=path v2=method。
+type SysCasbinRule struct {
 	Id    int    `json:"id" gorm:"column:id;primaryKey;autoIncrement"`
 	Ptype string `json:"ptype" gorm:"column:ptype;size:16"`
 	V0    string `json:"v0" gorm:"column:v0;size:128"`
@@ -189,4 +189,4 @@ type CasbinRule struct {
 }
 
 // TableName 表名。
-func (CasbinRule) TableName() string { return enum.TableCasbinRule.String() }
+func (SysCasbinRule) TableName() string { return enum.TableSysCasbinRule.String() }

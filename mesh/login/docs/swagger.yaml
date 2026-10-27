@@ -1,6 +1,6 @@
 basePath: /
 definitions:
-  dto.LoginReq:
+  dto.PlayerLoginReq:
     properties:
       loginType:
         description: 登录类型 0账号登录 1手机号登录 2微信授权登录
@@ -11,22 +11,24 @@ definitions:
         type: string
       username:
         type: string
+      zone:
+        type: string
     type: object
-  dto.LoginResp:
+  dto.PlayerLoginResp:
     properties:
       gateAddr:
         type: string
       token:
         type: string
     type: object
-  dto.RegisterReq:
+  dto.PlayerRegisterReq:
     properties:
       password:
         type: string
       username:
         type: string
     type: object
-  dto.RegisterResp:
+  dto.PlayerRegisterResp:
     properties:
       gateAddr:
         type: string
@@ -40,7 +42,7 @@ info:
   title: 登录服 API
   version: "1.0"
 paths:
-  /api/v1/account/login:
+  /api/v1/player/login:
     post:
       consumes:
       - application/json
@@ -50,18 +52,18 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/dto.LoginReq'
+          $ref: '#/definitions/dto.PlayerLoginReq'
       produces:
       - application/json
       responses:
         "200":
           description: 响应包在 {code, message, data} 中
           schema:
-            $ref: '#/definitions/dto.LoginResp'
-      summary: 登录账号
+            $ref: '#/definitions/dto.PlayerLoginResp'
+      summary: 登录
       tags:
       - account
-  /api/v1/account/register:
+  /api/v1/player/register:
     post:
       consumes:
       - application/json
@@ -71,15 +73,15 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/dto.RegisterReq'
+          $ref: '#/definitions/dto.PlayerRegisterReq'
       produces:
       - application/json
       responses:
         "200":
           description: 响应包在 {code, message, data} 中
           schema:
-            $ref: '#/definitions/dto.RegisterResp'
-      summary: 注册账号
+            $ref: '#/definitions/dto.PlayerRegisterResp'
+      summary: 注册
       tags:
       - account
 swagger: "2.0"

@@ -4,6 +4,7 @@ package errs
 import (
 	"errors"
 	"server-cluster/share/dto"
+	"server-cluster/share/util"
 	"strings"
 
 	"github.com/dobyte/due/component/http/v2"
@@ -15,14 +16,13 @@ import (
 )
 
 var (
-	ErrInternal        = consts.CodeInternalError.Err()
-	ErrInvalidParams   = consts.CodeInvalidParams.Err()
-	ErrUnauthorized    = consts.CodeUnauthorized.Err()
-	ErrAccountNotFound = consts.CodeAccountNotFound.Err()
-	ErrAccountExists   = consts.CodeAccountExists.Err()
-	ErrPasswordWrong   = consts.CodePasswordWrong.Err()
-	ErrTokenInvalid    = consts.CodeTokenInvalid.Err()
-	ErrPlayerNotFound  = consts.CodePlayerNotFound.Err()
+	ErrInternal       = consts.CodeInternalError.Err()
+	ErrInvalidParams  = consts.CodeInvalidParams.Err()
+	ErrUnauthorized   = consts.CodeUnauthorized.Err()
+	ErrPlayerNotFound = consts.CodePlayerNotFound.Err()
+	ErrPlayerExists   = consts.CodePlayerExists.Err()
+	ErrPasswordWrong  = consts.CodePasswordWrong.Err()
+	ErrTokenInvalid   = consts.CodeTokenInvalid.Err()
 )
 
 // WithMessage 基于既有错误码改写提示文案，返回新的 error（不影响原码）。
@@ -80,6 +80,6 @@ func FailCtxErr(c fiber.Ctx, err error) error {
 func FailErr(ctx http.Context, err error) error { return FailCtxErr(ctx, err) }
 
 // Page 组装分页响应。
-func Page(list any, total int64, pageIndex, pageSize int) dto.PageData {
-	return dto.PageData{List: list, Count: total, PageIndex: pageIndex, PageSize: pageSize}
+func Page[T any](list []T, total int64, pageIndex, pageSize int) util.PageResp[T] {
+	return util.PageResp[T]{List: list, Count: total, PageIndex: pageIndex, PageSize: pageSize}
 }

@@ -5,11 +5,10 @@ import (
 	"errors"
 	"strconv"
 
+	"gorm.io/gorm"
 	"github.com/dobyte/due/v2/utils/xtime"
 
 	"server-cluster/node/game/app/global"
-	"server-cluster/node/game/app/repo"
-	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
 	"server-cluster/share/singleton"
@@ -29,38 +28,35 @@ func Player() global.PlayerLogic { return playerLogicInst.MustGet() }
 
 // EnterGame 进入游戏：playerID 由 handler 层从 ctx.UID() 取得（首包 verify 已完成绑定）。
 func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.EnterGameReq) (*pb.EnterGameResp, error) {
-	// 加载玩家，不存在则创建
-	player, err := repo.Player().Load(ctx, playerID)
-	if err != nil {
-		if !errors.Is(err, errs.ErrPlayerNotFound) {
-			return nil, err
-		}
-		player = &model.PlayerModel{
+	core, err := global.PlayerCoreCache.Get(ctx, playerID)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		// 首次进入，建档并异步落库
+		core = model.PlayerCore{
 			PlayerID: playerID,
-			Name:     "player_" + strconv.FormatInt(playerID, 10),
+			Nickname: "player_" + strconv.FormatInt(playerID, 10),
 			Level:    1,
 		}
-		if err = repo.Player().Save(ctx, player); err != nil {
-			return nil, err
-		}
+		global.PlayerCoreCache.Set(playerID, core)
+	} else if err != nil {
+		return nil, err
 	}
 
 	return &pb.EnterGameResp{
-		Base:       toPlayerBase(player),
+		Base:       toPlayerBase(&core),
 		ServerTime: xtime.Now().UnixMilli(),
 	}, nil
 }
 
-// LeaveGame 离开游戏：玩家数据入库。
+// LeaveGame 离开游戏：数据经缓存异步落库，无需同步保存。
 func (this *playerLogic) LeaveGame(ctx context.Context, playerID int64, req *pb.LeaveGameReq) (*pb.LeaveGameResp, error) {
 	return &pb.LeaveGameResp{}, nil
 }
 
-// toPlayerBase 持久化模型 → wire 基础信息。
-func toPlayerBase(m *model.PlayerModel) *pb.PlayerBase {
+// toPlayerBase 玩家核心数据 → wire 基础信息。
+func toPlayerBase(m *model.PlayerCore) *pb.PlayerBase {
 	return &pb.PlayerBase{
 		PlayerId: m.PlayerID,
-		Name:     m.Name,
+		Name:     m.Nickname,
 		Level:    m.Level,
 	}
 }

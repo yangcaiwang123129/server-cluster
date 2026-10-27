@@ -1,28 +1,14 @@
 package global
 
 import (
+	"server-cluster/share/model"
+
 	"github.com/dobyte/due/v2/log"
 
 	"server-cluster/internal/svc"
-	"server-cluster/mesh/admin/app/repo"
-	"server-cluster/share/model"
 )
 
-// adminTables 管理后台全部表模型。
-var adminTables = []any{
-	&model.SysUser{},
-	&model.SysRole{},
-	&model.SysMenu{},
-	&model.SysApi{},
-	&model.SysDictType{},
-	&model.SysDictData{},
-	&model.SysConfig{},
-	&model.SysLoginLog{},
-	&model.SysOperaLog{},
-	&model.CasbinRule{},
-}
-
-// Init 初始化应用：svc（DB/Redis/雪花ID/JWT）→ 自动建表 → 数据访问句柄 → 种子数据。
+// Init 初始化应用：svc（DB/Redis/雪花ID/JWT）→ 自动建表 → 种子数据。
 // 须在注册路由前调用。
 func Init() error {
 	if err := svc.Init(); err != nil {
@@ -33,10 +19,23 @@ func Init() error {
 		log.Warnf("admin: mysql not configured, admin apis disabled: %v", err)
 		gdb = nil
 	}
-	if err := svc.AutoMigrate(gdb, adminTables...); err != nil {
-		return err
+	// 自动建表（系统相关表）
+	if inst, err := svc.Ctx().MySQL.Default(); err == nil {
+		if err = svc.AutoMigrate(inst.Gorm(),
+			&model.SysUser{},
+			&model.SysRole{},
+			&model.SysMenu{},
+			&model.SysApi{},
+			&model.SysDictType{},
+			&model.SysDictData{},
+			&model.SysConfig{},
+			&model.SysLoginLog{},
+			&model.SysOperaLog{},
+			&model.SysCasbinRule{},
+		); err != nil {
+			return err
+		}
 	}
-	repo.Init(gdb)
 	if gdb != nil {
 		if err := seed(gdb); err != nil {
 			return err

@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "server-cluster/share/pb";
+
+// ========== 容器类型枚举 ==========
+
+enum ContainerType {
+  CONTAINER_TYPE_UNSPECIFIED = 0;
+  CONTAINER_TYPE_BACKPACK = 1; // 背包（局内随身，死亡掉落）
+  CONTAINER_TYPE_STASH = 2;    // 仓库（局外固定，不掉落）
+  CONTAINER_TYPE_SECURE = 3;   // 保险箱（局内随身，不掉落）
+}
+
+// ========== 容器快照消息 ==========
+
+// 容器中的物品（不含尺寸 w/h，客户端查 ItemDef 算）
+message ContainerItem {
+  int64 uid = 1;       // 物品唯一实例ID
+  int32 def_id = 2;    // 物品配置ID
+  int32 count = 3;     // 堆叠数量
+  int32 x = 4;         // 网格 X
+  int32 y = 5;         // 网格 Y
+  bool rotated = 6;    // 是否旋转
+}
+
+// 容器完整快照（成功时返回给客户端）
+message ContainerSnapshot {
+  int64 container_id = 1;           // 容器实例ID（=playerID + type 编码）
+  ContainerType type = 2;           // 容器类型
+  int32 grid_w = 3;                 // 网格宽度
+  int32 grid_h = 4;                 // 网格高度
+  int32 version = 5;                // 操作版本号（每次修改+1）
+  repeated ContainerItem items = 6;  // 物品列表
+}
+
+// ========== 客户端请求 ==========
+
+// 拉取容器（路由 10010）
+message GetContainerReq {
+  ContainerType type = 1; // 容器类型
+}
+
+// 拉取容器响应
+message GetContainerResp {
+  ContainerSnapshot snapshot = 1;
+}
+
+// 移动物品（路由 10011）
+message MoveItemReq {
+  ContainerType type = 1; // 容器类型
+  int64 uid = 2;          // 物品实例ID
+  int32 to_x = 3;         // 目标 X
+  int32 to_y = 4;         // 目标 Y
+  bool rotated = 5;       // 是否旋转放置
+}
+
+// 旋转物品（路由 10012）
+message RotateItemReq {
+  ContainerType type = 1; // 容器类型
+  int64 uid = 2;          // 物品实例ID
+}
+
+// 删除物品（路由 10013）
+message RemoveItemReq {
+  ContainerType type = 1; // 容器类型
+  int64 uid = 2;          // 物品实例ID
+}
+
+// 一键整理（路由 10014）
+message SortContainerReq {
+  ContainerType type = 1; // 容器类型
+}
+
+// ========== 操作统一响应 ==========
+// Move/Rotate/Remove/Sort 成功都返回容器快照
+message ContainerOpResp {
+  ContainerSnapshot snapshot = 1;
+}

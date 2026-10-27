@@ -7,6 +7,24 @@ import (
 	"server-cluster/share/enum"
 )
 
+// PlayerBase 玩家账号，对应 player_base 表。
+type PlayerBase struct {
+	PlayerID    int64  `gorm:"primaryKey;column:player_id" json:"playerID"`
+	Username    string `gorm:"column:username;size:64" json:"username"`
+	Password    string `gorm:"column:password;size:256" json:"password"`
+	Zone        int32  `gorm:"column:zone" json:"zone"`
+	PhoneNumber int32  `gorm:"column:phone_number" json:"phoneNumber"`
+	CreatedAt   int64  `gorm:"column:created_at" json:"created_at"`
+}
+
+// TableName 指定表名。
+func (PlayerBase) TableName() string { return enum.TablePlayerBase.String() }
+
+func (this *PlayerBase) Marshal() ([]byte, error)    { return json.Marshal(this) }
+func (this *PlayerBase) Unmarshal(data []byte) error { return json.Unmarshal(data, this) }
+func (this *PlayerBase) Scan(src any) error          { return ScanJSON(src, this) }
+func (this PlayerBase) Value() (driver.Value, error) { return ValueJSON(this) }
+
 // PlayerCore 玩家核心数据，对应 player_core 表。
 type PlayerCore struct {
 	PlayerID int64  `gorm:"primaryKey;column:player_id" json:"player_id"`
@@ -23,15 +41,23 @@ func (this *PlayerCore) Scan(src any) error          { return ScanJSON(src, this
 func (this PlayerCore) Value() (driver.Value, error) { return ValueJSON(this) }
 func (PlayerCore) TableName() string                 { return enum.TablePlayerCore.String() }
 
-// CorePatch 核心数据补丁；nil 字段表示不修改，值为绝对覆盖。
-type CorePatch struct {
-	Nickname *string `json:"nickname,omitempty"`
-	Level    *int32  `json:"level,omitempty"`
-	Exp      *int64  `json:"exp,omitempty"`
-	Gold     *int64  `json:"gold,omitempty"`
+// PlayerExtra 玩家拓展数据，对应 player_extra 表。
+type PlayerExtra struct {
+	PlayerID int64  `gorm:"primaryKey;column:player_id" json:"player_id"`
+	Nickname string `gorm:"column:nickname"             json:"nickname"`
+	Level    int32  `gorm:"column:level"                json:"level"`
+	Exp      int64  `gorm:"column:exp"                  json:"exp"`
+	Gold     int64  `gorm:"column:gold"                 json:"gold"`
+	Version  uint64 `gorm:"column:version"              json:"version"`
 }
 
-// PlayerAsset 玩家持久资产行，对应 player_assets 表。
+func (this *PlayerExtra) Marshal() ([]byte, error)    { return json.Marshal(this) }
+func (this *PlayerExtra) Unmarshal(data []byte) error { return json.Unmarshal(data, this) }
+func (this *PlayerExtra) Scan(src any) error          { return ScanJSON(src, this) }
+func (this PlayerExtra) Value() (driver.Value, error) { return ValueJSON(this) }
+func (PlayerExtra) TableName() string                 { return enum.TablePlayerExtra.String() }
+
+// PlayerAsset 玩家资产行（一玩家多行），对应 player_assets 表。
 type PlayerAsset struct {
 	PlayerID  int64  `gorm:"primaryKey;column:player_id"  json:"player_id"`
 	AssetType int32  `gorm:"primaryKey;column:asset_type" json:"asset_type"`
@@ -45,14 +71,14 @@ func (this *PlayerAsset) Scan(src any) error          { return ScanJSON(src, thi
 func (this PlayerAsset) Value() (driver.Value, error) { return ValueJSON(this) }
 func (PlayerAsset) TableName() string                 { return enum.TablePlayerAssets.String() }
 
-// AssetChange 资产变更；Amount 为增量（正增负减），结算/扣减统一入口。
+// AssetChange 资产变更；Amount 为增量（正增负减）。
 type AssetChange struct {
 	AssetType int32 `json:"asset_type"`
 	Amount    int64 `json:"amount"`
 }
 
-// PlayerProfile 玩家档案，对应 player_profile 表。
-type PlayerProfile struct {
+// PlayerHero 玩家英雄，对应 player_hero 表。
+type PlayerHero struct {
 	PlayerID     int64  `gorm:"primaryKey;column:player_id" json:"player_id"`
 	Signature    string `gorm:"column:signature"            json:"signature"`
 	AvatarID     int32  `gorm:"column:avatar_id"            json:"avatar_id"`
@@ -60,18 +86,11 @@ type PlayerProfile struct {
 	Version      uint64 `gorm:"column:version"              json:"version"`
 }
 
-func (this *PlayerProfile) Marshal() ([]byte, error)    { return json.Marshal(this) }
-func (this *PlayerProfile) Unmarshal(data []byte) error { return json.Unmarshal(data, this) }
-func (this *PlayerProfile) Scan(src any) error          { return ScanJSON(src, this) }
-func (this PlayerProfile) Value() (driver.Value, error) { return ValueJSON(this) }
-func (PlayerProfile) TableName() string                 { return enum.TablePlayerProfile.String() }
-
-// ProfilePatch 档案补丁；nil 字段表示不修改。
-type ProfilePatch struct {
-	Signature    *string `json:"signature,omitempty"`
-	AvatarID     *int32  `json:"avatar_id,omitempty"`
-	SettingsJSON *string `json:"settings_json,omitempty"`
-}
+func (this *PlayerHero) Marshal() ([]byte, error)    { return json.Marshal(this) }
+func (this *PlayerHero) Unmarshal(data []byte) error { return json.Unmarshal(data, this) }
+func (this *PlayerHero) Scan(src any) error          { return ScanJSON(src, this) }
+func (this PlayerHero) Value() (driver.Value, error) { return ValueJSON(this) }
+func (PlayerHero) TableName() string                 { return enum.TablePlayerHero.String() }
 
 // LootItem 战斗拾取道具（对局内临时资产，结算时映射为 AssetChange；非表实体）。
 type LootItem struct {
@@ -83,18 +102,3 @@ func (this *LootItem) Marshal() ([]byte, error)    { return json.Marshal(this) }
 func (this *LootItem) Unmarshal(data []byte) error { return json.Unmarshal(data, this) }
 func (this *LootItem) Scan(src any) error          { return ScanJSON(src, this) }
 func (this LootItem) Value() (driver.Value, error) { return ValueJSON(this) }
-
-// PlayerModel 玩家表模型（gorm）。
-type PlayerModel struct {
-	PlayerID int64  `gorm:"primaryKey;column:player_id" json:"playerID"`
-	Name     string `gorm:"column:name"        json:"name"`
-	Level    int32  `gorm:"column:level"       json:"level"`
-}
-
-// TableName 指定表名。
-func (PlayerModel) TableName() string { return enum.TablePlayer.String() }
-
-func (this *PlayerModel) Marshal() ([]byte, error)    { return json.Marshal(this) }
-func (this *PlayerModel) Unmarshal(data []byte) error { return json.Unmarshal(data, this) }
-func (this *PlayerModel) Scan(src any) error          { return ScanJSON(src, this) }
-func (this PlayerModel) Value() (driver.Value, error) { return ValueJSON(this) }

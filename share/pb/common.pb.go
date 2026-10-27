@@ -30,6 +30,12 @@ const (
 	RouteCode_ROUTE_CODE_VERIFY      RouteCode = 10000 // 首包，验证账号令牌，用于绑定节点和网关
 	RouteCode_ROUTE_CODE_ENTER_GAME  RouteCode = 10001 // 进入游戏
 	RouteCode_ROUTE_CODE_LEAVE_GAME  RouteCode = 10002 // 离开游戏
+	// 玩家容器 10010~10019
+	RouteCode_ROUTE_CODE_GET_CONTAINER  RouteCode = 10010 // 拉取容器快照
+	RouteCode_ROUTE_CODE_MOVE_ITEM      RouteCode = 10011 // 移动物品
+	RouteCode_ROUTE_CODE_ROTATE_ITEM    RouteCode = 10012 // 旋转物品
+	RouteCode_ROUTE_CODE_REMOVE_ITEM    RouteCode = 10013 // 删除物品
+	RouteCode_ROUTE_CODE_SORT_CONTAINER RouteCode = 10014 // 一键整理
 )
 
 // Enum value maps for RouteCode.
@@ -39,12 +45,22 @@ var (
 		10000: "ROUTE_CODE_VERIFY",
 		10001: "ROUTE_CODE_ENTER_GAME",
 		10002: "ROUTE_CODE_LEAVE_GAME",
+		10010: "ROUTE_CODE_GET_CONTAINER",
+		10011: "ROUTE_CODE_MOVE_ITEM",
+		10012: "ROUTE_CODE_ROTATE_ITEM",
+		10013: "ROUTE_CODE_REMOVE_ITEM",
+		10014: "ROUTE_CODE_SORT_CONTAINER",
 	}
 	RouteCode_value = map[string]int32{
-		"ROUTE_CODE_UNSPECIFIED": 0,
-		"ROUTE_CODE_VERIFY":      10000,
-		"ROUTE_CODE_ENTER_GAME":  10001,
-		"ROUTE_CODE_LEAVE_GAME":  10002,
+		"ROUTE_CODE_UNSPECIFIED":    0,
+		"ROUTE_CODE_VERIFY":         10000,
+		"ROUTE_CODE_ENTER_GAME":     10001,
+		"ROUTE_CODE_LEAVE_GAME":     10002,
+		"ROUTE_CODE_GET_CONTAINER":  10010,
+		"ROUTE_CODE_MOVE_ITEM":      10011,
+		"ROUTE_CODE_ROTATE_ITEM":    10012,
+		"ROUTE_CODE_REMOVE_ITEM":    10013,
+		"ROUTE_CODE_SORT_CONTAINER": 10014,
 	}
 )
 
@@ -325,6 +341,91 @@ func (x *PlayerBase) GetDiamond() int64 {
 	return 0
 }
 
+// 玩家容器
+type PlayerContainer struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`                          // 昵称
+	Level         int32                  `protobuf:"varint,3,opt,name=level,proto3" json:"level,omitempty"`                       // 等级
+	Exp           int64                  `protobuf:"varint,4,opt,name=exp,proto3" json:"exp,omitempty"`                           // 经验
+	Gold          int64                  `protobuf:"varint,5,opt,name=gold,proto3" json:"gold,omitempty"`                         // 金币
+	Diamond       int64                  `protobuf:"varint,6,opt,name=diamond,proto3" json:"diamond,omitempty"`                   // 钻石
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PlayerContainer) Reset() {
+	*x = PlayerContainer{}
+	mi := &file_common_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PlayerContainer) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PlayerContainer) ProtoMessage() {}
+
+func (x *PlayerContainer) ProtoReflect() protoreflect.Message {
+	mi := &file_common_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PlayerContainer.ProtoReflect.Descriptor instead.
+func (*PlayerContainer) Descriptor() ([]byte, []int) {
+	return file_common_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *PlayerContainer) GetPlayerId() int64 {
+	if x != nil {
+		return x.PlayerId
+	}
+	return 0
+}
+
+func (x *PlayerContainer) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *PlayerContainer) GetLevel() int32 {
+	if x != nil {
+		return x.Level
+	}
+	return 0
+}
+
+func (x *PlayerContainer) GetExp() int64 {
+	if x != nil {
+		return x.Exp
+	}
+	return 0
+}
+
+func (x *PlayerContainer) GetGold() int64 {
+	if x != nil {
+		return x.Gold
+	}
+	return 0
+}
+
+func (x *PlayerContainer) GetDiamond() int64 {
+	if x != nil {
+		return x.Diamond
+	}
+	return 0
+}
+
 var File_common_proto protoreflect.FileDescriptor
 
 const file_common_proto_rawDesc = "" +
@@ -344,12 +445,24 @@ const file_common_proto_rawDesc = "" +
 	"\x05level\x18\x03 \x01(\x05R\x05level\x12\x10\n" +
 	"\x03exp\x18\x04 \x01(\x03R\x03exp\x12\x12\n" +
 	"\x04gold\x18\x05 \x01(\x03R\x04gold\x12\x18\n" +
-	"\adiamond\x18\x06 \x01(\x03R\adiamond*w\n" +
+	"\adiamond\x18\x06 \x01(\x03R\adiamond\"\x98\x01\n" +
+	"\x0fPlayerContainer\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
+	"\x05level\x18\x03 \x01(\x05R\x05level\x12\x10\n" +
+	"\x03exp\x18\x04 \x01(\x03R\x03exp\x12\x12\n" +
+	"\x04gold\x18\x05 \x01(\x03R\x04gold\x12\x18\n" +
+	"\adiamond\x18\x06 \x01(\x03R\adiamond*\x8b\x02\n" +
 	"\tRouteCode\x12\x1a\n" +
 	"\x16ROUTE_CODE_UNSPECIFIED\x10\x00\x12\x16\n" +
 	"\x11ROUTE_CODE_VERIFY\x10\x90N\x12\x1a\n" +
 	"\x15ROUTE_CODE_ENTER_GAME\x10\x91N\x12\x1a\n" +
-	"\x15ROUTE_CODE_LEAVE_GAME\x10\x92N*\x8c\x02\n" +
+	"\x15ROUTE_CODE_LEAVE_GAME\x10\x92N\x12\x1d\n" +
+	"\x18ROUTE_CODE_GET_CONTAINER\x10\x9aN\x12\x19\n" +
+	"\x14ROUTE_CODE_MOVE_ITEM\x10\x9bN\x12\x1b\n" +
+	"\x16ROUTE_CODE_ROTATE_ITEM\x10\x9cN\x12\x1b\n" +
+	"\x16ROUTE_CODE_REMOVE_ITEM\x10\x9dN\x12\x1e\n" +
+	"\x19ROUTE_CODE_SORT_CONTAINER\x10\x9eN*\x8c\x02\n" +
 	"\aErrCode\x12\x0f\n" +
 	"\vERR_CODE_OK\x10\x00\x12\x1c\n" +
 	"\x17ERR_CODE_INTERNAL_ERROR\x10\xe8\a\x12\x1c\n" +
@@ -374,13 +487,14 @@ func file_common_proto_rawDescGZIP() []byte {
 }
 
 var file_common_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_common_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_common_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_common_proto_goTypes = []any{
-	(RouteCode)(0),       // 0: pb.RouteCode
-	(ErrCode)(0),         // 1: pb.ErrCode
-	(*ServerNotify)(nil), // 2: pb.ServerNotify
-	(*PlayerData)(nil),   // 3: pb.PlayerData
-	(*PlayerBase)(nil),   // 4: pb.PlayerBase
+	(RouteCode)(0),          // 0: pb.RouteCode
+	(ErrCode)(0),            // 1: pb.ErrCode
+	(*ServerNotify)(nil),    // 2: pb.ServerNotify
+	(*PlayerData)(nil),      // 3: pb.PlayerData
+	(*PlayerBase)(nil),      // 4: pb.PlayerBase
+	(*PlayerContainer)(nil), // 5: pb.PlayerContainer
 }
 var file_common_proto_depIdxs = []int32{
 	4, // 0: pb.PlayerData.player_base:type_name -> pb.PlayerBase
@@ -402,7 +516,7 @@ func file_common_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_common_proto_rawDesc), len(file_common_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   3,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -1,4 +1,10 @@
 // 管理后台服：提供运维/GM HTTP 接口（纯 HTTP 服务，不对外提供 gRPC）。
+//
+// @title 管理后台 API
+// @version 1.0
+// @description 后台系统管理
+// @host 188.18.23.72:8081
+// @BasePath /
 package main
 
 import (
@@ -20,7 +26,7 @@ func main() {
 		log.Fatalf("admin init failed: %v", err)
 	}
 	// 注册 HTTP 路由
-	handler.Register(httpComponent.Proxy().Router())
+	handler.RegisterSys(httpComponent.Proxy().Router())
 	// 添加组件到容器
 	container.Add(httpComponent)
 	// 启动容器

@@ -12,7 +12,6 @@ package {{__namespace}}
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"sync"
 )
 
@@ -41,14 +40,11 @@ func (t *Table[T]) GetDataMap() map[int32]*T { return t.dataMap }
 // GetDataList 返回按文件顺序排列的全部记录。
 func (t *Table[T]) GetDataList() []*T { return t.dataList }
 
-// dataDir 是配置表 JSON 数据所在的目录（相对项目根）。
-const dataDir = "cfg/data"
-
-// LoadTable 从 dataDir/<file>.json 加载一张表，keyFn 从记录中提取主键。
+// LoadTable 读取内嵌的 <file>.json 加载一张表，keyFn 从记录中提取主键。
 func LoadTable[T any](file string, keyFn func(*T) int32) (*Table[T], error) {
-	raw, err := os.ReadFile(dataDir + "/" + file + ".json")
+	raw, err := loadRaw(file)
 	if err != nil {
-		return nil, fmt.Errorf("cfg: read %s.json: %w (cwd=%s)", file, err, mustGetwd())
+		return nil, fmt.Errorf("cfg: read %s.json: %w", file, err)
 	}
 	var rows []*T
 	if err := json.Unmarshal(raw, &rows); err != nil {
@@ -66,13 +62,6 @@ func LoadTable[T any](file string, keyFn func(*T) int32) (*Table[T], error) {
 		tb.dataMap[k] = r
 	}
 	return tb, nil
-}
-
-func mustGetwd() string {
-	if wd, err := os.Getwd(); err == nil {
-		return wd
-	}
-	return "<unknown>"
 }
 
 //------------------------------------------------------------------------------

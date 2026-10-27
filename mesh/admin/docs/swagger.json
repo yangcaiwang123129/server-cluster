@@ -1,0 +1,2343 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "后台系统管理：用户、角色、菜单、接口、配置、字典、日志。",
+        "title": "管理后台 API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "188.18.23.72:8081",
+    "basePath": "/",
+    "paths": {
+        "/api/v1/app-config": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "获取前端品牌配置",
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/captcha": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "获取图形验证码",
+                "responses": {
+                    "200": {
+                        "description": "验证码 ID 与图片地址",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CaptchaResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/config": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "配置列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "页码",
+                        "name": "pageIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "每页条数",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "配置名称",
+                        "name": "configName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "配置键",
+                        "name": "configKey",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "系统内置（Y/N）",
+                        "name": "configType",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "新增配置",
+                "parameters": [
+                    {
+                        "description": "请求体",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ConfigSaveReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "批量删除配置",
+                "parameters": [
+                    {
+                        "description": "批量删除ID",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.IdsReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/config/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "配置详情",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "配置ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "修改配置",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "配置ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "请求体",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ConfigSaveReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/configKey/{key}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "按配置键取值",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "配置键",
+                        "name": "key",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/dict-data/option-select": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "字典项下拉项",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "字典类型",
+                        "name": "dictType",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/dict/data": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "字典项列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "页码",
+                        "name": "pageIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "每页条数",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "字典类型",
+                        "name": "dictType",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "字典标签",
+                        "name": "dictLabel",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "状态",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "新增字典项",
+                "parameters": [
+                    {
+                        "description": "请求体",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DictDataSaveReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "批量删除字典项",
+                "parameters": [
+                    {
+                        "description": "批量删除ID",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.IdsReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/dict/data/{dictCode}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "字典项详情",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "字典编码",
+                        "name": "dictCode",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "修改字典项",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "字典编码",
+                        "name": "dictCode",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "请求体",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DictDataSaveReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/dict/type": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "字典类型列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "页码",
+                        "name": "pageIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "每页条数",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "字典名称",
+                        "name": "dictName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "字典类型",
+                        "name": "dictType",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "状态",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "新增字典类型",
+                "parameters": [
+                    {
+                        "description": "请求体",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DictTypeSaveReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "批量删除字典类型",
+                "parameters": [
+                    {
+                        "description": "批量删除ID",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.IdsReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/dict/type-option-select": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "字典类型下拉项",
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/dict/type/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "字典类型详情",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "字典类型ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "修改字典类型",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "字典类型ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "请求体",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DictTypeSaveReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/getinfo": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "获取当前用户信息",
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/login": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "后台登录",
+                "parameters": [
+                    {
+                        "description": "登录参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.AdminLoginReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "登录成功，token 与信封同级",
+                        "schema": {
+                            "$ref": "#/definitions/dto.TokenResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/logout": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "注销登录",
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/menu": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "菜单树",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "菜单标题",
+                        "name": "title",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "菜单名称",
+                        "name": "menuName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "显示状态",
+                        "name": "visible",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "新增菜单",
+                "parameters": [
+                    {
+                        "description": "请求体",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.MenuSaveReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "批量删除菜单",
+                "parameters": [
+                    {
+                        "description": "批量删除ID",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.IdsReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/menu/{id}": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "修改菜单",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "菜单ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "请求体",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.MenuSaveReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/menu/{menuId}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "菜单详情",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "菜单ID",
+                        "name": "menuId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/menurole": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "获取当前用户动态菜单",
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/operlog/clean": {
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "清空操作日志",
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/role": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "角色列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "页码",
+                        "name": "pageIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "每页条数",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "角色名",
+                        "name": "roleName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "权限字符",
+                        "name": "roleKey",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "状态",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "新增角色",
+                "parameters": [
+                    {
+                        "description": "请求体",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.RoleSaveReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "批量删除角色",
+                "parameters": [
+                    {
+                        "description": "批量删除ID",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.IdsReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/role-status": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "启用/停用角色",
+                "parameters": [
+                    {
+                        "description": "请求体",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.RoleStatusReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/role/{roleId}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "角色详情",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "角色ID",
+                        "name": "roleId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "修改角色",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "角色ID",
+                        "name": "roleId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "请求体",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.RoleSaveReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/roleMenuTreeselect/{roleId}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "角色授权菜单树",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "角色ID",
+                        "name": "roleId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/set-config": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "获取内置系统配置",
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "保存内置系统配置",
+                "parameters": [
+                    {
+                        "description": "请求体",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.SetConfigItem"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/sys-api": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "接口列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "页码",
+                        "name": "pageIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "每页条数",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "接口标题",
+                        "name": "title",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "接口路径",
+                        "name": "path",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "请求方式",
+                        "name": "action",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "接口类型",
+                        "name": "type",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "新增接口",
+                "parameters": [
+                    {
+                        "description": "请求体",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ApiSaveReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "批量删除接口",
+                "parameters": [
+                    {
+                        "description": "批量删除ID",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.IdsReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/sys-api/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "接口详情",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "接口ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "修改接口",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "接口ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "请求体",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ApiSaveReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/sys-login-log": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "登录日志列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "页码",
+                        "name": "pageIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "每页条数",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "登录账号",
+                        "name": "username",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "登录IP",
+                        "name": "ipaddr",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "登录状态",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "开始时间",
+                        "name": "beginTime",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "结束时间",
+                        "name": "endTime",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "批量删除登录日志",
+                "parameters": [
+                    {
+                        "description": "批量删除ID",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.IdsReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/sys-login-log/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "登录日志详情",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "日志ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/sys-opera-log": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "操作日志列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "页码",
+                        "name": "pageIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "每页条数",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "模块标题",
+                        "name": "title",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "操作人",
+                        "name": "operName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "操作状态",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "开始时间",
+                        "name": "beginTime",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "结束时间",
+                        "name": "endTime",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "批量删除操作日志",
+                "parameters": [
+                    {
+                        "description": "批量删除ID",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.IdsReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/sys-user": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "用户列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "页码",
+                        "name": "pageIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "每页条数",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "用户名",
+                        "name": "username",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "手机号",
+                        "name": "phone",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "状态",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "修改用户",
+                "parameters": [
+                    {
+                        "description": "请求体",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserSaveReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "新增用户",
+                "parameters": [
+                    {
+                        "description": "请求体",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserSaveReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "批量删除用户",
+                "parameters": [
+                    {
+                        "description": "批量删除ID",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.IdsReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/sys-user/profile": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "修改当前用户资料",
+                "parameters": [
+                    {
+                        "description": "请求体",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserProfileUpdateReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/sys-user/{userId}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "用户详情",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "用户ID",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/profile": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "获取当前用户资料",
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/pwd/reset": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "重置用户密码",
+                "parameters": [
+                    {
+                        "description": "请求体",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserPasswordResetReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/pwd/set": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "修改当前用户密码",
+                "parameters": [
+                    {
+                        "description": "请求体",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserPasswordSetReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/status": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "启用/停用用户",
+                "parameters": [
+                    {
+                        "description": "请求体",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserStatusReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "dto.AdminLoginReq": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ApiSaveReq": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string"
+                },
+                "handle": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.CaptchaResp": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ConfigSaveReq": {
+            "type": "object",
+            "properties": {
+                "configKey": {
+                    "type": "string"
+                },
+                "configName": {
+                    "type": "string"
+                },
+                "configType": {
+                    "type": "string"
+                },
+                "configValue": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "isFrontend": {
+                    "type": "string"
+                },
+                "remark": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.DictDataSaveReq": {
+            "type": "object",
+            "properties": {
+                "cssClass": {
+                    "type": "string"
+                },
+                "dictCode": {
+                    "type": "integer"
+                },
+                "dictLabel": {
+                    "type": "string"
+                },
+                "dictSort": {
+                    "type": "integer"
+                },
+                "dictType": {
+                    "type": "string"
+                },
+                "dictValue": {
+                    "type": "string"
+                },
+                "isDefault": {
+                    "type": "string"
+                },
+                "listClass": {
+                    "type": "string"
+                },
+                "remark": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.DictTypeSaveReq": {
+            "type": "object",
+            "properties": {
+                "dictName": {
+                    "type": "string"
+                },
+                "dictType": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "remark": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.IdsReq": {
+            "type": "object",
+            "properties": {
+                "ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "dto.MenuSaveReq": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string"
+                },
+                "apis": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "component": {
+                    "type": "string"
+                },
+                "icon": {
+                    "type": "string"
+                },
+                "isFrame": {
+                    "type": "string"
+                },
+                "menuId": {
+                    "type": "integer"
+                },
+                "menuName": {
+                    "type": "string"
+                },
+                "menuType": {
+                    "type": "string"
+                },
+                "noCache": {
+                    "type": "boolean"
+                },
+                "parentId": {
+                    "type": "integer"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "permission": {
+                    "type": "string"
+                },
+                "sort": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "visible": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.Resp": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {},
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.RoleSaveReq": {
+            "type": "object",
+            "properties": {
+                "menuIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "remark": {
+                    "type": "string"
+                },
+                "roleId": {
+                    "type": "integer"
+                },
+                "roleKey": {
+                    "type": "string"
+                },
+                "roleName": {
+                    "type": "string"
+                },
+                "roleSort": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.RoleStatusReq": {
+            "type": "object",
+            "properties": {
+                "roleId": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SetConfigItem": {
+            "type": "object",
+            "properties": {
+                "configKey": {
+                    "type": "string"
+                },
+                "configValue": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.TokenResp": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "msg": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UserPasswordResetReq": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.UserPasswordSetReq": {
+            "type": "object",
+            "properties": {
+                "newPassword": {
+                    "type": "string"
+                },
+                "oldPassword": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UserProfileUpdateReq": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "nickName": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "sex": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UserSaveReq": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "nickName": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "remark": {
+                    "type": "string"
+                },
+                "roleId": {
+                    "type": "integer"
+                },
+                "sex": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UserStatusReq": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

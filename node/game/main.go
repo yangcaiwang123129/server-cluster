@@ -2,8 +2,6 @@
 package main
 
 import (
-	_ "server-cluster/share/dueutil"
-
 	"github.com/dobyte/due/locate/redis/v2"
 	"github.com/dobyte/due/registry/etcd/v2"
 	"github.com/dobyte/due/transport/grpc/v2"
@@ -37,7 +35,6 @@ func main() {
 	// 注册客户端路由
 	handler.RegisterPlayer(component.Proxy())
 	handler.RegisterPlayerContainer(component.Proxy())
-	handler.RegisterPlayerHero(component.Proxy())
 	// 添加节点组件
 	container.Add(component)
 	// 启动容器

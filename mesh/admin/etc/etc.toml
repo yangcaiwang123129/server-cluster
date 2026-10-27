@@ -19,6 +19,14 @@ timezone = "Local"
 # HTTP 监听地址（due http 组件）
 [http]
     addr = "188.18.23.72:8081"
+
+# Swagger 文档（由 swag 生成，due http 组件自动挂载到 /swagger）
+[http.swagger]
+    enable = true
+    title = "管理后台 API"
+    filePath = "docs/swagger.json"
+    basePath = "/swagger"
+
 [log]
     level = "info"
     timeFormat = "2006/01/02 15:04:05.000000"
@@ -46,7 +54,7 @@ timezone = "Local"
 # MySQL 命名实例（多数据源；dsn 为空则跳过该实例）
 [[db.mysql.instances]]
     name = "default"
-    dsn = "root:root123@tcp(127.0.0.1:3306)/account?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s&readTimeout=10s&writeTimeout=10s"
+    dsn = "root:root123@tcp(127.0.0.1:3306)/game?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s&readTimeout=10s&writeTimeout=10s"
     max_open_conns = 50
     max_idle_conns = 20
 

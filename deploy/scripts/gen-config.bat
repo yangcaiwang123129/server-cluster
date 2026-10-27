@@ -51,6 +51,16 @@ if errorlevel 1 (
     exit /b 1
 )
 
+rem --- 2.5 Sync data into embed dir (share\tpl\data, loaded via go:embed) ---
+echo [gen-config] sync data to embed dir...
+if not exist "share\tpl\data" mkdir "share\tpl\data"
+copy /y "%DATA_OUT%\*.json" "share\tpl\data\" >nul
+if errorlevel 1 (
+    echo [gen-config] ERROR: copy data failed
+    pause
+    exit /b 1
+)
+
 rem --- 3. gofmt ---
 echo [gen-config] gofmt...
 where gofmt >nul 2>nul
