@@ -22,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	PlayerService_GetOnlinePlayers_FullMethodName = "/internal.PlayerService/GetOnlinePlayers"
+	PlayerService_KickPlayer_FullMethodName       = "/internal.PlayerService/KickPlayer"
 )
 
 // PlayerServiceClient is the client API for PlayerService service.
@@ -32,6 +33,8 @@ const (
 type PlayerServiceClient interface {
 	// GetOnlinePlayers 查看在线玩家列表
 	GetOnlinePlayers(ctx context.Context, in *GetOnlinePlayersReq, opts ...grpc.CallOption) (*GetOnlinePlayersResp, error)
+	// KickPlayer 踢玩家下线
+	KickPlayer(ctx context.Context, in *KickPlayerReq, opts ...grpc.CallOption) (*KickPlayerResp, error)
 }
 
 type playerServiceClient struct {
@@ -52,6 +55,16 @@ func (c *playerServiceClient) GetOnlinePlayers(ctx context.Context, in *GetOnlin
 	return out, nil
 }
 
+func (c *playerServiceClient) KickPlayer(ctx context.Context, in *KickPlayerReq, opts ...grpc.CallOption) (*KickPlayerResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(KickPlayerResp)
+	err := c.cc.Invoke(ctx, PlayerService_KickPlayer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PlayerServiceServer is the server API for PlayerService service.
 // All implementations must embed UnimplementedPlayerServiceServer
 // for forward compatibility.
@@ -60,6 +73,8 @@ func (c *playerServiceClient) GetOnlinePlayers(ctx context.Context, in *GetOnlin
 type PlayerServiceServer interface {
 	// GetOnlinePlayers 查看在线玩家列表
 	GetOnlinePlayers(context.Context, *GetOnlinePlayersReq) (*GetOnlinePlayersResp, error)
+	// KickPlayer 踢玩家下线
+	KickPlayer(context.Context, *KickPlayerReq) (*KickPlayerResp, error)
 	mustEmbedUnimplementedPlayerServiceServer()
 }
 
@@ -72,6 +87,9 @@ type UnimplementedPlayerServiceServer struct{}
 
 func (UnimplementedPlayerServiceServer) GetOnlinePlayers(context.Context, *GetOnlinePlayersReq) (*GetOnlinePlayersResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetOnlinePlayers not implemented")
+}
+func (UnimplementedPlayerServiceServer) KickPlayer(context.Context, *KickPlayerReq) (*KickPlayerResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method KickPlayer not implemented")
 }
 func (UnimplementedPlayerServiceServer) mustEmbedUnimplementedPlayerServiceServer() {}
 func (UnimplementedPlayerServiceServer) testEmbeddedByValue()                       {}
@@ -112,6 +130,24 @@ func _PlayerService_GetOnlinePlayers_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PlayerService_KickPlayer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(KickPlayerReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlayerServiceServer).KickPlayer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PlayerService_KickPlayer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlayerServiceServer).KickPlayer(ctx, req.(*KickPlayerReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PlayerService_ServiceDesc is the grpc.ServiceDesc for PlayerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -122,6 +158,10 @@ var PlayerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetOnlinePlayers",
 			Handler:    _PlayerService_GetOnlinePlayers_Handler,
+		},
+		{
+			MethodName: "KickPlayer",
+			Handler:    _PlayerService_KickPlayer_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

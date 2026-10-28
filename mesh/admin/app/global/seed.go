@@ -138,3 +138,58 @@ func seedMenus(tx *gorm.DB, items []seedMenu, parentId int) error {
 	}
 	return nil
 }
+
+// syncMenus 为已初始化的库补齐新增菜单与接口（按 menu_name 幂等，不覆盖既有菜单配置）。
+func syncMenus(gdb *gorm.DB) error {
+	return gdb.Transaction(func(tx *gorm.DB) error {
+		return syncMenuNodes(tx, defaultMenus, 0)
+	})
+}
+
+// syncMenuNodes 递归补齐菜单节点：已存在的菜单沿用原配置与 ID，只补缺失的接口关系。
+func syncMenuNodes(tx *gorm.DB, items []seedMenu, parentId int) error {
+	for i := range items {
+		var menu model.SysMenu
+		err := tx.Where("menu_name = ?", items[i].Menu.MenuName).First(&menu).Error
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			menu = items[i].Menu
+			menu.ParentId = parentId
+			if err := tx.Create(&menu).Error; err != nil {
+				return err
+			}
+		} else if err != nil {
+			return err
+		}
+
+		for _, api := range items[i].Apis {
+			var record model.SysApi
+			err := tx.Where("path = ? AND action = ?", api.Path, api.Action).First(&record).Error
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				record = model.SysApi{Path: api.Path, Action: api.Action, Title: api.Title, Type: "BUS"}
+				if err := tx.Create(&record).Error; err != nil {
+					return err
+				}
+			} else if err != nil {
+				return err
+			}
+
+			var count int64
+			if err := tx.Table("sys_menu_api_rule").
+				Where("menu_id = ? AND api_id = ?", menu.MenuId, record.ApiId).
+				Count(&count).Error; err != nil {
+				return err
+			}
+			if count == 0 {
+				if err := tx.Table("sys_menu_api_rule").
+					Create(map[string]any{"menu_id": menu.MenuId, "api_id": record.ApiId}).Error; err != nil {
+					return err
+				}
+			}
+		}
+
+		if err := syncMenuNodes(tx, items[i].Children, menu.MenuId); err != nil {
+			return err
+		}
+	}
+	return nil
+}

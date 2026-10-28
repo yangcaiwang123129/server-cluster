@@ -7,6 +7,7 @@ import sysApi from './sys-api'
 import sysOperLog from './sys-oper-log'
 import sysLoginLog from './sys-login-log'
 import player from './player'
+import playerItem from './player-item'
 
 /**
  * The admin section, one module per page under src/views/admin.
@@ -27,5 +28,6 @@ export default {
   sysApi,
   sysOperLog,
   sysLoginLog,
-  player
+  player,
+  playerItem
 }

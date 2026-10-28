@@ -7,6 +7,7 @@ import sysApi from './sys-api'
 import sysOperLog from './sys-oper-log'
 import sysLoginLog from './sys-login-log'
 import player from './player'
+import playerItem from './player-item'
 
 export default {
   sysUser,
@@ -17,5 +18,6 @@ export default {
   sysApi,
   sysOperLog,
   sysLoginLog,
-  player
+  player,
+  playerItem
 }

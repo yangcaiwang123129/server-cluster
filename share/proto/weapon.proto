@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package pb;
+
+import "common.proto";
+
+option go_package = "server-cluster/share/pb";
+
+// 武器列表请求（路由 10030）
+message WeaponListReq {
+}
+
+// 武器列表响应
+message WeaponListResp {
+  Result result = 1;
+  repeated WeaponEntry weapon_entries = 2;
+}

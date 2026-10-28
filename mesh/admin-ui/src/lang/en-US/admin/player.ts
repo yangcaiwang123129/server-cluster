@@ -12,5 +12,12 @@ export default {
   createdAt: 'Created At',
 
   online: 'Online Players',
-  enterTime: 'Enter Time'
+  enterTime: 'Enter Time',
+
+  // ── Kick ────────────────────────────────────────────────────────
+  kick: 'Kick',
+  banKick: 'Ban & Kick',
+  kickConfirm: 'Kick player {playerId} offline?',
+  banKickConfirm: 'Ban and kick player {playerId} offline?',
+  kickOk: 'Player kicked offline'
 }

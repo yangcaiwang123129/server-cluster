@@ -10,7 +10,6 @@ import (
 	"server-cluster/share/tpl"
 	"sort"
 	"sync"
-	"sync/atomic"
 )
 
 // 容器类型。
@@ -22,16 +21,17 @@ const (
 
 var (
 	ErrItemNotFound     = errors.New("item not found in container")
+	ErrItemExists       = errors.New("item already exists in container")
 	ErrPositionConflict = errors.New("position conflict")
 )
 
 // PlayerContainer 玩家容器集合：一个玩家 3 个容器，每容器一列 JSON。
 type PlayerContainer struct {
-	PlayerID int64      `gorm:"primaryKey;column:player_id"               json:"player_id"`
-	Backpack *Container `gorm:"column:backpack;type:json;serializer:json" json:"backpack"`
-	Stash    *Container `gorm:"column:stash;type:json;serializer:json"    json:"stash"`
-	Secure   *Container `gorm:"column:secure;type:json;serializer:json"   json:"secure"`
-	Version  int64      `gorm:"column:version"                            json:"version"`
+	PlayerID int64      `gorm:"column:player_id;type:bigint;not null;primaryKey;comment:玩家ID" json:"player_id"`
+	Backpack *Container `gorm:"column:backpack;type:json;serializer:json;comment:背包(JSON)" json:"backpack"`
+	Stash    *Container `gorm:"column:stash;type:json;serializer:json;comment:仓库(JSON)" json:"stash"`
+	Secure   *Container `gorm:"column:secure;type:json;serializer:json;comment:保险箱(JSON)" json:"secure"`
+	Version  int64      `gorm:"column:version;type:bigint;not null;default:1;comment:版本号(乐观锁)" json:"version"`
 }
 
 // TableName 指定表名。
@@ -97,17 +97,9 @@ func (p *PlayerContainer) Rebuild() {
 	}
 }
 
-// itemDefStore 配置快照，整体替换。
-var itemDefStore atomic.Value
-
 // GetItemCfgById 按 id 查配置；不存在返回 nil。
 func GetItemCfgById(itemCfgID int32) *tpl.ItemCfg {
-	v := itemDefStore.Load()
-	if v == nil {
-		return nil
-	}
-
-	return tpl.T().Item.GetDataMap()[itemCfgID]
+	return tpl.T().Item.Get(itemCfgID)
 }
 
 // itemSize 读取配置占格（vector2），异常时退回 1x1。
@@ -224,6 +216,28 @@ func (c *Container) canPlace(occ []int64, it *Item, x, y int32, rotated bool) bo
 		}
 	}
 	return true
+}
+
+// AddItem 放入物品：校验实例唯一、边界与碰撞后追加。
+func (c *Container) AddItem(it Item) error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.indexMap == nil {
+		c.buildIndex()
+	}
+	if _, ok := c.indexMap[it.ItemID]; ok {
+		return ErrItemExists
+	}
+	occ := c.buildOccupied()
+	if !c.canPlace(occ, &it, it.GridX, it.GridY, it.Rotated) {
+		return ErrPositionConflict
+	}
+
+	c.Items = append(c.Items, it)
+	c.Version++
+	c.buildIndex()
+	return nil
 }
 
 // MoveItem 将物品 uid 移到 (toX,toY)，可选旋转；canPlace 校验通过才改坐标。

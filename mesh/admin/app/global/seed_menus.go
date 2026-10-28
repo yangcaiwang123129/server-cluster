@@ -105,6 +105,17 @@ var defaultMenus = []seedMenu{
 				Apis: []seedAPI{
 					{"玩家列表", "/api/v1/player", "GET"},
 					{"在线玩家", "/api/v1/player/online", "GET"},
+					{"踢玩家下线", "/api/v1/player/kick", "POST"},
+				},
+			},
+			{
+				Menu: model.SysMenu{MenuName: "PlayerItemManage", Title: "玩家物品", Path: "/player/item/index", Component: "/admin/player-item/index", MenuType: "C", Permission: "game:player:item:list", Sort: 2, Visible: "0", IsFrame: "1"},
+				Apis: []seedAPI{
+					{"物品配置列表", "/api/v1/item", "GET"},
+					{"玩家容器详情", "/api/v1/player/container", "GET"},
+					{"添加物品", "/api/v1/player/container/item", "POST"},
+					{"移动物品", "/api/v1/player/container/item", "PUT"},
+					{"整理物品", "/api/v1/player/container/sort", "POST"},
 				},
 			},
 		},

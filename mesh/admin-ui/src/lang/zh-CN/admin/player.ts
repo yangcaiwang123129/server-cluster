@@ -15,5 +15,12 @@ export default {
 
   // ── Online dialog ───────────────────────────────────────────────
   online: '在线玩家',
-  enterTime: '进入时间'
+  enterTime: '进入时间',
+
+  // ── Kick ────────────────────────────────────────────────────────
+  kick: '踢下线',
+  banKick: '封号踢下线',
+  kickConfirm: '确认踢玩家 {playerId} 下线？',
+  banKickConfirm: '确认封号并踢玩家 {playerId} 下线？',
+  kickOk: '已踢下线'
 }

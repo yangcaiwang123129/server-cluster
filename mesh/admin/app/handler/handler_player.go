@@ -22,6 +22,7 @@ func RegisterPlayer(router http.Router) {
 	// registerPlayer 玩家管理路由。
 	groupRouter.Get("/player", handlePlayerList)
 	groupRouter.Get("/player/online", handlePlayerOnline)
+	groupRouter.Post("/player/kick", handlePlayerKick)
 }
 
 // handlePlayerList 玩家分页列表（player_base）。
@@ -60,4 +61,22 @@ func handlePlayerOnline(ctx http.Context) error {
 		return errs.FailErr(ctx, err)
 	}
 	return errs.OK(ctx, list)
+}
+
+// handlePlayerKick 踢玩家下线（经 mesh 调 game 服）。
+// @Summary 踢玩家下线
+// @Tags system
+// @Produce json
+// @Param body body dto.PlayerKickReq true "踢人参数"
+// @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
+// @Router /api/v1/player/kick [post]
+func handlePlayerKick(ctx http.Context) error {
+	var req dto.PlayerKickReq
+	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.NodeID == "" {
+		return errs.Fail(ctx, 400, "请求参数错误")
+	}
+	if err := logic.Player().PlayerKick(req); err != nil {
+		return errs.FailErr(ctx, err)
+	}
+	return errs.OK(ctx, nil)
 }

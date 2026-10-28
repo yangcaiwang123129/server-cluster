@@ -14,7 +14,7 @@ var (
 	CodeInvalidParams  = codes.NewCode(int(pb.ErrCode_ERR_CODE_INVALID_PARAMS), "invalid params")
 	CodeUnauthorized   = codes.NewCode(int(pb.ErrCode_ERR_CODE_UNAUTHORIZED), "unauthorized")
 	CodePlayerNotFound = codes.NewCode(int(pb.ErrCode_ERR_CODE_PLAYER_NOT_FOUND), "player not found")
-	CodePlayerExists   = codes.NewCode(int(pb.ErrCode_ERR_CODE_ACCOUNT_EXISTS), "player already exists")
+	CodePlayerExists   = codes.NewCode(int(pb.ErrCode_ERR_CODE_PLAYER_EXISTS), "player already exists")
 	CodePasswordWrong  = codes.NewCode(int(pb.ErrCode_ERR_CODE_PASSWORD_WRONG), "password wrong")
 	CodeTokenInvalid   = codes.NewCode(int(pb.ErrCode_ERR_CODE_TOKEN_INVALID), "token invalid")
 )

@@ -2,6 +2,7 @@
 package handler
 
 import (
+	"github.com/dobyte/due/v2/cluster"
 	"github.com/dobyte/due/v2/cluster/node"
 
 	"server-cluster/internal/svc"
@@ -15,6 +16,13 @@ func RegisterPlayer(proxy *node.Proxy) {
 	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_VERIFY), handleVerify)
 	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_ENTER_GAME), handleEnterGame, node.StatefulRoute)
 	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_LEAVE_GAME), handleLeaveGame, node.StatefulRoute)
+
+	// 断线兜底清理：客户端未走 LeaveGame 直接掉线时销毁玩家 actor（Leave 重复 Kill 幂等）。
+	proxy.AddEventHandler(cluster.Disconnect, func(ctx node.Context) {
+		if uid := ctx.UID(); uid > 0 {
+			logic.Online().Leave(uid)
+		}
+	})
 }
 
 // handleVerify 首包：校验 login 服签发的 JWT，绑定网关与节点（proto 注释明确这是绑定入口）。

@@ -2,6 +2,7 @@ package global
 
 import (
 	"server-cluster/share/model"
+	"server-cluster/share/tpl"
 
 	"github.com/dobyte/due/v2/log"
 
@@ -36,8 +37,15 @@ func Init() error {
 			return err
 		}
 	}
+	// 载入 Luban 配置表（物品配置等 GM 展示数据）
+	if err = tpl.Load(); err != nil {
+		return err
+	}
 	if gdb != nil {
 		if err := seed(gdb); err != nil {
+			return err
+		}
+		if err := syncMenus(gdb); err != nil {
 			return err
 		}
 	}

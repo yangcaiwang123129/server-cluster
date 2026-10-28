@@ -3,8 +3,10 @@ package cache
 import (
 	"context"
 	"errors"
+	"reflect"
 	"server-cluster/internal/svc"
 	"sync"
+	"time"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -20,10 +22,12 @@ var schemaCache sync.Map
 // upsertChunkSize 单条 upsert 语句最大行数（防占位符超限）。
 const upsertChunkSize = 500
 
-// tableMeta 表元信息：主键列 + 非主键更新列。
+// tableMeta 表元信息：主键列 + 非主键更新列 + int64 时间字段。
 type tableMeta struct {
 	pkCols     []clause.Column
 	updateCols []string
+	createdAt  *schema.Field
+	updatedAt  *schema.Field
 }
 
 // parseTableMeta 解析 T 的主键列与非主键列。
@@ -40,7 +44,19 @@ func parseTableMeta[T PlayerTableModel]() (*tableMeta, error) {
 		return nil, errors.New("cache: table " + sch.Table + " has no primary key")
 	}
 	for _, f := range sch.Fields {
-		if f.PrimaryKey || f.DBName == "" {
+		// gorm 只自动填充 time.Time，int64 时间戳需要落库前手动赋值
+		switch f.DBName {
+		case "created_at":
+			if f.FieldType.Kind() == reflect.Int64 {
+				m.createdAt = f
+			}
+		case "updated_at":
+			if f.FieldType.Kind() == reflect.Int64 {
+				m.updatedAt = f
+			}
+		}
+		// created_at 只在插入时写入，upsert 冲突时保留首次创建时间
+		if f.PrimaryKey || f.DBName == "" || f.DBName == "created_at" {
 			continue
 		}
 		m.updateCols = append(m.updateCols, f.DBName)
@@ -48,8 +64,32 @@ func parseTableMeta[T PlayerTableModel]() (*tableMeta, error) {
 	return m, nil
 }
 
+// fillTimestamps 为 int64 时间字段填毫秒时间戳：
+// created_at 仅在为 0（首次插入）时赋值，updated_at 每次落库刷新。
+func fillTimestamps[T any](meta *tableMeta, rows []T) {
+	if meta.createdAt == nil && meta.updatedAt == nil {
+		return
+	}
+	now := time.Now().UnixMilli()
+	ctx := context.Background()
+	for i := range rows {
+		rv := reflect.ValueOf(&rows[i]).Elem()
+		if f := meta.createdAt; f != nil {
+			if v, _ := f.ValueOf(ctx, rv); v != nil {
+				if n, ok := v.(int64); ok && n == 0 {
+					_ = f.Set(ctx, rv, now)
+				}
+			}
+		}
+		if f := meta.updatedAt; f != nil {
+			_ = f.Set(ctx, rv, now)
+		}
+	}
+}
+
 // upsertRows 批量 upsert：冲突列 = 主键列，更新列 = 非 PK 列（按 chunk 切分）。
 func upsertRows[T PlayerTableModel](db *gorm.DB, rows []T, meta *tableMeta) error {
+	fillTimestamps(meta, rows)
 	for start := 0; start < len(rows); start += upsertChunkSize {
 		end := start + upsertChunkSize
 		if end > len(rows) {

@@ -292,6 +292,7 @@ func (x *GetContainerReq) GetType() ContainerType {
 type GetContainerResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Snapshot      *ContainerSnapshot     `protobuf:"bytes,1,opt,name=snapshot,proto3" json:"snapshot,omitempty"`
+	Result        *Result                `protobuf:"bytes,2,opt,name=result,proto3" json:"result,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -329,6 +330,13 @@ func (*GetContainerResp) Descriptor() ([]byte, []int) {
 func (x *GetContainerResp) GetSnapshot() *ContainerSnapshot {
 	if x != nil {
 		return x.Snapshot
+	}
+	return nil
+}
+
+func (x *GetContainerResp) GetResult() *Result {
+	if x != nil {
+		return x.Result
 	}
 	return nil
 }
@@ -566,6 +574,7 @@ func (x *SortContainerReq) GetType() ContainerType {
 type ContainerOpResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Snapshot      *ContainerSnapshot     `protobuf:"bytes,1,opt,name=snapshot,proto3" json:"snapshot,omitempty"`
+	Result        *Result                `protobuf:"bytes,2,opt,name=result,proto3" json:"result,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -607,11 +616,18 @@ func (x *ContainerOpResp) GetSnapshot() *ContainerSnapshot {
 	return nil
 }
 
+func (x *ContainerOpResp) GetResult() *Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
 var File_container_proto protoreflect.FileDescriptor
 
 const file_container_proto_rawDesc = "" +
 	"\n" +
-	"\x0fcontainer.proto\x12\x02pb\"\x84\x01\n" +
+	"\x0fcontainer.proto\x12\x02pb\x1a\fcommon.proto\"\x84\x01\n" +
 	"\rContainerItem\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\x03R\x03uid\x12\x15\n" +
 	"\x06def_id\x18\x02 \x01(\x05R\x05defId\x12\x14\n" +
@@ -627,9 +643,11 @@ const file_container_proto_rawDesc = "" +
 	"\aversion\x18\x05 \x01(\x05R\aversion\x12'\n" +
 	"\x05items\x18\x06 \x03(\v2\x11.pb.ContainerItemR\x05items\"8\n" +
 	"\x0fGetContainerReq\x12%\n" +
-	"\x04type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\x04type\"E\n" +
+	"\x04type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\x04type\"i\n" +
 	"\x10GetContainerResp\x121\n" +
-	"\bsnapshot\x18\x01 \x01(\v2\x15.pb.ContainerSnapshotR\bsnapshot\"\x86\x01\n" +
+	"\bsnapshot\x18\x01 \x01(\v2\x15.pb.ContainerSnapshotR\bsnapshot\x12\"\n" +
+	"\x06result\x18\x02 \x01(\v2\n" +
+	".pb.ResultR\x06result\"\x86\x01\n" +
 	"\vMoveItemReq\x12%\n" +
 	"\x04type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\x04type\x12\x10\n" +
 	"\x03uid\x18\x02 \x01(\x03R\x03uid\x12\x11\n" +
@@ -643,9 +661,11 @@ const file_container_proto_rawDesc = "" +
 	"\x04type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\x04type\x12\x10\n" +
 	"\x03uid\x18\x02 \x01(\x03R\x03uid\"9\n" +
 	"\x10SortContainerReq\x12%\n" +
-	"\x04type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\x04type\"D\n" +
+	"\x04type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\x04type\"h\n" +
 	"\x0fContainerOpResp\x121\n" +
-	"\bsnapshot\x18\x01 \x01(\v2\x15.pb.ContainerSnapshotR\bsnapshot*\x81\x01\n" +
+	"\bsnapshot\x18\x01 \x01(\v2\x15.pb.ContainerSnapshotR\bsnapshot\x12\"\n" +
+	"\x06result\x18\x02 \x01(\v2\n" +
+	".pb.ResultR\x06result*\x81\x01\n" +
 	"\rContainerType\x12\x1e\n" +
 	"\x1aCONTAINER_TYPE_UNSPECIFIED\x10\x00\x12\x1b\n" +
 	"\x17CONTAINER_TYPE_BACKPACK\x10\x01\x12\x18\n" +
@@ -677,22 +697,25 @@ var file_container_proto_goTypes = []any{
 	(*RemoveItemReq)(nil),     // 7: pb.RemoveItemReq
 	(*SortContainerReq)(nil),  // 8: pb.SortContainerReq
 	(*ContainerOpResp)(nil),   // 9: pb.ContainerOpResp
+	(*Result)(nil),            // 10: pb.Result
 }
 var file_container_proto_depIdxs = []int32{
-	0, // 0: pb.ContainerSnapshot.type:type_name -> pb.ContainerType
-	1, // 1: pb.ContainerSnapshot.items:type_name -> pb.ContainerItem
-	0, // 2: pb.GetContainerReq.type:type_name -> pb.ContainerType
-	2, // 3: pb.GetContainerResp.snapshot:type_name -> pb.ContainerSnapshot
-	0, // 4: pb.MoveItemReq.type:type_name -> pb.ContainerType
-	0, // 5: pb.RotateItemReq.type:type_name -> pb.ContainerType
-	0, // 6: pb.RemoveItemReq.type:type_name -> pb.ContainerType
-	0, // 7: pb.SortContainerReq.type:type_name -> pb.ContainerType
-	2, // 8: pb.ContainerOpResp.snapshot:type_name -> pb.ContainerSnapshot
-	9, // [9:9] is the sub-list for method output_type
-	9, // [9:9] is the sub-list for method input_type
-	9, // [9:9] is the sub-list for extension type_name
-	9, // [9:9] is the sub-list for extension extendee
-	0, // [0:9] is the sub-list for field type_name
+	0,  // 0: pb.ContainerSnapshot.type:type_name -> pb.ContainerType
+	1,  // 1: pb.ContainerSnapshot.items:type_name -> pb.ContainerItem
+	0,  // 2: pb.GetContainerReq.type:type_name -> pb.ContainerType
+	2,  // 3: pb.GetContainerResp.snapshot:type_name -> pb.ContainerSnapshot
+	10, // 4: pb.GetContainerResp.result:type_name -> pb.Result
+	0,  // 5: pb.MoveItemReq.type:type_name -> pb.ContainerType
+	0,  // 6: pb.RotateItemReq.type:type_name -> pb.ContainerType
+	0,  // 7: pb.RemoveItemReq.type:type_name -> pb.ContainerType
+	0,  // 8: pb.SortContainerReq.type:type_name -> pb.ContainerType
+	2,  // 9: pb.ContainerOpResp.snapshot:type_name -> pb.ContainerSnapshot
+	10, // 10: pb.ContainerOpResp.result:type_name -> pb.Result
+	11, // [11:11] is the sub-list for method output_type
+	11, // [11:11] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_container_proto_init() }
@@ -700,6 +723,7 @@ func file_container_proto_init() {
 	if File_container_proto != nil {
 		return
 	}
+	file_common_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

@@ -122,6 +122,67 @@ func (s *Cache[K, V]) Delete(ctx context.Context, key K) error {
 	return s.deleter(ctx, []K{key})
 }
 
+// Flush 立即同步落库全部待写条目；失败时整批回队并返回错误。
+// 用于下线等必须确定性落库的场景（后台协程的周期落库失败只记录日志）。
+func (s *Cache[K, V]) Flush(ctx context.Context) error {
+	if s.saver == nil {
+		return nil
+	}
+	s.mu.Lock()
+	if len(s.pending) == 0 {
+		s.mu.Unlock()
+		return nil
+	}
+	entries := make([]CacheEntry[K, V], 0, len(s.pending))
+	for k, v := range s.pending {
+		entries = append(entries, CacheEntry[K, V]{Key: k, Value: v})
+	}
+	s.pending = make(map[K]V)
+	s.mu.Unlock()
+
+	if err := s.saver(ctx, entries); err != nil {
+		s.mu.Lock()
+		for _, e := range entries {
+			if _, ok := s.pending[e.Key]; !ok {
+				s.pending[e.Key] = e.Value
+			}
+		}
+		s.mu.Unlock()
+		return err
+	}
+	return nil
+}
+
+// FlushKey 立即同步落库单个 key 的待写值；该 key 无待写值时直接返回 nil。
+func (s *Cache[K, V]) FlushKey(ctx context.Context, key K) error {
+	if s.saver == nil {
+		return nil
+	}
+	s.mu.Lock()
+	val, ok := s.pending[key]
+	if ok {
+		delete(s.pending, key)
+	}
+	s.mu.Unlock()
+	if !ok {
+		return nil
+	}
+	if err := s.saver(ctx, []CacheEntry[K, V]{{Key: key, Value: val}}); err != nil {
+		s.mu.Lock()
+		if _, exists := s.pending[key]; !exists {
+			s.pending[key] = val
+		}
+		s.mu.Unlock()
+		return err
+	}
+	return nil
+}
+
+// Evict 仅逐出内存缓存，不落库也不删库（下线清理内存用）。
+func (s *Cache[K, V]) Evict(key K) {
+	s.cache.Delete(key)
+}
+
 // Close 停止后台协程，剩余 pending 全部落库后释放缓存。
 func (s *Cache[K, V]) Close() {
 	s.closeOnce.Do(func() {
@@ -147,31 +208,9 @@ func (s *Cache[K, V]) flushLoop() {
 	}
 }
 
-// flushPending 取走全部 pending 批量落库；失败整批回队（不覆盖其间的新写入）。
+// flushPending 周期落库：走 Flush，失败整批回队下轮重试。
 func (s *Cache[K, V]) flushPending() {
-	if s.saver == nil {
-		return
-	}
-	s.mu.Lock()
-	if len(s.pending) == 0 {
-		s.mu.Unlock()
-		return
-	}
-	entries := make([]CacheEntry[K, V], 0, len(s.pending))
-	for k, v := range s.pending {
-		entries = append(entries, CacheEntry[K, V]{Key: k, Value: v})
-	}
-	s.pending = make(map[K]V)
-	s.mu.Unlock()
-
-	if err := s.saver(context.Background(), entries); err != nil {
-		s.mu.Lock()
-		for _, e := range entries {
-			if _, ok := s.pending[e.Key]; !ok {
-				s.pending[e.Key] = e.Value
-			}
-		}
-		s.mu.Unlock()
-		log.Errorf("cache: %s flush %d entries failed: %v", s.name, len(entries), err)
+	if err := s.Flush(context.Background()); err != nil {
+		log.Errorf("cache: %s flush failed: %v", s.name, err)
 	}
 }

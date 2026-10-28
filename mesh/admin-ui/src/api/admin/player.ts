@@ -19,3 +19,12 @@ export function listOnlinePlayer() {
     method: 'get'
   })
 }
+
+/** Kick a player offline on its game node. kickType mirrors pb.KickType: 1 active, 2 ban. */
+export function kickPlayer(data: { playerId: number; nodeId: string; kickType: number }) {
+  return request<ApiResponse<null>>({
+    url: '/api/v1/player/kick',
+    method: 'post',
+    data
+  })
+}

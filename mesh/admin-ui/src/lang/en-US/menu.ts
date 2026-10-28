@@ -21,5 +21,6 @@ export default {
   SysConfigSet: 'Settings', // 参数设置
   Log: 'Logs', // 日志管理
   SysLoginLogManage: 'Login Logs', // 登录日志
-  OperLog: 'Operation Logs' // 操作日志
+  OperLog: 'Operation Logs', // 操作日志
+  PlayerItemManage: 'Player Items' // 玩家物品
 }

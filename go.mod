@@ -15,6 +15,7 @@ require (
 	github.com/lafriks/go-tiled v0.15.0
 	github.com/quasilyte/pathing v0.0.0-20260812090109-6fc0d53186b5
 	github.com/redis/go-redis/v9 v9.22.0
+	github.com/shopspring/decimal v1.6.0
 	github.com/swaggo/swag v1.16.6
 	golang.org/x/crypto v0.58.0
 	google.golang.org/grpc v1.83.1

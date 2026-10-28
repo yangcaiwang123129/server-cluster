@@ -6,18 +6,20 @@ import (
 	"github.com/dobyte/due/v2/cluster/node"
 	"github.com/dobyte/due/v2/etc"
 	"github.com/dobyte/due/v2/log"
+	"github.com/dobyte/due/v2/registry"
 	"github.com/dobyte/jwt"
 	"gorm.io/gorm"
 )
 
 // Context 基础设施句柄集合，以后扩展 etcd、kafka 等都挂在这里。
 type Context struct {
-	HTTP      *http.Proxy   // HTTP 组件代理；须由 http 服在组件创建后注入
-	Node      *node.Proxy   // 节点组件代理；须由 node 服在组件创建后注入
-	MySQL     *MySQLManager // 命名 MySQL 实例
-	Redis     *RedisManager // 命名 Redis 实例（不同业务可用不同 db 号）
-	JWT       *jwt.JWT      // 令牌签发/校验器；etc.jwt.secret 未配置的服务为 nil
-	Snowflake *Snowflake    // 雪花 ID 生成器
+	HTTP      *http.Proxy        // HTTP 组件代理；须由 http 服在组件创建后注入
+	Node      *node.Proxy        // 节点组件代理；须由 node 服在组件创建后注入
+	Registry  registry.Registry  // 服务注册发现；须由使用方在创建后注入
+	MySQL     *MySQLManager      // 命名 MySQL 实例
+	Redis     *RedisManager      // 命名 Redis 实例（不同业务可用不同 db 号）
+	JWT       *jwt.JWT           // 令牌签发/校验器；etc.jwt.secret 未配置的服务为 nil
+	Snowflake *Snowflake         // 雪花 ID 生成器
 }
 
 var ctx *Context
@@ -105,6 +107,18 @@ func NodeProxy() *node.Proxy {
 		panic("svc: node proxy is not injected")
 	}
 	return p
+}
+
+// SetRegistry 注入服务注册发现（需要枚举实例的服务在创建后调用）。
+func SetRegistry(r registry.Registry) { Ctx().Registry = r }
+
+// Registry 获取服务注册发现；未注入直接 panic。
+func Registry() registry.Registry {
+	r := Ctx().Registry
+	if r == nil {
+		panic("svc: registry is not injected")
+	}
+	return r
 }
 
 // Close 释放资源，进程退出前调用。

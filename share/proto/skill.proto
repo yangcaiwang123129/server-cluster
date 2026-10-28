@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package pb;
+
+import "common.proto";
+
+option go_package = "server-cluster/share/pb";
+
+// 技能列表请求（路由 10020）
+message SkillListReq {
+}
+
+// 技能列表响应
+message SkillListResp {
+  Result result = 1;
+  repeated SkillEntry skill_entries = 2;
+}

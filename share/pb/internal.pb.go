@@ -23,11 +23,62 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// KickType 踢下线类型。
+type KickType int32
+
+const (
+	KickType_KICK_TYPE_UNSPECIFIED KickType = 0 // 未指定
+	KickType_KICK_TYPE_ACTIVE      KickType = 1 // 主动踢下线
+	KickType_KICK_TYPE_BAN         KickType = 2 // 封号踢下线
+)
+
+// Enum value maps for KickType.
+var (
+	KickType_name = map[int32]string{
+		0: "KICK_TYPE_UNSPECIFIED",
+		1: "KICK_TYPE_ACTIVE",
+		2: "KICK_TYPE_BAN",
+	}
+	KickType_value = map[string]int32{
+		"KICK_TYPE_UNSPECIFIED": 0,
+		"KICK_TYPE_ACTIVE":      1,
+		"KICK_TYPE_BAN":         2,
+	}
+)
+
+func (x KickType) Enum() *KickType {
+	p := new(KickType)
+	*p = x
+	return p
+}
+
+func (x KickType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (KickType) Descriptor() protoreflect.EnumDescriptor {
+	return file_internal_proto_enumTypes[0].Descriptor()
+}
+
+func (KickType) Type() protoreflect.EnumType {
+	return &file_internal_proto_enumTypes[0]
+}
+
+func (x KickType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use KickType.Descriptor instead.
+func (KickType) EnumDescriptor() ([]byte, []int) {
+	return file_internal_proto_rawDescGZIP(), []int{0}
+}
+
 // OnlinePlayer 在线玩家信息。
 type OnlinePlayer struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"`    // 玩家ID
 	EnterTime     int64                  `protobuf:"varint,2,opt,name=enter_time,json=enterTime,proto3" json:"enter_time,omitempty"` // 进入游戏时间（秒级时间戳）
+	NodeId        string                 `protobuf:"bytes,3,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`           // 所在 game 服实例 ID
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -74,6 +125,13 @@ func (x *OnlinePlayer) GetEnterTime() int64 {
 		return x.EnterTime
 	}
 	return 0
+}
+
+func (x *OnlinePlayer) GetNodeId() string {
+	if x != nil {
+		return x.NodeId
+	}
+	return ""
 }
 
 // GetOnlinePlayersReq 查看在线玩家请求。
@@ -158,20 +216,132 @@ func (x *GetOnlinePlayersResp) GetPlayers() []*OnlinePlayer {
 	return nil
 }
 
+// KickPlayerReq 踢玩家下线请求（调用方按 game 实例分组定向调用，每实例一批玩家）。
+type KickPlayerReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerIds     []int64                `protobuf:"varint,1,rep,packed,name=player_ids,json=playerIds,proto3" json:"player_ids,omitempty"`              // 玩家ID列表
+	KickType      KickType               `protobuf:"varint,2,opt,name=kick_type,json=kickType,proto3,enum=internal.KickType" json:"kick_type,omitempty"` // 踢下线类型
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *KickPlayerReq) Reset() {
+	*x = KickPlayerReq{}
+	mi := &file_internal_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *KickPlayerReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*KickPlayerReq) ProtoMessage() {}
+
+func (x *KickPlayerReq) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use KickPlayerReq.ProtoReflect.Descriptor instead.
+func (*KickPlayerReq) Descriptor() ([]byte, []int) {
+	return file_internal_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *KickPlayerReq) GetPlayerIds() []int64 {
+	if x != nil {
+		return x.PlayerIds
+	}
+	return nil
+}
+
+func (x *KickPlayerReq) GetKickType() KickType {
+	if x != nil {
+		return x.KickType
+	}
+	return KickType_KICK_TYPE_UNSPECIFIED
+}
+
+// KickPlayerResp 踢玩家下线响应。
+type KickPlayerResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FailedIds     []int64                `protobuf:"varint,1,rep,packed,name=failed_ids,json=failedIds,proto3" json:"failed_ids,omitempty"` // 踢失败（不在线等）的玩家ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *KickPlayerResp) Reset() {
+	*x = KickPlayerResp{}
+	mi := &file_internal_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *KickPlayerResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*KickPlayerResp) ProtoMessage() {}
+
+func (x *KickPlayerResp) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use KickPlayerResp.ProtoReflect.Descriptor instead.
+func (*KickPlayerResp) Descriptor() ([]byte, []int) {
+	return file_internal_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *KickPlayerResp) GetFailedIds() []int64 {
+	if x != nil {
+		return x.FailedIds
+	}
+	return nil
+}
+
 var File_internal_proto protoreflect.FileDescriptor
 
 const file_internal_proto_rawDesc = "" +
 	"\n" +
-	"\x0einternal.proto\x12\binternal\"J\n" +
+	"\x0einternal.proto\x12\binternal\"c\n" +
 	"\fOnlinePlayer\x12\x1b\n" +
 	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12\x1d\n" +
 	"\n" +
-	"enter_time\x18\x02 \x01(\x03R\tenterTime\"\x15\n" +
+	"enter_time\x18\x02 \x01(\x03R\tenterTime\x12\x17\n" +
+	"\anode_id\x18\x03 \x01(\tR\x06nodeId\"\x15\n" +
 	"\x13GetOnlinePlayersReq\"H\n" +
 	"\x14GetOnlinePlayersResp\x120\n" +
-	"\aplayers\x18\x01 \x03(\v2\x16.internal.OnlinePlayerR\aplayers2b\n" +
+	"\aplayers\x18\x01 \x03(\v2\x16.internal.OnlinePlayerR\aplayers\"_\n" +
+	"\rKickPlayerReq\x12\x1d\n" +
+	"\n" +
+	"player_ids\x18\x01 \x03(\x03R\tplayerIds\x12/\n" +
+	"\tkick_type\x18\x02 \x01(\x0e2\x12.internal.KickTypeR\bkickType\"/\n" +
+	"\x0eKickPlayerResp\x12\x1d\n" +
+	"\n" +
+	"failed_ids\x18\x01 \x03(\x03R\tfailedIds*N\n" +
+	"\bKickType\x12\x19\n" +
+	"\x15KICK_TYPE_UNSPECIFIED\x10\x00\x12\x14\n" +
+	"\x10KICK_TYPE_ACTIVE\x10\x01\x12\x11\n" +
+	"\rKICK_TYPE_BAN\x10\x022\xa3\x01\n" +
 	"\rPlayerService\x12Q\n" +
-	"\x10GetOnlinePlayers\x12\x1d.internal.GetOnlinePlayersReq\x1a\x1e.internal.GetOnlinePlayersRespB\x19Z\x17server-cluster/share/pbb\x06proto3"
+	"\x10GetOnlinePlayers\x12\x1d.internal.GetOnlinePlayersReq\x1a\x1e.internal.GetOnlinePlayersResp\x12?\n" +
+	"\n" +
+	"KickPlayer\x12\x17.internal.KickPlayerReq\x1a\x18.internal.KickPlayerRespB\x19Z\x17server-cluster/share/pbb\x06proto3"
 
 var (
 	file_internal_proto_rawDescOnce sync.Once
@@ -185,21 +355,28 @@ func file_internal_proto_rawDescGZIP() []byte {
 	return file_internal_proto_rawDescData
 }
 
-var file_internal_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_internal_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_internal_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_internal_proto_goTypes = []any{
-	(*OnlinePlayer)(nil),         // 0: internal.OnlinePlayer
-	(*GetOnlinePlayersReq)(nil),  // 1: internal.GetOnlinePlayersReq
-	(*GetOnlinePlayersResp)(nil), // 2: internal.GetOnlinePlayersResp
+	(KickType)(0),                // 0: internal.KickType
+	(*OnlinePlayer)(nil),         // 1: internal.OnlinePlayer
+	(*GetOnlinePlayersReq)(nil),  // 2: internal.GetOnlinePlayersReq
+	(*GetOnlinePlayersResp)(nil), // 3: internal.GetOnlinePlayersResp
+	(*KickPlayerReq)(nil),        // 4: internal.KickPlayerReq
+	(*KickPlayerResp)(nil),       // 5: internal.KickPlayerResp
 }
 var file_internal_proto_depIdxs = []int32{
-	0, // 0: internal.GetOnlinePlayersResp.players:type_name -> internal.OnlinePlayer
-	1, // 1: internal.PlayerService.GetOnlinePlayers:input_type -> internal.GetOnlinePlayersReq
-	2, // 2: internal.PlayerService.GetOnlinePlayers:output_type -> internal.GetOnlinePlayersResp
-	2, // [2:3] is the sub-list for method output_type
-	1, // [1:2] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	1, // 0: internal.GetOnlinePlayersResp.players:type_name -> internal.OnlinePlayer
+	0, // 1: internal.KickPlayerReq.kick_type:type_name -> internal.KickType
+	2, // 2: internal.PlayerService.GetOnlinePlayers:input_type -> internal.GetOnlinePlayersReq
+	4, // 3: internal.PlayerService.KickPlayer:input_type -> internal.KickPlayerReq
+	3, // 4: internal.PlayerService.GetOnlinePlayers:output_type -> internal.GetOnlinePlayersResp
+	5, // 5: internal.PlayerService.KickPlayer:output_type -> internal.KickPlayerResp
+	4, // [4:6] is the sub-list for method output_type
+	2, // [2:4] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_internal_proto_init() }
@@ -212,13 +389,14 @@ func file_internal_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_proto_rawDesc), len(file_internal_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   3,
+			NumEnums:      1,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_internal_proto_goTypes,
 		DependencyIndexes: file_internal_proto_depIdxs,
+		EnumInfos:         file_internal_proto_enumTypes,
 		MessageInfos:      file_internal_proto_msgTypes,
 	}.Build()
 	File_internal_proto = out.File

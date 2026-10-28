@@ -9,14 +9,20 @@ import (
 var (
 	// PlayerBaseCache 玩家账号（player_base，一玩家一行）
 	PlayerBaseCache = cache.NewPlayerTableCache[model.PlayerBase](cache.CacherConfig{Name: "player_base"})
-	// PlayerCoreCache 玩家核心数据（player_core，一玩家一行）
+	// PlayerCoreCache 玩家核心数值（player_core，一玩家一行）
 	PlayerCoreCache = cache.NewPlayerTableCache[model.PlayerCore](cache.CacherConfig{Name: "player_core"})
-	// PlayerExtraCache 玩家拓展数据（player_extra，一玩家一行）
-	PlayerExtraCache = cache.NewPlayerTableCache[model.PlayerExtra](cache.CacherConfig{Name: "player_extra"})
-	// PlayerAssetsCache 玩家资产（player_assets，一玩家多行）
-	PlayerAssetsCache = cache.NewPlayerRowsCache[model.PlayerAsset](cache.CacherConfig{Name: "player_assets"})
-	// PlayerHeroCache 玩家英雄（player_hero，一玩家一行）
+	// PlayerProfileCache 玩家展示资料（player_profile，一玩家一行）
+	PlayerProfileCache = cache.NewPlayerTableCache[model.PlayerProfile](cache.CacherConfig{Name: "player_profile"})
+	// PlayerAssetCache 玩家资产（player_asset，一玩家多行）
+	PlayerAssetCache = cache.NewPlayerRowsCache[model.PlayerAsset](cache.CacherConfig{Name: "player_asset"})
+	// PlayerHeroCache 玩家英雄持有（player_hero，一玩家一行，英雄 map JSON）
 	PlayerHeroCache = cache.NewPlayerTableCache[model.PlayerHero](cache.CacherConfig{Name: "player_hero"})
+	// PlayerSkillCache 玩家技能持有（player_skill，一玩家一行，技能 map JSON）
+	PlayerSkillCache = cache.NewPlayerTableCache[model.PlayerSkill](cache.CacherConfig{Name: "player_skill"})
+	// PlayerWeaponCache 玩家武器持有（player_weapon，一玩家一行，武器 map JSON）
+	PlayerWeaponCache = cache.NewPlayerTableCache[model.PlayerWeapon](cache.CacherConfig{Name: "player_weapon"})
+	// PlayerGearCache 玩家装备持有（player_gear，一玩家一行，装备 map JSON）
+	PlayerGearCache = cache.NewPlayerTableCache[model.PlayerGear](cache.CacherConfig{Name: "player_gear"})
 	// PlayerContainerCache 玩家容器（player_container，一玩家一行）
 	PlayerContainerCache = cache.NewPlayerTableCache[model.PlayerContainer](cache.CacherConfig{Name: "player_container"})
 )
@@ -25,8 +31,11 @@ var (
 func CloseCaches() {
 	PlayerBaseCache.Close()
 	PlayerCoreCache.Close()
-	PlayerExtraCache.Close()
-	PlayerAssetsCache.Close()
+	PlayerProfileCache.Close()
+	PlayerAssetCache.Close()
 	PlayerHeroCache.Close()
+	PlayerSkillCache.Close()
+	PlayerWeaponCache.Close()
+	PlayerGearCache.Close()
 	PlayerContainerCache.Close()
 }

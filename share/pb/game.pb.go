@@ -69,6 +69,7 @@ func (x *VerifyReq) GetToken() string {
 // 验证令牌响应
 type VerifyResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -101,6 +102,13 @@ func (x *VerifyResp) ProtoReflect() protoreflect.Message {
 // Deprecated: Use VerifyResp.ProtoReflect.Descriptor instead.
 func (*VerifyResp) Descriptor() ([]byte, []int) {
 	return file_game_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *VerifyResp) GetResult() *Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
 }
 
 // 进入游戏请求（路由 10001）
@@ -150,11 +158,13 @@ func (x *EnterGameReq) GetToken() string {
 
 // 进入游戏响应（登录成功后返回给客户端的结构体）
 type EnterGameResp struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Base          *PlayerBase            `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`                                // 玩家基础信息
-	ServerTime    int64                  `protobuf:"varint,2,opt,name=server_time,json=serverTime,proto3" json:"server_time,omitempty"` // 服务器毫秒时间戳
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Base            *PlayerBase            `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`                                                                   // 玩家基础信息
+	ServerTime      int64                  `protobuf:"varint,2,opt,name=server_time,json=serverTime,proto3" json:"server_time,omitempty"`                                    // 服务器毫秒时间戳
+	PlayerMagicAttr MagicAttr              `protobuf:"varint,3,opt,name=player_magic_attr,json=playerMagicAttr,proto3,enum=pb.MagicAttr" json:"player_magic_attr,omitempty"` // 玩家属性
+	Result          *Result                `protobuf:"bytes,4,opt,name=result,proto3" json:"result,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *EnterGameResp) Reset() {
@@ -201,6 +211,20 @@ func (x *EnterGameResp) GetServerTime() int64 {
 	return 0
 }
 
+func (x *EnterGameResp) GetPlayerMagicAttr() MagicAttr {
+	if x != nil {
+		return x.PlayerMagicAttr
+	}
+	return MagicAttr_PLAYER_ATTR_UNSPECIFIED
+}
+
+func (x *EnterGameResp) GetResult() *Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
 // 离开游戏请求（路由 10002）
 type LeaveGameReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -241,6 +265,7 @@ func (*LeaveGameReq) Descriptor() ([]byte, []int) {
 // 离开游戏响应
 type LeaveGameResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -275,6 +300,13 @@ func (*LeaveGameResp) Descriptor() ([]byte, []int) {
 	return file_game_proto_rawDescGZIP(), []int{5}
 }
 
+func (x *LeaveGameResp) GetResult() *Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
 var File_game_proto protoreflect.FileDescriptor
 
 const file_game_proto_rawDesc = "" +
@@ -282,17 +314,24 @@ const file_game_proto_rawDesc = "" +
 	"\n" +
 	"game.proto\x12\x02pb\x1a\fcommon.proto\"!\n" +
 	"\tVerifyReq\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\"\f\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\"0\n" +
 	"\n" +
-	"VerifyResp\"$\n" +
+	"VerifyResp\x12\"\n" +
+	"\x06result\x18\x01 \x01(\v2\n" +
+	".pb.ResultR\x06result\"$\n" +
 	"\fEnterGameReq\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\"T\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\"\xb3\x01\n" +
 	"\rEnterGameResp\x12\"\n" +
 	"\x04base\x18\x01 \x01(\v2\x0e.pb.PlayerBaseR\x04base\x12\x1f\n" +
 	"\vserver_time\x18\x02 \x01(\x03R\n" +
-	"serverTime\"\x0e\n" +
-	"\fLeaveGameReq\"\x0f\n" +
-	"\rLeaveGameRespB\x19Z\x17server-cluster/share/pbb\x06proto3"
+	"serverTime\x129\n" +
+	"\x11player_magic_attr\x18\x03 \x01(\x0e2\r.pb.MagicAttrR\x0fplayerMagicAttr\x12\"\n" +
+	"\x06result\x18\x04 \x01(\v2\n" +
+	".pb.ResultR\x06result\"\x0e\n" +
+	"\fLeaveGameReq\"3\n" +
+	"\rLeaveGameResp\x12\"\n" +
+	"\x06result\x18\x01 \x01(\v2\n" +
+	".pb.ResultR\x06resultB\x19Z\x17server-cluster/share/pbb\x06proto3"
 
 var (
 	file_game_proto_rawDescOnce sync.Once
@@ -314,15 +353,21 @@ var file_game_proto_goTypes = []any{
 	(*EnterGameResp)(nil), // 3: pb.EnterGameResp
 	(*LeaveGameReq)(nil),  // 4: pb.LeaveGameReq
 	(*LeaveGameResp)(nil), // 5: pb.LeaveGameResp
-	(*PlayerBase)(nil),    // 6: pb.PlayerBase
+	(*Result)(nil),        // 6: pb.Result
+	(*PlayerBase)(nil),    // 7: pb.PlayerBase
+	(MagicAttr)(0),        // 8: pb.MagicAttr
 }
 var file_game_proto_depIdxs = []int32{
-	6, // 0: pb.EnterGameResp.base:type_name -> pb.PlayerBase
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	6, // 0: pb.VerifyResp.result:type_name -> pb.Result
+	7, // 1: pb.EnterGameResp.base:type_name -> pb.PlayerBase
+	8, // 2: pb.EnterGameResp.player_magic_attr:type_name -> pb.MagicAttr
+	6, // 3: pb.EnterGameResp.result:type_name -> pb.Result
+	6, // 4: pb.LeaveGameResp.result:type_name -> pb.Result
+	5, // [5:5] is the sub-list for method output_type
+	5, // [5:5] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_game_proto_init() }

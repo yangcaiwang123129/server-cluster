@@ -9,6 +9,7 @@ option go_package = "server-cluster/share/pb";
 message OnlinePlayer {
   int64 player_id = 1;  // 玩家ID
   int64 enter_time = 2; // 进入游戏时间（秒级时间戳）
+  string node_id = 3;   // 所在 game 服实例 ID
 }
 
 // GetOnlinePlayersReq 查看在线玩家请求。
@@ -19,8 +20,28 @@ message GetOnlinePlayersResp {
   repeated OnlinePlayer players = 1; // 在线玩家列表
 }
 
+// KickType 踢下线类型。
+enum KickType {
+  KICK_TYPE_UNSPECIFIED = 0; // 未指定
+  KICK_TYPE_ACTIVE = 1;      // 主动踢下线
+  KICK_TYPE_BAN = 2;         // 封号踢下线
+}
+
+// KickPlayerReq 踢玩家下线请求（调用方按 game 实例分组定向调用，每实例一批玩家）。
+message KickPlayerReq {
+  repeated int64 player_ids = 1; // 玩家ID列表
+  KickType kick_type = 2;        // 踢下线类型
+}
+
+// KickPlayerResp 踢玩家下线响应。
+message KickPlayerResp {
+  repeated int64 failed_ids = 1; // 踢失败（不在线等）的玩家ID
+}
+
 // PlayerService 玩家相关内部服务（game 服提供）。
 service PlayerService {
   // GetOnlinePlayers 查看在线玩家列表
   rpc GetOnlinePlayers (GetOnlinePlayersReq) returns (GetOnlinePlayersResp);
+  // KickPlayer 踢玩家下线
+  rpc KickPlayer (KickPlayerReq) returns (KickPlayerResp);
 }

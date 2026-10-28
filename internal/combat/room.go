@@ -16,20 +16,20 @@ const (
 
 // 玩家初始属性。
 const (
-	initialHP      = 100
-	initialAttack  = 100
-	initialDefense = 0
-	initialSpeed   = 100
+	initialHP       = 100
+	initialAttack   = 100
+	initialDefense  = 0
+	initialSpeed    = 100
 )
 
 // PlayerState 房间内玩家的战斗状态。
 type PlayerState struct {
-	ID           int64
+	ID          int64
 	GridX, GridY int
-	HP           int
-	BaseAttack   int
-	BaseDefense  int
-	BaseSpeed    int
+	HP          int
+	BaseAttack  int
+	BaseDefense int
+	BaseSpeed   int
 	// Attack/Defense/Speed 为叠加 buff 后的实时属性。
 	Attack    int
 	Defense   int

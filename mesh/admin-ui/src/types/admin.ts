@@ -229,4 +229,57 @@ export interface Player {
 export interface OnlinePlayer {
   playerId?: number
   enterTime?: number
+  /** game node instance the player resides on */
+  nodeId?: string
+}
+
+/** Filters the Luban item catalog accepts. */
+export interface ItemCfgQuery {
+  keyword?: string
+}
+
+/** A row from the Luban itemconfig table. */
+export interface ItemCfg {
+  id?: number
+  name?: string
+  desc?: string
+  type?: number
+  iconKey?: string
+  /** footprint in cells */
+  width?: number
+  height?: number
+  rarity?: number
+  maxCount?: number
+  overlayMaxCount?: number
+  storageType?: number
+  price?: number
+  sellingPrice?: number
+  usedInBackpack?: boolean
+}
+
+/** An item instance placed on a player container's grid. */
+export interface ContainerItem {
+  itemId?: number
+  itemCfgId?: number
+  count?: number
+  gridX?: number
+  gridY?: number
+  rotated?: boolean
+  name?: string
+  iconKey?: string
+  /** occupied cells in the current orientation */
+  width?: number
+  height?: number
+  rarity?: number
+  maxCount?: number
+}
+
+/** A player container (1 backpack, 2 stash, 3 secure) with its grid. */
+export interface PlayerContainer {
+  playerId?: number
+  containerType?: number
+  gridW?: number
+  gridH?: number
+  version?: number
+  items?: ContainerItem[]
 }

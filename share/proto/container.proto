@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package pb;
 
+import "common.proto";
+
 option go_package = "server-cluster/share/pb";
 
 // ========== 容器类型枚举 ==========
@@ -45,6 +47,7 @@ message GetContainerReq {
 // 拉取容器响应
 message GetContainerResp {
   ContainerSnapshot snapshot = 1;
+  Result result = 2;
 }
 
 // 移动物品（路由 10011）
@@ -77,4 +80,5 @@ message SortContainerReq {
 // Move/Rotate/Remove/Sort 成功都返回容器快照
 message ContainerOpResp {
   ContainerSnapshot snapshot = 1;
+  Result result = 2;
 }

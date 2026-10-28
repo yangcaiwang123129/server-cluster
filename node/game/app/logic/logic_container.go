@@ -90,6 +90,22 @@ func saveContainer(playerID int64, pc *model.PlayerContainer) {
 	global.PlayerContainerCache.Set(playerID, *pc)
 }
 
+// EnterGame 进入游戏：加载/建档玩家容器，未建档则初始化并挂入缓存。
+func (this *playerContainerLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq) (*pb.EnterGameResp, error) {
+	if _, err := loadContainer(ctx, playerID); err != nil {
+		return nil, err
+	}
+	return &pb.EnterGameResp{}, nil
+}
+
+// LeaveGame 离开游戏：容器待写数据同步落库，并逐出内存缓存。
+func (this *playerContainerLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq) (*pb.LeaveGameResp, error) {
+	if err := flushAndEvict(ctx, global.PlayerContainerCache, playerID); err != nil {
+		return nil, err
+	}
+	return &pb.LeaveGameResp{}, nil
+}
+
 // ---------- GetContainer ----------
 
 func (this *playerContainerLogic) GetContainer(ctx context.Context, playerID int64, req *pb.GetContainerReq) (*pb.GetContainerResp, error) {

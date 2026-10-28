@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package pb;
+
+import "common.proto";
+
+option go_package = "server-cluster/share/pb";
+
+// 英雄列表请求（路由 10040）
+message HeroListReq {
+}
+
+// 英雄列表响应
+message HeroListResp {
+  Result result = 1;
+  repeated HeroEntry hero_entries = 2;
+}

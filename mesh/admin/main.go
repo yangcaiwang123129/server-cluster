@@ -38,9 +38,12 @@ func main() {
 	}
 	// 注入组件代理（服务间 RPC 用）
 	svc.SetHTTPProxy(httpComponent.Proxy())
+	// 注入注册发现（在线玩家列表枚举 game 实例用）
+	svc.SetRegistry(registry)
 	// 注册 HTTP 路由
 	handler.RegisterSys(httpComponent.Proxy().Router())
 	handler.RegisterPlayer(httpComponent.Proxy().Router())
+	handler.RegisterItem(httpComponent.Proxy().Router())
 	// 添加组件到容器
 	container.Add(httpComponent)
 	// 启动容器

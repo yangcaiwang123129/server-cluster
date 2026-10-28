@@ -13,6 +13,7 @@ message VerifyReq {
 
 // 验证令牌响应
 message VerifyResp {
+  Result result = 1;
 }
 
 // 进入游戏请求（路由 10001）
@@ -22,8 +23,10 @@ message EnterGameReq {
 
 // 进入游戏响应（登录成功后返回给客户端的结构体）
 message EnterGameResp {
-  PlayerBase base = 1;   // 玩家基础信息
-  int64 server_time = 2; // 服务器毫秒时间戳
+  PlayerBase base = 1;              // 玩家基础信息
+  int64 server_time = 2;            // 服务器毫秒时间戳
+  MagicAttr player_magic_attr = 3;  // 玩家属性
+  Result result = 4;
 }
 
 // 离开游戏请求（路由 10002）
@@ -32,4 +35,5 @@ message LeaveGameReq {
 
 // 离开游戏响应
 message LeaveGameResp {
+  Result result = 1;
 }
