@@ -257,9 +257,9 @@ export interface ItemCfg {
   usedInBackpack?: boolean
 }
 
-/** An item instance placed on a player container's grid. */
-export interface ContainerItem {
-  itemId?: number
+/** GM 容器内物品（含配置展示信息）。itemId 为雪花 ID，后端按字符串下发。 */
+export interface GmContainerItem {
+  itemId?: string
   itemCfgId?: number
   count?: number
   gridX?: number
@@ -274,12 +274,61 @@ export interface ContainerItem {
   maxCount?: number
 }
 
-/** A player container (1 backpack, 2 stash, 3 secure) with its grid. */
-export interface PlayerContainer {
+export interface GmContainer {
   playerId?: number
   containerType?: number
   gridW?: number
   gridH?: number
   version?: number
-  items?: ContainerItem[]
+  items?: GmContainerItem[]
+}
+
+export interface GmHero {
+  heroId?: number
+  level?: number
+  exp?: number
+  star?: number
+  skinId?: number
+  equipped?: boolean
+  /** config-derived display info */
+  name?: string
+  rarity?: number
+}
+
+export interface GmWeapon {
+  weaponId?: number
+  level?: number
+  durability?: number
+  equipped?: boolean
+  /** config-derived display info */
+  name?: string
+  iconKey?: string
+}
+
+export interface GmSkill {
+  skillId?: number
+  level?: number
+  equipped?: boolean
+  /** config-derived display info */
+  name?: string
+  desc?: string
+}
+
+export interface GmGear {
+  gearId?: number
+  level?: number
+  equipped?: boolean
+  /** config-derived display info */
+  name?: string
+  iconKey?: string
+  desc?: string
+}
+
+/** A row from the game config catalog (hero/weapon/skill/gear), for pickers. */
+export interface GameCatalogEntry {
+  id?: number
+  name?: string
+  iconKey?: string
+  desc?: string
+  rarity?: number
 }

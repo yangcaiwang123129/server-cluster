@@ -26,7 +26,7 @@ message ContainerNotify {
 // 容器内移动物品请求（路由 10012）
 message ContainerMoveReq {
   ContainerType type = 1; // 容器类型
-  int64 uid = 2;          // 物品实例ID
+  int64 item_id = 2;      // 物品实例ID
   int32 to_x = 3;         // 目标 X
   int32 to_y = 4;         // 目标 Y
   bool rotated = 5;       // 是否旋转放置
@@ -40,7 +40,7 @@ message ContainerMoveResp {
 // 容器内旋转物品请求（路由 10013）
 message ContainerRotateReq {
   ContainerType type = 1; // 容器类型
-  int64 uid = 2;          // 物品实例ID
+  int64 item_id = 2;      // 物品实例ID
 }
 
 // 容器内旋转物品响应
@@ -62,7 +62,7 @@ message SortContainerResp {
 message ContainerTransferReq {
   ContainerType from_type = 1; // 源容器类型
   ContainerType to_type = 2;   // 目标容器类型
-  int64 uid = 3;               // 物品实例ID
+  int64 item_id = 3;           // 物品实例ID
   int32 to_x = 4;              // 目标 X
   int32 to_y = 5;              // 目标 Y
   bool rotated = 6;            // 是否旋转放置

@@ -176,7 +176,7 @@ func (x *ContainerNotify) GetItemEntry() *ItemEntry {
 type ContainerMoveReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Type          ContainerType          `protobuf:"varint,1,opt,name=type,proto3,enum=pb.ContainerType" json:"type,omitempty"` // 容器类型
-	Uid           int64                  `protobuf:"varint,2,opt,name=uid,proto3" json:"uid,omitempty"`                         // 物品实例ID
+	ItemId        int64                  `protobuf:"varint,2,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"`     // 物品实例ID
 	ToX           int32                  `protobuf:"varint,3,opt,name=to_x,json=toX,proto3" json:"to_x,omitempty"`              // 目标 X
 	ToY           int32                  `protobuf:"varint,4,opt,name=to_y,json=toY,proto3" json:"to_y,omitempty"`              // 目标 Y
 	Rotated       bool                   `protobuf:"varint,5,opt,name=rotated,proto3" json:"rotated,omitempty"`                 // 是否旋转放置
@@ -221,9 +221,9 @@ func (x *ContainerMoveReq) GetType() ContainerType {
 	return ContainerType_CONTAINER_TYPE_UNSPECIFIED
 }
 
-func (x *ContainerMoveReq) GetUid() int64 {
+func (x *ContainerMoveReq) GetItemId() int64 {
 	if x != nil {
-		return x.Uid
+		return x.ItemId
 	}
 	return 0
 }
@@ -298,7 +298,7 @@ func (x *ContainerMoveResp) GetResult() *Result {
 type ContainerRotateReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Type          ContainerType          `protobuf:"varint,1,opt,name=type,proto3,enum=pb.ContainerType" json:"type,omitempty"` // 容器类型
-	Uid           int64                  `protobuf:"varint,2,opt,name=uid,proto3" json:"uid,omitempty"`                         // 物品实例ID
+	ItemId        int64                  `protobuf:"varint,2,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"`     // 物品实例ID
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -340,9 +340,9 @@ func (x *ContainerRotateReq) GetType() ContainerType {
 	return ContainerType_CONTAINER_TYPE_UNSPECIFIED
 }
 
-func (x *ContainerRotateReq) GetUid() int64 {
+func (x *ContainerRotateReq) GetItemId() int64 {
 	if x != nil {
-		return x.Uid
+		return x.ItemId
 	}
 	return 0
 }
@@ -487,7 +487,7 @@ type ContainerTransferReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	FromType      ContainerType          `protobuf:"varint,1,opt,name=from_type,json=fromType,proto3,enum=pb.ContainerType" json:"from_type,omitempty"` // 源容器类型
 	ToType        ContainerType          `protobuf:"varint,2,opt,name=to_type,json=toType,proto3,enum=pb.ContainerType" json:"to_type,omitempty"`       // 目标容器类型
-	Uid           int64                  `protobuf:"varint,3,opt,name=uid,proto3" json:"uid,omitempty"`                                                 // 物品实例ID
+	ItemId        int64                  `protobuf:"varint,3,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"`                             // 物品实例ID
 	ToX           int32                  `protobuf:"varint,4,opt,name=to_x,json=toX,proto3" json:"to_x,omitempty"`                                      // 目标 X
 	ToY           int32                  `protobuf:"varint,5,opt,name=to_y,json=toY,proto3" json:"to_y,omitempty"`                                      // 目标 Y
 	Rotated       bool                   `protobuf:"varint,6,opt,name=rotated,proto3" json:"rotated,omitempty"`                                         // 是否旋转放置
@@ -539,9 +539,9 @@ func (x *ContainerTransferReq) GetToType() ContainerType {
 	return ContainerType_CONTAINER_TYPE_UNSPECIFIED
 }
 
-func (x *ContainerTransferReq) GetUid() int64 {
+func (x *ContainerTransferReq) GetItemId() int64 {
 	if x != nil {
-		return x.Uid
+		return x.ItemId
 	}
 	return 0
 }
@@ -642,19 +642,19 @@ const file_container_proto_rawDesc = "" +
 	"\x0fContainerNotify\x128\n" +
 	"\x0econtainer_type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\rcontainerType\x12,\n" +
 	"\n" +
-	"item_entry\x18\x02 \x01(\v2\r.pb.ItemEntryR\titemEntry\"\x8b\x01\n" +
+	"item_entry\x18\x02 \x01(\v2\r.pb.ItemEntryR\titemEntry\"\x92\x01\n" +
 	"\x10ContainerMoveReq\x12%\n" +
-	"\x04type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\x04type\x12\x10\n" +
-	"\x03uid\x18\x02 \x01(\x03R\x03uid\x12\x11\n" +
+	"\x04type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\x04type\x12\x17\n" +
+	"\aitem_id\x18\x02 \x01(\x03R\x06itemId\x12\x11\n" +
 	"\x04to_x\x18\x03 \x01(\x05R\x03toX\x12\x11\n" +
 	"\x04to_y\x18\x04 \x01(\x05R\x03toY\x12\x18\n" +
 	"\arotated\x18\x05 \x01(\bR\arotated\"7\n" +
 	"\x11ContainerMoveResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
-	".pb.ResultR\x06result\"M\n" +
+	".pb.ResultR\x06result\"T\n" +
 	"\x12ContainerRotateReq\x12%\n" +
-	"\x04type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\x04type\x12\x10\n" +
-	"\x03uid\x18\x02 \x01(\x03R\x03uid\"9\n" +
+	"\x04type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\x04type\x12\x17\n" +
+	"\aitem_id\x18\x02 \x01(\x03R\x06itemId\"9\n" +
 	"\x13ContainerRotateResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\"L\n" +
@@ -662,11 +662,11 @@ const file_container_proto_rawDesc = "" +
 	"\x0econtainer_type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\rcontainerType\"7\n" +
 	"\x11SortContainerResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
-	".pb.ResultR\x06result\"\xc4\x01\n" +
+	".pb.ResultR\x06result\"\xcb\x01\n" +
 	"\x14ContainerTransferReq\x12.\n" +
 	"\tfrom_type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\bfromType\x12*\n" +
-	"\ato_type\x18\x02 \x01(\x0e2\x11.pb.ContainerTypeR\x06toType\x12\x10\n" +
-	"\x03uid\x18\x03 \x01(\x03R\x03uid\x12\x11\n" +
+	"\ato_type\x18\x02 \x01(\x0e2\x11.pb.ContainerTypeR\x06toType\x12\x17\n" +
+	"\aitem_id\x18\x03 \x01(\x03R\x06itemId\x12\x11\n" +
 	"\x04to_x\x18\x04 \x01(\x05R\x03toX\x12\x11\n" +
 	"\x04to_y\x18\x05 \x01(\x05R\x03toY\x12\x18\n" +
 	"\arotated\x18\x06 \x01(\bR\arotated\"\x9d\x01\n" +

@@ -12,11 +12,14 @@ import (
 	"github.com/dobyte/due/v2/cluster/node"
 	"github.com/dobyte/due/v2/log"
 
+	"server-cluster/internal/singleinstance"
 	"server-cluster/node/battle/app/global"
 	"server-cluster/node/battle/app/handler"
 )
 
 func main() {
+	// 单实例保护：重复启动会触发 due 日志 rotate 失败 panic，提前拦截
+	singleinstance.Check("battle-1")
 	// 创建容器（gate 与 node 同容器注册，共用一套定位器与注册中心）
 	container := due.NewContainer()
 

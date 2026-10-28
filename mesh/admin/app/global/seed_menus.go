@@ -98,29 +98,6 @@ var defaultMenus = []seedMenu{
 		},
 	},
 	{
-		Menu: model.SysMenu{MenuName: "Player", Title: "玩家管理", Path: "/player", MenuType: "M", Component: "Layout", Sort: 3, Visible: "0", IsFrame: "1"},
-		Children: []seedMenu{
-			{
-				Menu: model.SysMenu{MenuName: "PlayerManage", Title: "玩家列表", Path: "/player/player/index", Component: "/admin/player/index", MenuType: "C", Permission: "game:player:list", Sort: 1, Visible: "0", IsFrame: "1"},
-				Apis: []seedAPI{
-					{"玩家列表", "/api/v1/player", "GET"},
-					{"在线玩家", "/api/v1/player/online", "GET"},
-					{"踢玩家下线", "/api/v1/player/kick", "POST"},
-				},
-			},
-			{
-				Menu: model.SysMenu{MenuName: "PlayerItemManage", Title: "玩家物品", Path: "/player/item/index", Component: "/admin/player-item/index", MenuType: "C", Permission: "game:player:item:list", Sort: 2, Visible: "0", IsFrame: "1"},
-				Apis: []seedAPI{
-					{"物品配置列表", "/api/v1/item", "GET"},
-					{"玩家容器详情", "/api/v1/player/container", "GET"},
-					{"添加物品", "/api/v1/player/container/item", "POST"},
-					{"移动物品", "/api/v1/player/container/item", "PUT"},
-					{"整理物品", "/api/v1/player/container/sort", "POST"},
-				},
-			},
-		},
-	},
-	{
 		Menu: model.SysMenu{MenuName: "Log", Title: "日志管理", Path: "/log", MenuType: "M", Component: "Layout", Sort: 2, Visible: "0", IsFrame: "1"},
 		Children: []seedMenu{
 			{
@@ -137,6 +114,67 @@ var defaultMenus = []seedMenu{
 					{"操作日志列表", "/api/v1/sys-opera-log", "GET"},
 					{"删除操作日志", "/api/v1/sys-opera-log", "DELETE"},
 					{"清空操作日志", "/api/v1/operlog/clean", "DELETE"},
+				},
+			},
+		},
+	},
+	{
+		Menu: model.SysMenu{MenuName: "Game", Title: "游戏管理", Path: "/game", MenuType: "M", Component: "Layout", Sort: 3, Visible: "0", IsFrame: "1"},
+		Children: []seedMenu{
+			{
+				Menu: model.SysMenu{MenuName: "PlayerManage", Title: "玩家列表", Path: "/game/player/index", Component: "/admin/player/index", MenuType: "C", Permission: "game:player:list", Sort: 1, Visible: "0", IsFrame: "1"},
+				Apis: []seedAPI{
+					{"玩家列表", "/api/v1/player", "GET"},
+					{"在线玩家", "/api/v1/player/online", "GET"},
+					{"踢玩家下线", "/api/v1/player/kick", "POST"},
+				},
+			},
+			{
+				Menu: model.SysMenu{MenuName: "GameContainerManage", Title: "容器管理", Path: "/game/container/index", Component: "/admin/game-container/index", MenuType: "C", Permission: "game:gm:container:list", Sort: 2, Visible: "0", IsFrame: "1"},
+				Apis: []seedAPI{
+					{"物品配置列表", "/api/v1/item", "GET"},
+					{"GM容器列表", "/api/v1/game/container", "GET"},
+					{"GM添加物品", "/api/v1/game/container/item", "POST"},
+					{"GM移动物品", "/api/v1/game/container/move", "POST"},
+					{"GM旋转物品", "/api/v1/game/container/rotate", "POST"},
+					{"GM整理容器", "/api/v1/game/container/sort", "POST"},
+					{"GM转移物品", "/api/v1/game/container/transfer", "POST"},
+				},
+			},
+			{
+				Menu: model.SysMenu{MenuName: "GameHeroManage", Title: "英雄管理", Path: "/game/hero/index", Component: "/admin/game-hero/index", MenuType: "C", Permission: "game:gm:hero:list", Sort: 4, Visible: "0", IsFrame: "1"},
+				Apis: []seedAPI{
+					{"游戏配置目录", "/api/v1/game/catalog", "GET"},
+					{"GM英雄列表", "/api/v1/game/hero", "GET"},
+					{"GM新增英雄", "/api/v1/game/hero", "POST"},
+					{"GM更新英雄", "/api/v1/game/hero", "PUT"},
+				},
+			},
+			{
+				Menu: model.SysMenu{MenuName: "GameWeaponManage", Title: "武器管理", Path: "/game/weapon/index", Component: "/admin/game-weapon/index", MenuType: "C", Permission: "game:gm:weapon:list", Sort: 5, Visible: "0", IsFrame: "1"},
+				Apis: []seedAPI{
+					{"游戏配置目录", "/api/v1/game/catalog", "GET"},
+					{"GM武器列表", "/api/v1/game/weapon", "GET"},
+					{"GM新增武器", "/api/v1/game/weapon", "POST"},
+					{"GM更新武器", "/api/v1/game/weapon", "PUT"},
+				},
+			},
+			{
+				Menu: model.SysMenu{MenuName: "GameSkillManage", Title: "技能管理", Path: "/game/skill/index", Component: "/admin/game-skill/index", MenuType: "C", Permission: "game:gm:skill:list", Sort: 6, Visible: "0", IsFrame: "1"},
+				Apis: []seedAPI{
+					{"游戏配置目录", "/api/v1/game/catalog", "GET"},
+					{"GM技能列表", "/api/v1/game/skill", "GET"},
+					{"GM新增技能", "/api/v1/game/skill", "POST"},
+					{"GM更新技能", "/api/v1/game/skill", "PUT"},
+				},
+			},
+			{
+				Menu: model.SysMenu{MenuName: "GameGearManage", Title: "装备管理", Path: "/game/gear/index", Component: "/admin/game-gear/index", MenuType: "C", Permission: "game:gm:gear:list", Sort: 7, Visible: "0", IsFrame: "1"},
+				Apis: []seedAPI{
+					{"游戏配置目录", "/api/v1/game/catalog", "GET"},
+					{"GM装备列表", "/api/v1/game/gear", "GET"},
+					{"GM新增装备", "/api/v1/game/gear", "POST"},
+					{"GM更新装备", "/api/v1/game/gear", "PUT"},
 				},
 			},
 		},

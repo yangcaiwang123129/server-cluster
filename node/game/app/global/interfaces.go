@@ -45,6 +45,8 @@ type ContainerLogic interface {
 	ContainerSort(ctx context.Context, playerID int64, req *pb.SortContainerReq) (*pb.SortContainerResp, error)
 	// ContainerTransfer 容器间移动物品
 	ContainerTransfer(ctx context.Context, playerID int64, req *pb.ContainerTransferReq) (*pb.ContainerTransferResp, error)
+	// ContainerAddItem 向容器放入物品（GM，返回变更后的容器）
+	ContainerAddItem(ctx context.Context, playerID int64, req *pb.GmContainerAddItemReq) (*pb.ContainerListResp, error)
 }
 
 // SkillLogic 技能业务接口：玩家技能持有数据生命周期。

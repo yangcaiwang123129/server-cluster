@@ -7,12 +7,14 @@ import (
 
 	"gorm.io/gorm"
 
+	"server-cluster/internal/svc"
 	"server-cluster/node/game/app/global"
 	"server-cluster/share/consts"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
 	"server-cluster/share/singleton"
+	"server-cluster/share/tpl"
 )
 
 type containerLogic struct{}
@@ -165,7 +167,7 @@ func (this *containerLogic) ContainerMove(ctx context.Context, playerID int64, r
 		return nil, err
 	}
 
-	if err := c.MoveItem(req.GetUid(), req.GetToX(), req.GetToY(), req.GetRotated()); err != nil {
+	if err := c.MoveItem(req.GetItemId(), req.GetToX(), req.GetToY(), req.GetRotated()); err != nil {
 		return nil, containerErr(err)
 	}
 
@@ -180,7 +182,7 @@ func (this *containerLogic) ContainerRotate(ctx context.Context, playerID int64,
 		return nil, err
 	}
 
-	if err := c.RotateItem(req.GetUid()); err != nil {
+	if err := c.RotateItem(req.GetItemId()); err != nil {
 		return nil, containerErr(err)
 	}
 
@@ -220,7 +222,7 @@ func (this *containerLogic) ContainerTransfer(ctx context.Context, playerID int6
 		return nil, errs.ErrInvalidParams
 	}
 
-	if err := pc.TransferItem(fromType, toType, req.GetUid(), req.GetToX(), req.GetToY(), req.GetRotated()); err != nil {
+	if err := pc.TransferItem(fromType, toType, req.GetItemId(), req.GetToX(), req.GetToY(), req.GetRotated()); err != nil {
 		return nil, containerErr(err)
 	}
 
@@ -229,4 +231,40 @@ func (this *containerLogic) ContainerTransfer(ctx context.Context, playerID int6
 		FromEntry: containerToEntry(playerID, fromC),
 		ToEntry:   containerToEntry(playerID, toC),
 	}, nil
+}
+
+// ContainerAddItem 向容器放入物品（GM）：校验配置与占格后挂缓存待落库。
+func (this *containerLogic) ContainerAddItem(ctx context.Context, playerID int64, req *pb.GmContainerAddItemReq) (*pb.ContainerListResp, error) {
+	if !tpl.T().Item.Has(req.GetItemCfgId()) {
+		return nil, errs.WithMessage(consts.CodeInvalidParams, "物品配置不存在")
+	}
+
+	pc, c, err := containerOf(ctx, playerID, pb.ContainerType(req.GetContainerType()))
+	if err != nil {
+		return nil, err
+	}
+	// 存量脏数据缺配置时占格计算会 panic，先校验
+	for _, it := range c.ItemsCopy() {
+		if !tpl.T().Item.Has(it.ItemCfgID) {
+			return nil, errs.WithMessage(consts.CodeInvalidParams, fmt.Sprintf("容器内物品配置缺失，物品配置ID: %d", it.ItemCfgID))
+		}
+	}
+
+	count := req.GetCount()
+	if count <= 0 {
+		count = 1
+	}
+	if err := c.AddItem(model.Item{
+		ItemID:    svc.NextID(),
+		ItemCfgID: req.GetItemCfgId(),
+		Count:     count,
+		GridX:     req.GetGridX(),
+		GridY:     req.GetGridY(),
+		Rotated:   req.GetRotated(),
+	}); err != nil {
+		return nil, containerErr(err)
+	}
+
+	saveContainer(playerID, pc)
+	return &pb.ContainerListResp{ContainerEntries: []*pb.ContainerEntry{containerToEntry(playerID, c)}}, nil
 }

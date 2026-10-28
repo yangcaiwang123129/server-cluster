@@ -9,7 +9,7 @@ export default {
 
   // ── Columns ─────────────────────────────────────────────────────
   playerId: '玩家ID',
-  zone: '区服',
+  zone: '区号',
   phoneNumber: '手机号',
   createdAt: '创建时间',
 

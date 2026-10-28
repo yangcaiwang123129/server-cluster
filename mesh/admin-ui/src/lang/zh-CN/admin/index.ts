@@ -7,7 +7,11 @@ import sysApi from './sys-api'
 import sysOperLog from './sys-oper-log'
 import sysLoginLog from './sys-login-log'
 import player from './player'
-import playerItem from './player-item'
+import gameContainer from './game-container'
+import gameHero from './game-hero'
+import gameWeapon from './game-weapon'
+import gameSkill from './game-skill'
+import gameGear from './game-gear'
 
 /**
  * The admin section, one module per page under src/views/admin.
@@ -29,5 +33,9 @@ export default {
   sysOperLog,
   sysLoginLog,
   player,
-  playerItem
+  gameContainer,
+  gameHero,
+  gameWeapon,
+  gameSkill,
+  gameGear
 }

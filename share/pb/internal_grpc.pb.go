@@ -21,147 +21,867 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PlayerService_GetOnlinePlayers_FullMethodName = "/internal.PlayerService/GetOnlinePlayers"
-	PlayerService_KickPlayer_FullMethodName       = "/internal.PlayerService/KickPlayer"
+	GameAdminService_GetOnlinePlayers_FullMethodName  = "/internal.GameAdminService/GetOnlinePlayers"
+	GameAdminService_KickPlayer_FullMethodName        = "/internal.GameAdminService/KickPlayer"
+	GameAdminService_ContainerList_FullMethodName     = "/internal.GameAdminService/ContainerList"
+	GameAdminService_ContainerMove_FullMethodName     = "/internal.GameAdminService/ContainerMove"
+	GameAdminService_ContainerRotate_FullMethodName   = "/internal.GameAdminService/ContainerRotate"
+	GameAdminService_ContainerSort_FullMethodName     = "/internal.GameAdminService/ContainerSort"
+	GameAdminService_ContainerTransfer_FullMethodName = "/internal.GameAdminService/ContainerTransfer"
+	GameAdminService_ContainerAddItem_FullMethodName  = "/internal.GameAdminService/ContainerAddItem"
+	GameAdminService_HeroList_FullMethodName          = "/internal.GameAdminService/HeroList"
+	GameAdminService_HeroAdd_FullMethodName           = "/internal.GameAdminService/HeroAdd"
+	GameAdminService_HeroUpdate_FullMethodName        = "/internal.GameAdminService/HeroUpdate"
+	GameAdminService_WeaponList_FullMethodName        = "/internal.GameAdminService/WeaponList"
+	GameAdminService_WeaponAdd_FullMethodName         = "/internal.GameAdminService/WeaponAdd"
+	GameAdminService_WeaponUpdate_FullMethodName      = "/internal.GameAdminService/WeaponUpdate"
+	GameAdminService_SkillList_FullMethodName         = "/internal.GameAdminService/SkillList"
+	GameAdminService_SkillAdd_FullMethodName          = "/internal.GameAdminService/SkillAdd"
+	GameAdminService_SkillUpdate_FullMethodName       = "/internal.GameAdminService/SkillUpdate"
+	GameAdminService_GearList_FullMethodName          = "/internal.GameAdminService/GearList"
+	GameAdminService_GearAdd_FullMethodName           = "/internal.GameAdminService/GearAdd"
+	GameAdminService_GearUpdate_FullMethodName        = "/internal.GameAdminService/GearUpdate"
 )
 
-// PlayerServiceClient is the client API for PlayerService service.
+// GameAdminServiceClient is the client API for GameAdminService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// PlayerService 玩家相关内部服务（game 服提供）。
-type PlayerServiceClient interface {
+// GameAdminService 后台 GM 服务（game 服提供，admin 服调用）。
+type GameAdminServiceClient interface {
 	// GetOnlinePlayers 查看在线玩家列表
 	GetOnlinePlayers(ctx context.Context, in *GetOnlinePlayersReq, opts ...grpc.CallOption) (*GetOnlinePlayersResp, error)
 	// KickPlayer 踢玩家下线
 	KickPlayer(ctx context.Context, in *KickPlayerReq, opts ...grpc.CallOption) (*KickPlayerResp, error)
+	// ContainerList 容器列表
+	ContainerList(ctx context.Context, in *GmContainerListReq, opts ...grpc.CallOption) (*ContainerListResp, error)
+	// ContainerMove 容器内移动物品
+	ContainerMove(ctx context.Context, in *GmContainerMoveReq, opts ...grpc.CallOption) (*ContainerMoveResp, error)
+	// ContainerRotate 容器内旋转物品
+	ContainerRotate(ctx context.Context, in *GmContainerRotateReq, opts ...grpc.CallOption) (*ContainerRotateResp, error)
+	// ContainerSort 容器一键整理
+	ContainerSort(ctx context.Context, in *GmContainerSortReq, opts ...grpc.CallOption) (*SortContainerResp, error)
+	// ContainerTransfer 容器间移动物品
+	ContainerTransfer(ctx context.Context, in *GmContainerTransferReq, opts ...grpc.CallOption) (*ContainerTransferResp, error)
+	// ContainerAddItem 向容器放入物品（返回变更后的容器）
+	ContainerAddItem(ctx context.Context, in *GmContainerAddItemReq, opts ...grpc.CallOption) (*ContainerListResp, error)
+	// HeroList 英雄列表
+	HeroList(ctx context.Context, in *GmHeroListReq, opts ...grpc.CallOption) (*HeroListResp, error)
+	// HeroAdd 新增英雄
+	HeroAdd(ctx context.Context, in *GmHeroAddReq, opts ...grpc.CallOption) (*HeroAddResp, error)
+	// HeroUpdate 更新英雄
+	HeroUpdate(ctx context.Context, in *GmHeroUpdateReq, opts ...grpc.CallOption) (*HeroUpdateResp, error)
+	// WeaponList 武器列表
+	WeaponList(ctx context.Context, in *GmWeaponListReq, opts ...grpc.CallOption) (*WeaponListResp, error)
+	// WeaponAdd 新增武器
+	WeaponAdd(ctx context.Context, in *GmWeaponAddReq, opts ...grpc.CallOption) (*WeaponAddResp, error)
+	// WeaponUpdate 更新武器
+	WeaponUpdate(ctx context.Context, in *GmWeaponUpdateReq, opts ...grpc.CallOption) (*WeaponUpdateResp, error)
+	// SkillList 技能列表
+	SkillList(ctx context.Context, in *GmSkillListReq, opts ...grpc.CallOption) (*SkillListResp, error)
+	// SkillAdd 新增技能
+	SkillAdd(ctx context.Context, in *GmSkillAddReq, opts ...grpc.CallOption) (*SkillAddResp, error)
+	// SkillUpdate 更新技能
+	SkillUpdate(ctx context.Context, in *GmSkillUpdateReq, opts ...grpc.CallOption) (*SkillUpdateResp, error)
+	// GearList 装备列表
+	GearList(ctx context.Context, in *GmGearListReq, opts ...grpc.CallOption) (*GearListResp, error)
+	// GearAdd 新增装备
+	GearAdd(ctx context.Context, in *GmGearAddReq, opts ...grpc.CallOption) (*GearAddResp, error)
+	// GearUpdate 更新装备
+	GearUpdate(ctx context.Context, in *GmGearUpdateReq, opts ...grpc.CallOption) (*GearUpdateResp, error)
 }
 
-type playerServiceClient struct {
+type gameAdminServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewPlayerServiceClient(cc grpc.ClientConnInterface) PlayerServiceClient {
-	return &playerServiceClient{cc}
+func NewGameAdminServiceClient(cc grpc.ClientConnInterface) GameAdminServiceClient {
+	return &gameAdminServiceClient{cc}
 }
 
-func (c *playerServiceClient) GetOnlinePlayers(ctx context.Context, in *GetOnlinePlayersReq, opts ...grpc.CallOption) (*GetOnlinePlayersResp, error) {
+func (c *gameAdminServiceClient) GetOnlinePlayers(ctx context.Context, in *GetOnlinePlayersReq, opts ...grpc.CallOption) (*GetOnlinePlayersResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetOnlinePlayersResp)
-	err := c.cc.Invoke(ctx, PlayerService_GetOnlinePlayers_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, GameAdminService_GetOnlinePlayers_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *playerServiceClient) KickPlayer(ctx context.Context, in *KickPlayerReq, opts ...grpc.CallOption) (*KickPlayerResp, error) {
+func (c *gameAdminServiceClient) KickPlayer(ctx context.Context, in *KickPlayerReq, opts ...grpc.CallOption) (*KickPlayerResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(KickPlayerResp)
-	err := c.cc.Invoke(ctx, PlayerService_KickPlayer_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, GameAdminService_KickPlayer_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// PlayerServiceServer is the server API for PlayerService service.
-// All implementations must embed UnimplementedPlayerServiceServer
+func (c *gameAdminServiceClient) ContainerList(ctx context.Context, in *GmContainerListReq, opts ...grpc.CallOption) (*ContainerListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ContainerListResp)
+	err := c.cc.Invoke(ctx, GameAdminService_ContainerList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameAdminServiceClient) ContainerMove(ctx context.Context, in *GmContainerMoveReq, opts ...grpc.CallOption) (*ContainerMoveResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ContainerMoveResp)
+	err := c.cc.Invoke(ctx, GameAdminService_ContainerMove_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameAdminServiceClient) ContainerRotate(ctx context.Context, in *GmContainerRotateReq, opts ...grpc.CallOption) (*ContainerRotateResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ContainerRotateResp)
+	err := c.cc.Invoke(ctx, GameAdminService_ContainerRotate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameAdminServiceClient) ContainerSort(ctx context.Context, in *GmContainerSortReq, opts ...grpc.CallOption) (*SortContainerResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SortContainerResp)
+	err := c.cc.Invoke(ctx, GameAdminService_ContainerSort_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameAdminServiceClient) ContainerTransfer(ctx context.Context, in *GmContainerTransferReq, opts ...grpc.CallOption) (*ContainerTransferResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ContainerTransferResp)
+	err := c.cc.Invoke(ctx, GameAdminService_ContainerTransfer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameAdminServiceClient) ContainerAddItem(ctx context.Context, in *GmContainerAddItemReq, opts ...grpc.CallOption) (*ContainerListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ContainerListResp)
+	err := c.cc.Invoke(ctx, GameAdminService_ContainerAddItem_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameAdminServiceClient) HeroList(ctx context.Context, in *GmHeroListReq, opts ...grpc.CallOption) (*HeroListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HeroListResp)
+	err := c.cc.Invoke(ctx, GameAdminService_HeroList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameAdminServiceClient) HeroAdd(ctx context.Context, in *GmHeroAddReq, opts ...grpc.CallOption) (*HeroAddResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HeroAddResp)
+	err := c.cc.Invoke(ctx, GameAdminService_HeroAdd_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameAdminServiceClient) HeroUpdate(ctx context.Context, in *GmHeroUpdateReq, opts ...grpc.CallOption) (*HeroUpdateResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HeroUpdateResp)
+	err := c.cc.Invoke(ctx, GameAdminService_HeroUpdate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameAdminServiceClient) WeaponList(ctx context.Context, in *GmWeaponListReq, opts ...grpc.CallOption) (*WeaponListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WeaponListResp)
+	err := c.cc.Invoke(ctx, GameAdminService_WeaponList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameAdminServiceClient) WeaponAdd(ctx context.Context, in *GmWeaponAddReq, opts ...grpc.CallOption) (*WeaponAddResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WeaponAddResp)
+	err := c.cc.Invoke(ctx, GameAdminService_WeaponAdd_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameAdminServiceClient) WeaponUpdate(ctx context.Context, in *GmWeaponUpdateReq, opts ...grpc.CallOption) (*WeaponUpdateResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WeaponUpdateResp)
+	err := c.cc.Invoke(ctx, GameAdminService_WeaponUpdate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameAdminServiceClient) SkillList(ctx context.Context, in *GmSkillListReq, opts ...grpc.CallOption) (*SkillListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SkillListResp)
+	err := c.cc.Invoke(ctx, GameAdminService_SkillList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameAdminServiceClient) SkillAdd(ctx context.Context, in *GmSkillAddReq, opts ...grpc.CallOption) (*SkillAddResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SkillAddResp)
+	err := c.cc.Invoke(ctx, GameAdminService_SkillAdd_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameAdminServiceClient) SkillUpdate(ctx context.Context, in *GmSkillUpdateReq, opts ...grpc.CallOption) (*SkillUpdateResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SkillUpdateResp)
+	err := c.cc.Invoke(ctx, GameAdminService_SkillUpdate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameAdminServiceClient) GearList(ctx context.Context, in *GmGearListReq, opts ...grpc.CallOption) (*GearListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GearListResp)
+	err := c.cc.Invoke(ctx, GameAdminService_GearList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameAdminServiceClient) GearAdd(ctx context.Context, in *GmGearAddReq, opts ...grpc.CallOption) (*GearAddResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GearAddResp)
+	err := c.cc.Invoke(ctx, GameAdminService_GearAdd_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameAdminServiceClient) GearUpdate(ctx context.Context, in *GmGearUpdateReq, opts ...grpc.CallOption) (*GearUpdateResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GearUpdateResp)
+	err := c.cc.Invoke(ctx, GameAdminService_GearUpdate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// GameAdminServiceServer is the server API for GameAdminService service.
+// All implementations must embed UnimplementedGameAdminServiceServer
 // for forward compatibility.
 //
-// PlayerService 玩家相关内部服务（game 服提供）。
-type PlayerServiceServer interface {
+// GameAdminService 后台 GM 服务（game 服提供，admin 服调用）。
+type GameAdminServiceServer interface {
 	// GetOnlinePlayers 查看在线玩家列表
 	GetOnlinePlayers(context.Context, *GetOnlinePlayersReq) (*GetOnlinePlayersResp, error)
 	// KickPlayer 踢玩家下线
 	KickPlayer(context.Context, *KickPlayerReq) (*KickPlayerResp, error)
-	mustEmbedUnimplementedPlayerServiceServer()
+	// ContainerList 容器列表
+	ContainerList(context.Context, *GmContainerListReq) (*ContainerListResp, error)
+	// ContainerMove 容器内移动物品
+	ContainerMove(context.Context, *GmContainerMoveReq) (*ContainerMoveResp, error)
+	// ContainerRotate 容器内旋转物品
+	ContainerRotate(context.Context, *GmContainerRotateReq) (*ContainerRotateResp, error)
+	// ContainerSort 容器一键整理
+	ContainerSort(context.Context, *GmContainerSortReq) (*SortContainerResp, error)
+	// ContainerTransfer 容器间移动物品
+	ContainerTransfer(context.Context, *GmContainerTransferReq) (*ContainerTransferResp, error)
+	// ContainerAddItem 向容器放入物品（返回变更后的容器）
+	ContainerAddItem(context.Context, *GmContainerAddItemReq) (*ContainerListResp, error)
+	// HeroList 英雄列表
+	HeroList(context.Context, *GmHeroListReq) (*HeroListResp, error)
+	// HeroAdd 新增英雄
+	HeroAdd(context.Context, *GmHeroAddReq) (*HeroAddResp, error)
+	// HeroUpdate 更新英雄
+	HeroUpdate(context.Context, *GmHeroUpdateReq) (*HeroUpdateResp, error)
+	// WeaponList 武器列表
+	WeaponList(context.Context, *GmWeaponListReq) (*WeaponListResp, error)
+	// WeaponAdd 新增武器
+	WeaponAdd(context.Context, *GmWeaponAddReq) (*WeaponAddResp, error)
+	// WeaponUpdate 更新武器
+	WeaponUpdate(context.Context, *GmWeaponUpdateReq) (*WeaponUpdateResp, error)
+	// SkillList 技能列表
+	SkillList(context.Context, *GmSkillListReq) (*SkillListResp, error)
+	// SkillAdd 新增技能
+	SkillAdd(context.Context, *GmSkillAddReq) (*SkillAddResp, error)
+	// SkillUpdate 更新技能
+	SkillUpdate(context.Context, *GmSkillUpdateReq) (*SkillUpdateResp, error)
+	// GearList 装备列表
+	GearList(context.Context, *GmGearListReq) (*GearListResp, error)
+	// GearAdd 新增装备
+	GearAdd(context.Context, *GmGearAddReq) (*GearAddResp, error)
+	// GearUpdate 更新装备
+	GearUpdate(context.Context, *GmGearUpdateReq) (*GearUpdateResp, error)
+	mustEmbedUnimplementedGameAdminServiceServer()
 }
 
-// UnimplementedPlayerServiceServer must be embedded to have
+// UnimplementedGameAdminServiceServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedPlayerServiceServer struct{}
+type UnimplementedGameAdminServiceServer struct{}
 
-func (UnimplementedPlayerServiceServer) GetOnlinePlayers(context.Context, *GetOnlinePlayersReq) (*GetOnlinePlayersResp, error) {
+func (UnimplementedGameAdminServiceServer) GetOnlinePlayers(context.Context, *GetOnlinePlayersReq) (*GetOnlinePlayersResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetOnlinePlayers not implemented")
 }
-func (UnimplementedPlayerServiceServer) KickPlayer(context.Context, *KickPlayerReq) (*KickPlayerResp, error) {
+func (UnimplementedGameAdminServiceServer) KickPlayer(context.Context, *KickPlayerReq) (*KickPlayerResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method KickPlayer not implemented")
 }
-func (UnimplementedPlayerServiceServer) mustEmbedUnimplementedPlayerServiceServer() {}
-func (UnimplementedPlayerServiceServer) testEmbeddedByValue()                       {}
+func (UnimplementedGameAdminServiceServer) ContainerList(context.Context, *GmContainerListReq) (*ContainerListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ContainerList not implemented")
+}
+func (UnimplementedGameAdminServiceServer) ContainerMove(context.Context, *GmContainerMoveReq) (*ContainerMoveResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ContainerMove not implemented")
+}
+func (UnimplementedGameAdminServiceServer) ContainerRotate(context.Context, *GmContainerRotateReq) (*ContainerRotateResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ContainerRotate not implemented")
+}
+func (UnimplementedGameAdminServiceServer) ContainerSort(context.Context, *GmContainerSortReq) (*SortContainerResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ContainerSort not implemented")
+}
+func (UnimplementedGameAdminServiceServer) ContainerTransfer(context.Context, *GmContainerTransferReq) (*ContainerTransferResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ContainerTransfer not implemented")
+}
+func (UnimplementedGameAdminServiceServer) ContainerAddItem(context.Context, *GmContainerAddItemReq) (*ContainerListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ContainerAddItem not implemented")
+}
+func (UnimplementedGameAdminServiceServer) HeroList(context.Context, *GmHeroListReq) (*HeroListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method HeroList not implemented")
+}
+func (UnimplementedGameAdminServiceServer) HeroAdd(context.Context, *GmHeroAddReq) (*HeroAddResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method HeroAdd not implemented")
+}
+func (UnimplementedGameAdminServiceServer) HeroUpdate(context.Context, *GmHeroUpdateReq) (*HeroUpdateResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method HeroUpdate not implemented")
+}
+func (UnimplementedGameAdminServiceServer) WeaponList(context.Context, *GmWeaponListReq) (*WeaponListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method WeaponList not implemented")
+}
+func (UnimplementedGameAdminServiceServer) WeaponAdd(context.Context, *GmWeaponAddReq) (*WeaponAddResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method WeaponAdd not implemented")
+}
+func (UnimplementedGameAdminServiceServer) WeaponUpdate(context.Context, *GmWeaponUpdateReq) (*WeaponUpdateResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method WeaponUpdate not implemented")
+}
+func (UnimplementedGameAdminServiceServer) SkillList(context.Context, *GmSkillListReq) (*SkillListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method SkillList not implemented")
+}
+func (UnimplementedGameAdminServiceServer) SkillAdd(context.Context, *GmSkillAddReq) (*SkillAddResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method SkillAdd not implemented")
+}
+func (UnimplementedGameAdminServiceServer) SkillUpdate(context.Context, *GmSkillUpdateReq) (*SkillUpdateResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method SkillUpdate not implemented")
+}
+func (UnimplementedGameAdminServiceServer) GearList(context.Context, *GmGearListReq) (*GearListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method GearList not implemented")
+}
+func (UnimplementedGameAdminServiceServer) GearAdd(context.Context, *GmGearAddReq) (*GearAddResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method GearAdd not implemented")
+}
+func (UnimplementedGameAdminServiceServer) GearUpdate(context.Context, *GmGearUpdateReq) (*GearUpdateResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method GearUpdate not implemented")
+}
+func (UnimplementedGameAdminServiceServer) mustEmbedUnimplementedGameAdminServiceServer() {}
+func (UnimplementedGameAdminServiceServer) testEmbeddedByValue()                          {}
 
-// UnsafePlayerServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to PlayerServiceServer will
+// UnsafeGameAdminServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to GameAdminServiceServer will
 // result in compilation errors.
-type UnsafePlayerServiceServer interface {
-	mustEmbedUnimplementedPlayerServiceServer()
+type UnsafeGameAdminServiceServer interface {
+	mustEmbedUnimplementedGameAdminServiceServer()
 }
 
-func RegisterPlayerServiceServer(s grpc.ServiceRegistrar, srv PlayerServiceServer) {
-	// If the following call panics, it indicates UnimplementedPlayerServiceServer was
+func RegisterGameAdminServiceServer(s grpc.ServiceRegistrar, srv GameAdminServiceServer) {
+	// If the following call panics, it indicates UnimplementedGameAdminServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&PlayerService_ServiceDesc, srv)
+	s.RegisterService(&GameAdminService_ServiceDesc, srv)
 }
 
-func _PlayerService_GetOnlinePlayers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _GameAdminService_GetOnlinePlayers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetOnlinePlayersReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PlayerServiceServer).GetOnlinePlayers(ctx, in)
+		return srv.(GameAdminServiceServer).GetOnlinePlayers(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: PlayerService_GetOnlinePlayers_FullMethodName,
+		FullMethod: GameAdminService_GetOnlinePlayers_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PlayerServiceServer).GetOnlinePlayers(ctx, req.(*GetOnlinePlayersReq))
+		return srv.(GameAdminServiceServer).GetOnlinePlayers(ctx, req.(*GetOnlinePlayersReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PlayerService_KickPlayer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _GameAdminService_KickPlayer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(KickPlayerReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PlayerServiceServer).KickPlayer(ctx, in)
+		return srv.(GameAdminServiceServer).KickPlayer(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: PlayerService_KickPlayer_FullMethodName,
+		FullMethod: GameAdminService_KickPlayer_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PlayerServiceServer).KickPlayer(ctx, req.(*KickPlayerReq))
+		return srv.(GameAdminServiceServer).KickPlayer(ctx, req.(*KickPlayerReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// PlayerService_ServiceDesc is the grpc.ServiceDesc for PlayerService service.
+func _GameAdminService_ContainerList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GmContainerListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameAdminServiceServer).ContainerList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameAdminService_ContainerList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameAdminServiceServer).ContainerList(ctx, req.(*GmContainerListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameAdminService_ContainerMove_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GmContainerMoveReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameAdminServiceServer).ContainerMove(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameAdminService_ContainerMove_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameAdminServiceServer).ContainerMove(ctx, req.(*GmContainerMoveReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameAdminService_ContainerRotate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GmContainerRotateReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameAdminServiceServer).ContainerRotate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameAdminService_ContainerRotate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameAdminServiceServer).ContainerRotate(ctx, req.(*GmContainerRotateReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameAdminService_ContainerSort_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GmContainerSortReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameAdminServiceServer).ContainerSort(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameAdminService_ContainerSort_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameAdminServiceServer).ContainerSort(ctx, req.(*GmContainerSortReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameAdminService_ContainerTransfer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GmContainerTransferReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameAdminServiceServer).ContainerTransfer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameAdminService_ContainerTransfer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameAdminServiceServer).ContainerTransfer(ctx, req.(*GmContainerTransferReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameAdminService_ContainerAddItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GmContainerAddItemReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameAdminServiceServer).ContainerAddItem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameAdminService_ContainerAddItem_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameAdminServiceServer).ContainerAddItem(ctx, req.(*GmContainerAddItemReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameAdminService_HeroList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GmHeroListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameAdminServiceServer).HeroList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameAdminService_HeroList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameAdminServiceServer).HeroList(ctx, req.(*GmHeroListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameAdminService_HeroAdd_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GmHeroAddReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameAdminServiceServer).HeroAdd(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameAdminService_HeroAdd_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameAdminServiceServer).HeroAdd(ctx, req.(*GmHeroAddReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameAdminService_HeroUpdate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GmHeroUpdateReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameAdminServiceServer).HeroUpdate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameAdminService_HeroUpdate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameAdminServiceServer).HeroUpdate(ctx, req.(*GmHeroUpdateReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameAdminService_WeaponList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GmWeaponListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameAdminServiceServer).WeaponList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameAdminService_WeaponList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameAdminServiceServer).WeaponList(ctx, req.(*GmWeaponListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameAdminService_WeaponAdd_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GmWeaponAddReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameAdminServiceServer).WeaponAdd(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameAdminService_WeaponAdd_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameAdminServiceServer).WeaponAdd(ctx, req.(*GmWeaponAddReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameAdminService_WeaponUpdate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GmWeaponUpdateReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameAdminServiceServer).WeaponUpdate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameAdminService_WeaponUpdate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameAdminServiceServer).WeaponUpdate(ctx, req.(*GmWeaponUpdateReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameAdminService_SkillList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GmSkillListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameAdminServiceServer).SkillList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameAdminService_SkillList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameAdminServiceServer).SkillList(ctx, req.(*GmSkillListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameAdminService_SkillAdd_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GmSkillAddReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameAdminServiceServer).SkillAdd(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameAdminService_SkillAdd_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameAdminServiceServer).SkillAdd(ctx, req.(*GmSkillAddReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameAdminService_SkillUpdate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GmSkillUpdateReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameAdminServiceServer).SkillUpdate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameAdminService_SkillUpdate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameAdminServiceServer).SkillUpdate(ctx, req.(*GmSkillUpdateReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameAdminService_GearList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GmGearListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameAdminServiceServer).GearList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameAdminService_GearList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameAdminServiceServer).GearList(ctx, req.(*GmGearListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameAdminService_GearAdd_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GmGearAddReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameAdminServiceServer).GearAdd(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameAdminService_GearAdd_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameAdminServiceServer).GearAdd(ctx, req.(*GmGearAddReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameAdminService_GearUpdate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GmGearUpdateReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameAdminServiceServer).GearUpdate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameAdminService_GearUpdate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameAdminServiceServer).GearUpdate(ctx, req.(*GmGearUpdateReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// GameAdminService_ServiceDesc is the grpc.ServiceDesc for GameAdminService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var PlayerService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "internal.PlayerService",
-	HandlerType: (*PlayerServiceServer)(nil),
+var GameAdminService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "internal.GameAdminService",
+	HandlerType: (*GameAdminServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "GetOnlinePlayers",
-			Handler:    _PlayerService_GetOnlinePlayers_Handler,
+			Handler:    _GameAdminService_GetOnlinePlayers_Handler,
 		},
 		{
 			MethodName: "KickPlayer",
-			Handler:    _PlayerService_KickPlayer_Handler,
+			Handler:    _GameAdminService_KickPlayer_Handler,
+		},
+		{
+			MethodName: "ContainerList",
+			Handler:    _GameAdminService_ContainerList_Handler,
+		},
+		{
+			MethodName: "ContainerMove",
+			Handler:    _GameAdminService_ContainerMove_Handler,
+		},
+		{
+			MethodName: "ContainerRotate",
+			Handler:    _GameAdminService_ContainerRotate_Handler,
+		},
+		{
+			MethodName: "ContainerSort",
+			Handler:    _GameAdminService_ContainerSort_Handler,
+		},
+		{
+			MethodName: "ContainerTransfer",
+			Handler:    _GameAdminService_ContainerTransfer_Handler,
+		},
+		{
+			MethodName: "ContainerAddItem",
+			Handler:    _GameAdminService_ContainerAddItem_Handler,
+		},
+		{
+			MethodName: "HeroList",
+			Handler:    _GameAdminService_HeroList_Handler,
+		},
+		{
+			MethodName: "HeroAdd",
+			Handler:    _GameAdminService_HeroAdd_Handler,
+		},
+		{
+			MethodName: "HeroUpdate",
+			Handler:    _GameAdminService_HeroUpdate_Handler,
+		},
+		{
+			MethodName: "WeaponList",
+			Handler:    _GameAdminService_WeaponList_Handler,
+		},
+		{
+			MethodName: "WeaponAdd",
+			Handler:    _GameAdminService_WeaponAdd_Handler,
+		},
+		{
+			MethodName: "WeaponUpdate",
+			Handler:    _GameAdminService_WeaponUpdate_Handler,
+		},
+		{
+			MethodName: "SkillList",
+			Handler:    _GameAdminService_SkillList_Handler,
+		},
+		{
+			MethodName: "SkillAdd",
+			Handler:    _GameAdminService_SkillAdd_Handler,
+		},
+		{
+			MethodName: "SkillUpdate",
+			Handler:    _GameAdminService_SkillUpdate_Handler,
+		},
+		{
+			MethodName: "GearList",
+			Handler:    _GameAdminService_GearList_Handler,
+		},
+		{
+			MethodName: "GearAdd",
+			Handler:    _GameAdminService_GearAdd_Handler,
+		},
+		{
+			MethodName: "GearUpdate",
+			Handler:    _GameAdminService_GearUpdate_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

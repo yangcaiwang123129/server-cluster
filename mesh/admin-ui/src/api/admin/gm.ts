@@ -1,0 +1,223 @@
+import request from '@/utils/request'
+import type { ApiResponse, PageQuery, PageResult } from '@/types/api'
+import type { GameCatalogEntry, GmContainer, GmGear, GmHero, GmSkill, GmWeapon, ItemCfg, ItemCfgQuery } from '@/types/admin'
+
+/**
+ * GM 接口：admin 经 mesh 转发到 game 服，每个方法对应 game 侧 logic 的一个函数。
+ * 请求统一以 playerId 定位玩家，后台自动选择玩家所在实例。
+ */
+
+/** Item catalog (Luban itemconfig), paginated by the admin server. */
+export function listItem(query: ItemCfgQuery & Partial<PageQuery>) {
+  return request<ApiResponse<PageResult<ItemCfg>>>({
+    url: '/api/v1/item',
+    method: 'get',
+    params: query
+  })
+}
+
+/** Game config catalog for hero/weapon/skill/gear pickers (Luban tables). */
+export function listGameCatalog(params: { type: 'hero' | 'weapon' | 'skill' | 'gear'; keyword?: string }) {
+  return request<ApiResponse<GameCatalogEntry[]>>({
+    url: '/api/v1/game/catalog',
+    method: 'get',
+    params
+  })
+}
+
+// ── 容器 ──────────────────────────────────────────────────────────
+
+/** 容器列表，containerType 为 0 时返回全部容器。 */
+export function listGmContainer(params: { playerId: number; containerType?: number }) {
+  return request<ApiResponse<GmContainer[]>>({
+    url: '/api/v1/game/container',
+    method: 'get',
+    params
+  })
+}
+
+/** 容器内移动物品。itemId 为雪花 ID 字符串（JSON 大 int64 会丢精度）。 */
+export function moveGmContainerItem(data: {
+  playerId: number
+  containerType: number
+  itemId: string
+  toX: number
+  toY: number
+  rotated: boolean
+}) {
+  return request<ApiResponse<null>>({
+    url: '/api/v1/game/container/move',
+    method: 'post',
+    data
+  })
+}
+
+/** 容器内旋转物品。 */
+export function rotateGmContainerItem(data: { playerId: number; containerType: number; itemId: string }) {
+  return request<ApiResponse<null>>({
+    url: '/api/v1/game/container/rotate',
+    method: 'post',
+    data
+  })
+}
+
+/** 容器一键整理。 */
+export function sortGmContainer(data: { playerId: number; containerType: number }) {
+  return request<ApiResponse<null>>({
+    url: '/api/v1/game/container/sort',
+    method: 'post',
+    data
+  })
+}
+
+/** 容器间移动物品（返回变更后的源/目标容器）。 */
+export function transferGmContainerItem(data: {
+  playerId: number
+  fromType: number
+  toType: number
+  itemId: string
+  toX: number
+  toY: number
+  rotated: boolean
+}) {
+  return request<ApiResponse<GmContainer[]>>({
+    url: '/api/v1/game/container/transfer',
+    method: 'post',
+    data
+  })
+}
+
+/** 向容器放入物品（返回变更后的容器）。 */
+export function addGmContainerItem(data: {
+  playerId: number
+  containerType: number
+  itemCfgId: number
+  count: number
+  gridX: number
+  gridY: number
+  rotated: boolean
+}) {
+  return request<ApiResponse<GmContainer[]>>({
+    url: '/api/v1/game/container/item',
+    method: 'post',
+    data
+  })
+}
+
+// ── 英雄 ──────────────────────────────────────────────────────────
+
+export function listGmHero(params: { playerId: number }) {
+  return request<ApiResponse<GmHero[]>>({
+    url: '/api/v1/game/hero',
+    method: 'get',
+    params
+  })
+}
+
+export function addGmHero(data: { playerId: number; heroId: number }) {
+  return request<ApiResponse<GmHero>>({
+    url: '/api/v1/game/hero',
+    method: 'post',
+    data
+  })
+}
+
+export function updateGmHero(data: {
+  playerId: number
+  heroId: number
+  level: number
+  exp: number
+  star: number
+  skinId: number
+  equipped: boolean
+}) {
+  return request<ApiResponse<GmHero>>({
+    url: '/api/v1/game/hero',
+    method: 'put',
+    data
+  })
+}
+
+// ── 武器 ──────────────────────────────────────────────────────────
+
+export function listGmWeapon(params: { playerId: number }) {
+  return request<ApiResponse<GmWeapon[]>>({
+    url: '/api/v1/game/weapon',
+    method: 'get',
+    params
+  })
+}
+
+export function addGmWeapon(data: { playerId: number; weaponId: number }) {
+  return request<ApiResponse<GmWeapon>>({
+    url: '/api/v1/game/weapon',
+    method: 'post',
+    data
+  })
+}
+
+export function updateGmWeapon(data: {
+  playerId: number
+  weaponId: number
+  level: number
+  durability: number
+  equipped: boolean
+}) {
+  return request<ApiResponse<GmWeapon>>({
+    url: '/api/v1/game/weapon',
+    method: 'put',
+    data
+  })
+}
+
+// ── 技能 ──────────────────────────────────────────────────────────
+
+export function listGmSkill(params: { playerId: number }) {
+  return request<ApiResponse<GmSkill[]>>({
+    url: '/api/v1/game/skill',
+    method: 'get',
+    params
+  })
+}
+
+export function addGmSkill(data: { playerId: number; skillId: number }) {
+  return request<ApiResponse<GmSkill>>({
+    url: '/api/v1/game/skill',
+    method: 'post',
+    data
+  })
+}
+
+export function updateGmSkill(data: { playerId: number; skillId: number; level: number; equipped: boolean }) {
+  return request<ApiResponse<GmSkill>>({
+    url: '/api/v1/game/skill',
+    method: 'put',
+    data
+  })
+}
+
+// ── 装备 ──────────────────────────────────────────────────────────
+
+export function listGmGear(params: { playerId: number }) {
+  return request<ApiResponse<GmGear[]>>({
+    url: '/api/v1/game/gear',
+    method: 'get',
+    params
+  })
+}
+
+export function addGmGear(data: { playerId: number; gearId: number }) {
+  return request<ApiResponse<GmGear>>({
+    url: '/api/v1/game/gear',
+    method: 'post',
+    data
+  })
+}
+
+export function updateGmGear(data: { playerId: number; gearId: number; level: number; equipped: boolean }) {
+  return request<ApiResponse<GmGear>>({
+    url: '/api/v1/game/gear',
+    method: 'put',
+    data
+  })
+}

@@ -256,11 +256,975 @@ func (x *KickPlayerResp) GetFailedIds() []int64 {
 	return nil
 }
 
+// GmContainerListReq 容器列表请求。
+type GmContainerListReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
+	Req           *ContainerListReq      `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数（容器类型）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GmContainerListReq) Reset() {
+	*x = GmContainerListReq{}
+	mi := &file_internal_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GmContainerListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GmContainerListReq) ProtoMessage() {}
+
+func (x *GmContainerListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GmContainerListReq.ProtoReflect.Descriptor instead.
+func (*GmContainerListReq) Descriptor() ([]byte, []int) {
+	return file_internal_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *GmContainerListReq) GetPlayerId() int64 {
+	if x != nil {
+		return x.PlayerId
+	}
+	return 0
+}
+
+func (x *GmContainerListReq) GetReq() *ContainerListReq {
+	if x != nil {
+		return x.Req
+	}
+	return nil
+}
+
+// GmContainerMoveReq 容器内移动物品请求。
+type GmContainerMoveReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
+	Req           *ContainerMoveReq      `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GmContainerMoveReq) Reset() {
+	*x = GmContainerMoveReq{}
+	mi := &file_internal_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GmContainerMoveReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GmContainerMoveReq) ProtoMessage() {}
+
+func (x *GmContainerMoveReq) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GmContainerMoveReq.ProtoReflect.Descriptor instead.
+func (*GmContainerMoveReq) Descriptor() ([]byte, []int) {
+	return file_internal_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *GmContainerMoveReq) GetPlayerId() int64 {
+	if x != nil {
+		return x.PlayerId
+	}
+	return 0
+}
+
+func (x *GmContainerMoveReq) GetReq() *ContainerMoveReq {
+	if x != nil {
+		return x.Req
+	}
+	return nil
+}
+
+// GmContainerRotateReq 容器内旋转物品请求。
+type GmContainerRotateReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
+	Req           *ContainerRotateReq    `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GmContainerRotateReq) Reset() {
+	*x = GmContainerRotateReq{}
+	mi := &file_internal_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GmContainerRotateReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GmContainerRotateReq) ProtoMessage() {}
+
+func (x *GmContainerRotateReq) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GmContainerRotateReq.ProtoReflect.Descriptor instead.
+func (*GmContainerRotateReq) Descriptor() ([]byte, []int) {
+	return file_internal_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *GmContainerRotateReq) GetPlayerId() int64 {
+	if x != nil {
+		return x.PlayerId
+	}
+	return 0
+}
+
+func (x *GmContainerRotateReq) GetReq() *ContainerRotateReq {
+	if x != nil {
+		return x.Req
+	}
+	return nil
+}
+
+// GmContainerSortReq 容器一键整理请求。
+type GmContainerSortReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
+	Req           *SortContainerReq      `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GmContainerSortReq) Reset() {
+	*x = GmContainerSortReq{}
+	mi := &file_internal_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GmContainerSortReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GmContainerSortReq) ProtoMessage() {}
+
+func (x *GmContainerSortReq) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GmContainerSortReq.ProtoReflect.Descriptor instead.
+func (*GmContainerSortReq) Descriptor() ([]byte, []int) {
+	return file_internal_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *GmContainerSortReq) GetPlayerId() int64 {
+	if x != nil {
+		return x.PlayerId
+	}
+	return 0
+}
+
+func (x *GmContainerSortReq) GetReq() *SortContainerReq {
+	if x != nil {
+		return x.Req
+	}
+	return nil
+}
+
+// GmContainerTransferReq 容器间移动物品请求。
+type GmContainerTransferReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
+	Req           *ContainerTransferReq  `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GmContainerTransferReq) Reset() {
+	*x = GmContainerTransferReq{}
+	mi := &file_internal_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GmContainerTransferReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GmContainerTransferReq) ProtoMessage() {}
+
+func (x *GmContainerTransferReq) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GmContainerTransferReq.ProtoReflect.Descriptor instead.
+func (*GmContainerTransferReq) Descriptor() ([]byte, []int) {
+	return file_internal_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *GmContainerTransferReq) GetPlayerId() int64 {
+	if x != nil {
+		return x.PlayerId
+	}
+	return 0
+}
+
+func (x *GmContainerTransferReq) GetReq() *ContainerTransferReq {
+	if x != nil {
+		return x.Req
+	}
+	return nil
+}
+
+// GmContainerAddItemReq 向容器放入物品请求（坐标为左上角格）。
+type GmContainerAddItemReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"`                // 玩家ID
+	ContainerType int32                  `protobuf:"varint,2,opt,name=container_type,json=containerType,proto3" json:"container_type,omitempty"` // 容器类型：1 背包 2 仓库 3 保险箱
+	ItemCfgId     int32                  `protobuf:"varint,3,opt,name=item_cfg_id,json=itemCfgId,proto3" json:"item_cfg_id,omitempty"`           // 物品配置ID
+	Count         int32                  `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`                                      // 堆叠数量
+	GridX         int32                  `protobuf:"varint,5,opt,name=grid_x,json=gridX,proto3" json:"grid_x,omitempty"`                         // 网格X
+	GridY         int32                  `protobuf:"varint,6,opt,name=grid_y,json=gridY,proto3" json:"grid_y,omitempty"`                         // 网格Y
+	Rotated       bool                   `protobuf:"varint,7,opt,name=rotated,proto3" json:"rotated,omitempty"`                                  // 是否旋转放置
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GmContainerAddItemReq) Reset() {
+	*x = GmContainerAddItemReq{}
+	mi := &file_internal_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GmContainerAddItemReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GmContainerAddItemReq) ProtoMessage() {}
+
+func (x *GmContainerAddItemReq) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GmContainerAddItemReq.ProtoReflect.Descriptor instead.
+func (*GmContainerAddItemReq) Descriptor() ([]byte, []int) {
+	return file_internal_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *GmContainerAddItemReq) GetPlayerId() int64 {
+	if x != nil {
+		return x.PlayerId
+	}
+	return 0
+}
+
+func (x *GmContainerAddItemReq) GetContainerType() int32 {
+	if x != nil {
+		return x.ContainerType
+	}
+	return 0
+}
+
+func (x *GmContainerAddItemReq) GetItemCfgId() int32 {
+	if x != nil {
+		return x.ItemCfgId
+	}
+	return 0
+}
+
+func (x *GmContainerAddItemReq) GetCount() int32 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
+func (x *GmContainerAddItemReq) GetGridX() int32 {
+	if x != nil {
+		return x.GridX
+	}
+	return 0
+}
+
+func (x *GmContainerAddItemReq) GetGridY() int32 {
+	if x != nil {
+		return x.GridY
+	}
+	return 0
+}
+
+func (x *GmContainerAddItemReq) GetRotated() bool {
+	if x != nil {
+		return x.Rotated
+	}
+	return false
+}
+
+// GmHeroListReq 英雄列表请求。
+type GmHeroListReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GmHeroListReq) Reset() {
+	*x = GmHeroListReq{}
+	mi := &file_internal_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GmHeroListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GmHeroListReq) ProtoMessage() {}
+
+func (x *GmHeroListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GmHeroListReq.ProtoReflect.Descriptor instead.
+func (*GmHeroListReq) Descriptor() ([]byte, []int) {
+	return file_internal_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *GmHeroListReq) GetPlayerId() int64 {
+	if x != nil {
+		return x.PlayerId
+	}
+	return 0
+}
+
+// GmHeroAddReq 新增英雄请求。
+type GmHeroAddReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
+	Req           *HeroAddReq            `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GmHeroAddReq) Reset() {
+	*x = GmHeroAddReq{}
+	mi := &file_internal_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GmHeroAddReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GmHeroAddReq) ProtoMessage() {}
+
+func (x *GmHeroAddReq) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GmHeroAddReq.ProtoReflect.Descriptor instead.
+func (*GmHeroAddReq) Descriptor() ([]byte, []int) {
+	return file_internal_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *GmHeroAddReq) GetPlayerId() int64 {
+	if x != nil {
+		return x.PlayerId
+	}
+	return 0
+}
+
+func (x *GmHeroAddReq) GetReq() *HeroAddReq {
+	if x != nil {
+		return x.Req
+	}
+	return nil
+}
+
+// GmHeroUpdateReq 更新英雄请求。
+type GmHeroUpdateReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
+	Req           *HeroUpdateReq         `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GmHeroUpdateReq) Reset() {
+	*x = GmHeroUpdateReq{}
+	mi := &file_internal_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GmHeroUpdateReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GmHeroUpdateReq) ProtoMessage() {}
+
+func (x *GmHeroUpdateReq) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GmHeroUpdateReq.ProtoReflect.Descriptor instead.
+func (*GmHeroUpdateReq) Descriptor() ([]byte, []int) {
+	return file_internal_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *GmHeroUpdateReq) GetPlayerId() int64 {
+	if x != nil {
+		return x.PlayerId
+	}
+	return 0
+}
+
+func (x *GmHeroUpdateReq) GetReq() *HeroUpdateReq {
+	if x != nil {
+		return x.Req
+	}
+	return nil
+}
+
+// GmWeaponListReq 武器列表请求。
+type GmWeaponListReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GmWeaponListReq) Reset() {
+	*x = GmWeaponListReq{}
+	mi := &file_internal_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GmWeaponListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GmWeaponListReq) ProtoMessage() {}
+
+func (x *GmWeaponListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GmWeaponListReq.ProtoReflect.Descriptor instead.
+func (*GmWeaponListReq) Descriptor() ([]byte, []int) {
+	return file_internal_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *GmWeaponListReq) GetPlayerId() int64 {
+	if x != nil {
+		return x.PlayerId
+	}
+	return 0
+}
+
+// GmWeaponAddReq 新增武器请求。
+type GmWeaponAddReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
+	Req           *WeaponAddReq          `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GmWeaponAddReq) Reset() {
+	*x = GmWeaponAddReq{}
+	mi := &file_internal_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GmWeaponAddReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GmWeaponAddReq) ProtoMessage() {}
+
+func (x *GmWeaponAddReq) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GmWeaponAddReq.ProtoReflect.Descriptor instead.
+func (*GmWeaponAddReq) Descriptor() ([]byte, []int) {
+	return file_internal_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *GmWeaponAddReq) GetPlayerId() int64 {
+	if x != nil {
+		return x.PlayerId
+	}
+	return 0
+}
+
+func (x *GmWeaponAddReq) GetReq() *WeaponAddReq {
+	if x != nil {
+		return x.Req
+	}
+	return nil
+}
+
+// GmWeaponUpdateReq 更新武器请求。
+type GmWeaponUpdateReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
+	Req           *WeaponUpdateReq       `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GmWeaponUpdateReq) Reset() {
+	*x = GmWeaponUpdateReq{}
+	mi := &file_internal_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GmWeaponUpdateReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GmWeaponUpdateReq) ProtoMessage() {}
+
+func (x *GmWeaponUpdateReq) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GmWeaponUpdateReq.ProtoReflect.Descriptor instead.
+func (*GmWeaponUpdateReq) Descriptor() ([]byte, []int) {
+	return file_internal_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *GmWeaponUpdateReq) GetPlayerId() int64 {
+	if x != nil {
+		return x.PlayerId
+	}
+	return 0
+}
+
+func (x *GmWeaponUpdateReq) GetReq() *WeaponUpdateReq {
+	if x != nil {
+		return x.Req
+	}
+	return nil
+}
+
+// GmSkillListReq 技能列表请求。
+type GmSkillListReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GmSkillListReq) Reset() {
+	*x = GmSkillListReq{}
+	mi := &file_internal_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GmSkillListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GmSkillListReq) ProtoMessage() {}
+
+func (x *GmSkillListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GmSkillListReq.ProtoReflect.Descriptor instead.
+func (*GmSkillListReq) Descriptor() ([]byte, []int) {
+	return file_internal_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *GmSkillListReq) GetPlayerId() int64 {
+	if x != nil {
+		return x.PlayerId
+	}
+	return 0
+}
+
+// GmSkillAddReq 新增技能请求。
+type GmSkillAddReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
+	Req           *SkillAddReq           `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GmSkillAddReq) Reset() {
+	*x = GmSkillAddReq{}
+	mi := &file_internal_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GmSkillAddReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GmSkillAddReq) ProtoMessage() {}
+
+func (x *GmSkillAddReq) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GmSkillAddReq.ProtoReflect.Descriptor instead.
+func (*GmSkillAddReq) Descriptor() ([]byte, []int) {
+	return file_internal_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *GmSkillAddReq) GetPlayerId() int64 {
+	if x != nil {
+		return x.PlayerId
+	}
+	return 0
+}
+
+func (x *GmSkillAddReq) GetReq() *SkillAddReq {
+	if x != nil {
+		return x.Req
+	}
+	return nil
+}
+
+// GmSkillUpdateReq 更新技能请求。
+type GmSkillUpdateReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
+	Req           *SkillUpdateReq        `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GmSkillUpdateReq) Reset() {
+	*x = GmSkillUpdateReq{}
+	mi := &file_internal_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GmSkillUpdateReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GmSkillUpdateReq) ProtoMessage() {}
+
+func (x *GmSkillUpdateReq) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GmSkillUpdateReq.ProtoReflect.Descriptor instead.
+func (*GmSkillUpdateReq) Descriptor() ([]byte, []int) {
+	return file_internal_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *GmSkillUpdateReq) GetPlayerId() int64 {
+	if x != nil {
+		return x.PlayerId
+	}
+	return 0
+}
+
+func (x *GmSkillUpdateReq) GetReq() *SkillUpdateReq {
+	if x != nil {
+		return x.Req
+	}
+	return nil
+}
+
+// GmGearListReq 装备列表请求。
+type GmGearListReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GmGearListReq) Reset() {
+	*x = GmGearListReq{}
+	mi := &file_internal_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GmGearListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GmGearListReq) ProtoMessage() {}
+
+func (x *GmGearListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GmGearListReq.ProtoReflect.Descriptor instead.
+func (*GmGearListReq) Descriptor() ([]byte, []int) {
+	return file_internal_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *GmGearListReq) GetPlayerId() int64 {
+	if x != nil {
+		return x.PlayerId
+	}
+	return 0
+}
+
+// GmGearAddReq 新增装备请求。
+type GmGearAddReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
+	Req           *GearAddReq            `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GmGearAddReq) Reset() {
+	*x = GmGearAddReq{}
+	mi := &file_internal_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GmGearAddReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GmGearAddReq) ProtoMessage() {}
+
+func (x *GmGearAddReq) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GmGearAddReq.ProtoReflect.Descriptor instead.
+func (*GmGearAddReq) Descriptor() ([]byte, []int) {
+	return file_internal_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *GmGearAddReq) GetPlayerId() int64 {
+	if x != nil {
+		return x.PlayerId
+	}
+	return 0
+}
+
+func (x *GmGearAddReq) GetReq() *GearAddReq {
+	if x != nil {
+		return x.Req
+	}
+	return nil
+}
+
+// GmGearUpdateReq 更新装备请求。
+type GmGearUpdateReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
+	Req           *GearUpdateReq         `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GmGearUpdateReq) Reset() {
+	*x = GmGearUpdateReq{}
+	mi := &file_internal_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GmGearUpdateReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GmGearUpdateReq) ProtoMessage() {}
+
+func (x *GmGearUpdateReq) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GmGearUpdateReq.ProtoReflect.Descriptor instead.
+func (*GmGearUpdateReq) Descriptor() ([]byte, []int) {
+	return file_internal_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *GmGearUpdateReq) GetPlayerId() int64 {
+	if x != nil {
+		return x.PlayerId
+	}
+	return 0
+}
+
+func (x *GmGearUpdateReq) GetReq() *GearUpdateReq {
+	if x != nil {
+		return x.Req
+	}
+	return nil
+}
+
 var File_internal_proto protoreflect.FileDescriptor
 
 const file_internal_proto_rawDesc = "" +
 	"\n" +
-	"\x0einternal.proto\x12\binternal\"c\n" +
+	"\x0einternal.proto\x12\binternal\x1a\x0fcontainer.proto\x1a\n" +
+	"gear.proto\x1a\n" +
+	"hero.proto\x1a\vskill.proto\x1a\fweapon.proto\"c\n" +
 	"\fOnlinePlayer\x12\x1b\n" +
 	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12\x1d\n" +
 	"\n" +
@@ -274,11 +1238,88 @@ const file_internal_proto_rawDesc = "" +
 	"player_ids\x18\x01 \x03(\x03R\tplayerIds\"/\n" +
 	"\x0eKickPlayerResp\x12\x1d\n" +
 	"\n" +
-	"failed_ids\x18\x01 \x03(\x03R\tfailedIds2\xa3\x01\n" +
-	"\rPlayerService\x12Q\n" +
+	"failed_ids\x18\x01 \x03(\x03R\tfailedIds\"Y\n" +
+	"\x12GmContainerListReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12&\n" +
+	"\x03req\x18\x02 \x01(\v2\x14.pb.ContainerListReqR\x03req\"Y\n" +
+	"\x12GmContainerMoveReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12&\n" +
+	"\x03req\x18\x02 \x01(\v2\x14.pb.ContainerMoveReqR\x03req\"]\n" +
+	"\x14GmContainerRotateReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12(\n" +
+	"\x03req\x18\x02 \x01(\v2\x16.pb.ContainerRotateReqR\x03req\"Y\n" +
+	"\x12GmContainerSortReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12&\n" +
+	"\x03req\x18\x02 \x01(\v2\x14.pb.SortContainerReqR\x03req\"a\n" +
+	"\x16GmContainerTransferReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12*\n" +
+	"\x03req\x18\x02 \x01(\v2\x18.pb.ContainerTransferReqR\x03req\"\xd9\x01\n" +
+	"\x15GmContainerAddItemReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12%\n" +
+	"\x0econtainer_type\x18\x02 \x01(\x05R\rcontainerType\x12\x1e\n" +
+	"\vitem_cfg_id\x18\x03 \x01(\x05R\titemCfgId\x12\x14\n" +
+	"\x05count\x18\x04 \x01(\x05R\x05count\x12\x15\n" +
+	"\x06grid_x\x18\x05 \x01(\x05R\x05gridX\x12\x15\n" +
+	"\x06grid_y\x18\x06 \x01(\x05R\x05gridY\x12\x18\n" +
+	"\arotated\x18\a \x01(\bR\arotated\",\n" +
+	"\rGmHeroListReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\"M\n" +
+	"\fGmHeroAddReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12 \n" +
+	"\x03req\x18\x02 \x01(\v2\x0e.pb.HeroAddReqR\x03req\"S\n" +
+	"\x0fGmHeroUpdateReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12#\n" +
+	"\x03req\x18\x02 \x01(\v2\x11.pb.HeroUpdateReqR\x03req\".\n" +
+	"\x0fGmWeaponListReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\"Q\n" +
+	"\x0eGmWeaponAddReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12\"\n" +
+	"\x03req\x18\x02 \x01(\v2\x10.pb.WeaponAddReqR\x03req\"W\n" +
+	"\x11GmWeaponUpdateReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12%\n" +
+	"\x03req\x18\x02 \x01(\v2\x13.pb.WeaponUpdateReqR\x03req\"-\n" +
+	"\x0eGmSkillListReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\"O\n" +
+	"\rGmSkillAddReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12!\n" +
+	"\x03req\x18\x02 \x01(\v2\x0f.pb.SkillAddReqR\x03req\"U\n" +
+	"\x10GmSkillUpdateReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12$\n" +
+	"\x03req\x18\x02 \x01(\v2\x12.pb.SkillUpdateReqR\x03req\",\n" +
+	"\rGmGearListReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\"M\n" +
+	"\fGmGearAddReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12 \n" +
+	"\x03req\x18\x02 \x01(\v2\x0e.pb.GearAddReqR\x03req\"S\n" +
+	"\x0fGmGearUpdateReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12#\n" +
+	"\x03req\x18\x02 \x01(\v2\x11.pb.GearUpdateReqR\x03req2\x9d\n" +
+	"\n" +
+	"\x10GameAdminService\x12Q\n" +
 	"\x10GetOnlinePlayers\x12\x1d.internal.GetOnlinePlayersReq\x1a\x1e.internal.GetOnlinePlayersResp\x12?\n" +
 	"\n" +
-	"KickPlayer\x12\x17.internal.KickPlayerReq\x1a\x18.internal.KickPlayerRespB\x19Z\x17server-cluster/share/pbb\x06proto3"
+	"KickPlayer\x12\x17.internal.KickPlayerReq\x1a\x18.internal.KickPlayerResp\x12D\n" +
+	"\rContainerList\x12\x1c.internal.GmContainerListReq\x1a\x15.pb.ContainerListResp\x12D\n" +
+	"\rContainerMove\x12\x1c.internal.GmContainerMoveReq\x1a\x15.pb.ContainerMoveResp\x12J\n" +
+	"\x0fContainerRotate\x12\x1e.internal.GmContainerRotateReq\x1a\x17.pb.ContainerRotateResp\x12D\n" +
+	"\rContainerSort\x12\x1c.internal.GmContainerSortReq\x1a\x15.pb.SortContainerResp\x12P\n" +
+	"\x11ContainerTransfer\x12 .internal.GmContainerTransferReq\x1a\x19.pb.ContainerTransferResp\x12J\n" +
+	"\x10ContainerAddItem\x12\x1f.internal.GmContainerAddItemReq\x1a\x15.pb.ContainerListResp\x125\n" +
+	"\bHeroList\x12\x17.internal.GmHeroListReq\x1a\x10.pb.HeroListResp\x122\n" +
+	"\aHeroAdd\x12\x16.internal.GmHeroAddReq\x1a\x0f.pb.HeroAddResp\x12;\n" +
+	"\n" +
+	"HeroUpdate\x12\x19.internal.GmHeroUpdateReq\x1a\x12.pb.HeroUpdateResp\x12;\n" +
+	"\n" +
+	"WeaponList\x12\x19.internal.GmWeaponListReq\x1a\x12.pb.WeaponListResp\x128\n" +
+	"\tWeaponAdd\x12\x18.internal.GmWeaponAddReq\x1a\x11.pb.WeaponAddResp\x12A\n" +
+	"\fWeaponUpdate\x12\x1b.internal.GmWeaponUpdateReq\x1a\x14.pb.WeaponUpdateResp\x128\n" +
+	"\tSkillList\x12\x18.internal.GmSkillListReq\x1a\x11.pb.SkillListResp\x125\n" +
+	"\bSkillAdd\x12\x17.internal.GmSkillAddReq\x1a\x10.pb.SkillAddResp\x12>\n" +
+	"\vSkillUpdate\x12\x1a.internal.GmSkillUpdateReq\x1a\x13.pb.SkillUpdateResp\x125\n" +
+	"\bGearList\x12\x17.internal.GmGearListReq\x1a\x10.pb.GearListResp\x122\n" +
+	"\aGearAdd\x12\x16.internal.GmGearAddReq\x1a\x0f.pb.GearAddResp\x12;\n" +
+	"\n" +
+	"GearUpdate\x12\x19.internal.GmGearUpdateReq\x1a\x12.pb.GearUpdateRespB\x19Z\x17server-cluster/share/pbb\x06proto3"
 
 var (
 	file_internal_proto_rawDescOnce sync.Once
@@ -292,25 +1333,122 @@ func file_internal_proto_rawDescGZIP() []byte {
 	return file_internal_proto_rawDescData
 }
 
-var file_internal_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_internal_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_internal_proto_goTypes = []any{
-	(*OnlinePlayer)(nil),         // 0: internal.OnlinePlayer
-	(*GetOnlinePlayersReq)(nil),  // 1: internal.GetOnlinePlayersReq
-	(*GetOnlinePlayersResp)(nil), // 2: internal.GetOnlinePlayersResp
-	(*KickPlayerReq)(nil),        // 3: internal.KickPlayerReq
-	(*KickPlayerResp)(nil),       // 4: internal.KickPlayerResp
+	(*OnlinePlayer)(nil),           // 0: internal.OnlinePlayer
+	(*GetOnlinePlayersReq)(nil),    // 1: internal.GetOnlinePlayersReq
+	(*GetOnlinePlayersResp)(nil),   // 2: internal.GetOnlinePlayersResp
+	(*KickPlayerReq)(nil),          // 3: internal.KickPlayerReq
+	(*KickPlayerResp)(nil),         // 4: internal.KickPlayerResp
+	(*GmContainerListReq)(nil),     // 5: internal.GmContainerListReq
+	(*GmContainerMoveReq)(nil),     // 6: internal.GmContainerMoveReq
+	(*GmContainerRotateReq)(nil),   // 7: internal.GmContainerRotateReq
+	(*GmContainerSortReq)(nil),     // 8: internal.GmContainerSortReq
+	(*GmContainerTransferReq)(nil), // 9: internal.GmContainerTransferReq
+	(*GmContainerAddItemReq)(nil),  // 10: internal.GmContainerAddItemReq
+	(*GmHeroListReq)(nil),          // 11: internal.GmHeroListReq
+	(*GmHeroAddReq)(nil),           // 12: internal.GmHeroAddReq
+	(*GmHeroUpdateReq)(nil),        // 13: internal.GmHeroUpdateReq
+	(*GmWeaponListReq)(nil),        // 14: internal.GmWeaponListReq
+	(*GmWeaponAddReq)(nil),         // 15: internal.GmWeaponAddReq
+	(*GmWeaponUpdateReq)(nil),      // 16: internal.GmWeaponUpdateReq
+	(*GmSkillListReq)(nil),         // 17: internal.GmSkillListReq
+	(*GmSkillAddReq)(nil),          // 18: internal.GmSkillAddReq
+	(*GmSkillUpdateReq)(nil),       // 19: internal.GmSkillUpdateReq
+	(*GmGearListReq)(nil),          // 20: internal.GmGearListReq
+	(*GmGearAddReq)(nil),           // 21: internal.GmGearAddReq
+	(*GmGearUpdateReq)(nil),        // 22: internal.GmGearUpdateReq
+	(*ContainerListReq)(nil),       // 23: pb.ContainerListReq
+	(*ContainerMoveReq)(nil),       // 24: pb.ContainerMoveReq
+	(*ContainerRotateReq)(nil),     // 25: pb.ContainerRotateReq
+	(*SortContainerReq)(nil),       // 26: pb.SortContainerReq
+	(*ContainerTransferReq)(nil),   // 27: pb.ContainerTransferReq
+	(*HeroAddReq)(nil),             // 28: pb.HeroAddReq
+	(*HeroUpdateReq)(nil),          // 29: pb.HeroUpdateReq
+	(*WeaponAddReq)(nil),           // 30: pb.WeaponAddReq
+	(*WeaponUpdateReq)(nil),        // 31: pb.WeaponUpdateReq
+	(*SkillAddReq)(nil),            // 32: pb.SkillAddReq
+	(*SkillUpdateReq)(nil),         // 33: pb.SkillUpdateReq
+	(*GearAddReq)(nil),             // 34: pb.GearAddReq
+	(*GearUpdateReq)(nil),          // 35: pb.GearUpdateReq
+	(*ContainerListResp)(nil),      // 36: pb.ContainerListResp
+	(*ContainerMoveResp)(nil),      // 37: pb.ContainerMoveResp
+	(*ContainerRotateResp)(nil),    // 38: pb.ContainerRotateResp
+	(*SortContainerResp)(nil),      // 39: pb.SortContainerResp
+	(*ContainerTransferResp)(nil),  // 40: pb.ContainerTransferResp
+	(*HeroListResp)(nil),           // 41: pb.HeroListResp
+	(*HeroAddResp)(nil),            // 42: pb.HeroAddResp
+	(*HeroUpdateResp)(nil),         // 43: pb.HeroUpdateResp
+	(*WeaponListResp)(nil),         // 44: pb.WeaponListResp
+	(*WeaponAddResp)(nil),          // 45: pb.WeaponAddResp
+	(*WeaponUpdateResp)(nil),       // 46: pb.WeaponUpdateResp
+	(*SkillListResp)(nil),          // 47: pb.SkillListResp
+	(*SkillAddResp)(nil),           // 48: pb.SkillAddResp
+	(*SkillUpdateResp)(nil),        // 49: pb.SkillUpdateResp
+	(*GearListResp)(nil),           // 50: pb.GearListResp
+	(*GearAddResp)(nil),            // 51: pb.GearAddResp
+	(*GearUpdateResp)(nil),         // 52: pb.GearUpdateResp
 }
 var file_internal_proto_depIdxs = []int32{
-	0, // 0: internal.GetOnlinePlayersResp.players:type_name -> internal.OnlinePlayer
-	1, // 1: internal.PlayerService.GetOnlinePlayers:input_type -> internal.GetOnlinePlayersReq
-	3, // 2: internal.PlayerService.KickPlayer:input_type -> internal.KickPlayerReq
-	2, // 3: internal.PlayerService.GetOnlinePlayers:output_type -> internal.GetOnlinePlayersResp
-	4, // 4: internal.PlayerService.KickPlayer:output_type -> internal.KickPlayerResp
-	3, // [3:5] is the sub-list for method output_type
-	1, // [1:3] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	0,  // 0: internal.GetOnlinePlayersResp.players:type_name -> internal.OnlinePlayer
+	23, // 1: internal.GmContainerListReq.req:type_name -> pb.ContainerListReq
+	24, // 2: internal.GmContainerMoveReq.req:type_name -> pb.ContainerMoveReq
+	25, // 3: internal.GmContainerRotateReq.req:type_name -> pb.ContainerRotateReq
+	26, // 4: internal.GmContainerSortReq.req:type_name -> pb.SortContainerReq
+	27, // 5: internal.GmContainerTransferReq.req:type_name -> pb.ContainerTransferReq
+	28, // 6: internal.GmHeroAddReq.req:type_name -> pb.HeroAddReq
+	29, // 7: internal.GmHeroUpdateReq.req:type_name -> pb.HeroUpdateReq
+	30, // 8: internal.GmWeaponAddReq.req:type_name -> pb.WeaponAddReq
+	31, // 9: internal.GmWeaponUpdateReq.req:type_name -> pb.WeaponUpdateReq
+	32, // 10: internal.GmSkillAddReq.req:type_name -> pb.SkillAddReq
+	33, // 11: internal.GmSkillUpdateReq.req:type_name -> pb.SkillUpdateReq
+	34, // 12: internal.GmGearAddReq.req:type_name -> pb.GearAddReq
+	35, // 13: internal.GmGearUpdateReq.req:type_name -> pb.GearUpdateReq
+	1,  // 14: internal.GameAdminService.GetOnlinePlayers:input_type -> internal.GetOnlinePlayersReq
+	3,  // 15: internal.GameAdminService.KickPlayer:input_type -> internal.KickPlayerReq
+	5,  // 16: internal.GameAdminService.ContainerList:input_type -> internal.GmContainerListReq
+	6,  // 17: internal.GameAdminService.ContainerMove:input_type -> internal.GmContainerMoveReq
+	7,  // 18: internal.GameAdminService.ContainerRotate:input_type -> internal.GmContainerRotateReq
+	8,  // 19: internal.GameAdminService.ContainerSort:input_type -> internal.GmContainerSortReq
+	9,  // 20: internal.GameAdminService.ContainerTransfer:input_type -> internal.GmContainerTransferReq
+	10, // 21: internal.GameAdminService.ContainerAddItem:input_type -> internal.GmContainerAddItemReq
+	11, // 22: internal.GameAdminService.HeroList:input_type -> internal.GmHeroListReq
+	12, // 23: internal.GameAdminService.HeroAdd:input_type -> internal.GmHeroAddReq
+	13, // 24: internal.GameAdminService.HeroUpdate:input_type -> internal.GmHeroUpdateReq
+	14, // 25: internal.GameAdminService.WeaponList:input_type -> internal.GmWeaponListReq
+	15, // 26: internal.GameAdminService.WeaponAdd:input_type -> internal.GmWeaponAddReq
+	16, // 27: internal.GameAdminService.WeaponUpdate:input_type -> internal.GmWeaponUpdateReq
+	17, // 28: internal.GameAdminService.SkillList:input_type -> internal.GmSkillListReq
+	18, // 29: internal.GameAdminService.SkillAdd:input_type -> internal.GmSkillAddReq
+	19, // 30: internal.GameAdminService.SkillUpdate:input_type -> internal.GmSkillUpdateReq
+	20, // 31: internal.GameAdminService.GearList:input_type -> internal.GmGearListReq
+	21, // 32: internal.GameAdminService.GearAdd:input_type -> internal.GmGearAddReq
+	22, // 33: internal.GameAdminService.GearUpdate:input_type -> internal.GmGearUpdateReq
+	2,  // 34: internal.GameAdminService.GetOnlinePlayers:output_type -> internal.GetOnlinePlayersResp
+	4,  // 35: internal.GameAdminService.KickPlayer:output_type -> internal.KickPlayerResp
+	36, // 36: internal.GameAdminService.ContainerList:output_type -> pb.ContainerListResp
+	37, // 37: internal.GameAdminService.ContainerMove:output_type -> pb.ContainerMoveResp
+	38, // 38: internal.GameAdminService.ContainerRotate:output_type -> pb.ContainerRotateResp
+	39, // 39: internal.GameAdminService.ContainerSort:output_type -> pb.SortContainerResp
+	40, // 40: internal.GameAdminService.ContainerTransfer:output_type -> pb.ContainerTransferResp
+	36, // 41: internal.GameAdminService.ContainerAddItem:output_type -> pb.ContainerListResp
+	41, // 42: internal.GameAdminService.HeroList:output_type -> pb.HeroListResp
+	42, // 43: internal.GameAdminService.HeroAdd:output_type -> pb.HeroAddResp
+	43, // 44: internal.GameAdminService.HeroUpdate:output_type -> pb.HeroUpdateResp
+	44, // 45: internal.GameAdminService.WeaponList:output_type -> pb.WeaponListResp
+	45, // 46: internal.GameAdminService.WeaponAdd:output_type -> pb.WeaponAddResp
+	46, // 47: internal.GameAdminService.WeaponUpdate:output_type -> pb.WeaponUpdateResp
+	47, // 48: internal.GameAdminService.SkillList:output_type -> pb.SkillListResp
+	48, // 49: internal.GameAdminService.SkillAdd:output_type -> pb.SkillAddResp
+	49, // 50: internal.GameAdminService.SkillUpdate:output_type -> pb.SkillUpdateResp
+	50, // 51: internal.GameAdminService.GearList:output_type -> pb.GearListResp
+	51, // 52: internal.GameAdminService.GearAdd:output_type -> pb.GearAddResp
+	52, // 53: internal.GameAdminService.GearUpdate:output_type -> pb.GearUpdateResp
+	34, // [34:54] is the sub-list for method output_type
+	14, // [14:34] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_internal_proto_init() }
@@ -318,13 +1456,18 @@ func file_internal_proto_init() {
 	if File_internal_proto != nil {
 		return
 	}
+	file_container_proto_init()
+	file_gear_proto_init()
+	file_hero_proto_init()
+	file_skill_proto_init()
+	file_weapon_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_proto_rawDesc), len(file_internal_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   23,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

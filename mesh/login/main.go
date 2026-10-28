@@ -8,6 +8,7 @@
 package main
 
 import (
+	"server-cluster/internal/singleinstance"
 	"server-cluster/mesh/login/app/handler"
 
 	"github.com/dobyte/due/component/http/v2"
@@ -19,6 +20,8 @@ import (
 )
 
 func main() {
+	// 单实例保护：重复启动会触发 due 日志 rotate 失败 panic，提前拦截
+	singleinstance.Check("login")
 	// 创建容器
 	container := due.NewContainer()
 	// 创建 HTTP 组件（监听地址、swagger 等由 etc.http.* 配置驱动）

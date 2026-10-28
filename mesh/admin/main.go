@@ -14,12 +14,15 @@ import (
 	"github.com/dobyte/due/v2"
 	"github.com/dobyte/due/v2/log"
 
+	"server-cluster/internal/singleinstance"
 	"server-cluster/internal/svc"
 	"server-cluster/mesh/admin/app/global"
 	"server-cluster/mesh/admin/app/handler"
 )
 
 func main() {
+	// 单实例保护：重复启动会触发 due 日志 rotate 失败 panic，提前拦截
+	singleinstance.Check("admin")
 	// 创建容器
 	container := due.NewContainer()
 	// 创建服务注册发现（admin 经 etcd 发现 game 节点）
@@ -44,6 +47,7 @@ func main() {
 	handler.RegisterSys(httpComponent.Proxy().Router())
 	handler.RegisterPlayer(httpComponent.Proxy().Router())
 	handler.RegisterItem(httpComponent.Proxy().Router())
+	handler.RegisterGm(httpComponent.Proxy().Router())
 	// 添加组件到容器
 	container.Add(httpComponent)
 	// 启动容器

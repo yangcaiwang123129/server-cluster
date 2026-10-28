@@ -7,9 +7,13 @@ import (
 	"github.com/dobyte/due/registry/etcd/v2"
 	"github.com/dobyte/due/v2"
 	"github.com/dobyte/due/v2/cluster/gate"
+
+	"server-cluster/internal/singleinstance"
 )
 
 func main() {
+	// 单实例保护：重复启动会触发 due 日志 rotate 失败 panic，提前拦截
+	singleinstance.Check("gate-1")
 	// 创建容器
 	container := due.NewContainer()
 	// 创建网络服务器

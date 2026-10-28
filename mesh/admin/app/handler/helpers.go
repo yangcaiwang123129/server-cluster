@@ -26,6 +26,15 @@ func paramInt(ctx http.Context, name string) int {
 	return v
 }
 
+// queryPlayerID 读取查询串中的玩家ID；非法或缺省返回 0。
+func queryPlayerID(ctx http.Context) int64 {
+	playerID, _ := strconv.ParseInt(ctx.Query("playerId"), 10, 64)
+	if playerID <= 0 {
+		return 0
+	}
+	return playerID
+}
+
 // orderBy 解析 useTable 的 <prop>Order 排序参数，只接受白名单列。
 func orderBy(ctx http.Context, columns map[string]string) string {
 	for prop, column := range columns {

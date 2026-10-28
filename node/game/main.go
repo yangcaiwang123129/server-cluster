@@ -12,12 +12,15 @@ import (
 	"github.com/dobyte/due/v2/cluster/node"
 	"github.com/dobyte/due/v2/log"
 
+	"server-cluster/internal/singleinstance"
 	"server-cluster/internal/svc"
 	"server-cluster/node/game/app/global"
 	"server-cluster/node/game/app/handler"
 )
 
 func main() {
+	// 单实例保护：重复启动会触发 due 日志 rotate 失败 panic，提前拦截
+	singleinstance.Check("game-1")
 	// 创建容器
 	container := due.NewContainer()
 	// 创建用户定位器
@@ -41,7 +44,7 @@ func main() {
 	// 注册客户端路由（含玩家 actor 业务路由）
 	handler.Register(component.Proxy())
 	// 注册服务间 RPC provider
-	component.Proxy().AddServiceProvider(pb.PlayerService_ServiceDesc.ServiceName, &pb.PlayerService_ServiceDesc, &service.OnlineProvider{})
+	component.Proxy().AddServiceProvider(pb.GameAdminService_ServiceDesc.ServiceName, &pb.GameAdminService_ServiceDesc, &service.GmProvider{})
 	// 添加节点组件
 	container.Add(component)
 	// 启动容器

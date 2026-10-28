@@ -61,7 +61,7 @@ func (this *playerLogic) PlayerOnline() ([]dto.OnlinePlayerResp, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), rpcTimeout)
 	defer cancel()
 
-	instances, err := gameInstances(ctx, pb.PlayerService_ServiceDesc.ServiceName)
+	instances, err := gameInstances(ctx, pb.GameAdminService_ServiceDesc.ServiceName)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (this *playerLogic) PlayerOnline() ([]dto.OnlinePlayerResp, error) {
 				return // 实例不可达：跳过，避免单实例故障拖垮整个列表
 			}
 			resp := &pb.GetOnlinePlayersResp{}
-			if err := client.Call(ctx, pb.PlayerService_ServiceDesc.ServiceName, pb.PlayerService_GetOnlinePlayers_FullMethodName, &pb.GetOnlinePlayersReq{}, resp); err != nil {
+			if err := client.Call(ctx, pb.GameAdminService_ServiceDesc.ServiceName, methodName(pb.GameAdminService_GetOnlinePlayers_FullMethodName), &pb.GetOnlinePlayersReq{}, resp); err != nil {
 				return
 			}
 			mu.Lock()
@@ -118,7 +118,7 @@ func (this *playerLogic) PlayerKick(req dto.PlayerKickReq) error {
 		return err
 	}
 	resp := &pb.KickPlayerResp{}
-	if err := client.Call(ctx, pb.PlayerService_ServiceDesc.ServiceName, pb.PlayerService_KickPlayer_FullMethodName,
+	if err := client.Call(ctx, pb.GameAdminService_ServiceDesc.ServiceName, methodName(pb.GameAdminService_KickPlayer_FullMethodName),
 		&pb.KickPlayerReq{PlayerIds: []int64{req.PlayerID}}, resp); err != nil {
 		return err
 	}

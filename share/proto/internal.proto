@@ -3,6 +3,12 @@ syntax = "proto3";
 
 package internal;
 
+import "container.proto";
+import "gear.proto";
+import "hero.proto";
+import "skill.proto";
+import "weapon.proto";
+
 option go_package = "server-cluster/share/pb";
 
 // OnlinePlayer 在线玩家信息。
@@ -30,10 +36,162 @@ message KickPlayerResp {
   repeated int64 failed_ids = 1; // 踢失败（不在线等）的玩家ID
 }
 
-// PlayerService 玩家相关内部服务（game 服提供）。
-service PlayerService {
+//  ========== 管理后台 GM（admin 服经 mesh 定向调用 game 服，入参统一携带 playerID） ==========
+
+// GmContainerListReq 容器列表请求。
+message GmContainerListReq {
+  int64 player_id = 1;   // 玩家ID
+  pb.ContainerListReq req = 2; // 业务参数（容器类型）
+}
+
+// GmContainerMoveReq 容器内移动物品请求。
+message GmContainerMoveReq {
+  int64 player_id = 1;   // 玩家ID
+  pb.ContainerMoveReq req = 2; // 业务参数
+}
+
+// GmContainerRotateReq 容器内旋转物品请求。
+message GmContainerRotateReq {
+  int64 player_id = 1;     // 玩家ID
+  pb.ContainerRotateReq req = 2; // 业务参数
+}
+
+// GmContainerSortReq 容器一键整理请求。
+message GmContainerSortReq {
+  int64 player_id = 1;    // 玩家ID
+  pb.SortContainerReq req = 2; // 业务参数
+}
+
+// GmContainerTransferReq 容器间移动物品请求。
+message GmContainerTransferReq {
+  int64 player_id = 1;       // 玩家ID
+  pb.ContainerTransferReq req = 2; // 业务参数
+}
+
+// GmContainerAddItemReq 向容器放入物品请求（坐标为左上角格）。
+message GmContainerAddItemReq {
+  int64 player_id = 1;      // 玩家ID
+  int32 container_type = 2; // 容器类型：1 背包 2 仓库 3 保险箱
+  int32 item_cfg_id = 3;    // 物品配置ID
+  int32 count = 4;          // 堆叠数量
+  int32 grid_x = 5;         // 网格X
+  int32 grid_y = 6;         // 网格Y
+  bool rotated = 7;         // 是否旋转放置
+}
+
+// GmHeroListReq 英雄列表请求。
+message GmHeroListReq {
+  int64 player_id = 1; // 玩家ID
+}
+
+// GmHeroAddReq 新增英雄请求。
+message GmHeroAddReq {
+  int64 player_id = 1; // 玩家ID
+  pb.HeroAddReq req = 2; // 业务参数
+}
+
+// GmHeroUpdateReq 更新英雄请求。
+message GmHeroUpdateReq {
+  int64 player_id = 1; // 玩家ID
+  pb.HeroUpdateReq req = 2; // 业务参数
+}
+
+// GmWeaponListReq 武器列表请求。
+message GmWeaponListReq {
+  int64 player_id = 1; // 玩家ID
+}
+
+// GmWeaponAddReq 新增武器请求。
+message GmWeaponAddReq {
+  int64 player_id = 1; // 玩家ID
+  pb.WeaponAddReq req = 2; // 业务参数
+}
+
+// GmWeaponUpdateReq 更新武器请求。
+message GmWeaponUpdateReq {
+  int64 player_id = 1; // 玩家ID
+  pb.WeaponUpdateReq req = 2; // 业务参数
+}
+
+// GmSkillListReq 技能列表请求。
+message GmSkillListReq {
+  int64 player_id = 1; // 玩家ID
+}
+
+// GmSkillAddReq 新增技能请求。
+message GmSkillAddReq {
+  int64 player_id = 1; // 玩家ID
+  pb.SkillAddReq req = 2; // 业务参数
+}
+
+// GmSkillUpdateReq 更新技能请求。
+message GmSkillUpdateReq {
+  int64 player_id = 1; // 玩家ID
+  pb.SkillUpdateReq req = 2; // 业务参数
+}
+
+// GmGearListReq 装备列表请求。
+message GmGearListReq {
+  int64 player_id = 1; // 玩家ID
+}
+
+// GmGearAddReq 新增装备请求。
+message GmGearAddReq {
+  int64 player_id = 1; // 玩家ID
+  pb.GearAddReq req = 2; // 业务参数
+}
+
+// GmGearUpdateReq 更新装备请求。
+message GmGearUpdateReq {
+  int64 player_id = 1; // 玩家ID
+  pb.GearUpdateReq req = 2; // 业务参数
+}
+
+// GameAdminService 后台 GM 服务（game 服提供，admin 服调用）。
+service GameAdminService {
   // GetOnlinePlayers 查看在线玩家列表
   rpc GetOnlinePlayers (GetOnlinePlayersReq) returns (GetOnlinePlayersResp);
   // KickPlayer 踢玩家下线
   rpc KickPlayer (KickPlayerReq) returns (KickPlayerResp);
+
+  // ContainerList 容器列表
+  rpc ContainerList (GmContainerListReq) returns (pb.ContainerListResp);
+  // ContainerMove 容器内移动物品
+  rpc ContainerMove (GmContainerMoveReq) returns (pb.ContainerMoveResp);
+  // ContainerRotate 容器内旋转物品
+  rpc ContainerRotate (GmContainerRotateReq) returns (pb.ContainerRotateResp);
+  // ContainerSort 容器一键整理
+  rpc ContainerSort (GmContainerSortReq) returns (pb.SortContainerResp);
+  // ContainerTransfer 容器间移动物品
+  rpc ContainerTransfer (GmContainerTransferReq) returns (pb.ContainerTransferResp);
+  // ContainerAddItem 向容器放入物品（返回变更后的容器）
+  rpc ContainerAddItem (GmContainerAddItemReq) returns (pb.ContainerListResp);
+
+  // HeroList 英雄列表
+  rpc HeroList (GmHeroListReq) returns (pb.HeroListResp);
+  // HeroAdd 新增英雄
+  rpc HeroAdd (GmHeroAddReq) returns (pb.HeroAddResp);
+  // HeroUpdate 更新英雄
+  rpc HeroUpdate (GmHeroUpdateReq) returns (pb.HeroUpdateResp);
+
+  // WeaponList 武器列表
+  rpc WeaponList (GmWeaponListReq) returns (pb.WeaponListResp);
+  // WeaponAdd 新增武器
+  rpc WeaponAdd (GmWeaponAddReq) returns (pb.WeaponAddResp);
+  // WeaponUpdate 更新武器
+  rpc WeaponUpdate (GmWeaponUpdateReq) returns (pb.WeaponUpdateResp);
+
+  // SkillList 技能列表
+  rpc SkillList (GmSkillListReq) returns (pb.SkillListResp);
+  // SkillAdd 新增技能
+  rpc SkillAdd (GmSkillAddReq) returns (pb.SkillAddResp);
+  // SkillUpdate 更新技能
+  rpc SkillUpdate (GmSkillUpdateReq) returns (pb.SkillUpdateResp);
+
+  // GearList 装备列表
+  rpc GearList (GmGearListReq) returns (pb.GearListResp);
+  // GearAdd 新增装备
+  rpc GearAdd (GmGearAddReq) returns (pb.GearAddResp);
+  // GearUpdate 更新装备
+  rpc GearUpdate (GmGearUpdateReq) returns (pb.GearUpdateResp);
 }
