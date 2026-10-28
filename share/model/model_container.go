@@ -240,11 +240,8 @@ func (c *Container) AddItem(it Item) error {
 	return nil
 }
 
-// MoveItem 将物品 uid 移到 (toX,toY)，可选旋转；canPlace 校验通过才改坐标。
-func (c *Container) MoveItem(uid int64, toX, toY int32, rotated bool) error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
+// moveItemLocked 已持锁版本：把 uid 移到 (toX,toY)，可选旋转。
+func (c *Container) moveItemLocked(uid int64, toX, toY int32, rotated bool) error {
 	it, ok := c.indexMap[uid]
 	if !ok {
 		return ErrItemNotFound
@@ -257,6 +254,17 @@ func (c *Container) MoveItem(uid int64, toX, toY int32, rotated bool) error {
 	it.GridX, it.GridY, it.Rotated = toX, toY, rotated
 	c.Version++
 	return nil
+}
+
+// MoveItem 将物品 uid 移到 (toX,toY)，可选旋转；canPlace 校验通过才改坐标。
+func (c *Container) MoveItem(uid int64, toX, toY int32, rotated bool) error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.indexMap == nil {
+		c.buildIndex()
+	}
+	return c.moveItemLocked(uid, toX, toY, rotated)
 }
 
 // RotateItem 原地旋转物品 uid。
@@ -279,11 +287,8 @@ func (c *Container) RotateItem(uid int64) error {
 	return nil
 }
 
-// RemoveItem 删除物品 uid。
-func (c *Container) RemoveItem(uid int64) error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
+// removeItemLocked 已持锁版本：删除物品 uid。
+func (c *Container) removeItemLocked(uid int64) error {
 	if _, ok := c.indexMap[uid]; !ok {
 		return ErrItemNotFound
 	}
@@ -298,6 +303,17 @@ func (c *Container) RemoveItem(uid int64) error {
 	c.Version++
 	c.buildIndex()
 	return nil
+}
+
+// RemoveItem 删除物品 uid。
+func (c *Container) RemoveItem(uid int64) error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.indexMap == nil {
+		c.buildIndex()
+	}
+	return c.removeItemLocked(uid)
 }
 
 // AutoSort 一键整理：面积降序 → 双朝向扫描放置 → 放不下整体回滚。
@@ -416,4 +432,47 @@ func (c *Container) OnDeath() {
 	c.Items = c.Items[:0]
 	c.Version++
 	c.buildIndex()
+}
+
+// TransferItem 把物品 uid 从 from 容器移到 to 容器的 (toX,toY,rotated) 位置。
+// 两个容器按 Type 升序加锁，避免互搬时的死锁；目标放不下时源容器不做任何修改。
+func (p *PlayerContainer) TransferItem(from, to int32, uid int64, toX, toY int32, rotated bool) error {
+	fromC, toC := p.ByType(from), p.ByType(to)
+	if fromC == toC {
+		return fromC.MoveItem(uid, toX, toY, rotated)
+	}
+
+	first, second := fromC, toC
+	if second.Type < first.Type {
+		first, second = second, first
+	}
+	first.mu.Lock()
+	defer first.mu.Unlock()
+	second.mu.Lock()
+	defer second.mu.Unlock()
+
+	if fromC.indexMap == nil {
+		fromC.buildIndex()
+	}
+	if toC.indexMap == nil {
+		toC.buildIndex()
+	}
+	it, ok := fromC.indexMap[uid]
+	if !ok {
+		return ErrItemNotFound
+	}
+	if _, ok := toC.indexMap[uid]; ok {
+		return ErrItemExists
+	}
+	moved := *it
+	moved.GridX, moved.GridY, moved.Rotated = toX, toY, rotated
+	if !toC.canPlace(toC.buildOccupied(), &moved, toX, toY, rotated) {
+		return ErrPositionConflict
+	}
+
+	fromC.removeItemLocked(uid)
+	toC.Items = append(toC.Items, moved)
+	toC.Version++
+	toC.buildIndex()
+	return nil
 }

@@ -6,15 +6,41 @@ import "common.proto";
 
 option go_package = "server-cluster/share/pb";
 
-// 装备列表请求（路由 10020）
+// 装备列表请求（路由 10050）
 message GearListReq {
 }
 
 // 装备列表响应
 message GearListResp {
   Result result = 1;
+  repeated GearEntry gear_entries = 2;
 }
 
 // 装备变化通知（路由 10051）
 message GearChangeNotify {
+  GearEntry gear_entry = 1;
+}
+
+// 新增装备请求（路由 10052）
+message GearAddReq {
+  int32 gear_id = 1; // 装备配置ID
+}
+
+// 新增装备响应
+message GearAddResp {
+  Result result = 1;
+  GearEntry gear_entry = 2; // 新增后的持有状态
+}
+
+// 更新装备请求（路由 10053）
+message GearUpdateReq {
+  int32 gear_id = 1;  // 装备配置ID
+  int32 level = 2;    // 等级
+  bool equipped = 3;  // 是否穿戴
+}
+
+// 更新装备响应
+message GearUpdateResp {
+  Result result = 1;
+  GearEntry gear_entry = 2; // 更新后的持有状态
 }

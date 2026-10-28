@@ -8,23 +8,23 @@ import (
 	"server-cluster/share/pb"
 )
 
-// RegisterPlayerContainer 向 node proxy 注册玩家容器相关客户端路由。
-func RegisterPlayerContainer(proxy *node.Proxy) {
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_CONTAINER_LIST), handleGetContainer, node.StatefulRoute)
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_CONTAINER_MOVE), handleMoveItem, node.StatefulRoute)
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_CONTAINER_ROTATE), handleRotateItem, node.StatefulRoute)
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_CONTAINER_REMOVE), handleRemoveItem, node.StatefulRoute)
+// RegisterContainer 向 node proxy 注册玩家容器相关客户端路由。
+func RegisterContainer(proxy *node.Proxy) {
+	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_CONTAINER_LIST), handleContainerList, node.StatefulRoute)
+	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_CONTAINER_MOVE), handleContainerMove, node.StatefulRoute)
+	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_CONTAINER_ROTATE), handleContainerRotate, node.StatefulRoute)
 	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_CONTAINER_SORT), handleSortContainer, node.StatefulRoute)
+	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_CONTAINER_TRANSFER), handleContainerTransfer, node.StatefulRoute)
 }
 
-// handleGetContainer 拉取容器快照。
-func handleGetContainer(ctx node.Context) {
-	req := &pb.GetContainerReq{}
+// handleContainerList 容器列表。
+func handleContainerList(ctx node.Context) {
+	req := &pb.ContainerListReq{}
 	if err := ctx.Parse(req); err != nil {
 		_ = ctx.Response(err)
 		return
 	}
-	resp, err := logic.PlayerContainer().GetContainer(ctx.Context(), ctx.UID(), req)
+	resp, err := logic.PlayerContainer().ContainerList(ctx.Context(), ctx.UID(), req)
 	if err != nil {
 		_ = ctx.Response(err)
 		return
@@ -32,14 +32,14 @@ func handleGetContainer(ctx node.Context) {
 	_ = ctx.Response(resp)
 }
 
-// handleMoveItem 移动物品。
-func handleMoveItem(ctx node.Context) {
-	req := &pb.MoveItemReq{}
+// handleContainerMove 容器内移动物品。
+func handleContainerMove(ctx node.Context) {
+	req := &pb.ContainerMoveReq{}
 	if err := ctx.Parse(req); err != nil {
 		_ = ctx.Response(err)
 		return
 	}
-	resp, err := logic.PlayerContainer().MoveItem(ctx.Context(), ctx.UID(), req)
+	resp, err := logic.PlayerContainer().ContainerMove(ctx.Context(), ctx.UID(), req)
 	if err != nil {
 		_ = ctx.Response(err)
 		return
@@ -47,14 +47,14 @@ func handleMoveItem(ctx node.Context) {
 	_ = ctx.Response(resp)
 }
 
-// handleRotateItem 旋转物品。
-func handleRotateItem(ctx node.Context) {
-	req := &pb.RotateItemReq{}
+// handleContainerRotate 容器内旋转物品。
+func handleContainerRotate(ctx node.Context) {
+	req := &pb.ContainerRotateReq{}
 	if err := ctx.Parse(req); err != nil {
 		_ = ctx.Response(err)
 		return
 	}
-	resp, err := logic.PlayerContainer().RotateItem(ctx.Context(), ctx.UID(), req)
+	resp, err := logic.PlayerContainer().ContainerRotate(ctx.Context(), ctx.UID(), req)
 	if err != nil {
 		_ = ctx.Response(err)
 		return
@@ -62,29 +62,29 @@ func handleRotateItem(ctx node.Context) {
 	_ = ctx.Response(resp)
 }
 
-// handleRemoveItem 删除物品。
-func handleRemoveItem(ctx node.Context) {
-	req := &pb.RemoveItemReq{}
-	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
-		return
-	}
-	resp, err := logic.PlayerContainer().RemoveItem(ctx.Context(), ctx.UID(), req)
-	if err != nil {
-		_ = ctx.Response(err)
-		return
-	}
-	_ = ctx.Response(resp)
-}
-
-// handleSortContainer 一键整理。
+// handleSortContainer 容器一键整理。
 func handleSortContainer(ctx node.Context) {
 	req := &pb.SortContainerReq{}
 	if err := ctx.Parse(req); err != nil {
 		_ = ctx.Response(err)
 		return
 	}
-	resp, err := logic.PlayerContainer().SortContainer(ctx.Context(), ctx.UID(), req)
+	resp, err := logic.PlayerContainer().ContainerSort(ctx.Context(), ctx.UID(), req)
+	if err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	_ = ctx.Response(resp)
+}
+
+// handleContainerTransfer 容器间移动物品。
+func handleContainerTransfer(ctx node.Context) {
+	req := &pb.ContainerTransferReq{}
+	if err := ctx.Parse(req); err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	resp, err := logic.PlayerContainer().ContainerTransfer(ctx.Context(), ctx.UID(), req)
 	if err != nil {
 		_ = ctx.Response(err)
 		return

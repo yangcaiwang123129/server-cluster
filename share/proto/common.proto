@@ -11,33 +11,42 @@ enum RouteCode {
   ROUTE_CODE_UNSPECIFIED = 0;
 
   // 玩家 10000~10009
-  ROUTE_CODE_VERIFY = 10000;  // 首包，验证账号令牌，用于绑定节点和网关
-  ROUTE_CODE_ENTER_GAME = 10001;  // 进入游戏
-  ROUTE_CODE_LEAVE_GAME = 10002;  // 离开游戏
-  ROUTE_CODE_SEVER_NOTIFY = 10003;  // 服务器通知
+  ROUTE_CODE_VERIFY       = 10000; // 首包，验证账号令牌，用于绑定节点和网关
+  ROUTE_CODE_ENTER_GAME   = 10001; // 进入游戏
+  ROUTE_CODE_LEAVE_GAME   = 10002; // 离开游戏
+  ROUTE_CODE_SEVER_NOTIFY = 10003; // 服务器通知
 
   // 玩家容器 10010~10019
-  ROUTE_CODE_CONTAINER_LIST = 10010;  // 容器列表
-  ROUTE_CODE_CONTAINER_NOTIFY = 10011;  // 容器内变化通知
-  ROUTE_CODE_CONTAINER_MOVE = 100112; // 容器内物品移动
-  ROUTE_CODE_CONTAINER_ROTATE = 10013;  // 容器内物品旋转
-  ROUTE_CODE_CONTAINER_SORT = 10014;  // 容器一键整理物品
+  ROUTE_CODE_CONTAINER_LIST     = 10010;  // 容器列表
+  ROUTE_CODE_CONTAINER_NOTIFY   = 10011;  // 容器内变化通知
+  ROUTE_CODE_CONTAINER_MOVE     = 100112; // 容器内物品移动
+  ROUTE_CODE_CONTAINER_ROTATE   = 10013;  // 容器内物品旋转
+  ROUTE_CODE_CONTAINER_SORT     = 10014;  // 容器一键整理物品
+  ROUTE_CODE_CONTAINER_TRANSFER = 10015;  // 容器间物品移动
 
   // 英雄 10020~10029
-  ROUTE_CODE_HERO_LIST = 10020;  // 英雄列表
-  ROUTE_CODE_HERO_NOTIFY = 10021;  // 英雄变化通知
+  ROUTE_CODE_HERO_LIST   = 10020; // 英雄列表
+  ROUTE_CODE_HERO_NOTIFY = 10021; // 英雄变化通知
+  ROUTE_CODE_HERO_ADD    = 10022; // 新增英雄
+  ROUTE_CODE_HERO_UPDATE = 10023; // 更新英雄
 
   // 武器 10030~10039
-  ROUTE_CODE_WEAPON_LIST = 10030;  // 武器列表
-  ROUTE_CODE_WEAPON_NOTIFY = 10031;  // 武器变化通知
+  ROUTE_CODE_WEAPON_LIST   = 10030; // 武器列表
+  ROUTE_CODE_WEAPON_NOTIFY = 10031; // 武器变化通知
+  ROUTE_CODE_WEAPON_ADD    = 10032; // 新增武器
+  ROUTE_CODE_WEAPON_UPDATE = 10033; // 更新武器
 
   // 技能 10040~10049
-  ROUTE_CODE_SKILL_LIST = 10040;  // 技能列表
-  ROUTE_CODE_SKILL_NOTIFY = 10041;  // 技能变化通知
+  ROUTE_CODE_SKILL_LIST   = 10040; // 技能列表
+  ROUTE_CODE_SKILL_NOTIFY = 10041; // 技能变化通知
+  ROUTE_CODE_SKILL_ADD    = 10042; // 新增技能
+  ROUTE_CODE_SKILL_UPDATE = 10043; // 更新技能
 
   // 装备 10050~10059
-  ROUTE_CODE_GEAR_LIST = 10050;  // 装备列表
-  ROUTE_CODE_GEAR_NOTIFY = 10051;  // 装备变化通知
+  ROUTE_CODE_GEAR_LIST   = 10050; // 装备列表
+  ROUTE_CODE_GEAR_NOTIFY = 10051; // 装备变化通知
+  ROUTE_CODE_GEAR_ADD    = 10052; // 新增装备
+  ROUTE_CODE_GEAR_UPDATE = 10053; // 更新装备
 
   // 战斗服 50000~59999
 
@@ -46,20 +55,20 @@ enum RouteCode {
 
 //  ========== 业务错误码枚举（1000~9999） ==========
 enum ErrCode {
-  ERR_CODE_OK = 0; // 成功
-  ERR_CODE_INTERNAL_ERROR = 1000;
-  ERR_CODE_INVALID_PARAMS = 1001;
-  ERR_CODE_UNAUTHORIZED = 1002;
+  ERR_CODE_OK               = 0;    // 成功
+  ERR_CODE_INTERNAL_ERROR   = 1000;
+  ERR_CODE_INVALID_PARAMS   = 1001;
+  ERR_CODE_UNAUTHORIZED     = 1002;
   ERR_CODE_PLAYER_NOT_FOUND = 2000;
-  ERR_CODE_PLAYER_EXISTS = 2001;
-  ERR_CODE_PASSWORD_WRONG = 2002;
-  ERR_CODE_TOKEN_INVALID = 2003;
+  ERR_CODE_PLAYER_EXISTS    = 2001;
+  ERR_CODE_PASSWORD_WRONG   = 2002;
+  ERR_CODE_TOKEN_INVALID    = 2003;
 }
 
 //  ========== 通知类型 ==========
 enum NOTIFY_TYPE {
-  NOTIFY_TYPE_KICK = 0; // 踢下线
-  NOTIFY_TYPE_MAINTAIN = 2; // 维护
+  NOTIFY_TYPE_KICK      = 0; // 踢下线
+  NOTIFY_TYPE_MAINTAIN  = 2; // 维护
   NOTIFY_TYPE_BROADCAST = 3; // 公告
 }
 
@@ -107,9 +116,9 @@ message ObjectList {
 // 动态值：oneof 通用基本类型。
 message ObjectValue {
   oneof kind {
-    bool bool_value = 1; // 布尔
-    int32 int_value = 2; // 整数
-    int64 Bigint_value = 3; // 整数
+    bool bool_value = 1;     // 布尔
+    int32 int_value = 2;     // 整数
+    int64 Bigint_value = 3;  // 整数
     double double_value = 4; // 浮点数
     string string_value = 5; // 字符串
   }
@@ -117,64 +126,52 @@ message ObjectValue {
 
 // 容器中的物品
 message ItemEntry {
-  int64 item_id = 1;    // 物品唯一实例ID
+  int64 item_id = 1;     // 物品唯一实例ID
   int32 item_cfg_id = 2; // 物品配置ID
-  int32 count = 3;  // 堆叠数量
+  int32 count = 3;       // 堆叠数量
   int32 grid_x = 4;      // 网格 X
   int32 grid_y = 5;      // 网格 Y
-  bool rotated = 6; // 是否旋转
+  bool rotated = 6;      // 是否旋转
 }
 
 // 容器条目
 message ContainerEntry {
-  int64 container_id = 1;           // 容器实例ID（=playerID + type 编码）
-  ContainerType type = 2;           // 容器类型
-  int32 grid_w = 3;                 // 网格宽度
-  int32 grid_h = 4;                 // 网格高度
-  int32 version = 5;                // 操作版本号（每次修改+1）
+  int64 container_id = 1;              // 容器实例ID（=playerID + type 编码）
+  ContainerType type = 2;              // 容器类型
+  int32 grid_w = 3;                    // 网格宽度
+  int32 grid_h = 4;                    // 网格高度
+  int32 version = 5;                   // 操作版本号（每次修改+1）
   repeated ItemEntry item_entries = 6; // 物品列表
 }
 
-// 英雄条目
+// 英雄持有（仅状态，静态属性由 hero_id 关联英雄配置表）
 message HeroEntry {
-  int32 id = 1;                 // 英雄ID
-  string name = 2;              // 名字
-  int32 job = 3;                // 职业
-  int32 weapon_id = 4;          // 默认武器
-  int32 control_difficulty = 5; // 操控难度
-  int32 character_shards = 6;   // 角色碎片
-  int32 rarity = 7;             // 稀有度
-  int32 character_id = 8;       // 角色配置
-  int32 skill_id = 9;           // 携带技能
-  int32 gear_id = 10;           // 穿戴装备
+  int32 hero_id = 1;   // 英雄配置ID
+  int32 level = 2;     // 等级
+  int64 exp = 3;       // 经验
+  int32 star = 4;      // 星级
+  int32 skin_id = 5;   // 皮肤ID
+  bool equipped = 6;   // 是否出战
 }
 
-// 武器条目
+// 武器持有（仅状态，静态属性由 weapon_id 关联武器配置表）
 message WeaponEntry {
-  int32 id = 1;              // 武器ID
-  string weapon_name = 2;    // 武器名字
-  string icon = 3;           // 武器图标
-  int32 weapon_damage = 4;   // 武器伤害
-  int32 penetrate_level = 5; // 穿透等级
-  int32 fire_rate = 6;       // 射速
-  int32 reload_time = 7;     // 换弹时间
-  int32 field_attack = 8;    // 攻击范围
-  int32 scatter_attack = 9;  // 攻击散射
-  int32 scatter_move = 10;   // 移动攻击散射
-  int32 scatter_aim = 11;    // 瞄准攻击散射
-  int32 time_aim = 12;       // 瞄准时间
+  int32 weapon_id = 1;   // 武器配置ID
+  int32 level = 2;       // 等级
+  int32 durability = 3;  // 耐久度
+  bool equipped = 4;     // 是否装备
 }
 
-// 技能条目
+// 技能持有（仅状态，静态属性由 skill_id 关联技能配置表）
 message SkillEntry {
-  int32 id = 1;                 // 技能ID
-  int32 skill_template = 2;     // 技能模版
-  string skill_name = 3;        // 技能名字
-  string desc = 4;              // 技能简述
-  string desc_detail = 5;       // 技能详情
-  int32 damage = 6;             // 伤害
-  float auto_fire_angle_x = 7;  // 自动攻击角度 X
-  float auto_fire_angle_y = 8;  // 自动攻击角度 Y
-  float auto_fire_distance = 9; // 自动攻击距离
-  int32 capacity = 10;          // 容量
+  int32 skill_id = 1; // 技能配置ID
+  int32 level = 2;    // 等级
+  bool equipped = 3;  // 是否装备
+}
+
+// 装备持有（仅状态，静态属性由 gear_id 关联装备配置表）
+message GearEntry {
+  int32 gear_id = 1;  // 装备配置ID
+  int32 level = 2;    // 等级
+  bool equipped = 3;  // 是否穿戴
 }

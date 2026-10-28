@@ -21,7 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// 装备列表请求（路由 10020）
+// 装备列表请求（路由 10050）
 type GearListReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -62,6 +62,7 @@ func (*GearListReq) Descriptor() ([]byte, []int) {
 type GearListResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	GearEntries   []*GearEntry           `protobuf:"bytes,2,rep,name=gear_entries,json=gearEntries,proto3" json:"gear_entries,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -103,9 +104,17 @@ func (x *GearListResp) GetResult() *Result {
 	return nil
 }
 
+func (x *GearListResp) GetGearEntries() []*GearEntry {
+	if x != nil {
+		return x.GearEntries
+	}
+	return nil
+}
+
 // 装备变化通知（路由 10051）
 type GearChangeNotify struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	GearEntry     *GearEntry             `protobuf:"bytes,1,opt,name=gear_entry,json=gearEntry,proto3" json:"gear_entry,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -140,17 +149,256 @@ func (*GearChangeNotify) Descriptor() ([]byte, []int) {
 	return file_gear_proto_rawDescGZIP(), []int{2}
 }
 
+func (x *GearChangeNotify) GetGearEntry() *GearEntry {
+	if x != nil {
+		return x.GearEntry
+	}
+	return nil
+}
+
+// 新增装备请求（路由 10052）
+type GearAddReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GearId        int32                  `protobuf:"varint,1,opt,name=gear_id,json=gearId,proto3" json:"gear_id,omitempty"` // 装备配置ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GearAddReq) Reset() {
+	*x = GearAddReq{}
+	mi := &file_gear_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GearAddReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GearAddReq) ProtoMessage() {}
+
+func (x *GearAddReq) ProtoReflect() protoreflect.Message {
+	mi := &file_gear_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GearAddReq.ProtoReflect.Descriptor instead.
+func (*GearAddReq) Descriptor() ([]byte, []int) {
+	return file_gear_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *GearAddReq) GetGearId() int32 {
+	if x != nil {
+		return x.GearId
+	}
+	return 0
+}
+
+// 新增装备响应
+type GearAddResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	GearEntry     *GearEntry             `protobuf:"bytes,2,opt,name=gear_entry,json=gearEntry,proto3" json:"gear_entry,omitempty"` // 新增后的持有状态
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GearAddResp) Reset() {
+	*x = GearAddResp{}
+	mi := &file_gear_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GearAddResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GearAddResp) ProtoMessage() {}
+
+func (x *GearAddResp) ProtoReflect() protoreflect.Message {
+	mi := &file_gear_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GearAddResp.ProtoReflect.Descriptor instead.
+func (*GearAddResp) Descriptor() ([]byte, []int) {
+	return file_gear_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *GearAddResp) GetResult() *Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
+func (x *GearAddResp) GetGearEntry() *GearEntry {
+	if x != nil {
+		return x.GearEntry
+	}
+	return nil
+}
+
+// 更新装备请求（路由 10053）
+type GearUpdateReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GearId        int32                  `protobuf:"varint,1,opt,name=gear_id,json=gearId,proto3" json:"gear_id,omitempty"` // 装备配置ID
+	Level         int32                  `protobuf:"varint,2,opt,name=level,proto3" json:"level,omitempty"`                 // 等级
+	Equipped      bool                   `protobuf:"varint,3,opt,name=equipped,proto3" json:"equipped,omitempty"`           // 是否穿戴
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GearUpdateReq) Reset() {
+	*x = GearUpdateReq{}
+	mi := &file_gear_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GearUpdateReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GearUpdateReq) ProtoMessage() {}
+
+func (x *GearUpdateReq) ProtoReflect() protoreflect.Message {
+	mi := &file_gear_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GearUpdateReq.ProtoReflect.Descriptor instead.
+func (*GearUpdateReq) Descriptor() ([]byte, []int) {
+	return file_gear_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *GearUpdateReq) GetGearId() int32 {
+	if x != nil {
+		return x.GearId
+	}
+	return 0
+}
+
+func (x *GearUpdateReq) GetLevel() int32 {
+	if x != nil {
+		return x.Level
+	}
+	return 0
+}
+
+func (x *GearUpdateReq) GetEquipped() bool {
+	if x != nil {
+		return x.Equipped
+	}
+	return false
+}
+
+// 更新装备响应
+type GearUpdateResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	GearEntry     *GearEntry             `protobuf:"bytes,2,opt,name=gear_entry,json=gearEntry,proto3" json:"gear_entry,omitempty"` // 更新后的持有状态
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GearUpdateResp) Reset() {
+	*x = GearUpdateResp{}
+	mi := &file_gear_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GearUpdateResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GearUpdateResp) ProtoMessage() {}
+
+func (x *GearUpdateResp) ProtoReflect() protoreflect.Message {
+	mi := &file_gear_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GearUpdateResp.ProtoReflect.Descriptor instead.
+func (*GearUpdateResp) Descriptor() ([]byte, []int) {
+	return file_gear_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *GearUpdateResp) GetResult() *Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
+func (x *GearUpdateResp) GetGearEntry() *GearEntry {
+	if x != nil {
+		return x.GearEntry
+	}
+	return nil
+}
+
 var File_gear_proto protoreflect.FileDescriptor
 
 const file_gear_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
 	"gear.proto\x12\x02pb\x1a\fcommon.proto\"\r\n" +
-	"\vGearListReq\"2\n" +
+	"\vGearListReq\"d\n" +
 	"\fGearListResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
-	".pb.ResultR\x06result\"\x12\n" +
-	"\x10GearChangeNotifyB\x19Z\x17server-cluster/share/pbb\x06proto3"
+	".pb.ResultR\x06result\x120\n" +
+	"\fgear_entries\x18\x02 \x03(\v2\r.pb.GearEntryR\vgearEntries\"@\n" +
+	"\x10GearChangeNotify\x12,\n" +
+	"\n" +
+	"gear_entry\x18\x01 \x01(\v2\r.pb.GearEntryR\tgearEntry\"%\n" +
+	"\n" +
+	"GearAddReq\x12\x17\n" +
+	"\agear_id\x18\x01 \x01(\x05R\x06gearId\"_\n" +
+	"\vGearAddResp\x12\"\n" +
+	"\x06result\x18\x01 \x01(\v2\n" +
+	".pb.ResultR\x06result\x12,\n" +
+	"\n" +
+	"gear_entry\x18\x02 \x01(\v2\r.pb.GearEntryR\tgearEntry\"Z\n" +
+	"\rGearUpdateReq\x12\x17\n" +
+	"\agear_id\x18\x01 \x01(\x05R\x06gearId\x12\x14\n" +
+	"\x05level\x18\x02 \x01(\x05R\x05level\x12\x1a\n" +
+	"\bequipped\x18\x03 \x01(\bR\bequipped\"b\n" +
+	"\x0eGearUpdateResp\x12\"\n" +
+	"\x06result\x18\x01 \x01(\v2\n" +
+	".pb.ResultR\x06result\x12,\n" +
+	"\n" +
+	"gear_entry\x18\x02 \x01(\v2\r.pb.GearEntryR\tgearEntryB\x19Z\x17server-cluster/share/pbb\x06proto3"
 
 var (
 	file_gear_proto_rawDescOnce sync.Once
@@ -164,20 +412,31 @@ func file_gear_proto_rawDescGZIP() []byte {
 	return file_gear_proto_rawDescData
 }
 
-var file_gear_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_gear_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_gear_proto_goTypes = []any{
 	(*GearListReq)(nil),      // 0: pb.GearListReq
 	(*GearListResp)(nil),     // 1: pb.GearListResp
 	(*GearChangeNotify)(nil), // 2: pb.GearChangeNotify
-	(*Result)(nil),           // 3: pb.Result
+	(*GearAddReq)(nil),       // 3: pb.GearAddReq
+	(*GearAddResp)(nil),      // 4: pb.GearAddResp
+	(*GearUpdateReq)(nil),    // 5: pb.GearUpdateReq
+	(*GearUpdateResp)(nil),   // 6: pb.GearUpdateResp
+	(*Result)(nil),           // 7: pb.Result
+	(*GearEntry)(nil),        // 8: pb.GearEntry
 }
 var file_gear_proto_depIdxs = []int32{
-	3, // 0: pb.GearListResp.result:type_name -> pb.Result
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	7, // 0: pb.GearListResp.result:type_name -> pb.Result
+	8, // 1: pb.GearListResp.gear_entries:type_name -> pb.GearEntry
+	8, // 2: pb.GearChangeNotify.gear_entry:type_name -> pb.GearEntry
+	7, // 3: pb.GearAddResp.result:type_name -> pb.Result
+	8, // 4: pb.GearAddResp.gear_entry:type_name -> pb.GearEntry
+	7, // 5: pb.GearUpdateResp.result:type_name -> pb.Result
+	8, // 6: pb.GearUpdateResp.gear_entry:type_name -> pb.GearEntry
+	7, // [7:7] is the sub-list for method output_type
+	7, // [7:7] is the sub-list for method input_type
+	7, // [7:7] is the sub-list for extension type_name
+	7, // [7:7] is the sub-list for extension extendee
+	0, // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_gear_proto_init() }
@@ -192,7 +451,7 @@ func file_gear_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_gear_proto_rawDesc), len(file_gear_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

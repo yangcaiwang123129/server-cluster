@@ -4,6 +4,7 @@ package global
 
 import (
 	"context"
+	"server-cluster/internal/actor"
 	"server-cluster/share/pb"
 )
 
@@ -19,40 +20,73 @@ type PlayerModuleLogic interface {
 // PlayerLogic 玩家模块业务接口。
 type PlayerLogic interface {
 	PlayerModuleLogic
+	// PlayerGetActor 获取玩家actor
+	PlayerGetActor(ctx context.Context, playerID int64) (*actor.PlayerActor, error)
+	// PlayerGetActors 玩家获取所有actor
+	PlayerGetActors(ctx context.Context) (*actor.PlayerActor, error)
+	// PlayerCreateActor 玩家创建actor
+	PlayerCreateActor(ctx context.Context, playerID int64) error
+	// DePlayerActor 玩家销毁actor
+	DePlayerActor(ctx context.Context, playerID int64) error
+	// PlayerKick 玩家踢下线
+	PlayerKick(ctx context.Context, playerID int64) error
 }
 
 // PlayerContainerLogic 玩家容器业务接口。
 type PlayerContainerLogic interface {
 	PlayerModuleLogic
-	// GetContainer 拉取容器快照
-	GetContainer(ctx context.Context, playerID int64, req *pb.GetContainerReq) (*pb.GetContainerResp, error)
-	// MoveItem 移动物品
-	MoveItem(ctx context.Context, playerID int64, req *pb.MoveItemReq) (*pb.ContainerOpResp, error)
-	// RotateItem 旋转物品
-	RotateItem(ctx context.Context, playerID int64, req *pb.RotateItemReq) (*pb.ContainerOpResp, error)
-	// RemoveItem 删除物品
-	RemoveItem(ctx context.Context, playerID int64, req *pb.RemoveItemReq) (*pb.ContainerOpResp, error)
-	// SortContainer 一键整理
-	SortContainer(ctx context.Context, playerID int64, req *pb.SortContainerReq) (*pb.ContainerOpResp, error)
+	// ContainerList 容器列表
+	ContainerList(ctx context.Context, playerID int64, req *pb.ContainerListReq) (*pb.ContainerListResp, error)
+	// ContainerMove 容器内移动物品
+	ContainerMove(ctx context.Context, playerID int64, req *pb.ContainerMoveReq) (*pb.ContainerMoveResp, error)
+	// ContainerRotate 容器内旋转物品
+	ContainerRotate(ctx context.Context, playerID int64, req *pb.ContainerRotateReq) (*pb.ContainerRotateResp, error)
+	// ContainerSort 容器一键整理
+	ContainerSort(ctx context.Context, playerID int64, req *pb.SortContainerReq) (*pb.SortContainerResp, error)
+	// ContainerTransfer 容器间移动物品
+	ContainerTransfer(ctx context.Context, playerID int64, req *pb.ContainerTransferReq) (*pb.ContainerTransferResp, error)
 }
 
-// SkillLogic 技能业务接口：配置读取 + 玩家技能持有数据生命周期。
+// SkillLogic 技能业务接口：玩家技能持有数据生命周期。
 type SkillLogic interface {
 	PlayerModuleLogic
 	// SkillList 技能列表
-	SkillList(ctx context.Context) (*pb.SkillListResp, error)
+	SkillList(ctx context.Context, playerID int64) (*pb.SkillListResp, error)
+	// SkillAdd 新增技能
+	SkillAdd(ctx context.Context, playerID int64, req *pb.SkillAddReq) (*pb.SkillAddResp, error)
+	// SkillUpdate 更新技能
+	SkillUpdate(ctx context.Context, playerID int64, req *pb.SkillUpdateReq) (*pb.SkillUpdateResp, error)
 }
 
-// WeaponLogic 武器业务接口：配置读取 + 玩家武器持有数据生命周期。
+// WeaponLogic 武器业务接口：玩家武器持有数据生命周期。
 type WeaponLogic interface {
 	PlayerModuleLogic
 	// WeaponList 武器列表
-	WeaponList(ctx context.Context) (*pb.WeaponListResp, error)
+	WeaponList(ctx context.Context, playerID int64) (*pb.WeaponListResp, error)
+	// WeaponAdd 新增武器
+	WeaponAdd(ctx context.Context, playerID int64, req *pb.WeaponAddReq) (*pb.WeaponAddResp, error)
+	// WeaponUpdate 更新武器
+	WeaponUpdate(ctx context.Context, playerID int64, req *pb.WeaponUpdateReq) (*pb.WeaponUpdateResp, error)
 }
 
-// HeroLogic 英雄业务接口：配置读取 + 玩家英雄持有数据生命周期。
+// HeroLogic 英雄业务接口：玩家英雄持有数据生命周期。
 type HeroLogic interface {
 	PlayerModuleLogic
 	// HeroList 英雄列表
-	HeroList(ctx context.Context) (*pb.HeroListResp, error)
+	HeroList(ctx context.Context, playerID int64) (*pb.HeroListResp, error)
+	// HeroAdd 新增英雄
+	HeroAdd(ctx context.Context, playerID int64, req *pb.HeroAddReq) (*pb.HeroAddResp, error)
+	// HeroUpdate 更新英雄
+	HeroUpdate(ctx context.Context, playerID int64, req *pb.HeroUpdateReq) (*pb.HeroUpdateResp, error)
+}
+
+// GearLogic 装备业务接口：玩家装备持有数据生命周期。
+type GearLogic interface {
+	PlayerModuleLogic
+	// GearList 装备列表
+	GearList(ctx context.Context, playerID int64) (*pb.GearListResp, error)
+	// GearAdd 新增装备
+	GearAdd(ctx context.Context, playerID int64, req *pb.GearAddReq) (*pb.GearAddResp, error)
+	// GearUpdate 更新装备
+	GearUpdate(ctx context.Context, playerID int64, req *pb.GearUpdateReq) (*pb.GearUpdateResp, error)
 }

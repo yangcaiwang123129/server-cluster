@@ -3,6 +3,8 @@ package logic
 import (
 	"context"
 	"errors"
+	"server-cluster/internal/actor"
+	"server-cluster/share/util"
 	"strconv"
 	"sync"
 	"time"
@@ -24,7 +26,9 @@ import (
 	"server-cluster/share/singleton"
 )
 
-type playerLogic struct{}
+type playerLogic struct {
+	OnlinePlayerActors *util.SafeMap[int64, *actor.PlayerActor] // playerID -> 玩家actor
+}
 
 var playerLogicInst = singleton.NewContainer[global.PlayerLogic]("PlayerLogic")
 
@@ -62,10 +66,42 @@ func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.
 		return nil, err
 	}
 
-	return &pb.EnterGameResp{
+	resp := &pb.EnterGameResp{
 		Result:     &pb.Result{Code: pb.ErrCode_ERR_CODE_OK},
 		ServerTime: xtime.Now().UnixMilli(),
-	}, nil
+	}
+	// 当前出战英雄 / 装备武器：仅下发状态，静态属性由客户端关联配置表
+	if row, err := global.PlayerHeroCache.Get(ctx, playerID); err == nil && row.Heroes != nil {
+		row.Heroes.Range(func(_ int32, h model.HeroInfo) bool {
+			if !h.Equipped {
+				return true
+			}
+			resp.HeroEntry = &pb.HeroEntry{
+				HeroId:   h.HeroID,
+				Level:    h.Level,
+				Exp:      h.Exp,
+				Star:     h.Star,
+				SkinId:   h.SkinID,
+				Equipped: true,
+			}
+			return false
+		})
+	}
+	if row, err := global.PlayerWeaponCache.Get(ctx, playerID); err == nil && row.Weapons != nil {
+		row.Weapons.Range(func(_ int32, w model.WeaponInfo) bool {
+			if !w.Equipped {
+				return true
+			}
+			resp.WeaponEntry = &pb.WeaponEntry{
+				WeaponId:   w.WeaponID,
+				Level:      w.Level,
+				Durability: w.Durability,
+				Equipped:   true,
+			}
+			return false
+		})
+	}
+	return resp, nil
 }
 
 // LeaveGame 离开游戏：各模块待写数据同步落库并清缓存，再销毁玩家 actor。
@@ -87,12 +123,11 @@ func (this *playerLogic) LeaveGame(ctx context.Context, playerID int64, req *pb.
 		_, err := mod.LeaveGame(ctx, playerID, req)
 		record("module", err)
 	}
-	// 无独立模块的玩家表：账号、核心、资料、资产、装备
+	// 无独立模块的玩家表：账号、核心、资料、资产
 	record("player_base", flushAndEvict(ctx, global.PlayerBaseCache, playerID))
 	record("player_core", flushAndEvict(ctx, global.PlayerCoreCache, playerID))
 	record("player_profile", flushAndEvict(ctx, global.PlayerProfileCache, playerID))
 	record("player_asset", flushAndEvict(ctx, global.PlayerAssetCache, playerID))
-	record("player_gear", flushAndEvict(ctx, global.PlayerGearCache, playerID))
 
 	Online().Leave(playerID)
 	return &pb.LeaveGameResp{}, firstErr
@@ -100,7 +135,7 @@ func (this *playerLogic) LeaveGame(ctx context.Context, playerID int64, req *pb.
 
 // playerModules 持有玩家数据的模块，按进入/离开的统一顺序驱动。
 func playerModules() []global.PlayerModuleLogic {
-	return []global.PlayerModuleLogic{PlayerContainer(), Hero(), Skill(), Weapon()}
+	return []global.PlayerModuleLogic{PlayerContainer(), Hero(), Skill(), Weapon(), Gear()}
 }
 
 // flushAndEvict 把该玩家的待写数据同步落库，并逐出内存缓存。
@@ -111,6 +146,14 @@ func flushAndEvict[V any](ctx context.Context, c *cache.Cache[int64, V], playerI
 	c.Evict(playerID)
 	return nil
 }
+
+func (this *playerLogic) PlayerGetActor(ctx context.Context, playerID int64) (*actor.PlayerActor, error) {
+
+}
+func (this *playerLogic) PlayerGetActors(ctx context.Context) (*actor.PlayerActor, error) {}
+func (this *playerLogic) PlayerCreateActor(ctx context.Context, playerID int64) error     {}
+func (this *playerLogic) DePlayerActor(ctx context.Context, playerID int64) error         {}
+func (this *playerLogic) PlayerKick(ctx context.Context, playerID int64) error            {}
 
 // OnlineProvider 实现 pb.PlayerServiceServer，供 admin 服等网格服务经 RPC 调用。
 type OnlineProvider struct {
@@ -135,7 +178,7 @@ func (p *OnlineProvider) KickPlayer(ctx context.Context, req *pb.KickPlayerReq) 
 	}
 	resp := &pb.KickPlayerResp{}
 	for _, id := range req.PlayerIds {
-		if err := Online().Kick(ctx, id, req.KickType); err != nil {
+		if err := Online().Kick(ctx, id); err != nil {
 			resp.FailedIds = append(resp.FailedIds, id)
 		}
 	}
@@ -156,7 +199,7 @@ func playerActorID(playerID int64) string {
 // 在线登记由 playerProcessor 的生命周期（Start/Destroy）驱动维护。
 type onlineRegistry struct {
 	mu      sync.RWMutex
-	players map[int64]int64 // playerID -> 进入时间（秒级时间戳）
+	players map[int64]int64 // playerID → 上线 Unix 秒
 }
 
 var onlineInst = &onlineRegistry{players: make(map[int64]int64)}
@@ -187,7 +230,7 @@ func (r *onlineRegistry) Leave(playerID int64) {
 }
 
 // Kick 踢玩家下线：销毁 actor 并强制断开网关连接。
-func (r *onlineRegistry) Kick(ctx context.Context, playerID int64, kickType pb.KickType) error {
+func (r *onlineRegistry) Kick(ctx context.Context, playerID int64) error {
 	if !r.IsOnline(playerID) {
 		return errs.NewError(int(pb.ErrCode_ERR_CODE_PLAYER_NOT_FOUND), "player is not online")
 	}
@@ -197,7 +240,6 @@ func (r *onlineRegistry) Kick(ctx context.Context, playerID int64, kickType pb.K
 	if err != nil {
 		return err
 	}
-	// kickType 仅用于审计区分（主动踢/封号踢），处理动作一致。
 	return svc.NodeProxy().Disconnect(ctx, &cluster.DisconnectArgs{
 		GID:    gid,
 		Kind:   session.User,

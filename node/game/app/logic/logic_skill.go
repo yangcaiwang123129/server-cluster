@@ -3,11 +3,13 @@ package logic
 import (
 	"context"
 	"errors"
-	"sync"
+	"sort"
 
 	"gorm.io/gorm"
 
 	"server-cluster/node/game/app/global"
+	"server-cluster/share/consts"
+	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
 	"server-cluster/share/singleton"
@@ -15,10 +17,7 @@ import (
 	"server-cluster/share/util"
 )
 
-type skillLogic struct {
-	once sync.Once
-	resp *pb.SkillListResp
-}
+type skillLogic struct{}
 
 var skillLogicInst = singleton.NewContainer[global.SkillLogic]("SkillLogic")
 
@@ -30,31 +29,70 @@ func init() {
 // Skill 获取技能业务单例。
 func Skill() global.SkillLogic { return skillLogicInst.MustGet() }
 
-// SkillList 技能列表：读内存配置表，首次请求转成 pb 后缓存复用。
-func (this *skillLogic) SkillList(context.Context) (*pb.SkillListResp, error) {
-	this.once.Do(func() {
-		cfgs := tpl.T().Skill.GetDataList()
-		items := make([]*pb.SkillEntry, 0, len(cfgs))
-		for _, cfg := range cfgs {
-			item := &pb.SkillEntry{
-				Id:               cfg.Id,
-				SkillTemplate:    cfg.SkillTemplate,
-				SkillName:        cfg.SkillName,
-				Desc:             cfg.Desc,
-				DescDetail:       cfg.DescDetail,
-				Damage:           cfg.Damage,
-				AutoFireDistance: cfg.AutoFireDistance,
-				Capacity:         cfg.Capacity,
-			}
-			if cfg.AutoFireAngle != nil {
-				item.AutoFireAngleX = cfg.AutoFireAngle.X
-				item.AutoFireAngleY = cfg.AutoFireAngle.Y
-			}
-			items = append(items, item)
-		}
-		this.resp = &pb.SkillListResp{SkillEntries: items}
+// SkillList 技能列表：只下发持有状态，静态属性由客户端按 skill_id 关联技能配置表。
+func (this *skillLogic) SkillList(ctx context.Context, playerID int64) (*pb.SkillListResp, error) {
+	row, err := loadPlayerSkill(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+
+	entries := make([]*pb.SkillEntry, 0, row.Skills.Len())
+	row.Skills.Range(func(_ int32, s model.SkillInfo) bool {
+		entries = append(entries, toSkillEntry(s))
+		return true
 	})
-	return this.resp, nil
+	// map 遍历无序，按配置ID排序保证客户端展示稳定
+	sort.Slice(entries, func(i, j int) bool { return entries[i].SkillId < entries[j].SkillId })
+	return &pb.SkillListResp{SkillEntries: entries}, nil
+}
+
+// toSkillEntry 持有数据 → wire 条目（仅状态）。
+func toSkillEntry(s model.SkillInfo) *pb.SkillEntry {
+	return &pb.SkillEntry{
+		SkillId:  s.SkillID,
+		Level:    s.Level,
+		Equipped: s.Equipped,
+	}
+}
+
+// SkillAdd 新增技能：配置ID必须存在，已拥有返回错误。
+func (this *skillLogic) SkillAdd(ctx context.Context, playerID int64, req *pb.SkillAddReq) (*pb.SkillAddResp, error) {
+	if !tpl.T().Skill.Has(req.GetSkillId()) {
+		return nil, errs.ErrInvalidParams
+	}
+
+	row, err := loadPlayerSkill(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+
+	s := model.SkillInfo{SkillID: req.GetSkillId()}
+	if !row.AddSkill(s) {
+		return nil, errs.WithMessage(consts.CodeInvalidParams, "技能已拥有")
+	}
+
+	global.PlayerSkillCache.Set(playerID, row)
+	return &pb.SkillAddResp{SkillEntry: toSkillEntry(s)}, nil
+}
+
+// SkillUpdate 更新技能：整体覆盖持有状态，未拥有返回错误。
+func (this *skillLogic) SkillUpdate(ctx context.Context, playerID int64, req *pb.SkillUpdateReq) (*pb.SkillUpdateResp, error) {
+	row, err := loadPlayerSkill(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+
+	s := model.SkillInfo{
+		SkillID:  req.GetSkillId(),
+		Level:    req.GetLevel(),
+		Equipped: req.GetEquipped(),
+	}
+	if !row.UpdateSkill(s) {
+		return nil, errs.WithMessage(consts.CodeInvalidParams, "技能未拥有")
+	}
+
+	global.PlayerSkillCache.Set(playerID, row)
+	return &pb.SkillUpdateResp{SkillEntry: toSkillEntry(s)}, nil
 }
 
 // EnterGame 进入游戏：加载玩家技能持有，未建档则初始化空集合。

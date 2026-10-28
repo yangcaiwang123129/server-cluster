@@ -20,3 +20,28 @@ message WeaponListResp {
 message WeaponChangeNotify {
   WeaponEntry weapon_entry = 1;
 }
+
+// 新增武器请求（路由 10032）
+message WeaponAddReq {
+  int32 weapon_id = 1; // 武器配置ID
+}
+
+// 新增武器响应
+message WeaponAddResp {
+  Result result = 1;
+  WeaponEntry weapon_entry = 2; // 新增后的持有状态
+}
+
+// 更新武器请求（路由 10033）
+message WeaponUpdateReq {
+  int32 weapon_id = 1;   // 武器配置ID
+  int32 level = 2;       // 等级
+  int32 durability = 3;  // 耐久度
+  bool equipped = 4;     // 是否装备
+}
+
+// 更新武器响应
+message WeaponUpdateResp {
+  Result result = 1;
+  WeaponEntry weapon_entry = 2; // 更新后的持有状态
+}

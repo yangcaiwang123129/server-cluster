@@ -156,6 +156,242 @@ func (x *HeroChangeNotify) GetHeroEntry() *HeroEntry {
 	return nil
 }
 
+// 新增英雄请求（路由 10022）
+type HeroAddReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	HeroId        int32                  `protobuf:"varint,1,opt,name=hero_id,json=heroId,proto3" json:"hero_id,omitempty"` // 英雄配置ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HeroAddReq) Reset() {
+	*x = HeroAddReq{}
+	mi := &file_hero_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HeroAddReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HeroAddReq) ProtoMessage() {}
+
+func (x *HeroAddReq) ProtoReflect() protoreflect.Message {
+	mi := &file_hero_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HeroAddReq.ProtoReflect.Descriptor instead.
+func (*HeroAddReq) Descriptor() ([]byte, []int) {
+	return file_hero_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *HeroAddReq) GetHeroId() int32 {
+	if x != nil {
+		return x.HeroId
+	}
+	return 0
+}
+
+// 新增英雄响应
+type HeroAddResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	HeroEntry     *HeroEntry             `protobuf:"bytes,2,opt,name=hero_entry,json=heroEntry,proto3" json:"hero_entry,omitempty"` // 新增后的持有状态
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HeroAddResp) Reset() {
+	*x = HeroAddResp{}
+	mi := &file_hero_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HeroAddResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HeroAddResp) ProtoMessage() {}
+
+func (x *HeroAddResp) ProtoReflect() protoreflect.Message {
+	mi := &file_hero_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HeroAddResp.ProtoReflect.Descriptor instead.
+func (*HeroAddResp) Descriptor() ([]byte, []int) {
+	return file_hero_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *HeroAddResp) GetResult() *Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
+func (x *HeroAddResp) GetHeroEntry() *HeroEntry {
+	if x != nil {
+		return x.HeroEntry
+	}
+	return nil
+}
+
+// 更新英雄请求（路由 10023）
+type HeroUpdateReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	HeroId        int32                  `protobuf:"varint,1,opt,name=hero_id,json=heroId,proto3" json:"hero_id,omitempty"` // 英雄配置ID
+	Level         int32                  `protobuf:"varint,2,opt,name=level,proto3" json:"level,omitempty"`                 // 等级
+	Exp           int64                  `protobuf:"varint,3,opt,name=exp,proto3" json:"exp,omitempty"`                     // 经验
+	Star          int32                  `protobuf:"varint,4,opt,name=star,proto3" json:"star,omitempty"`                   // 星级
+	SkinId        int32                  `protobuf:"varint,5,opt,name=skin_id,json=skinId,proto3" json:"skin_id,omitempty"` // 皮肤ID
+	Equipped      bool                   `protobuf:"varint,6,opt,name=equipped,proto3" json:"equipped,omitempty"`           // 是否出战
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HeroUpdateReq) Reset() {
+	*x = HeroUpdateReq{}
+	mi := &file_hero_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HeroUpdateReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HeroUpdateReq) ProtoMessage() {}
+
+func (x *HeroUpdateReq) ProtoReflect() protoreflect.Message {
+	mi := &file_hero_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HeroUpdateReq.ProtoReflect.Descriptor instead.
+func (*HeroUpdateReq) Descriptor() ([]byte, []int) {
+	return file_hero_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *HeroUpdateReq) GetHeroId() int32 {
+	if x != nil {
+		return x.HeroId
+	}
+	return 0
+}
+
+func (x *HeroUpdateReq) GetLevel() int32 {
+	if x != nil {
+		return x.Level
+	}
+	return 0
+}
+
+func (x *HeroUpdateReq) GetExp() int64 {
+	if x != nil {
+		return x.Exp
+	}
+	return 0
+}
+
+func (x *HeroUpdateReq) GetStar() int32 {
+	if x != nil {
+		return x.Star
+	}
+	return 0
+}
+
+func (x *HeroUpdateReq) GetSkinId() int32 {
+	if x != nil {
+		return x.SkinId
+	}
+	return 0
+}
+
+func (x *HeroUpdateReq) GetEquipped() bool {
+	if x != nil {
+		return x.Equipped
+	}
+	return false
+}
+
+// 更新英雄响应
+type HeroUpdateResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	HeroEntry     *HeroEntry             `protobuf:"bytes,2,opt,name=hero_entry,json=heroEntry,proto3" json:"hero_entry,omitempty"` // 更新后的持有状态
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HeroUpdateResp) Reset() {
+	*x = HeroUpdateResp{}
+	mi := &file_hero_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HeroUpdateResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HeroUpdateResp) ProtoMessage() {}
+
+func (x *HeroUpdateResp) ProtoReflect() protoreflect.Message {
+	mi := &file_hero_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HeroUpdateResp.ProtoReflect.Descriptor instead.
+func (*HeroUpdateResp) Descriptor() ([]byte, []int) {
+	return file_hero_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *HeroUpdateResp) GetResult() *Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
+func (x *HeroUpdateResp) GetHeroEntry() *HeroEntry {
+	if x != nil {
+		return x.HeroEntry
+	}
+	return nil
+}
+
 var File_hero_proto protoreflect.FileDescriptor
 
 const file_hero_proto_rawDesc = "" +
@@ -169,7 +405,27 @@ const file_hero_proto_rawDesc = "" +
 	"\fhero_entries\x18\x02 \x03(\v2\r.pb.HeroEntryR\vheroEntries\"@\n" +
 	"\x10HeroChangeNotify\x12,\n" +
 	"\n" +
-	"hero_entry\x18\x01 \x01(\v2\r.pb.HeroEntryR\theroEntryB\x19Z\x17server-cluster/share/pbb\x06proto3"
+	"hero_entry\x18\x01 \x01(\v2\r.pb.HeroEntryR\theroEntry\"%\n" +
+	"\n" +
+	"HeroAddReq\x12\x17\n" +
+	"\ahero_id\x18\x01 \x01(\x05R\x06heroId\"_\n" +
+	"\vHeroAddResp\x12\"\n" +
+	"\x06result\x18\x01 \x01(\v2\n" +
+	".pb.ResultR\x06result\x12,\n" +
+	"\n" +
+	"hero_entry\x18\x02 \x01(\v2\r.pb.HeroEntryR\theroEntry\"\x99\x01\n" +
+	"\rHeroUpdateReq\x12\x17\n" +
+	"\ahero_id\x18\x01 \x01(\x05R\x06heroId\x12\x14\n" +
+	"\x05level\x18\x02 \x01(\x05R\x05level\x12\x10\n" +
+	"\x03exp\x18\x03 \x01(\x03R\x03exp\x12\x12\n" +
+	"\x04star\x18\x04 \x01(\x05R\x04star\x12\x17\n" +
+	"\askin_id\x18\x05 \x01(\x05R\x06skinId\x12\x1a\n" +
+	"\bequipped\x18\x06 \x01(\bR\bequipped\"b\n" +
+	"\x0eHeroUpdateResp\x12\"\n" +
+	"\x06result\x18\x01 \x01(\v2\n" +
+	".pb.ResultR\x06result\x12,\n" +
+	"\n" +
+	"hero_entry\x18\x02 \x01(\v2\r.pb.HeroEntryR\theroEntryB\x19Z\x17server-cluster/share/pbb\x06proto3"
 
 var (
 	file_hero_proto_rawDescOnce sync.Once
@@ -183,23 +439,31 @@ func file_hero_proto_rawDescGZIP() []byte {
 	return file_hero_proto_rawDescData
 }
 
-var file_hero_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_hero_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_hero_proto_goTypes = []any{
 	(*HeroListReq)(nil),      // 0: pb.HeroListReq
 	(*HeroListResp)(nil),     // 1: pb.HeroListResp
 	(*HeroChangeNotify)(nil), // 2: pb.HeroChangeNotify
-	(*Result)(nil),           // 3: pb.Result
-	(*HeroEntry)(nil),        // 4: pb.HeroEntry
+	(*HeroAddReq)(nil),       // 3: pb.HeroAddReq
+	(*HeroAddResp)(nil),      // 4: pb.HeroAddResp
+	(*HeroUpdateReq)(nil),    // 5: pb.HeroUpdateReq
+	(*HeroUpdateResp)(nil),   // 6: pb.HeroUpdateResp
+	(*Result)(nil),           // 7: pb.Result
+	(*HeroEntry)(nil),        // 8: pb.HeroEntry
 }
 var file_hero_proto_depIdxs = []int32{
-	3, // 0: pb.HeroListResp.result:type_name -> pb.Result
-	4, // 1: pb.HeroListResp.hero_entries:type_name -> pb.HeroEntry
-	4, // 2: pb.HeroChangeNotify.hero_entry:type_name -> pb.HeroEntry
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	7, // 0: pb.HeroListResp.result:type_name -> pb.Result
+	8, // 1: pb.HeroListResp.hero_entries:type_name -> pb.HeroEntry
+	8, // 2: pb.HeroChangeNotify.hero_entry:type_name -> pb.HeroEntry
+	7, // 3: pb.HeroAddResp.result:type_name -> pb.Result
+	8, // 4: pb.HeroAddResp.hero_entry:type_name -> pb.HeroEntry
+	7, // 5: pb.HeroUpdateResp.result:type_name -> pb.Result
+	8, // 6: pb.HeroUpdateResp.hero_entry:type_name -> pb.HeroEntry
+	7, // [7:7] is the sub-list for method output_type
+	7, // [7:7] is the sub-list for method input_type
+	7, // [7:7] is the sub-list for extension type_name
+	7, // [7:7] is the sub-list for extension extendee
+	0, // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_hero_proto_init() }
@@ -214,7 +478,7 @@ func file_hero_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_hero_proto_rawDesc), len(file_hero_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

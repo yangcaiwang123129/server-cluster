@@ -119,7 +119,7 @@ func (this *playerLogic) PlayerKick(req dto.PlayerKickReq) error {
 	}
 	resp := &pb.KickPlayerResp{}
 	if err := client.Call(ctx, pb.PlayerService_ServiceDesc.ServiceName, pb.PlayerService_KickPlayer_FullMethodName,
-		&pb.KickPlayerReq{PlayerIds: []int64{req.PlayerID}, KickType: pb.KickType(req.KickType)}, resp); err != nil {
+		&pb.KickPlayerReq{PlayerIds: []int64{req.PlayerID}}, resp); err != nil {
 		return err
 	}
 	if len(resp.FailedIds) > 0 {

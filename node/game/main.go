@@ -37,10 +37,11 @@ func main() {
 	svc.SetNodeProxy(component.Proxy())
 	// 注册客户端路由
 	handler.RegisterPlayer(component.Proxy())
-	handler.RegisterPlayerContainer(component.Proxy())
-	handler.RegisterSkill(component.Proxy())
-	handler.RegisterWeapon(component.Proxy())
+	handler.RegisterContainer(component.Proxy())
 	handler.RegisterHero(component.Proxy())
+	handler.RegisterWeapon(component.Proxy())
+	handler.RegisterSkill(component.Proxy())
+	handler.RegisterGear(component.Proxy())
 	// 注册服务间 RPC provider（admin 服经 mesh 调用）
 	handler.RegisterInternal(component.Proxy())
 	// 添加节点组件

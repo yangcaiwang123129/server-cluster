@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 
 	"server-cluster/node/game/app/global"
+	"server-cluster/share/consts"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
@@ -26,50 +27,64 @@ func init() {
 // PlayerContainer 获取玩家容器业务单例。
 func PlayerContainer() global.PlayerContainerLogic { return playerContainerLogicInst.MustGet() }
 
-// ---------- 辅助：pb ContainerType → model Type ----------
-
-func containerTypeToModel(t pb.ContainerType) int32 {
+// containerTypeToModel pb 容器类型 → 领域容器类型；UNSPECIFIED 等非法值返回 false。
+func containerTypeToModel(t pb.ContainerType) (int32, bool) {
 	switch t {
 	case pb.ContainerType_CONTAINER_TYPE_BACKPACK:
-		return model.TypeBackpack
+		return model.TypeBackpack, true
 	case pb.ContainerType_CONTAINER_TYPE_STASH:
-		return model.TypeStash
+		return model.TypeStash, true
 	case pb.ContainerType_CONTAINER_TYPE_SECURE:
-		return model.TypeSecure
+		return model.TypeSecure, true
 	default:
-		return model.TypeBackpack
+		return 0, false
 	}
 }
 
-// ---------- 辅助：Container → pb.ContainerSnapshot ----------
+// containerID 容器实例 ID：playerID 与容器类型编码（playerID*10 + type）。
+func containerID(playerID int64, typ int32) int64 {
+	return playerID*10 + int64(typ)
+}
 
-func containerToSnapshot(c *model.Container) *pb.ContainerSnapshot {
+// containerToEntry 容器 → wire 容器条目。
+func containerToEntry(playerID int64, c *model.Container) *pb.ContainerEntry {
 	items := c.ItemsCopy()
-	pbItems := make([]*pb.ContainerItem, 0, len(items))
+	entries := make([]*pb.ItemEntry, 0, len(items))
 	for i := range items {
-		pbItems = append(pbItems, &pb.ContainerItem{
-			Uid:     items[i].ItemID,
-			DefId:   items[i].ItemCfgID,
-			Count:   items[i].Count,
-			X:       items[i].GridX,
-			Y:       items[i].GridY,
-			Rotated: items[i].Rotated,
+		entries = append(entries, &pb.ItemEntry{
+			ItemId:    items[i].ItemID,
+			ItemCfgId: items[i].ItemCfgID,
+			Count:     items[i].Count,
+			GridX:     items[i].GridX,
+			GridY:     items[i].GridY,
+			Rotated:   items[i].Rotated,
 		})
 	}
-	return &pb.ContainerSnapshot{
-		ContainerId: int64(c.Type), // 容器 ID 简单用 type 值
+	return &pb.ContainerEntry{
+		ContainerId: containerID(playerID, c.Type),
 		Type:        pb.ContainerType(c.Type),
 		GridW:       c.GridW,
 		GridH:       c.GridH,
 		Version:     c.Version,
-		Items:       pbItems,
+		ItemEntries: entries,
 	}
 }
 
-// ---------- 辅助：加载/保存玩家容器 ----------
+// containerErr 领域错误 → 客户端错误码；非预期错误保留原始信息。
+func containerErr(err error) error {
+	switch {
+	case errors.Is(err, model.ErrItemNotFound):
+		return errs.WithMessage(consts.CodeInvalidParams, "物品不存在")
+	case errors.Is(err, model.ErrItemExists):
+		return errs.WithMessage(consts.CodeInvalidParams, "物品已存在")
+	case errors.Is(err, model.ErrPositionConflict):
+		return errs.WithMessage(consts.CodeInvalidParams, "目标位置不可放置")
+	default:
+		return fmt.Errorf("logic: container op failed: %w", err)
+	}
+}
 
 // loadContainer 从缓存加载玩家容器集合；未建档则新建并挂入缓存（异步落库）。
-// 返回的 *PlayerContainer 与缓存副本共享 *Container 指针，业务方法对容器的修改全局可见。
 func loadContainer(ctx context.Context, playerID int64) (*model.PlayerContainer, error) {
 	pc, err := global.PlayerContainerCache.Get(ctx, playerID)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -90,6 +105,23 @@ func saveContainer(playerID int64, pc *model.PlayerContainer) {
 	global.PlayerContainerCache.Set(playerID, *pc)
 }
 
+// containerOf 加载玩家容器集合并取出指定类型的容器。
+func containerOf(ctx context.Context, playerID int64, t pb.ContainerType) (*model.PlayerContainer, *model.Container, error) {
+	pc, err := loadContainer(ctx, playerID)
+	if err != nil {
+		return nil, nil, err
+	}
+	typ, ok := containerTypeToModel(t)
+	if !ok {
+		return nil, nil, errs.ErrInvalidParams
+	}
+	c := pc.ByType(typ)
+	if c == nil {
+		return nil, nil, errs.ErrInvalidParams
+	}
+	return pc, c, nil
+}
+
 // EnterGame 进入游戏：加载/建档玩家容器，未建档则初始化并挂入缓存。
 func (this *playerContainerLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq) (*pb.EnterGameResp, error) {
 	if _, err := loadContainer(ctx, playerID); err != nil {
@@ -106,105 +138,94 @@ func (this *playerContainerLogic) LeaveGame(ctx context.Context, playerID int64,
 	return &pb.LeaveGameResp{}, nil
 }
 
-// ---------- GetContainer ----------
-
-func (this *playerContainerLogic) GetContainer(ctx context.Context, playerID int64, req *pb.GetContainerReq) (*pb.GetContainerResp, error) {
+// ContainerList 容器列表：指定类型返回该容器，UNSPECIFIED 返回全部容器。
+func (this *playerContainerLogic) ContainerList(ctx context.Context, playerID int64, req *pb.ContainerListReq) (*pb.ContainerListResp, error) {
 	pc, err := loadContainer(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
-	c := pc.ByType(containerTypeToModel(req.GetType()))
-	if c == nil {
-		return nil, errs.ErrInvalidParams
+
+	types := []int32{model.TypeBackpack, model.TypeStash, model.TypeSecure}
+	if typ, ok := containerTypeToModel(req.GetContainerType()); ok {
+		types = []int32{typ}
 	}
-	return &pb.GetContainerResp{Snapshot: containerToSnapshot(c)}, nil
+
+	entries := make([]*pb.ContainerEntry, 0, len(types))
+	for _, typ := range types {
+		entries = append(entries, containerToEntry(playerID, pc.ByType(typ)))
+	}
+	return &pb.ContainerListResp{ContainerEntries: entries}, nil
 }
 
-// ---------- MoveItem ----------
-
-func (this *playerContainerLogic) MoveItem(ctx context.Context, playerID int64, req *pb.MoveItemReq) (*pb.ContainerOpResp, error) {
-	pc, err := loadContainer(ctx, playerID)
+// ContainerMove 容器内移动物品。
+func (this *playerContainerLogic) ContainerMove(ctx context.Context, playerID int64, req *pb.ContainerMoveReq) (*pb.ContainerMoveResp, error) {
+	pc, c, err := containerOf(ctx, playerID, req.GetType())
 	if err != nil {
 		return nil, err
-	}
-	c := pc.ByType(containerTypeToModel(req.GetType()))
-	if c == nil {
-		return nil, errs.ErrInvalidParams
 	}
 
 	if err := c.MoveItem(req.GetUid(), req.GetToX(), req.GetToY(), req.GetRotated()); err != nil {
-		if errors.Is(err, model.ErrItemNotFound) {
-			return nil, errs.ErrInvalidParams
-		}
-		return nil, fmt.Errorf("logic: move item failed: %w", err)
+		return nil, containerErr(err)
 	}
 
 	saveContainer(playerID, pc)
-	return &pb.ContainerOpResp{Snapshot: containerToSnapshot(c)}, nil
+	return &pb.ContainerMoveResp{}, nil
 }
 
-// ---------- RotateItem ----------
-
-func (this *playerContainerLogic) RotateItem(ctx context.Context, playerID int64, req *pb.RotateItemReq) (*pb.ContainerOpResp, error) {
-	pc, err := loadContainer(ctx, playerID)
+// ContainerRotate 容器内旋转物品。
+func (this *playerContainerLogic) ContainerRotate(ctx context.Context, playerID int64, req *pb.ContainerRotateReq) (*pb.ContainerRotateResp, error) {
+	pc, c, err := containerOf(ctx, playerID, req.GetType())
 	if err != nil {
 		return nil, err
-	}
-	c := pc.ByType(containerTypeToModel(req.GetType()))
-	if c == nil {
-		return nil, errs.ErrInvalidParams
 	}
 
 	if err := c.RotateItem(req.GetUid()); err != nil {
-		if errors.Is(err, model.ErrItemNotFound) {
-			return nil, errs.ErrInvalidParams
-		}
-		return nil, fmt.Errorf("logic: rotate item failed: %w", err)
+		return nil, containerErr(err)
 	}
 
 	saveContainer(playerID, pc)
-	return &pb.ContainerOpResp{Snapshot: containerToSnapshot(c)}, nil
+	return &pb.ContainerRotateResp{}, nil
 }
 
-// ---------- RemoveItem ----------
-
-func (this *playerContainerLogic) RemoveItem(ctx context.Context, playerID int64, req *pb.RemoveItemReq) (*pb.ContainerOpResp, error) {
-	pc, err := loadContainer(ctx, playerID)
+// SortContainer 容器一键整理。
+func (this *playerContainerLogic) ContainerSort(ctx context.Context, playerID int64, req *pb.SortContainerReq) (*pb.SortContainerResp, error) {
+	pc, c, err := containerOf(ctx, playerID, req.GetContainerType())
 	if err != nil {
 		return nil, err
-	}
-	c := pc.ByType(containerTypeToModel(req.GetType()))
-	if c == nil {
-		return nil, errs.ErrInvalidParams
-	}
-
-	if err := c.RemoveItem(req.GetUid()); err != nil {
-		if errors.Is(err, model.ErrItemNotFound) {
-			return nil, errs.ErrInvalidParams
-		}
-		return nil, fmt.Errorf("logic: remove item failed: %w", err)
-	}
-
-	saveContainer(playerID, pc)
-	return &pb.ContainerOpResp{Snapshot: containerToSnapshot(c)}, nil
-}
-
-// ---------- SortContainer ----------
-
-func (this *playerContainerLogic) SortContainer(ctx context.Context, playerID int64, req *pb.SortContainerReq) (*pb.ContainerOpResp, error) {
-	pc, err := loadContainer(ctx, playerID)
-	if err != nil {
-		return nil, err
-	}
-	c := pc.ByType(containerTypeToModel(req.GetType()))
-	if c == nil {
-		return nil, errs.ErrInvalidParams
 	}
 
 	if err := c.AutoSort(); err != nil {
-		return nil, fmt.Errorf("logic: auto sort failed: %w", err)
+		return nil, containerErr(err)
 	}
 
 	saveContainer(playerID, pc)
-	return &pb.ContainerOpResp{Snapshot: containerToSnapshot(c)}, nil
+	return &pb.SortContainerResp{}, nil
+}
+
+// ContainerTransfer 容器间移动物品：目标容器放不下时源容器不变。
+func (this *playerContainerLogic) ContainerTransfer(ctx context.Context, playerID int64, req *pb.ContainerTransferReq) (*pb.ContainerTransferResp, error) {
+	fromType, okFrom := containerTypeToModel(req.GetFromType())
+	toType, okTo := containerTypeToModel(req.GetToType())
+	if !okFrom || !okTo || fromType == toType {
+		return nil, errs.ErrInvalidParams
+	}
+
+	pc, err := loadContainer(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+	fromC, toC := pc.ByType(fromType), pc.ByType(toType)
+	if fromC == nil || toC == nil {
+		return nil, errs.ErrInvalidParams
+	}
+
+	if err := pc.TransferItem(fromType, toType, req.GetUid(), req.GetToX(), req.GetToY(), req.GetRotated()); err != nil {
+		return nil, containerErr(err)
+	}
+
+	saveContainer(playerID, pc)
+	return &pb.ContainerTransferResp{
+		FromEntry: containerToEntry(playerID, fromC),
+		ToEntry:   containerToEntry(playerID, toC),
+	}, nil
 }

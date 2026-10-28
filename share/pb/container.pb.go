@@ -24,7 +24,7 @@ const (
 // 容器列表（路由 10010）
 type ContainerListReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ContainerType ContainerType          `protobuf:"varint,1,opt,name=container_type,json=containerType,proto3,enum=pb.ContainerType" json:"container_type,omitempty"` // 容器类型
+	ContainerType ContainerType          `protobuf:"varint,1,opt,name=container_type,json=containerType,proto3,enum=pb.ContainerType" json:"container_type,omitempty"` // 容器类型（UNSPECIFIED 表示全部容器）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -392,7 +392,7 @@ func (x *ContainerRotateResp) GetResult() *Result {
 	return nil
 }
 
-// 容器一键整理（路由 10014）
+// 容器一键整理请求（路由 10014）
 type SortContainerReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ContainerType ContainerType          `protobuf:"varint,1,opt,name=container_type,json=containerType,proto3,enum=pb.ContainerType" json:"container_type,omitempty"` // 容器类型
@@ -437,6 +437,197 @@ func (x *SortContainerReq) GetContainerType() ContainerType {
 	return ContainerType_CONTAINER_TYPE_UNSPECIFIED
 }
 
+// 容器一键整理响应
+type SortContainerResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SortContainerResp) Reset() {
+	*x = SortContainerResp{}
+	mi := &file_container_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SortContainerResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SortContainerResp) ProtoMessage() {}
+
+func (x *SortContainerResp) ProtoReflect() protoreflect.Message {
+	mi := &file_container_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SortContainerResp.ProtoReflect.Descriptor instead.
+func (*SortContainerResp) Descriptor() ([]byte, []int) {
+	return file_container_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *SortContainerResp) GetResult() *Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
+// 容器间移动物品请求（路由 10015）
+type ContainerTransferReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FromType      ContainerType          `protobuf:"varint,1,opt,name=from_type,json=fromType,proto3,enum=pb.ContainerType" json:"from_type,omitempty"` // 源容器类型
+	ToType        ContainerType          `protobuf:"varint,2,opt,name=to_type,json=toType,proto3,enum=pb.ContainerType" json:"to_type,omitempty"`       // 目标容器类型
+	Uid           int64                  `protobuf:"varint,3,opt,name=uid,proto3" json:"uid,omitempty"`                                                 // 物品实例ID
+	ToX           int32                  `protobuf:"varint,4,opt,name=to_x,json=toX,proto3" json:"to_x,omitempty"`                                      // 目标 X
+	ToY           int32                  `protobuf:"varint,5,opt,name=to_y,json=toY,proto3" json:"to_y,omitempty"`                                      // 目标 Y
+	Rotated       bool                   `protobuf:"varint,6,opt,name=rotated,proto3" json:"rotated,omitempty"`                                         // 是否旋转放置
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ContainerTransferReq) Reset() {
+	*x = ContainerTransferReq{}
+	mi := &file_container_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ContainerTransferReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ContainerTransferReq) ProtoMessage() {}
+
+func (x *ContainerTransferReq) ProtoReflect() protoreflect.Message {
+	mi := &file_container_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ContainerTransferReq.ProtoReflect.Descriptor instead.
+func (*ContainerTransferReq) Descriptor() ([]byte, []int) {
+	return file_container_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *ContainerTransferReq) GetFromType() ContainerType {
+	if x != nil {
+		return x.FromType
+	}
+	return ContainerType_CONTAINER_TYPE_UNSPECIFIED
+}
+
+func (x *ContainerTransferReq) GetToType() ContainerType {
+	if x != nil {
+		return x.ToType
+	}
+	return ContainerType_CONTAINER_TYPE_UNSPECIFIED
+}
+
+func (x *ContainerTransferReq) GetUid() int64 {
+	if x != nil {
+		return x.Uid
+	}
+	return 0
+}
+
+func (x *ContainerTransferReq) GetToX() int32 {
+	if x != nil {
+		return x.ToX
+	}
+	return 0
+}
+
+func (x *ContainerTransferReq) GetToY() int32 {
+	if x != nil {
+		return x.ToY
+	}
+	return 0
+}
+
+func (x *ContainerTransferReq) GetRotated() bool {
+	if x != nil {
+		return x.Rotated
+	}
+	return false
+}
+
+// 容器间移动物品响应
+type ContainerTransferResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	FromEntry     *ContainerEntry        `protobuf:"bytes,2,opt,name=from_entry,json=fromEntry,proto3" json:"from_entry,omitempty"` // 源容器（变更后）
+	ToEntry       *ContainerEntry        `protobuf:"bytes,3,opt,name=to_entry,json=toEntry,proto3" json:"to_entry,omitempty"`       // 目标容器（变更后）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ContainerTransferResp) Reset() {
+	*x = ContainerTransferResp{}
+	mi := &file_container_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ContainerTransferResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ContainerTransferResp) ProtoMessage() {}
+
+func (x *ContainerTransferResp) ProtoReflect() protoreflect.Message {
+	mi := &file_container_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ContainerTransferResp.ProtoReflect.Descriptor instead.
+func (*ContainerTransferResp) Descriptor() ([]byte, []int) {
+	return file_container_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *ContainerTransferResp) GetResult() *Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
+func (x *ContainerTransferResp) GetFromEntry() *ContainerEntry {
+	if x != nil {
+		return x.FromEntry
+	}
+	return nil
+}
+
+func (x *ContainerTransferResp) GetToEntry() *ContainerEntry {
+	if x != nil {
+		return x.ToEntry
+	}
+	return nil
+}
+
 var File_container_proto protoreflect.FileDescriptor
 
 const file_container_proto_rawDesc = "" +
@@ -468,7 +659,23 @@ const file_container_proto_rawDesc = "" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\"L\n" +
 	"\x10SortContainerReq\x128\n" +
-	"\x0econtainer_type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\rcontainerTypeB\x19Z\x17server-cluster/share/pbb\x06proto3"
+	"\x0econtainer_type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\rcontainerType\"7\n" +
+	"\x11SortContainerResp\x12\"\n" +
+	"\x06result\x18\x01 \x01(\v2\n" +
+	".pb.ResultR\x06result\"\xc4\x01\n" +
+	"\x14ContainerTransferReq\x12.\n" +
+	"\tfrom_type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\bfromType\x12*\n" +
+	"\ato_type\x18\x02 \x01(\x0e2\x11.pb.ContainerTypeR\x06toType\x12\x10\n" +
+	"\x03uid\x18\x03 \x01(\x03R\x03uid\x12\x11\n" +
+	"\x04to_x\x18\x04 \x01(\x05R\x03toX\x12\x11\n" +
+	"\x04to_y\x18\x05 \x01(\x05R\x03toY\x12\x18\n" +
+	"\arotated\x18\x06 \x01(\bR\arotated\"\x9d\x01\n" +
+	"\x15ContainerTransferResp\x12\"\n" +
+	"\x06result\x18\x01 \x01(\v2\n" +
+	".pb.ResultR\x06result\x121\n" +
+	"\n" +
+	"from_entry\x18\x02 \x01(\v2\x12.pb.ContainerEntryR\tfromEntry\x12-\n" +
+	"\bto_entry\x18\x03 \x01(\v2\x12.pb.ContainerEntryR\atoEntryB\x19Z\x17server-cluster/share/pbb\x06proto3"
 
 var (
 	file_container_proto_rawDescOnce sync.Once
@@ -482,37 +689,46 @@ func file_container_proto_rawDescGZIP() []byte {
 	return file_container_proto_rawDescData
 }
 
-var file_container_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_container_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_container_proto_goTypes = []any{
-	(*ContainerListReq)(nil),    // 0: pb.ContainerListReq
-	(*ContainerListResp)(nil),   // 1: pb.ContainerListResp
-	(*ContainerNotify)(nil),     // 2: pb.ContainerNotify
-	(*ContainerMoveReq)(nil),    // 3: pb.ContainerMoveReq
-	(*ContainerMoveResp)(nil),   // 4: pb.ContainerMoveResp
-	(*ContainerRotateReq)(nil),  // 5: pb.ContainerRotateReq
-	(*ContainerRotateResp)(nil), // 6: pb.ContainerRotateResp
-	(*SortContainerReq)(nil),    // 7: pb.SortContainerReq
-	(ContainerType)(0),          // 8: pb.ContainerType
-	(*Result)(nil),              // 9: pb.Result
-	(*ContainerEntry)(nil),      // 10: pb.ContainerEntry
-	(*ItemEntry)(nil),           // 11: pb.ItemEntry
+	(*ContainerListReq)(nil),      // 0: pb.ContainerListReq
+	(*ContainerListResp)(nil),     // 1: pb.ContainerListResp
+	(*ContainerNotify)(nil),       // 2: pb.ContainerNotify
+	(*ContainerMoveReq)(nil),      // 3: pb.ContainerMoveReq
+	(*ContainerMoveResp)(nil),     // 4: pb.ContainerMoveResp
+	(*ContainerRotateReq)(nil),    // 5: pb.ContainerRotateReq
+	(*ContainerRotateResp)(nil),   // 6: pb.ContainerRotateResp
+	(*SortContainerReq)(nil),      // 7: pb.SortContainerReq
+	(*SortContainerResp)(nil),     // 8: pb.SortContainerResp
+	(*ContainerTransferReq)(nil),  // 9: pb.ContainerTransferReq
+	(*ContainerTransferResp)(nil), // 10: pb.ContainerTransferResp
+	(ContainerType)(0),            // 11: pb.ContainerType
+	(*Result)(nil),                // 12: pb.Result
+	(*ContainerEntry)(nil),        // 13: pb.ContainerEntry
+	(*ItemEntry)(nil),             // 14: pb.ItemEntry
 }
 var file_container_proto_depIdxs = []int32{
-	8,  // 0: pb.ContainerListReq.container_type:type_name -> pb.ContainerType
-	9,  // 1: pb.ContainerListResp.result:type_name -> pb.Result
-	10, // 2: pb.ContainerListResp.container_entries:type_name -> pb.ContainerEntry
-	8,  // 3: pb.ContainerNotify.container_type:type_name -> pb.ContainerType
-	11, // 4: pb.ContainerNotify.item_entry:type_name -> pb.ItemEntry
-	8,  // 5: pb.ContainerMoveReq.type:type_name -> pb.ContainerType
-	9,  // 6: pb.ContainerMoveResp.result:type_name -> pb.Result
-	8,  // 7: pb.ContainerRotateReq.type:type_name -> pb.ContainerType
-	9,  // 8: pb.ContainerRotateResp.result:type_name -> pb.Result
-	8,  // 9: pb.SortContainerReq.container_type:type_name -> pb.ContainerType
-	10, // [10:10] is the sub-list for method output_type
-	10, // [10:10] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	11, // 0: pb.ContainerListReq.container_type:type_name -> pb.ContainerType
+	12, // 1: pb.ContainerListResp.result:type_name -> pb.Result
+	13, // 2: pb.ContainerListResp.container_entries:type_name -> pb.ContainerEntry
+	11, // 3: pb.ContainerNotify.container_type:type_name -> pb.ContainerType
+	14, // 4: pb.ContainerNotify.item_entry:type_name -> pb.ItemEntry
+	11, // 5: pb.ContainerMoveReq.type:type_name -> pb.ContainerType
+	12, // 6: pb.ContainerMoveResp.result:type_name -> pb.Result
+	11, // 7: pb.ContainerRotateReq.type:type_name -> pb.ContainerType
+	12, // 8: pb.ContainerRotateResp.result:type_name -> pb.Result
+	11, // 9: pb.SortContainerReq.container_type:type_name -> pb.ContainerType
+	12, // 10: pb.SortContainerResp.result:type_name -> pb.Result
+	11, // 11: pb.ContainerTransferReq.from_type:type_name -> pb.ContainerType
+	11, // 12: pb.ContainerTransferReq.to_type:type_name -> pb.ContainerType
+	12, // 13: pb.ContainerTransferResp.result:type_name -> pb.Result
+	13, // 14: pb.ContainerTransferResp.from_entry:type_name -> pb.ContainerEntry
+	13, // 15: pb.ContainerTransferResp.to_entry:type_name -> pb.ContainerEntry
+	16, // [16:16] is the sub-list for method output_type
+	16, // [16:16] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_container_proto_init() }
@@ -527,7 +743,7 @@ func file_container_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_container_proto_rawDesc), len(file_container_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

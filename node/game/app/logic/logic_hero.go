@@ -3,11 +3,13 @@ package logic
 import (
 	"context"
 	"errors"
-	"sync"
+	"sort"
 
 	"gorm.io/gorm"
 
 	"server-cluster/node/game/app/global"
+	"server-cluster/share/consts"
+	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
 	"server-cluster/share/singleton"
@@ -15,10 +17,7 @@ import (
 	"server-cluster/share/util"
 )
 
-type heroLogic struct {
-	once sync.Once
-	resp *pb.HeroListResp
-}
+type heroLogic struct{}
 
 var heroLogicInst = singleton.NewContainer[global.HeroLogic]("HeroLogic")
 
@@ -30,28 +29,76 @@ func init() {
 // Hero 获取英雄业务单例。
 func Hero() global.HeroLogic { return heroLogicInst.MustGet() }
 
-// HeroList 英雄列表（角色配置）：读内存配置表，首次请求转成 pb 后缓存复用。
-func (this *heroLogic) HeroList(context.Context) (*pb.HeroListResp, error) {
-	this.once.Do(func() {
-		cfgs := tpl.T().RoleInfo.GetDataList()
-		items := make([]*pb.HeroEntry, 0, len(cfgs))
-		for _, cfg := range cfgs {
-			items = append(items, &pb.HeroEntry{
-				Id:                cfg.Id,
-				Name:              cfg.Name,
-				Job:               int32(cfg.Job),
-				WeaponId:          cfg.WeaponId,
-				ControlDifficulty: cfg.ControlDifficulty,
-				CharacterShards:   cfg.CharacterShards,
-				Rarity:            cfg.Rarity,
-				CharacterId:       cfg.CharacterId,
-				SkillId:           firstInt32(cfg.SkillID),
-				GearId:            firstInt32(cfg.GearID),
-			})
-		}
-		this.resp = &pb.HeroListResp{HeroEntries: items}
+// HeroList 英雄列表：只下发持有状态，静态属性由客户端按 hero_id 关联英雄配置表。
+func (this *heroLogic) HeroList(ctx context.Context, playerID int64) (*pb.HeroListResp, error) {
+	row, err := loadPlayerHero(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+
+	entries := make([]*pb.HeroEntry, 0, row.Heroes.Len())
+	row.Heroes.Range(func(_ int32, h model.HeroInfo) bool {
+		entries = append(entries, toHeroEntry(h))
+		return true
 	})
-	return this.resp, nil
+	// map 遍历无序，按配置ID排序保证客户端展示稳定
+	sort.Slice(entries, func(i, j int) bool { return entries[i].HeroId < entries[j].HeroId })
+	return &pb.HeroListResp{HeroEntries: entries}, nil
+}
+
+// toHeroEntry 持有数据 → wire 条目（仅状态）。
+func toHeroEntry(h model.HeroInfo) *pb.HeroEntry {
+	return &pb.HeroEntry{
+		HeroId:   h.HeroID,
+		Level:    h.Level,
+		Exp:      h.Exp,
+		Star:     h.Star,
+		SkinId:   h.SkinID,
+		Equipped: h.Equipped,
+	}
+}
+
+// HeroAdd 新增英雄：配置ID必须存在，已拥有返回错误。
+func (this *heroLogic) HeroAdd(ctx context.Context, playerID int64, req *pb.HeroAddReq) (*pb.HeroAddResp, error) {
+	if !tpl.T().RoleInfo.Has(req.GetHeroId()) {
+		return nil, errs.ErrInvalidParams
+	}
+
+	row, err := loadPlayerHero(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+
+	h := model.HeroInfo{HeroID: req.GetHeroId()}
+	if !row.AddHero(h) {
+		return nil, errs.WithMessage(consts.CodeInvalidParams, "英雄已拥有")
+	}
+
+	global.PlayerHeroCache.Set(playerID, row)
+	return &pb.HeroAddResp{HeroEntry: toHeroEntry(h)}, nil
+}
+
+// HeroUpdate 更新英雄：整体覆盖持有状态，未拥有返回错误。
+func (this *heroLogic) HeroUpdate(ctx context.Context, playerID int64, req *pb.HeroUpdateReq) (*pb.HeroUpdateResp, error) {
+	row, err := loadPlayerHero(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+
+	h := model.HeroInfo{
+		HeroID:   req.GetHeroId(),
+		Level:    req.GetLevel(),
+		Exp:      req.GetExp(),
+		Star:     req.GetStar(),
+		SkinID:   req.GetSkinId(),
+		Equipped: req.GetEquipped(),
+	}
+	if !row.UpdateHero(h) {
+		return nil, errs.WithMessage(consts.CodeInvalidParams, "英雄未拥有")
+	}
+
+	global.PlayerHeroCache.Set(playerID, row)
+	return &pb.HeroUpdateResp{HeroEntry: toHeroEntry(h)}, nil
 }
 
 // EnterGame 进入游戏：加载玩家英雄持有，未建档则初始化空集合。
@@ -86,12 +133,4 @@ func loadPlayerHero(ctx context.Context, playerID int64) (model.PlayerHero, erro
 		row.Heroes = util.NewSafeMap[int32, model.HeroInfo]()
 	}
 	return row, nil
-}
-
-// firstInt32 取多值配置的首个元素；配置为多档/多段，pb 当前为单值，空列表返回 0。
-func firstInt32(values []int32) int32 {
-	if len(values) == 0 {
-		return 0
-	}
-	return values[0]
 }

@@ -6,7 +6,7 @@ import "common.proto";
 
 option go_package = "server-cluster/share/pb";
 
-// 技能列表请求（路由 10020）
+// 技能列表请求（路由 10040）
 message SkillListReq {
 }
 
@@ -16,7 +16,31 @@ message SkillListResp {
   repeated SkillEntry skill_entries = 2;
 }
 
-// 技能变化通知（路由 10021）
+// 技能变化通知（路由 10041）
 message SkillChangeNotify {
   SkillEntry skill_entry = 1;
+}
+
+// 新增技能请求（路由 10042）
+message SkillAddReq {
+  int32 skill_id = 1; // 技能配置ID
+}
+
+// 新增技能响应
+message SkillAddResp {
+  Result result = 1;
+  SkillEntry skill_entry = 2; // 新增后的持有状态
+}
+
+// 更新技能请求（路由 10043）
+message SkillUpdateReq {
+  int32 skill_id = 1; // 技能配置ID
+  int32 level = 2;    // 等级
+  bool equipped = 3;  // 是否装备
+}
+
+// 更新技能响应
+message SkillUpdateResp {
+  Result result = 1;
+  SkillEntry skill_entry = 2; // 更新后的持有状态
 }

@@ -20,3 +20,30 @@ message HeroListResp {
 message HeroChangeNotify {
   HeroEntry hero_entry = 1;
 }
+
+// 新增英雄请求（路由 10022）
+message HeroAddReq {
+  int32 hero_id = 1; // 英雄配置ID
+}
+
+// 新增英雄响应
+message HeroAddResp {
+  Result result = 1;
+  HeroEntry hero_entry = 2; // 新增后的持有状态
+}
+
+// 更新英雄请求（路由 10023）
+message HeroUpdateReq {
+  int32 hero_id = 1;   // 英雄配置ID
+  int32 level = 2;     // 等级
+  int64 exp = 3;       // 经验
+  int32 star = 4;      // 星级
+  int32 skin_id = 5;   // 皮肤ID
+  bool equipped = 6;   // 是否出战
+}
+
+// 更新英雄响应
+message HeroUpdateResp {
+  Result result = 1;
+  HeroEntry hero_entry = 2; // 更新后的持有状态
+}

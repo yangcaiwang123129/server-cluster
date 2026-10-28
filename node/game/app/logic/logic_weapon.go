@@ -3,11 +3,13 @@ package logic
 import (
 	"context"
 	"errors"
-	"sync"
+	"sort"
 
 	"gorm.io/gorm"
 
 	"server-cluster/node/game/app/global"
+	"server-cluster/share/consts"
+	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
 	"server-cluster/share/singleton"
@@ -15,10 +17,7 @@ import (
 	"server-cluster/share/util"
 )
 
-type weaponLogic struct {
-	once sync.Once
-	resp *pb.WeaponListResp
-}
+type weaponLogic struct{}
 
 var weaponLogicInst = singleton.NewContainer[global.WeaponLogic]("WeaponLogic")
 
@@ -30,30 +29,72 @@ func init() {
 // Weapon 获取武器业务单例。
 func Weapon() global.WeaponLogic { return weaponLogicInst.MustGet() }
 
-// WeaponList 武器列表：读内存配置表，首次请求转成 pb 后缓存复用。
-func (this *weaponLogic) WeaponList(context.Context) (*pb.WeaponListResp, error) {
-	this.once.Do(func() {
-		cfgs := tpl.T().Weapon.GetDataList()
-		items := make([]*pb.WeaponEntry, 0, len(cfgs))
-		for _, cfg := range cfgs {
-			items = append(items, &pb.WeaponEntry{
-				Id:             cfg.Id,
-				WeaponName:     cfg.WeaponName,
-				Icon:           cfg.Icon,
-				WeaponDamage:   firstInt32(cfg.WeaponDamage),
-				PenetrateLevel: firstInt32(cfg.PenetrateLevel),
-				FireRate:       firstInt32(cfg.FireRate),
-				ReloadTime:     firstInt32(cfg.ReloadTime),
-				FieldAttack:    firstInt32(cfg.FieldAttack),
-				ScatterAttack:  firstInt32(cfg.ScatterAttack),
-				ScatterMove:    firstInt32(cfg.ScatterMove),
-				ScatterAim:     firstInt32(cfg.ScatterAim),
-				TimeAim:        firstInt32(cfg.TimeAim),
-			})
-		}
-		this.resp = &pb.WeaponListResp{WeaponEntries: items}
+// WeaponList 武器列表：只下发持有状态，静态属性由客户端按 weapon_id 关联武器配置表。
+func (this *weaponLogic) WeaponList(ctx context.Context, playerID int64) (*pb.WeaponListResp, error) {
+	row, err := loadPlayerWeapon(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+
+	entries := make([]*pb.WeaponEntry, 0, row.Weapons.Len())
+	row.Weapons.Range(func(_ int32, w model.WeaponInfo) bool {
+		entries = append(entries, toWeaponEntry(w))
+		return true
 	})
-	return this.resp, nil
+	// map 遍历无序，按配置ID排序保证客户端展示稳定
+	sort.Slice(entries, func(i, j int) bool { return entries[i].WeaponId < entries[j].WeaponId })
+	return &pb.WeaponListResp{WeaponEntries: entries}, nil
+}
+
+// toWeaponEntry 持有数据 → wire 条目（仅状态）。
+func toWeaponEntry(w model.WeaponInfo) *pb.WeaponEntry {
+	return &pb.WeaponEntry{
+		WeaponId:   w.WeaponID,
+		Level:      w.Level,
+		Durability: w.Durability,
+		Equipped:   w.Equipped,
+	}
+}
+
+// WeaponAdd 新增武器：配置ID必须存在，已拥有返回错误。
+func (this *weaponLogic) WeaponAdd(ctx context.Context, playerID int64, req *pb.WeaponAddReq) (*pb.WeaponAddResp, error) {
+	if !tpl.T().Weapon.Has(req.GetWeaponId()) {
+		return nil, errs.ErrInvalidParams
+	}
+
+	row, err := loadPlayerWeapon(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+
+	w := model.WeaponInfo{WeaponID: req.GetWeaponId()}
+	if !row.AddWeapon(w) {
+		return nil, errs.WithMessage(consts.CodeInvalidParams, "武器已拥有")
+	}
+
+	global.PlayerWeaponCache.Set(playerID, row)
+	return &pb.WeaponAddResp{WeaponEntry: toWeaponEntry(w)}, nil
+}
+
+// WeaponUpdate 更新武器：整体覆盖持有状态，未拥有返回错误。
+func (this *weaponLogic) WeaponUpdate(ctx context.Context, playerID int64, req *pb.WeaponUpdateReq) (*pb.WeaponUpdateResp, error) {
+	row, err := loadPlayerWeapon(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+
+	w := model.WeaponInfo{
+		WeaponID:   req.GetWeaponId(),
+		Level:      req.GetLevel(),
+		Durability: req.GetDurability(),
+		Equipped:   req.GetEquipped(),
+	}
+	if !row.UpdateWeapon(w) {
+		return nil, errs.WithMessage(consts.CodeInvalidParams, "武器未拥有")
+	}
+
+	global.PlayerWeaponCache.Set(playerID, row)
+	return &pb.WeaponUpdateResp{WeaponEntry: toWeaponEntry(w)}, nil
 }
 
 // EnterGame 进入游戏：加载玩家武器持有，未建档则初始化空集合。

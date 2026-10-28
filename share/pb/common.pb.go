@@ -34,23 +34,32 @@ const (
 	RouteCode_ROUTE_CODE_LEAVE_GAME   RouteCode = 10002 // 离开游戏
 	RouteCode_ROUTE_CODE_SEVER_NOTIFY RouteCode = 10003 // 服务器通知
 	// 玩家容器 10010~10019
-	RouteCode_ROUTE_CODE_CONTAINER_LIST   RouteCode = 10010  // 容器列表
-	RouteCode_ROUTE_CODE_CONTAINER_NOTIFY RouteCode = 10011  // 容器内变化通知
-	RouteCode_ROUTE_CODE_CONTAINER_MOVE   RouteCode = 100112 // 容器内物品移动
-	RouteCode_ROUTE_CODE_CONTAINER_ROTATE RouteCode = 10013  // 容器内物品旋转
-	RouteCode_ROUTE_CODE_CONTAINER_SORT   RouteCode = 10014  // 容器一键整理物品
+	RouteCode_ROUTE_CODE_CONTAINER_LIST     RouteCode = 10010  // 容器列表
+	RouteCode_ROUTE_CODE_CONTAINER_NOTIFY   RouteCode = 10011  // 容器内变化通知
+	RouteCode_ROUTE_CODE_CONTAINER_MOVE     RouteCode = 100112 // 容器内物品移动
+	RouteCode_ROUTE_CODE_CONTAINER_ROTATE   RouteCode = 10013  // 容器内物品旋转
+	RouteCode_ROUTE_CODE_CONTAINER_SORT     RouteCode = 10014  // 容器一键整理物品
+	RouteCode_ROUTE_CODE_CONTAINER_TRANSFER RouteCode = 10015  // 容器间物品移动
 	// 英雄 10020~10029
 	RouteCode_ROUTE_CODE_HERO_LIST   RouteCode = 10020 // 英雄列表
 	RouteCode_ROUTE_CODE_HERO_NOTIFY RouteCode = 10021 // 英雄变化通知
+	RouteCode_ROUTE_CODE_HERO_ADD    RouteCode = 10022 // 新增英雄
+	RouteCode_ROUTE_CODE_HERO_UPDATE RouteCode = 10023 // 更新英雄
 	// 武器 10030~10039
 	RouteCode_ROUTE_CODE_WEAPON_LIST   RouteCode = 10030 // 武器列表
 	RouteCode_ROUTE_CODE_WEAPON_NOTIFY RouteCode = 10031 // 武器变化通知
+	RouteCode_ROUTE_CODE_WEAPON_ADD    RouteCode = 10032 // 新增武器
+	RouteCode_ROUTE_CODE_WEAPON_UPDATE RouteCode = 10033 // 更新武器
 	// 技能 10040~10049
 	RouteCode_ROUTE_CODE_SKILL_LIST   RouteCode = 10040 // 技能列表
 	RouteCode_ROUTE_CODE_SKILL_NOTIFY RouteCode = 10041 // 技能变化通知
+	RouteCode_ROUTE_CODE_SKILL_ADD    RouteCode = 10042 // 新增技能
+	RouteCode_ROUTE_CODE_SKILL_UPDATE RouteCode = 10043 // 更新技能
 	// 装备 10050~10059
 	RouteCode_ROUTE_CODE_GEAR_LIST   RouteCode = 10050 // 装备列表
 	RouteCode_ROUTE_CODE_GEAR_NOTIFY RouteCode = 10051 // 装备变化通知
+	RouteCode_ROUTE_CODE_GEAR_ADD    RouteCode = 10052 // 新增装备
+	RouteCode_ROUTE_CODE_GEAR_UPDATE RouteCode = 10053 // 更新装备
 )
 
 // Enum value maps for RouteCode.
@@ -66,34 +75,52 @@ var (
 		100112: "ROUTE_CODE_CONTAINER_MOVE",
 		10013:  "ROUTE_CODE_CONTAINER_ROTATE",
 		10014:  "ROUTE_CODE_CONTAINER_SORT",
+		10015:  "ROUTE_CODE_CONTAINER_TRANSFER",
 		10020:  "ROUTE_CODE_HERO_LIST",
 		10021:  "ROUTE_CODE_HERO_NOTIFY",
+		10022:  "ROUTE_CODE_HERO_ADD",
+		10023:  "ROUTE_CODE_HERO_UPDATE",
 		10030:  "ROUTE_CODE_WEAPON_LIST",
 		10031:  "ROUTE_CODE_WEAPON_NOTIFY",
+		10032:  "ROUTE_CODE_WEAPON_ADD",
+		10033:  "ROUTE_CODE_WEAPON_UPDATE",
 		10040:  "ROUTE_CODE_SKILL_LIST",
 		10041:  "ROUTE_CODE_SKILL_NOTIFY",
+		10042:  "ROUTE_CODE_SKILL_ADD",
+		10043:  "ROUTE_CODE_SKILL_UPDATE",
 		10050:  "ROUTE_CODE_GEAR_LIST",
 		10051:  "ROUTE_CODE_GEAR_NOTIFY",
+		10052:  "ROUTE_CODE_GEAR_ADD",
+		10053:  "ROUTE_CODE_GEAR_UPDATE",
 	}
 	RouteCode_value = map[string]int32{
-		"ROUTE_CODE_UNSPECIFIED":      0,
-		"ROUTE_CODE_VERIFY":           10000,
-		"ROUTE_CODE_ENTER_GAME":       10001,
-		"ROUTE_CODE_LEAVE_GAME":       10002,
-		"ROUTE_CODE_SEVER_NOTIFY":     10003,
-		"ROUTE_CODE_CONTAINER_LIST":   10010,
-		"ROUTE_CODE_CONTAINER_NOTIFY": 10011,
-		"ROUTE_CODE_CONTAINER_MOVE":   100112,
-		"ROUTE_CODE_CONTAINER_ROTATE": 10013,
-		"ROUTE_CODE_CONTAINER_SORT":   10014,
-		"ROUTE_CODE_HERO_LIST":        10020,
-		"ROUTE_CODE_HERO_NOTIFY":      10021,
-		"ROUTE_CODE_WEAPON_LIST":      10030,
-		"ROUTE_CODE_WEAPON_NOTIFY":    10031,
-		"ROUTE_CODE_SKILL_LIST":       10040,
-		"ROUTE_CODE_SKILL_NOTIFY":     10041,
-		"ROUTE_CODE_GEAR_LIST":        10050,
-		"ROUTE_CODE_GEAR_NOTIFY":      10051,
+		"ROUTE_CODE_UNSPECIFIED":        0,
+		"ROUTE_CODE_VERIFY":             10000,
+		"ROUTE_CODE_ENTER_GAME":         10001,
+		"ROUTE_CODE_LEAVE_GAME":         10002,
+		"ROUTE_CODE_SEVER_NOTIFY":       10003,
+		"ROUTE_CODE_CONTAINER_LIST":     10010,
+		"ROUTE_CODE_CONTAINER_NOTIFY":   10011,
+		"ROUTE_CODE_CONTAINER_MOVE":     100112,
+		"ROUTE_CODE_CONTAINER_ROTATE":   10013,
+		"ROUTE_CODE_CONTAINER_SORT":     10014,
+		"ROUTE_CODE_CONTAINER_TRANSFER": 10015,
+		"ROUTE_CODE_HERO_LIST":          10020,
+		"ROUTE_CODE_HERO_NOTIFY":        10021,
+		"ROUTE_CODE_HERO_ADD":           10022,
+		"ROUTE_CODE_HERO_UPDATE":        10023,
+		"ROUTE_CODE_WEAPON_LIST":        10030,
+		"ROUTE_CODE_WEAPON_NOTIFY":      10031,
+		"ROUTE_CODE_WEAPON_ADD":         10032,
+		"ROUTE_CODE_WEAPON_UPDATE":      10033,
+		"ROUTE_CODE_SKILL_LIST":         10040,
+		"ROUTE_CODE_SKILL_NOTIFY":       10041,
+		"ROUTE_CODE_SKILL_ADD":          10042,
+		"ROUTE_CODE_SKILL_UPDATE":       10043,
+		"ROUTE_CODE_GEAR_LIST":          10050,
+		"ROUTE_CODE_GEAR_NOTIFY":        10051,
+		"ROUTE_CODE_GEAR_ADD":           10052,
+		"ROUTE_CODE_GEAR_UPDATE":        10053,
 	}
 )
 
@@ -810,21 +837,17 @@ func (x *ContainerEntry) GetItemEntries() []*ItemEntry {
 	return nil
 }
 
-// 英雄条目
+// 英雄持有（仅状态，静态属性由 hero_id 关联英雄配置表）
 type HeroEntry struct {
-	state             protoimpl.MessageState `protogen:"open.v1"`
-	Id                int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                        // 英雄ID
-	Name              string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`                                                     // 名字
-	Job               int32                  `protobuf:"varint,3,opt,name=job,proto3" json:"job,omitempty"`                                                      // 职业
-	WeaponId          int32                  `protobuf:"varint,4,opt,name=weapon_id,json=weaponId,proto3" json:"weapon_id,omitempty"`                            // 默认武器
-	ControlDifficulty int32                  `protobuf:"varint,5,opt,name=control_difficulty,json=controlDifficulty,proto3" json:"control_difficulty,omitempty"` // 操控难度
-	CharacterShards   int32                  `protobuf:"varint,6,opt,name=character_shards,json=characterShards,proto3" json:"character_shards,omitempty"`       // 角色碎片
-	Rarity            int32                  `protobuf:"varint,7,opt,name=rarity,proto3" json:"rarity,omitempty"`                                                // 稀有度
-	CharacterId       int32                  `protobuf:"varint,8,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`                   // 角色配置
-	SkillId           int32                  `protobuf:"varint,9,opt,name=skill_id,json=skillId,proto3" json:"skill_id,omitempty"`                               // 携带技能
-	GearId            int32                  `protobuf:"varint,10,opt,name=gear_id,json=gearId,proto3" json:"gear_id,omitempty"`                                 // 穿戴装备
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	HeroId        int32                  `protobuf:"varint,1,opt,name=hero_id,json=heroId,proto3" json:"hero_id,omitempty"` // 英雄配置ID
+	Level         int32                  `protobuf:"varint,2,opt,name=level,proto3" json:"level,omitempty"`                 // 等级
+	Exp           int64                  `protobuf:"varint,3,opt,name=exp,proto3" json:"exp,omitempty"`                     // 经验
+	Star          int32                  `protobuf:"varint,4,opt,name=star,proto3" json:"star,omitempty"`                   // 星级
+	SkinId        int32                  `protobuf:"varint,5,opt,name=skin_id,json=skinId,proto3" json:"skin_id,omitempty"` // 皮肤ID
+	Equipped      bool                   `protobuf:"varint,6,opt,name=equipped,proto3" json:"equipped,omitempty"`           // 是否出战
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *HeroEntry) Reset() {
@@ -857,93 +880,57 @@ func (*HeroEntry) Descriptor() ([]byte, []int) {
 	return file_common_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *HeroEntry) GetId() int32 {
+func (x *HeroEntry) GetHeroId() int32 {
 	if x != nil {
-		return x.Id
+		return x.HeroId
 	}
 	return 0
 }
 
-func (x *HeroEntry) GetName() string {
+func (x *HeroEntry) GetLevel() int32 {
 	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *HeroEntry) GetJob() int32 {
-	if x != nil {
-		return x.Job
+		return x.Level
 	}
 	return 0
 }
 
-func (x *HeroEntry) GetWeaponId() int32 {
+func (x *HeroEntry) GetExp() int64 {
 	if x != nil {
-		return x.WeaponId
+		return x.Exp
 	}
 	return 0
 }
 
-func (x *HeroEntry) GetControlDifficulty() int32 {
+func (x *HeroEntry) GetStar() int32 {
 	if x != nil {
-		return x.ControlDifficulty
+		return x.Star
 	}
 	return 0
 }
 
-func (x *HeroEntry) GetCharacterShards() int32 {
+func (x *HeroEntry) GetSkinId() int32 {
 	if x != nil {
-		return x.CharacterShards
+		return x.SkinId
 	}
 	return 0
 }
 
-func (x *HeroEntry) GetRarity() int32 {
+func (x *HeroEntry) GetEquipped() bool {
 	if x != nil {
-		return x.Rarity
+		return x.Equipped
 	}
-	return 0
+	return false
 }
 
-func (x *HeroEntry) GetCharacterId() int32 {
-	if x != nil {
-		return x.CharacterId
-	}
-	return 0
-}
-
-func (x *HeroEntry) GetSkillId() int32 {
-	if x != nil {
-		return x.SkillId
-	}
-	return 0
-}
-
-func (x *HeroEntry) GetGearId() int32 {
-	if x != nil {
-		return x.GearId
-	}
-	return 0
-}
-
-// 武器条目
+// 武器持有（仅状态，静态属性由 weapon_id 关联武器配置表）
 type WeaponEntry struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	Id             int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                               // 武器ID
-	WeaponName     string                 `protobuf:"bytes,2,opt,name=weapon_name,json=weaponName,proto3" json:"weapon_name,omitempty"`              // 武器名字
-	Icon           string                 `protobuf:"bytes,3,opt,name=icon,proto3" json:"icon,omitempty"`                                            // 武器图标
-	WeaponDamage   int32                  `protobuf:"varint,4,opt,name=weapon_damage,json=weaponDamage,proto3" json:"weapon_damage,omitempty"`       // 武器伤害
-	PenetrateLevel int32                  `protobuf:"varint,5,opt,name=penetrate_level,json=penetrateLevel,proto3" json:"penetrate_level,omitempty"` // 穿透等级
-	FireRate       int32                  `protobuf:"varint,6,opt,name=fire_rate,json=fireRate,proto3" json:"fire_rate,omitempty"`                   // 射速
-	ReloadTime     int32                  `protobuf:"varint,7,opt,name=reload_time,json=reloadTime,proto3" json:"reload_time,omitempty"`             // 换弹时间
-	FieldAttack    int32                  `protobuf:"varint,8,opt,name=field_attack,json=fieldAttack,proto3" json:"field_attack,omitempty"`          // 攻击范围
-	ScatterAttack  int32                  `protobuf:"varint,9,opt,name=scatter_attack,json=scatterAttack,proto3" json:"scatter_attack,omitempty"`    // 攻击散射
-	ScatterMove    int32                  `protobuf:"varint,10,opt,name=scatter_move,json=scatterMove,proto3" json:"scatter_move,omitempty"`         // 移动攻击散射
-	ScatterAim     int32                  `protobuf:"varint,11,opt,name=scatter_aim,json=scatterAim,proto3" json:"scatter_aim,omitempty"`            // 瞄准攻击散射
-	TimeAim        int32                  `protobuf:"varint,12,opt,name=time_aim,json=timeAim,proto3" json:"time_aim,omitempty"`                     // 瞄准时间
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	WeaponId      int32                  `protobuf:"varint,1,opt,name=weapon_id,json=weaponId,proto3" json:"weapon_id,omitempty"` // 武器配置ID
+	Level         int32                  `protobuf:"varint,2,opt,name=level,proto3" json:"level,omitempty"`                       // 等级
+	Durability    int32                  `protobuf:"varint,3,opt,name=durability,proto3" json:"durability,omitempty"`             // 耐久度
+	Equipped      bool                   `protobuf:"varint,4,opt,name=equipped,proto3" json:"equipped,omitempty"`                 // 是否装备
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *WeaponEntry) Reset() {
@@ -976,105 +963,42 @@ func (*WeaponEntry) Descriptor() ([]byte, []int) {
 	return file_common_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *WeaponEntry) GetId() int32 {
+func (x *WeaponEntry) GetWeaponId() int32 {
 	if x != nil {
-		return x.Id
+		return x.WeaponId
 	}
 	return 0
 }
 
-func (x *WeaponEntry) GetWeaponName() string {
+func (x *WeaponEntry) GetLevel() int32 {
 	if x != nil {
-		return x.WeaponName
-	}
-	return ""
-}
-
-func (x *WeaponEntry) GetIcon() string {
-	if x != nil {
-		return x.Icon
-	}
-	return ""
-}
-
-func (x *WeaponEntry) GetWeaponDamage() int32 {
-	if x != nil {
-		return x.WeaponDamage
+		return x.Level
 	}
 	return 0
 }
 
-func (x *WeaponEntry) GetPenetrateLevel() int32 {
+func (x *WeaponEntry) GetDurability() int32 {
 	if x != nil {
-		return x.PenetrateLevel
+		return x.Durability
 	}
 	return 0
 }
 
-func (x *WeaponEntry) GetFireRate() int32 {
+func (x *WeaponEntry) GetEquipped() bool {
 	if x != nil {
-		return x.FireRate
+		return x.Equipped
 	}
-	return 0
+	return false
 }
 
-func (x *WeaponEntry) GetReloadTime() int32 {
-	if x != nil {
-		return x.ReloadTime
-	}
-	return 0
-}
-
-func (x *WeaponEntry) GetFieldAttack() int32 {
-	if x != nil {
-		return x.FieldAttack
-	}
-	return 0
-}
-
-func (x *WeaponEntry) GetScatterAttack() int32 {
-	if x != nil {
-		return x.ScatterAttack
-	}
-	return 0
-}
-
-func (x *WeaponEntry) GetScatterMove() int32 {
-	if x != nil {
-		return x.ScatterMove
-	}
-	return 0
-}
-
-func (x *WeaponEntry) GetScatterAim() int32 {
-	if x != nil {
-		return x.ScatterAim
-	}
-	return 0
-}
-
-func (x *WeaponEntry) GetTimeAim() int32 {
-	if x != nil {
-		return x.TimeAim
-	}
-	return 0
-}
-
-// 技能条目
+// 技能持有（仅状态，静态属性由 skill_id 关联技能配置表）
 type SkillEntry struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	Id               int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                        // 技能ID
-	SkillTemplate    int32                  `protobuf:"varint,2,opt,name=skill_template,json=skillTemplate,proto3" json:"skill_template,omitempty"`             // 技能模版
-	SkillName        string                 `protobuf:"bytes,3,opt,name=skill_name,json=skillName,proto3" json:"skill_name,omitempty"`                          // 技能名字
-	Desc             string                 `protobuf:"bytes,4,opt,name=desc,proto3" json:"desc,omitempty"`                                                     // 技能简述
-	DescDetail       string                 `protobuf:"bytes,5,opt,name=desc_detail,json=descDetail,proto3" json:"desc_detail,omitempty"`                       // 技能详情
-	Damage           int32                  `protobuf:"varint,6,opt,name=damage,proto3" json:"damage,omitempty"`                                                // 伤害
-	AutoFireAngleX   float32                `protobuf:"fixed32,7,opt,name=auto_fire_angle_x,json=autoFireAngleX,proto3" json:"auto_fire_angle_x,omitempty"`     // 自动攻击角度 X
-	AutoFireAngleY   float32                `protobuf:"fixed32,8,opt,name=auto_fire_angle_y,json=autoFireAngleY,proto3" json:"auto_fire_angle_y,omitempty"`     // 自动攻击角度 Y
-	AutoFireDistance float32                `protobuf:"fixed32,9,opt,name=auto_fire_distance,json=autoFireDistance,proto3" json:"auto_fire_distance,omitempty"` // 自动攻击距离
-	Capacity         int32                  `protobuf:"varint,10,opt,name=capacity,proto3" json:"capacity,omitempty"`                                           // 容量
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SkillId       int32                  `protobuf:"varint,1,opt,name=skill_id,json=skillId,proto3" json:"skill_id,omitempty"` // 技能配置ID
+	Level         int32                  `protobuf:"varint,2,opt,name=level,proto3" json:"level,omitempty"`                    // 等级
+	Equipped      bool                   `protobuf:"varint,3,opt,name=equipped,proto3" json:"equipped,omitempty"`              // 是否装备
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *SkillEntry) Reset() {
@@ -1107,74 +1031,86 @@ func (*SkillEntry) Descriptor() ([]byte, []int) {
 	return file_common_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *SkillEntry) GetId() int32 {
+func (x *SkillEntry) GetSkillId() int32 {
 	if x != nil {
-		return x.Id
+		return x.SkillId
 	}
 	return 0
 }
 
-func (x *SkillEntry) GetSkillTemplate() int32 {
+func (x *SkillEntry) GetLevel() int32 {
 	if x != nil {
-		return x.SkillTemplate
+		return x.Level
 	}
 	return 0
 }
 
-func (x *SkillEntry) GetSkillName() string {
+func (x *SkillEntry) GetEquipped() bool {
 	if x != nil {
-		return x.SkillName
+		return x.Equipped
 	}
-	return ""
+	return false
 }
 
-func (x *SkillEntry) GetDesc() string {
-	if x != nil {
-		return x.Desc
-	}
-	return ""
+// 装备持有（仅状态，静态属性由 gear_id 关联装备配置表）
+type GearEntry struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GearId        int32                  `protobuf:"varint,1,opt,name=gear_id,json=gearId,proto3" json:"gear_id,omitempty"` // 装备配置ID
+	Level         int32                  `protobuf:"varint,2,opt,name=level,proto3" json:"level,omitempty"`                 // 等级
+	Equipped      bool                   `protobuf:"varint,3,opt,name=equipped,proto3" json:"equipped,omitempty"`           // 是否穿戴
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SkillEntry) GetDescDetail() string {
-	if x != nil {
-		return x.DescDetail
-	}
-	return ""
+func (x *GearEntry) Reset() {
+	*x = GearEntry{}
+	mi := &file_common_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
 }
 
-func (x *SkillEntry) GetDamage() int32 {
+func (x *GearEntry) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GearEntry) ProtoMessage() {}
+
+func (x *GearEntry) ProtoReflect() protoreflect.Message {
+	mi := &file_common_proto_msgTypes[9]
 	if x != nil {
-		return x.Damage
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GearEntry.ProtoReflect.Descriptor instead.
+func (*GearEntry) Descriptor() ([]byte, []int) {
+	return file_common_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *GearEntry) GetGearId() int32 {
+	if x != nil {
+		return x.GearId
 	}
 	return 0
 }
 
-func (x *SkillEntry) GetAutoFireAngleX() float32 {
+func (x *GearEntry) GetLevel() int32 {
 	if x != nil {
-		return x.AutoFireAngleX
+		return x.Level
 	}
 	return 0
 }
 
-func (x *SkillEntry) GetAutoFireAngleY() float32 {
+func (x *GearEntry) GetEquipped() bool {
 	if x != nil {
-		return x.AutoFireAngleY
+		return x.Equipped
 	}
-	return 0
-}
-
-func (x *SkillEntry) GetAutoFireDistance() float32 {
-	if x != nil {
-		return x.AutoFireDistance
-	}
-	return 0
-}
-
-func (x *SkillEntry) GetCapacity() int32 {
-	if x != nil {
-		return x.Capacity
-	}
-	return 0
+	return false
 }
 
 var File_common_proto protoreflect.FileDescriptor
@@ -1215,51 +1151,30 @@ const file_common_proto_rawDesc = "" +
 	"\x06grid_w\x18\x03 \x01(\x05R\x05gridW\x12\x15\n" +
 	"\x06grid_h\x18\x04 \x01(\x05R\x05gridH\x12\x18\n" +
 	"\aversion\x18\x05 \x01(\x05R\aversion\x120\n" +
-	"\fitem_entries\x18\x06 \x03(\v2\r.pb.ItemEntryR\vitemEntries\"\xa7\x02\n" +
-	"\tHeroEntry\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x10\n" +
-	"\x03job\x18\x03 \x01(\x05R\x03job\x12\x1b\n" +
-	"\tweapon_id\x18\x04 \x01(\x05R\bweaponId\x12-\n" +
-	"\x12control_difficulty\x18\x05 \x01(\x05R\x11controlDifficulty\x12)\n" +
-	"\x10character_shards\x18\x06 \x01(\x05R\x0fcharacterShards\x12\x16\n" +
-	"\x06rarity\x18\a \x01(\x05R\x06rarity\x12!\n" +
-	"\fcharacter_id\x18\b \x01(\x05R\vcharacterId\x12\x19\n" +
-	"\bskill_id\x18\t \x01(\x05R\askillId\x12\x17\n" +
-	"\agear_id\x18\n" +
-	" \x01(\x05R\x06gearId\"\x87\x03\n" +
-	"\vWeaponEntry\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1f\n" +
-	"\vweapon_name\x18\x02 \x01(\tR\n" +
-	"weaponName\x12\x12\n" +
-	"\x04icon\x18\x03 \x01(\tR\x04icon\x12#\n" +
-	"\rweapon_damage\x18\x04 \x01(\x05R\fweaponDamage\x12'\n" +
-	"\x0fpenetrate_level\x18\x05 \x01(\x05R\x0epenetrateLevel\x12\x1b\n" +
-	"\tfire_rate\x18\x06 \x01(\x05R\bfireRate\x12\x1f\n" +
-	"\vreload_time\x18\a \x01(\x05R\n" +
-	"reloadTime\x12!\n" +
-	"\ffield_attack\x18\b \x01(\x05R\vfieldAttack\x12%\n" +
-	"\x0escatter_attack\x18\t \x01(\x05R\rscatterAttack\x12!\n" +
-	"\fscatter_move\x18\n" +
-	" \x01(\x05R\vscatterMove\x12\x1f\n" +
-	"\vscatter_aim\x18\v \x01(\x05R\n" +
-	"scatterAim\x12\x19\n" +
-	"\btime_aim\x18\f \x01(\x05R\atimeAim\"\xcf\x02\n" +
+	"\fitem_entries\x18\x06 \x03(\v2\r.pb.ItemEntryR\vitemEntries\"\x95\x01\n" +
+	"\tHeroEntry\x12\x17\n" +
+	"\ahero_id\x18\x01 \x01(\x05R\x06heroId\x12\x14\n" +
+	"\x05level\x18\x02 \x01(\x05R\x05level\x12\x10\n" +
+	"\x03exp\x18\x03 \x01(\x03R\x03exp\x12\x12\n" +
+	"\x04star\x18\x04 \x01(\x05R\x04star\x12\x17\n" +
+	"\askin_id\x18\x05 \x01(\x05R\x06skinId\x12\x1a\n" +
+	"\bequipped\x18\x06 \x01(\bR\bequipped\"|\n" +
+	"\vWeaponEntry\x12\x1b\n" +
+	"\tweapon_id\x18\x01 \x01(\x05R\bweaponId\x12\x14\n" +
+	"\x05level\x18\x02 \x01(\x05R\x05level\x12\x1e\n" +
 	"\n" +
-	"SkillEntry\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x05R\x02id\x12%\n" +
-	"\x0eskill_template\x18\x02 \x01(\x05R\rskillTemplate\x12\x1d\n" +
+	"durability\x18\x03 \x01(\x05R\n" +
+	"durability\x12\x1a\n" +
+	"\bequipped\x18\x04 \x01(\bR\bequipped\"Y\n" +
 	"\n" +
-	"skill_name\x18\x03 \x01(\tR\tskillName\x12\x12\n" +
-	"\x04desc\x18\x04 \x01(\tR\x04desc\x12\x1f\n" +
-	"\vdesc_detail\x18\x05 \x01(\tR\n" +
-	"descDetail\x12\x16\n" +
-	"\x06damage\x18\x06 \x01(\x05R\x06damage\x12)\n" +
-	"\x11auto_fire_angle_x\x18\a \x01(\x02R\x0eautoFireAngleX\x12)\n" +
-	"\x11auto_fire_angle_y\x18\b \x01(\x02R\x0eautoFireAngleY\x12,\n" +
-	"\x12auto_fire_distance\x18\t \x01(\x02R\x10autoFireDistance\x12\x1a\n" +
-	"\bcapacity\x18\n" +
-	" \x01(\x05R\bcapacity*\xa0\x04\n" +
+	"SkillEntry\x12\x19\n" +
+	"\bskill_id\x18\x01 \x01(\x05R\askillId\x12\x14\n" +
+	"\x05level\x18\x02 \x01(\x05R\x05level\x12\x1a\n" +
+	"\bequipped\x18\x03 \x01(\bR\bequipped\"V\n" +
+	"\tGearEntry\x12\x17\n" +
+	"\agear_id\x18\x01 \x01(\x05R\x06gearId\x12\x14\n" +
+	"\x05level\x18\x02 \x01(\x05R\x05level\x12\x1a\n" +
+	"\bequipped\x18\x03 \x01(\bR\bequipped*\xa6\x06\n" +
 	"\tRouteCode\x12\x1a\n" +
 	"\x16ROUTE_CODE_UNSPECIFIED\x10\x00\x12\x16\n" +
 	"\x11ROUTE_CODE_VERIFY\x10\x90N\x12\x1a\n" +
@@ -1270,15 +1185,24 @@ const file_common_proto_rawDesc = "" +
 	"\x1bROUTE_CODE_CONTAINER_NOTIFY\x10\x9bN\x12\x1f\n" +
 	"\x19ROUTE_CODE_CONTAINER_MOVE\x10\x90\x8e\x06\x12 \n" +
 	"\x1bROUTE_CODE_CONTAINER_ROTATE\x10\x9dN\x12\x1e\n" +
-	"\x19ROUTE_CODE_CONTAINER_SORT\x10\x9eN\x12\x19\n" +
+	"\x19ROUTE_CODE_CONTAINER_SORT\x10\x9eN\x12\"\n" +
+	"\x1dROUTE_CODE_CONTAINER_TRANSFER\x10\x9fN\x12\x19\n" +
 	"\x14ROUTE_CODE_HERO_LIST\x10\xa4N\x12\x1b\n" +
-	"\x16ROUTE_CODE_HERO_NOTIFY\x10\xa5N\x12\x1b\n" +
+	"\x16ROUTE_CODE_HERO_NOTIFY\x10\xa5N\x12\x18\n" +
+	"\x13ROUTE_CODE_HERO_ADD\x10\xa6N\x12\x1b\n" +
+	"\x16ROUTE_CODE_HERO_UPDATE\x10\xa7N\x12\x1b\n" +
 	"\x16ROUTE_CODE_WEAPON_LIST\x10\xaeN\x12\x1d\n" +
 	"\x18ROUTE_CODE_WEAPON_NOTIFY\x10\xafN\x12\x1a\n" +
+	"\x15ROUTE_CODE_WEAPON_ADD\x10\xb0N\x12\x1d\n" +
+	"\x18ROUTE_CODE_WEAPON_UPDATE\x10\xb1N\x12\x1a\n" +
 	"\x15ROUTE_CODE_SKILL_LIST\x10\xb8N\x12\x1c\n" +
 	"\x17ROUTE_CODE_SKILL_NOTIFY\x10\xb9N\x12\x19\n" +
+	"\x14ROUTE_CODE_SKILL_ADD\x10\xbaN\x12\x1c\n" +
+	"\x17ROUTE_CODE_SKILL_UPDATE\x10\xbbN\x12\x19\n" +
 	"\x14ROUTE_CODE_GEAR_LIST\x10\xc2N\x12\x1b\n" +
-	"\x16ROUTE_CODE_GEAR_NOTIFY\x10\xc3N*\xea\x01\n" +
+	"\x16ROUTE_CODE_GEAR_NOTIFY\x10\xc3N\x12\x18\n" +
+	"\x13ROUTE_CODE_GEAR_ADD\x10\xc4N\x12\x1b\n" +
+	"\x16ROUTE_CODE_GEAR_UPDATE\x10\xc5N*\xea\x01\n" +
 	"\aErrCode\x12\x0f\n" +
 	"\vERR_CODE_OK\x10\x00\x12\x1c\n" +
 	"\x17ERR_CODE_INTERNAL_ERROR\x10\xe8\a\x12\x1c\n" +
@@ -1320,7 +1244,7 @@ func file_common_proto_rawDescGZIP() []byte {
 }
 
 var file_common_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
-var file_common_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_common_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_common_proto_goTypes = []any{
 	(RouteCode)(0),         // 0: pb.RouteCode
 	(ErrCode)(0),           // 1: pb.ErrCode
@@ -1336,11 +1260,12 @@ var file_common_proto_goTypes = []any{
 	(*HeroEntry)(nil),      // 11: pb.HeroEntry
 	(*WeaponEntry)(nil),    // 12: pb.WeaponEntry
 	(*SkillEntry)(nil),     // 13: pb.SkillEntry
-	nil,                    // 14: pb.Object.ValuesEntry
+	(*GearEntry)(nil),      // 14: pb.GearEntry
+	nil,                    // 15: pb.Object.ValuesEntry
 }
 var file_common_proto_depIdxs = []int32{
 	1,  // 0: pb.Result.code:type_name -> pb.ErrCode
-	14, // 1: pb.Object.values:type_name -> pb.Object.ValuesEntry
+	15, // 1: pb.Object.values:type_name -> pb.Object.ValuesEntry
 	8,  // 2: pb.ObjectList.values:type_name -> pb.ObjectValue
 	3,  // 3: pb.ContainerEntry.type:type_name -> pb.ContainerType
 	9,  // 4: pb.ContainerEntry.item_entries:type_name -> pb.ItemEntry
@@ -1370,7 +1295,7 @@ func file_common_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_common_proto_rawDesc), len(file_common_proto_rawDesc)),
 			NumEnums:      5,
-			NumMessages:   10,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

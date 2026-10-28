@@ -11,6 +11,8 @@ import (
 // RegisterWeapon 向 node proxy 注册武器相关客户端路由。
 func RegisterWeapon(proxy *node.Proxy) {
 	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_WEAPON_LIST), handleWeaponList, node.StatefulRoute)
+	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_WEAPON_ADD), handleWeaponAdd, node.StatefulRoute)
+	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_WEAPON_UPDATE), handleWeaponUpdate, node.StatefulRoute)
 }
 
 // handleWeaponList 武器列表。
@@ -20,7 +22,37 @@ func handleWeaponList(ctx node.Context) {
 		_ = ctx.Response(err)
 		return
 	}
-	resp, err := logic.Weapon().WeaponList(ctx.Context())
+	resp, err := logic.Weapon().WeaponList(ctx.Context(), ctx.UID())
+	if err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	_ = ctx.Response(resp)
+}
+
+// handleWeaponAdd 新增武器。
+func handleWeaponAdd(ctx node.Context) {
+	req := &pb.WeaponAddReq{}
+	if err := ctx.Parse(req); err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	resp, err := logic.Weapon().WeaponAdd(ctx.Context(), ctx.UID(), req)
+	if err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	_ = ctx.Response(resp)
+}
+
+// handleWeaponUpdate 更新武器。
+func handleWeaponUpdate(ctx node.Context) {
+	req := &pb.WeaponUpdateReq{}
+	if err := ctx.Parse(req); err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	resp, err := logic.Weapon().WeaponUpdate(ctx.Context(), ctx.UID(), req)
 	if err != nil {
 		_ = ctx.Response(err)
 		return

@@ -90,6 +90,28 @@ type AssetChange struct {
 	Amount    int64 `json:"amount"`
 }
 
+// addOwned 新增一条持有数据；key 已存在返回 false。
+func addOwned[V any](m *util.SafeMap[int32, V], key int32, val V) bool {
+	added := false
+	m.Update(key, func(old V, exists bool) (V, bool) {
+		if exists {
+			return old, true
+		}
+		added = true
+		return val, true
+	})
+	return added
+}
+
+// updateOwned 覆盖一条已持有数据；key 不存在返回 false。
+func updateOwned[V any](m *util.SafeMap[int32, V], key int32, val V) bool {
+	if !m.Has(key) {
+		return false
+	}
+	m.Set(key, val)
+	return true
+}
+
 // HeroInfo 单个英雄的持有数据（player_hero.heroes 的 map 元素，key=英雄ID）。
 type HeroInfo struct {
 	HeroID   int32 `json:"hero_id"`  // 英雄ID(roleinfoconfig)
@@ -114,6 +136,12 @@ func (this *PlayerHero) Scan(src any) error          { return ScanJSON(src, this
 func (this PlayerHero) Value() (driver.Value, error) { return ValueJSON(this) }
 func (PlayerHero) TableName() string                 { return enum.TablePlayerHero.String() }
 
+// AddHero 新增英雄持有；已拥有返回 false。
+func (p *PlayerHero) AddHero(h HeroInfo) bool { return addOwned(p.Heroes, h.HeroID, h) }
+
+// UpdateHero 覆盖英雄持有状态；未拥有返回 false。
+func (p *PlayerHero) UpdateHero(h HeroInfo) bool { return updateOwned(p.Heroes, h.HeroID, h) }
+
 // SkillInfo 单个技能的持有数据（player_skill.skills 的 map 元素，key=技能ID）。
 type SkillInfo struct {
 	SkillID  int32 `json:"skill_id"` // 技能ID(skillconfig)
@@ -134,6 +162,12 @@ func (this *PlayerSkill) Unmarshal(data []byte) error { return json.Unmarshal(da
 func (this *PlayerSkill) Scan(src any) error          { return ScanJSON(src, this) }
 func (this PlayerSkill) Value() (driver.Value, error) { return ValueJSON(this) }
 func (PlayerSkill) TableName() string                 { return enum.TablePlayerSkill.String() }
+
+// AddSkill 新增技能持有；已拥有返回 false。
+func (p *PlayerSkill) AddSkill(s SkillInfo) bool { return addOwned(p.Skills, s.SkillID, s) }
+
+// UpdateSkill 覆盖技能持有状态；未拥有返回 false。
+func (p *PlayerSkill) UpdateSkill(s SkillInfo) bool { return updateOwned(p.Skills, s.SkillID, s) }
 
 // WeaponInfo 单个武器的持有数据（player_weapon.weapons 的 map 元素，key=武器ID）。
 type WeaponInfo struct {
@@ -157,6 +191,12 @@ func (this *PlayerWeapon) Scan(src any) error          { return ScanJSON(src, th
 func (this PlayerWeapon) Value() (driver.Value, error) { return ValueJSON(this) }
 func (PlayerWeapon) TableName() string                 { return enum.TablePlayerWeapon.String() }
 
+// AddWeapon 新增武器持有；已拥有返回 false。
+func (p *PlayerWeapon) AddWeapon(w WeaponInfo) bool { return addOwned(p.Weapons, w.WeaponID, w) }
+
+// UpdateWeapon 覆盖武器持有状态；未拥有返回 false。
+func (p *PlayerWeapon) UpdateWeapon(w WeaponInfo) bool { return updateOwned(p.Weapons, w.WeaponID, w) }
+
 // GearInfo 单件装备的持有数据（player_gear.gears 的 map 元素，key=装备ID）。
 type GearInfo struct {
 	GearID   int32 `json:"gear_id"`  // 装备ID
@@ -177,6 +217,12 @@ func (this *PlayerGear) Unmarshal(data []byte) error { return json.Unmarshal(dat
 func (this *PlayerGear) Scan(src any) error          { return ScanJSON(src, this) }
 func (this PlayerGear) Value() (driver.Value, error) { return ValueJSON(this) }
 func (PlayerGear) TableName() string                 { return enum.TablePlayerGear.String() }
+
+// AddGear 新增装备持有；已拥有返回 false。
+func (p *PlayerGear) AddGear(g GearInfo) bool { return addOwned(p.Gears, g.GearID, g) }
+
+// UpdateGear 覆盖装备持有状态；未拥有返回 false。
+func (p *PlayerGear) UpdateGear(g GearInfo) bool { return updateOwned(p.Gears, g.GearID, g) }
 
 // LootItem 战斗拾取道具（对局内临时资产，结算时映射为 AssetChange；非表实体）。
 type LootItem struct {
