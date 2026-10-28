@@ -79,7 +79,8 @@ func (a *Actor[T]) Send(ctx context.Context, msg Message) bool {
 	}
 }
 
-func (a *Actor[T]) Call(ctx context.Context, msg Message, reply chan<- interface{}) bool {
+// Call 发送消息并等待回包；reply 为接收方向通道（由调用方创建并传入消息）。
+func (a *Actor[T]) Call(ctx context.Context, msg Message, reply <-chan interface{}) bool {
 	if !a.Send(ctx, msg) {
 		return false
 	}
