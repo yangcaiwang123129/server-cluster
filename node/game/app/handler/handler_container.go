@@ -8,13 +8,13 @@ import (
 	"server-cluster/share/pb"
 )
 
-// RegisterContainer 向 node proxy 注册玩家容器相关客户端路由。
-func RegisterContainer(proxy *node.Proxy) {
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_CONTAINER_LIST), handleContainerList, node.StatefulRoute)
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_CONTAINER_MOVE), handleContainerMove, node.StatefulRoute)
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_CONTAINER_ROTATE), handleContainerRotate, node.StatefulRoute)
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_CONTAINER_SORT), handleSortContainer, node.StatefulRoute)
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_CONTAINER_TRANSFER), handleContainerTransfer, node.StatefulRoute)
+// init 注册容器路由（业务在玩家 actor 内串行执行）。
+func init() {
+	onActor(pb.RouteCode_ROUTE_CODE_CONTAINER_LIST, handleContainerList)
+	onActor(pb.RouteCode_ROUTE_CODE_CONTAINER_MOVE, handleContainerMove)
+	onActor(pb.RouteCode_ROUTE_CODE_CONTAINER_ROTATE, handleContainerRotate)
+	onActor(pb.RouteCode_ROUTE_CODE_CONTAINER_SORT, handleSortContainer)
+	onActor(pb.RouteCode_ROUTE_CODE_CONTAINER_TRANSFER, handleContainerTransfer)
 }
 
 // handleContainerList 容器列表。
@@ -24,7 +24,7 @@ func handleContainerList(ctx node.Context) {
 		_ = ctx.Response(err)
 		return
 	}
-	resp, err := logic.PlayerContainer().ContainerList(ctx.Context(), ctx.UID(), req)
+	resp, err := logic.Container().ContainerList(ctx.Context(), ctx.UID(), req)
 	if err != nil {
 		_ = ctx.Response(err)
 		return
@@ -39,7 +39,7 @@ func handleContainerMove(ctx node.Context) {
 		_ = ctx.Response(err)
 		return
 	}
-	resp, err := logic.PlayerContainer().ContainerMove(ctx.Context(), ctx.UID(), req)
+	resp, err := logic.Container().ContainerMove(ctx.Context(), ctx.UID(), req)
 	if err != nil {
 		_ = ctx.Response(err)
 		return
@@ -54,7 +54,7 @@ func handleContainerRotate(ctx node.Context) {
 		_ = ctx.Response(err)
 		return
 	}
-	resp, err := logic.PlayerContainer().ContainerRotate(ctx.Context(), ctx.UID(), req)
+	resp, err := logic.Container().ContainerRotate(ctx.Context(), ctx.UID(), req)
 	if err != nil {
 		_ = ctx.Response(err)
 		return
@@ -69,7 +69,7 @@ func handleSortContainer(ctx node.Context) {
 		_ = ctx.Response(err)
 		return
 	}
-	resp, err := logic.PlayerContainer().ContainerSort(ctx.Context(), ctx.UID(), req)
+	resp, err := logic.Container().ContainerSort(ctx.Context(), ctx.UID(), req)
 	if err != nil {
 		_ = ctx.Response(err)
 		return
@@ -84,7 +84,7 @@ func handleContainerTransfer(ctx node.Context) {
 		_ = ctx.Response(err)
 		return
 	}
-	resp, err := logic.PlayerContainer().ContainerTransfer(ctx.Context(), ctx.UID(), req)
+	resp, err := logic.Container().ContainerTransfer(ctx.Context(), ctx.UID(), req)
 	if err != nil {
 		_ = ctx.Response(err)
 		return

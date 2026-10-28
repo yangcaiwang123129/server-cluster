@@ -100,7 +100,8 @@ func (this *gearLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.Ente
 	if _, err := loadPlayerGear(ctx, playerID); err != nil {
 		return nil, err
 	}
-	return &pb.EnterGameResp{}, nil
+	// 装备数据由 GearList 下发，这里只预热缓存
+	return nil, nil
 }
 
 // LeaveGame 离开游戏：装备持有数据同步落库，并逐出内存缓存。
@@ -112,15 +113,15 @@ func (this *gearLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.Leav
 }
 
 // loadPlayerGear 加载玩家装备持有；未建档则初始化空 map 并挂入缓存（异步落库）。
-func loadPlayerGear(ctx context.Context, playerID int64) (model.PlayerGear, error) {
+func loadPlayerGear(ctx context.Context, playerID int64) (*model.PlayerGear, error) {
 	row, err := global.PlayerGearCache.Get(ctx, playerID)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		row = model.PlayerGear{PlayerID: playerID, Gears: util.NewSafeMap[int32, model.GearInfo]()}
+		row = &model.PlayerGear{PlayerID: playerID, Gears: util.NewSafeMap[int32, model.GearInfo]()}
 		global.PlayerGearCache.Set(playerID, row)
 		return row, nil
 	}
 	if err != nil {
-		return model.PlayerGear{}, err
+		return nil, err
 	}
 	if row.Gears == nil {
 		row.Gears = util.NewSafeMap[int32, model.GearInfo]()

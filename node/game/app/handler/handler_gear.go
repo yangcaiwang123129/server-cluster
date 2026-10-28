@@ -8,11 +8,11 @@ import (
 	"server-cluster/share/pb"
 )
 
-// RegisterGear 向 node proxy 注册装备相关客户端路由。
-func RegisterGear(proxy *node.Proxy) {
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_GEAR_LIST), handleGearList, node.StatefulRoute)
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_GEAR_ADD), handleGearAdd, node.StatefulRoute)
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_GEAR_UPDATE), handleGearUpdate, node.StatefulRoute)
+// init 注册装备路由（业务在玩家 actor 内串行执行）。
+func init() {
+	onActor(pb.RouteCode_ROUTE_CODE_GEAR_LIST, handleGearList)
+	onActor(pb.RouteCode_ROUTE_CODE_GEAR_ADD, handleGearAdd)
+	onActor(pb.RouteCode_ROUTE_CODE_GEAR_UPDATE, handleGearUpdate)
 }
 
 // handleGearList 装备列表。

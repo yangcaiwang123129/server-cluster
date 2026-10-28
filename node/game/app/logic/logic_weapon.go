@@ -99,10 +99,33 @@ func (this *weaponLogic) WeaponUpdate(ctx context.Context, playerID int64, req *
 
 // EnterGame 进入游戏：加载玩家武器持有，未建档则初始化空集合。
 func (this *weaponLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq) (*pb.EnterGameResp, error) {
-	if _, err := loadPlayerWeapon(ctx, playerID); err != nil {
+	row, err := loadPlayerWeapon(ctx, playerID)
+	if err != nil {
 		return nil, err
 	}
-	return &pb.EnterGameResp{}, nil
+	// 只下发当前装备武器的状态，静态属性由客户端关联武器配置表
+	return &pb.EnterGameResp{WeaponEntry: equippedWeaponEntry(row)}, nil
+}
+
+// equippedWeaponEntry 当前装备武器；未装备返回 nil。
+func equippedWeaponEntry(row *model.PlayerWeapon) *pb.WeaponEntry {
+	if row.Weapons == nil {
+		return nil
+	}
+	var entry *pb.WeaponEntry
+	row.Weapons.Range(func(_ int32, w model.WeaponInfo) bool {
+		if !w.Equipped {
+			return true
+		}
+		entry = &pb.WeaponEntry{
+			WeaponId:   w.WeaponID,
+			Level:      w.Level,
+			Durability: w.Durability,
+			Equipped:   true,
+		}
+		return false
+	})
+	return entry
 }
 
 // LeaveGame 离开游戏：武器持有数据同步落库，并逐出内存缓存。
@@ -114,15 +137,15 @@ func (this *weaponLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.Le
 }
 
 // loadPlayerWeapon 加载玩家武器持有；未建档则初始化空 map 并挂入缓存（异步落库）。
-func loadPlayerWeapon(ctx context.Context, playerID int64) (model.PlayerWeapon, error) {
+func loadPlayerWeapon(ctx context.Context, playerID int64) (*model.PlayerWeapon, error) {
 	row, err := global.PlayerWeaponCache.Get(ctx, playerID)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		row = model.PlayerWeapon{PlayerID: playerID, Weapons: util.NewSafeMap[int32, model.WeaponInfo]()}
+		row = &model.PlayerWeapon{PlayerID: playerID, Weapons: util.NewSafeMap[int32, model.WeaponInfo]()}
 		global.PlayerWeaponCache.Set(playerID, row)
 		return row, nil
 	}
 	if err != nil {
-		return model.PlayerWeapon{}, err
+		return nil, err
 	}
 	if row.Weapons == nil {
 		row.Weapons = util.NewSafeMap[int32, model.WeaponInfo]()

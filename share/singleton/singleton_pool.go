@@ -30,8 +30,8 @@ func (this *Container[T]) MustGet() T {
 	this.mu.RLock()
 	defer this.mu.RUnlock()
 
-	// 使用 reflect 检查是否为空（兼容接口和指针）
-	if reflect.ValueOf(this.inst).IsZero() || any(this.inst) == nil {
+	// 先判断 nil 接口/指针，再判断零值（对 nil 调用 IsZero 会 panic）
+	if any(this.inst) == nil || reflect.ValueOf(this.inst).IsZero() {
 		panic(fmt.Errorf("[registry] dependency '%s' is not registered or is nil. Check your app.Init()", this.name))
 	}
 	return this.inst

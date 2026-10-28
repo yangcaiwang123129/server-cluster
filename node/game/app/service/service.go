@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"server-cluster/internal/svc"
-	"server-cluster/node/game/app/global"
+	"server-cluster/node/game/app/logic"
 	"server-cluster/share/errs"
 	"server-cluster/share/pb"
 )
@@ -15,11 +15,18 @@ type OnlineProvider struct {
 
 // GetOnlinePlayers 查看在线玩家列表（携带本实例 ID，供调用方按服分组）。
 func (p *OnlineProvider) GetOnlinePlayers(ctx context.Context, req *pb.GetOnlinePlayersReq) (*pb.GetOnlinePlayersResp, error) {
-	global.PlayerLogic().PlayerGetActors()
+	actors, err := logic.PlayerLogic().PlayerGetActors(ctx)
+	if err != nil {
+		return nil, err
+	}
 	nodeID := svc.NodeProxy().GetID()
-	resp := &pb.GetOnlinePlayersResp{Players: make([]*pb.OnlinePlayer, 0, len(players))}
-	for id, enterTime := range players {
-		resp.Players = append(resp.Players, &pb.OnlinePlayer{PlayerId: id, EnterTime: enterTime, NodeId: nodeID})
+	resp := &pb.GetOnlinePlayersResp{Players: make([]*pb.OnlinePlayer, 0, len(actors))}
+	for _, a := range actors {
+		resp.Players = append(resp.Players, &pb.OnlinePlayer{
+			PlayerId:  a.PlayerID,
+			EnterTime: a.EnterTime,
+			NodeId:    nodeID,
+		})
 	}
 	return resp, nil
 }
@@ -31,7 +38,7 @@ func (p *OnlineProvider) KickPlayer(ctx context.Context, req *pb.KickPlayerReq) 
 	}
 	resp := &pb.KickPlayerResp{}
 	for _, id := range req.PlayerIds {
-		if err := Online().Kick(ctx, id); err != nil {
+		if err := logic.PlayerLogic().PlayerKick(ctx, id); err != nil {
 			resp.FailedIds = append(resp.FailedIds, id)
 		}
 	}

@@ -103,10 +103,35 @@ func (this *heroLogic) HeroUpdate(ctx context.Context, playerID int64, req *pb.H
 
 // EnterGame 进入游戏：加载玩家英雄持有，未建档则初始化空集合。
 func (this *heroLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq) (*pb.EnterGameResp, error) {
-	if _, err := loadPlayerHero(ctx, playerID); err != nil {
+	row, err := loadPlayerHero(ctx, playerID)
+	if err != nil {
 		return nil, err
 	}
-	return &pb.EnterGameResp{}, nil
+	// 只下发当前出战英雄的状态，静态属性由客户端关联英雄配置表
+	return &pb.EnterGameResp{HeroEntry: equippedHeroEntry(row)}, nil
+}
+
+// equippedHeroEntry 当前出战英雄；未出战返回 nil。
+func equippedHeroEntry(row *model.PlayerHero) *pb.HeroEntry {
+	if row.Heroes == nil {
+		return nil
+	}
+	var entry *pb.HeroEntry
+	row.Heroes.Range(func(_ int32, h model.HeroInfo) bool {
+		if !h.Equipped {
+			return true
+		}
+		entry = &pb.HeroEntry{
+			HeroId:   h.HeroID,
+			Level:    h.Level,
+			Exp:      h.Exp,
+			Star:     h.Star,
+			SkinId:   h.SkinID,
+			Equipped: true,
+		}
+		return false
+	})
+	return entry
 }
 
 // LeaveGame 离开游戏：英雄持有数据同步落库，并逐出内存缓存。
@@ -118,15 +143,15 @@ func (this *heroLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.Leav
 }
 
 // loadPlayerHero 加载玩家英雄持有；未建档则初始化空 map 并挂入缓存（异步落库）。
-func loadPlayerHero(ctx context.Context, playerID int64) (model.PlayerHero, error) {
+func loadPlayerHero(ctx context.Context, playerID int64) (*model.PlayerHero, error) {
 	row, err := global.PlayerHeroCache.Get(ctx, playerID)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		row = model.PlayerHero{PlayerID: playerID, Heroes: util.NewSafeMap[int32, model.HeroInfo]()}
+		row = &model.PlayerHero{PlayerID: playerID, Heroes: util.NewSafeMap[int32, model.HeroInfo]()}
 		global.PlayerHeroCache.Set(playerID, row)
 		return row, nil
 	}
 	if err != nil {
-		return model.PlayerHero{}, err
+		return nil, err
 	}
 	// DB 中该列为 NULL 时字段为 nil，补成空集合避免业务写操作 panic
 	if row.Heroes == nil {

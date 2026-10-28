@@ -15,14 +15,14 @@ func (r *Repo) GetPlayerContainer(playerID int64) (*model.PlayerContainer, error
 		return nil, err
 	}
 
-	var pc model.PlayerContainer
-	if err := d.First(&pc, "player_id = ?", playerID).Error; err != nil {
+	pc := &model.PlayerContainer{}
+	if err := d.First(pc, "player_id = ?", playerID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
 	}
-	return &pc, nil
+	return pc, nil
 }
 
 // SavePlayerContainer 保存玩家容器集合（三列 JSON 整体覆盖，无记录时插入）。

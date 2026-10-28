@@ -8,11 +8,11 @@ import (
 	"server-cluster/share/pb"
 )
 
-// RegisterHero 向 node proxy 注册英雄相关客户端路由。
-func RegisterHero(proxy *node.Proxy) {
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_HERO_LIST), handleHeroList, node.StatefulRoute)
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_HERO_ADD), handleHeroAdd, node.StatefulRoute)
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_HERO_UPDATE), handleHeroUpdate, node.StatefulRoute)
+// init 注册英雄路由（业务在玩家 actor 内串行执行）。
+func init() {
+	onActor(pb.RouteCode_ROUTE_CODE_HERO_LIST, handleHeroList)
+	onActor(pb.RouteCode_ROUTE_CODE_HERO_ADD, handleHeroAdd)
+	onActor(pb.RouteCode_ROUTE_CODE_HERO_UPDATE, handleHeroUpdate)
 }
 
 // handleHeroList 英雄列表。

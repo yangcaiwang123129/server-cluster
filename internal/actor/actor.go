@@ -4,13 +4,7 @@ import (
 	"context"
 	"log"
 	"time"
-
-	"github.com/dobyte/due/v2/cluster/node"
 )
-
-type PlayerActor struct {
-	*node.Actor
-}
 
 type Message interface{ MsgType() string }
 

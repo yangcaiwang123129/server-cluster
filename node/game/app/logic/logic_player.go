@@ -3,11 +3,8 @@ package logic
 import (
 	"context"
 	"errors"
-	"server-cluster/internal/actor"
 	"server-cluster/share/util"
 	"strconv"
-	"sync"
-	"time"
 
 	"github.com/dobyte/due/v2/cluster"
 	"github.com/dobyte/due/v2/cluster/node"
@@ -26,15 +23,24 @@ import (
 	"server-cluster/share/singleton"
 )
 
+// actorKindPlayer 玩家 actor 类型。
+const actorKindPlayer = "player"
+
 type playerLogic struct {
-	OnlinePlayerActors *util.SafeMap[int64, *actor.PlayerActor] // playerID -> 玩家actor
+	PlayerActors *util.SafeMap[int64, *global.PlayerActor] // playerID -> 玩家actor
 }
 
 var playerLogicInst = singleton.NewContainer[global.PlayerLogic]("PlayerLogic")
 
 // init 装配期自注册实现。
 func init() {
-	playerLogicInst.Register(&playerLogic{})
+	playerLogicInst.Register(&playerLogic{PlayerActors: util.NewSafeMap[int64, *global.PlayerActor]()})
+}
+
+// moduleLogics 持有玩家数据的模块，按进入/离开的统一顺序驱动。
+// 延迟获取单例：各模块的 init 注册顺序不确定，不能在包初始化阶段调用。
+func moduleLogics() []global.ModuleLogic {
+	return []global.ModuleLogic{Container(), Hero(), Skill(), Weapon(), Gear()}
 }
 
 // PlayerLogic 获取玩家模块业务单例。
@@ -45,7 +51,7 @@ func PlayerLogic() global.PlayerLogic { return playerLogicInst.MustGet() }
 func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.EnterGameReq) (*pb.EnterGameResp, error) {
 	if _, err := global.PlayerCoreCache.Get(ctx, playerID); errors.Is(err, gorm.ErrRecordNotFound) {
 		// 首次进入，建档并异步落库
-		global.PlayerCoreCache.Set(playerID, model.PlayerCore{
+		global.PlayerCoreCache.Set(playerID, &model.PlayerCore{
 			PlayerID: playerID,
 			Nickname: "player_" + strconv.FormatInt(playerID, 10),
 			Level:    1,
@@ -54,54 +60,37 @@ func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.
 		return nil, err
 	}
 
-	// 各玩家数据模块预热/建档，任一失败则不进入游戏
-	for _, mod := range playerModules() {
-		if _, err := mod.EnterGame(ctx, playerID, req); err != nil {
+	// 各玩家数据模块预热/建档，并把各自需要下发的初始状态合并进响应；任一失败则不进入游戏
+	resp := &pb.EnterGameResp{}
+	for _, mod := range moduleLogics() {
+		part, err := mod.EnterGame(ctx, playerID, req)
+		if err != nil {
 			return nil, err
 		}
+		mergeEnterGameResp(resp, part)
 	}
 
 	// 创建玩家 actor（已在线则复用），在线登记由 actor 生命周期驱动。
-	if err := Online().Enter(playerID); err != nil {
+	if err := this.PlayerCreateActor(ctx, playerID); err != nil {
 		return nil, err
 	}
 
-	resp := &pb.EnterGameResp{
-		Result:     &pb.Result{Code: pb.ErrCode_ERR_CODE_OK},
-		ServerTime: xtime.Now().UnixMilli(),
-	}
-	// 当前出战英雄 / 装备武器：仅下发状态，静态属性由客户端关联配置表
-	if row, err := global.PlayerHeroCache.Get(ctx, playerID); err == nil && row.Heroes != nil {
-		row.Heroes.Range(func(_ int32, h model.HeroInfo) bool {
-			if !h.Equipped {
-				return true
-			}
-			resp.HeroEntry = &pb.HeroEntry{
-				HeroId:   h.HeroID,
-				Level:    h.Level,
-				Exp:      h.Exp,
-				Star:     h.Star,
-				SkinId:   h.SkinID,
-				Equipped: true,
-			}
-			return false
-		})
-	}
-	if row, err := global.PlayerWeaponCache.Get(ctx, playerID); err == nil && row.Weapons != nil {
-		row.Weapons.Range(func(_ int32, w model.WeaponInfo) bool {
-			if !w.Equipped {
-				return true
-			}
-			resp.WeaponEntry = &pb.WeaponEntry{
-				WeaponId:   w.WeaponID,
-				Level:      w.Level,
-				Durability: w.Durability,
-				Equipped:   true,
-			}
-			return false
-		})
-	}
+	resp.Result = &pb.Result{Code: pb.ErrCode_ERR_CODE_OK}
+	resp.ServerTime = xtime.Now().UnixMilli()
 	return resp, nil
+}
+
+// mergeEnterGameResp 合并模块返回的初始状态（只取模块实际填充的字段）。
+func mergeEnterGameResp(dst, src *pb.EnterGameResp) {
+	if src == nil {
+		return
+	}
+	if src.HeroEntry != nil {
+		dst.HeroEntry = src.HeroEntry
+	}
+	if src.WeaponEntry != nil {
+		dst.WeaponEntry = src.WeaponEntry
+	}
 }
 
 // LeaveGame 离开游戏：各模块待写数据同步落库并清缓存，再销毁玩家 actor。
@@ -119,7 +108,7 @@ func (this *playerLogic) LeaveGame(ctx context.Context, playerID int64, req *pb.
 	}
 
 	// 各玩家数据模块
-	for _, mod := range playerModules() {
+	for _, mod := range moduleLogics() {
 		_, err := mod.LeaveGame(ctx, playerID, req)
 		record("module", err)
 	}
@@ -129,13 +118,8 @@ func (this *playerLogic) LeaveGame(ctx context.Context, playerID int64, req *pb.
 	record("player_profile", flushAndEvict(ctx, global.PlayerProfileCache, playerID))
 	record("player_asset", flushAndEvict(ctx, global.PlayerAssetCache, playerID))
 
-	Online().Leave(playerID)
+	record("player_actor", this.PlayerDestroyActor(ctx, playerID))
 	return &pb.LeaveGameResp{}, firstErr
-}
-
-// playerModules 持有玩家数据的模块，按进入/离开的统一顺序驱动。
-func playerModules() []global.PlayerModuleLogic {
-	return []global.PlayerModuleLogic{PlayerContainer(), Hero(), Skill(), Weapon(), Gear()}
 }
 
 // flushAndEvict 把该玩家的待写数据同步落库，并逐出内存缓存。
@@ -147,94 +131,70 @@ func flushAndEvict[V any](ctx context.Context, c *cache.Cache[int64, V], playerI
 	return nil
 }
 
-func (this *playerLogic) PlayerGetActor(ctx context.Context, playerID int64) (*actor.PlayerActor, error) {
-
-}
-func (this *playerLogic) PlayerGetActors(ctx context.Context) (*actor.PlayerActor, error) {}
-func (this *playerLogic) PlayerCreateActor(ctx context.Context, playerID int64) error     {}
-func (this *playerLogic) DePlayerActor(ctx context.Context, playerID int64) error         {}
-func (this *playerLogic) PlayerKick(ctx context.Context, playerID int64) error            {}
-
-// OnlineProvider 实现 pb.PlayerServiceServer，供 admin 服等网格服务经 RPC 调用。
-type OnlineProvider struct {
-	pb.UnimplementedPlayerServiceServer
-}
-
-// GetOnlinePlayers 查看在线玩家列表（携带本实例 ID，供调用方按服分组）。
-func (p *OnlineProvider) GetOnlinePlayers(ctx context.Context, req *pb.GetOnlinePlayersReq) (*pb.GetOnlinePlayersResp, error) {
-	players := Online().List()
-	nodeID := svc.NodeProxy().GetID()
-	resp := &pb.GetOnlinePlayersResp{Players: make([]*pb.OnlinePlayer, 0, len(players))}
-	for id, enterTime := range players {
-		resp.Players = append(resp.Players, &pb.OnlinePlayer{PlayerId: id, EnterTime: enterTime, NodeId: nodeID})
+// PlayerGetActor 获取玩家 actor；玩家不在线时返回玩家不存在。
+func (this *playerLogic) PlayerGetActor(ctx context.Context, playerID int64) (*global.PlayerActor, error) {
+	if pa, ok := this.PlayerActors.Get(playerID); ok {
+		return pa, nil
 	}
-	return resp, nil
+	return nil, errs.NewError(int(pb.ErrCode_ERR_CODE_PLAYER_NOT_FOUND), "player actor not found")
 }
 
-// KickPlayer 批量踢玩家下线（主动踢/封号踢），销毁 actor 并断开网关连接；失败（不在线等）玩家回列。
-func (p *OnlineProvider) KickPlayer(ctx context.Context, req *pb.KickPlayerReq) (*pb.KickPlayerResp, error) {
-	if len(req.PlayerIds) == 0 {
-		return nil, errs.NewError(int(pb.ErrCode_ERR_CODE_INVALID_PARAMS), "invalid player ids")
-	}
-	resp := &pb.KickPlayerResp{}
-	for _, id := range req.PlayerIds {
-		if err := Online().Kick(ctx, id); err != nil {
-			resp.FailedIds = append(resp.FailedIds, id)
-		}
-	}
-	return resp, nil
+// PlayerGetActors 获取全部在线玩家 actor（快照，可在遍历外安全使用）。
+func (this *playerLogic) PlayerGetActors(ctx context.Context) ([]*global.PlayerActor, error) {
+	actors := make([]*global.PlayerActor, 0, this.PlayerActors.Len())
+	this.PlayerActors.Range(func(_ int64, pa *global.PlayerActor) bool {
+		actors = append(actors, pa)
+		return true
+	})
+	return actors, nil
 }
 
-// ── 在线登记（due actor）────────────────────────────────────────────
-
-// actorKindPlayer 玩家 actor 类型。
-const actorKindPlayer = "player"
-
-// playerActorID 玩家 actor 唯一标识。
-func playerActorID(playerID int64) string {
-	return strconv.FormatInt(playerID, 10)
-}
-
-// onlineRegistry 在线玩家登记表：玩家进入游戏时创建 due actor，离开/断线/踢下线时销毁 actor。
-// 在线登记由 playerProcessor 的生命周期（Start/Destroy）驱动维护。
-type onlineRegistry struct {
-	mu      sync.RWMutex
-	players map[int64]int64 // playerID → 上线 Unix 秒
-}
-
-var onlineInst = &onlineRegistry{players: make(map[int64]int64)}
-
-// Online 在线登记表单例。
-func Online() *onlineRegistry { return onlineInst }
-
-// Enter 玩家进入：创建玩家 actor（已存在则复用，重复进入幂等）。
-func (r *onlineRegistry) Enter(playerID int64) error {
-	id := playerActorID(playerID)
-	if _, ok := svc.NodeProxy().Actor(actorKindPlayer, id); ok {
+// PlayerCreateActor 创建玩家 actor（已在线则幂等复用）。
+// 在线登记由 playerProcessor 的 Start/Destroy 生命周期维护。
+func (this *playerLogic) PlayerCreateActor(ctx context.Context, playerID int64) error {
+	if this.PlayerActors.Has(playerID) {
 		return nil
 	}
+
 	_, err := svc.NodeProxy().Spawn(newPlayerProcessor,
 		node.WithActorKind(actorKindPlayer),
-		node.WithActorID(id),
+		node.WithActorID(playerActorID(playerID)),
 		node.WithActorArgs(playerID))
-	if errors.Is(err, dueerrors.ErrActorExists) {
-		// Actor 预检与 Spawn 之间的并发竞态：他人已创建即视为进入成功。
+	if err == nil {
 		return nil
 	}
-	return err
+	if !errors.Is(err, dueerrors.ErrActorExists) {
+		return err
+	}
+
+	// 并发重复创建：actor 已由他人创建，读回并补齐本地登记。
+	pa, ok := svc.NodeProxy().Actor(actorKindPlayer, playerActorID(playerID))
+	if !ok {
+		return err
+	}
+	this.PlayerActors.Set(playerID, &global.PlayerActor{
+		Actor:     pa,
+		PlayerID:  playerID,
+		EnterTime: xtime.Now().Unix(),
+	})
+	return nil
 }
 
-// Leave 玩家离开：销毁 actor（幂等），Destroy 回调注销在线登记。
-func (r *onlineRegistry) Leave(playerID int64) {
+// PlayerDestroyActor 销毁玩家 actor（幂等），Destroy 回调同步注销在线登记。
+func (this *playerLogic) PlayerDestroyActor(ctx context.Context, playerID int64) error {
 	svc.NodeProxy().Kill(actorKindPlayer, playerActorID(playerID))
+	this.PlayerActors.Delete(playerID)
+	return nil
 }
 
-// Kick 踢玩家下线：销毁 actor 并强制断开网关连接。
-func (r *onlineRegistry) Kick(ctx context.Context, playerID int64) error {
-	if !r.IsOnline(playerID) {
+// PlayerKick 踢玩家下线：销毁 actor（注销在线登记）并强制断开网关连接。
+func (this *playerLogic) PlayerKick(ctx context.Context, playerID int64) error {
+	if !this.PlayerActors.Has(playerID) {
 		return errs.NewError(int(pb.ErrCode_ERR_CODE_PLAYER_NOT_FOUND), "player is not online")
 	}
-	r.Leave(playerID)
+	if err := this.PlayerDestroyActor(ctx, playerID); err != nil {
+		return err
+	}
 
 	gid, err := svc.NodeProxy().LocateGate(ctx, playerID)
 	if err != nil {
@@ -248,59 +208,61 @@ func (r *onlineRegistry) Kick(ctx context.Context, playerID int64) error {
 	})
 }
 
-// IsOnline 玩家是否在线。
-func (r *onlineRegistry) IsOnline(playerID int64) bool {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	_, ok := r.players[playerID]
-	return ok
+// ── 玩家 actor（due actor）────────────────────────────────────────────
+
+// playerActorID 玩家 actor 唯一标识。
+func playerActorID(playerID int64) string {
+	return strconv.FormatInt(playerID, 10)
 }
 
-// List 全量在线快照。
-func (r *onlineRegistry) List() map[int64]int64 {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	out := make(map[int64]int64, len(r.players))
-	for id, t := range r.players {
-		out[id] = t
-	}
-	return out
+// playerActorMap 在线玩家 actor 表（与 PlayerLogic 单例共享同一实例）。
+func playerActorMap() *util.SafeMap[int64, *global.PlayerActor] {
+	return playerLogicInst.MustGet().(*playerLogic).PlayerActors
 }
 
-// register 玩家上线登记（playerProcessor.Start 调用）。
-func (r *onlineRegistry) register(playerID int64) {
-	r.mu.Lock()
-	r.players[playerID] = time.Now().Unix()
-	r.mu.Unlock()
-}
+// actorRouteRegistrar 玩家 actor 路由注册器，由 handler 包装配期注入（避免 logic → handler 循环依赖）。
+var actorRouteRegistrar func(act *node.Actor)
 
-// unregister 玩家下线注销（playerProcessor.Destroy 调用）。
-func (r *onlineRegistry) unregister(playerID int64) {
-	r.mu.Lock()
-	delete(r.players, playerID)
-	r.mu.Unlock()
+// RegisterActorRouteRegistrar 注入玩家 actor 路由注册器（handler 包在装配期调用）。
+func RegisterActorRouteRegistrar(fn func(act *node.Actor)) {
+	actorRouteRegistrar = fn
 }
 
 // playerProcessor 玩家 actor 处理器：生命周期与在线登记一一对应。
 type playerProcessor struct {
+	node.BaseProcessor
+	actor    *node.Actor
 	playerID int64
 }
 
 // newPlayerProcessor due actor Creator。
-func newPlayerProcessor(actor *node.Actor, args ...any) node.Processor {
+func newPlayerProcessor(act *node.Actor, args ...any) node.Processor {
 	var playerID int64
 	if len(args) > 0 {
 		playerID, _ = args[0].(int64)
 	}
-	return &playerProcessor{playerID: playerID}
+	return &playerProcessor{actor: act, playerID: playerID}
 }
 
-func (p *playerProcessor) Init() {}
-
+// Start 玩家 actor 启动：写在线登记、绑定 uid 与 actor，并把业务路由注册到 actor。
 func (p *playerProcessor) Start() {
-	onlineInst.register(p.playerID)
+	playerActorMap().Set(p.playerID, &global.PlayerActor{
+		Actor:     p.actor,
+		PlayerID:  p.playerID,
+		EnterTime: xtime.Now().Unix(),
+	})
+
+	// uid 与 actor 绑定：stateful 消息由 scheduler 定位到本 actor
+	if err := p.actor.Proxy().BindActor(p.playerID, actorKindPlayer, p.actor.ID()); err != nil {
+		log.Errorf("logic: bind player actor failed, playerID=%d: %v", p.playerID, err)
+	}
+	// 注册业务路由：消息进入 actor 后串行处理
+	if actorRouteRegistrar != nil {
+		actorRouteRegistrar(p.actor)
+	}
 }
 
+// Destroy 玩家 actor 销毁：注销在线登记。
 func (p *playerProcessor) Destroy() {
-	onlineInst.unregister(p.playerID)
+	playerActorMap().Delete(p.playerID)
 }

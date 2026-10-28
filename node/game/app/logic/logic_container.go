@@ -15,17 +15,17 @@ import (
 	"server-cluster/share/singleton"
 )
 
-type playerContainerLogic struct{}
+type containerLogic struct{}
 
-var playerContainerLogicInst = singleton.NewContainer[global.PlayerContainerLogic]("PlayerContainerLogic")
+var containerLogicInst = singleton.NewContainer[global.ContainerLogic]("ContainerLogic")
 
 // init 装配期自注册实现。
 func init() {
-	playerContainerLogicInst.Register(&playerContainerLogic{})
+	containerLogicInst.Register(&containerLogic{})
 }
 
-// PlayerContainer 获取玩家容器业务单例。
-func PlayerContainer() global.PlayerContainerLogic { return playerContainerLogicInst.MustGet() }
+// Container 获取玩家容器业务单例。
+func Container() global.ContainerLogic { return containerLogicInst.MustGet() }
 
 // containerTypeToModel pb 容器类型 → 领域容器类型；UNSPECIFIED 等非法值返回 false。
 func containerTypeToModel(t pb.ContainerType) (int32, bool) {
@@ -88,21 +88,21 @@ func containerErr(err error) error {
 func loadContainer(ctx context.Context, playerID int64) (*model.PlayerContainer, error) {
 	pc, err := global.PlayerContainerCache.Get(ctx, playerID)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		pc = *model.NewPlayerContainer(playerID)
+		pc = model.NewPlayerContainer(playerID)
 		global.PlayerContainerCache.Set(playerID, pc)
-		return &pc, nil
+		return pc, nil
 	}
 	if err != nil {
 		return nil, err
 	}
 	// JSON 反序列化不含 index，需重建
 	pc.Rebuild()
-	return &pc, nil
+	return pc, nil
 }
 
 // saveContainer 挂回缓存并异步批量落库。
 func saveContainer(playerID int64, pc *model.PlayerContainer) {
-	global.PlayerContainerCache.Set(playerID, *pc)
+	global.PlayerContainerCache.Set(playerID, pc)
 }
 
 // containerOf 加载玩家容器集合并取出指定类型的容器。
@@ -123,15 +123,16 @@ func containerOf(ctx context.Context, playerID int64, t pb.ContainerType) (*mode
 }
 
 // EnterGame 进入游戏：加载/建档玩家容器，未建档则初始化并挂入缓存。
-func (this *playerContainerLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq) (*pb.EnterGameResp, error) {
+func (this *containerLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq) (*pb.EnterGameResp, error) {
 	if _, err := loadContainer(ctx, playerID); err != nil {
 		return nil, err
 	}
-	return &pb.EnterGameResp{}, nil
+	// 容器数据由 ContainerList 下发，这里只预热缓存
+	return nil, nil
 }
 
 // LeaveGame 离开游戏：容器待写数据同步落库，并逐出内存缓存。
-func (this *playerContainerLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq) (*pb.LeaveGameResp, error) {
+func (this *containerLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq) (*pb.LeaveGameResp, error) {
 	if err := flushAndEvict(ctx, global.PlayerContainerCache, playerID); err != nil {
 		return nil, err
 	}
@@ -139,7 +140,7 @@ func (this *playerContainerLogic) LeaveGame(ctx context.Context, playerID int64,
 }
 
 // ContainerList 容器列表：指定类型返回该容器，UNSPECIFIED 返回全部容器。
-func (this *playerContainerLogic) ContainerList(ctx context.Context, playerID int64, req *pb.ContainerListReq) (*pb.ContainerListResp, error) {
+func (this *containerLogic) ContainerList(ctx context.Context, playerID int64, req *pb.ContainerListReq) (*pb.ContainerListResp, error) {
 	pc, err := loadContainer(ctx, playerID)
 	if err != nil {
 		return nil, err
@@ -158,7 +159,7 @@ func (this *playerContainerLogic) ContainerList(ctx context.Context, playerID in
 }
 
 // ContainerMove 容器内移动物品。
-func (this *playerContainerLogic) ContainerMove(ctx context.Context, playerID int64, req *pb.ContainerMoveReq) (*pb.ContainerMoveResp, error) {
+func (this *containerLogic) ContainerMove(ctx context.Context, playerID int64, req *pb.ContainerMoveReq) (*pb.ContainerMoveResp, error) {
 	pc, c, err := containerOf(ctx, playerID, req.GetType())
 	if err != nil {
 		return nil, err
@@ -173,7 +174,7 @@ func (this *playerContainerLogic) ContainerMove(ctx context.Context, playerID in
 }
 
 // ContainerRotate 容器内旋转物品。
-func (this *playerContainerLogic) ContainerRotate(ctx context.Context, playerID int64, req *pb.ContainerRotateReq) (*pb.ContainerRotateResp, error) {
+func (this *containerLogic) ContainerRotate(ctx context.Context, playerID int64, req *pb.ContainerRotateReq) (*pb.ContainerRotateResp, error) {
 	pc, c, err := containerOf(ctx, playerID, req.GetType())
 	if err != nil {
 		return nil, err
@@ -188,7 +189,7 @@ func (this *playerContainerLogic) ContainerRotate(ctx context.Context, playerID 
 }
 
 // SortContainer 容器一键整理。
-func (this *playerContainerLogic) ContainerSort(ctx context.Context, playerID int64, req *pb.SortContainerReq) (*pb.SortContainerResp, error) {
+func (this *containerLogic) ContainerSort(ctx context.Context, playerID int64, req *pb.SortContainerReq) (*pb.SortContainerResp, error) {
 	pc, c, err := containerOf(ctx, playerID, req.GetContainerType())
 	if err != nil {
 		return nil, err
@@ -203,7 +204,7 @@ func (this *playerContainerLogic) ContainerSort(ctx context.Context, playerID in
 }
 
 // ContainerTransfer 容器间移动物品：目标容器放不下时源容器不变。
-func (this *playerContainerLogic) ContainerTransfer(ctx context.Context, playerID int64, req *pb.ContainerTransferReq) (*pb.ContainerTransferResp, error) {
+func (this *containerLogic) ContainerTransfer(ctx context.Context, playerID int64, req *pb.ContainerTransferReq) (*pb.ContainerTransferResp, error) {
 	fromType, okFrom := containerTypeToModel(req.GetFromType())
 	toType, okTo := containerTypeToModel(req.GetToType())
 	if !okFrom || !okTo || fromType == toType {

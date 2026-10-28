@@ -8,11 +8,11 @@ import (
 	"server-cluster/share/pb"
 )
 
-// RegisterWeapon 向 node proxy 注册武器相关客户端路由。
-func RegisterWeapon(proxy *node.Proxy) {
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_WEAPON_LIST), handleWeaponList, node.StatefulRoute)
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_WEAPON_ADD), handleWeaponAdd, node.StatefulRoute)
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_WEAPON_UPDATE), handleWeaponUpdate, node.StatefulRoute)
+// init 注册武器路由（业务在玩家 actor 内串行执行）。
+func init() {
+	onActor(pb.RouteCode_ROUTE_CODE_WEAPON_LIST, handleWeaponList)
+	onActor(pb.RouteCode_ROUTE_CODE_WEAPON_ADD, handleWeaponAdd)
+	onActor(pb.RouteCode_ROUTE_CODE_WEAPON_UPDATE, handleWeaponUpdate)
 }
 
 // handleWeaponList 武器列表。

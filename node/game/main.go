@@ -2,6 +2,9 @@
 package main
 
 import (
+	"server-cluster/node/game/app/service"
+	"server-cluster/share/pb"
+
 	"github.com/dobyte/due/locate/redis/v2"
 	"github.com/dobyte/due/registry/etcd/v2"
 	"github.com/dobyte/due/transport/grpc/v2"
@@ -35,15 +38,10 @@ func main() {
 	}
 	// 注入组件代理（服务间 RPC 用）
 	svc.SetNodeProxy(component.Proxy())
-	// 注册客户端路由
-	handler.RegisterPlayer(component.Proxy())
-	handler.RegisterContainer(component.Proxy())
-	handler.RegisterHero(component.Proxy())
-	handler.RegisterWeapon(component.Proxy())
-	handler.RegisterSkill(component.Proxy())
-	handler.RegisterGear(component.Proxy())
-	// 注册服务间 RPC provider（admin 服经 mesh 调用）
-	handler.RegisterInternal(component.Proxy())
+	// 注册客户端路由（含玩家 actor 业务路由）
+	handler.Register(component.Proxy())
+	// 注册服务间 RPC provider
+	component.Proxy().AddServiceProvider(pb.PlayerService_ServiceDesc.ServiceName, &pb.PlayerService_ServiceDesc, &service.OnlineProvider{})
 	// 添加节点组件
 	container.Add(component)
 	// 启动容器

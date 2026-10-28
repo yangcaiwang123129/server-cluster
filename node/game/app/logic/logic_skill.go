@@ -100,7 +100,8 @@ func (this *skillLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.Ent
 	if _, err := loadPlayerSkill(ctx, playerID); err != nil {
 		return nil, err
 	}
-	return &pb.EnterGameResp{}, nil
+	// 技能数据由 SkillList 下发，这里只预热缓存
+	return nil, nil
 }
 
 // LeaveGame 离开游戏：技能持有数据同步落库，并逐出内存缓存。
@@ -112,15 +113,15 @@ func (this *skillLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.Lea
 }
 
 // loadPlayerSkill 加载玩家技能持有；未建档则初始化空 map 并挂入缓存（异步落库）。
-func loadPlayerSkill(ctx context.Context, playerID int64) (model.PlayerSkill, error) {
+func loadPlayerSkill(ctx context.Context, playerID int64) (*model.PlayerSkill, error) {
 	row, err := global.PlayerSkillCache.Get(ctx, playerID)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		row = model.PlayerSkill{PlayerID: playerID, Skills: util.NewSafeMap[int32, model.SkillInfo]()}
+		row = &model.PlayerSkill{PlayerID: playerID, Skills: util.NewSafeMap[int32, model.SkillInfo]()}
 		global.PlayerSkillCache.Set(playerID, row)
 		return row, nil
 	}
 	if err != nil {
-		return model.PlayerSkill{}, err
+		return nil, err
 	}
 	if row.Skills == nil {
 		row.Skills = util.NewSafeMap[int32, model.SkillInfo]()

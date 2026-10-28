@@ -73,7 +73,14 @@ func fillTimestamps[T any](meta *tableMeta, rows []T) {
 	now := time.Now().UnixMilli()
 	ctx := context.Background()
 	for i := range rows {
+		// rows 可能是结构体或其指针，统一取到结构体本身（保持可寻址）
 		rv := reflect.ValueOf(&rows[i]).Elem()
+		if rv.Kind() == reflect.Ptr {
+			if rv.IsNil() {
+				continue
+			}
+			rv = rv.Elem()
+		}
 		if f := meta.createdAt; f != nil {
 			if v, _ := f.ValueOf(ctx, rv); v != nil {
 				if n, ok := v.(int64); ok && n == 0 {
@@ -88,7 +95,7 @@ func fillTimestamps[T any](meta *tableMeta, rows []T) {
 }
 
 // upsertRows 批量 upsert：冲突列 = 主键列，更新列 = 非 PK 列（按 chunk 切分）。
-func upsertRows[T PlayerTableModel](db *gorm.DB, rows []T, meta *tableMeta) error {
+func upsertRows[T any](db *gorm.DB, rows []T, meta *tableMeta) error {
 	fillTimestamps(meta, rows)
 	for start := 0; start < len(rows); start += upsertChunkSize {
 		end := start + upsertChunkSize
@@ -105,33 +112,32 @@ func upsertRows[T PlayerTableModel](db *gorm.DB, rows []T, meta *tableMeta) erro
 	return nil
 }
 
-// NewPlayerTableCache 单行表缓存：key=playerID，value=T（一玩家一行，如 PlayerCore / PlayerProfile）。
+// NewPlayerTableCache 单行表缓存：key=playerID，value=*M（一玩家一行，如 PlayerCore / PlayerProfile）。
 // 读：SELECT * WHERE player_id=?，无行返回 gorm.ErrRecordNotFound。
 // 写：异步批量 upsert（冲突列取主键，更新列取非 PK 列）。
 // 删：DELETE WHERE player_id IN（同步）。
-func NewPlayerTableCache[T PlayerTableModel](cfg CacherConfig) *Cache[int64, T] {
-	meta, err := parseTableMeta[T]()
+func NewPlayerTableCache[M PlayerTableModel](cfg CacherConfig) *Cache[int64, *M] {
+	meta, err := parseTableMeta[M]()
 	if err != nil {
 		panic(err)
 	}
-	loader := func(ctx context.Context, playerID int64) (T, error) {
+	loader := func(ctx context.Context, playerID int64) (*M, error) {
 		db, err := svc.Ctx().DB()
 		if err != nil {
-			var zero T
-			return zero, err
+			return nil, err
 		}
-		var row T
+		var row M
 		if err := db.WithContext(ctx).First(&row, "player_id = ?", playerID).Error; err != nil {
-			return row, err
+			return nil, err
 		}
-		return row, nil
+		return &row, nil
 	}
-	saver := func(ctx context.Context, entries []CacheEntry[int64, T]) error {
+	saver := func(ctx context.Context, entries []CacheEntry[int64, *M]) error {
 		db, err := svc.Ctx().DB()
 		if err != nil {
 			return err
 		}
-		rows := make([]T, 0, len(entries))
+		rows := make([]*M, 0, len(entries))
 		for _, e := range entries {
 			rows = append(rows, e.Value)
 		}
@@ -142,36 +148,40 @@ func NewPlayerTableCache[T PlayerTableModel](cfg CacherConfig) *Cache[int64, T] 
 		if err != nil {
 			return err
 		}
-		return db.WithContext(ctx).Delete(new(T), "player_id IN ?", ids).Error
+		return db.WithContext(ctx).Delete(new(M), "player_id IN ?", ids).Error
 	}
-	return NewCache[int64, T](cfg, loader, saver, deleter)
+	return NewCache[int64, *M](cfg, loader, saver, deleter)
 }
 
-// NewPlayerRowsCache 多行表缓存：key=playerID，value=[]T（一玩家多行，如 PlayerAsset）。
+// NewPlayerRowsCache 多行表缓存：key=playerID，value=[]*M（一玩家多行，如 PlayerAsset）。
 // 读：SELECT * WHERE player_id=?，无行返回空切片。
 // 写/删：同单行表缓存。
-func NewPlayerRowsCache[T PlayerTableModel](cfg CacherConfig) *Cache[int64, []T] {
-	meta, err := parseTableMeta[T]()
+func NewPlayerRowsCache[M PlayerTableModel](cfg CacherConfig) *Cache[int64, []*M] {
+	meta, err := parseTableMeta[M]()
 	if err != nil {
 		panic(err)
 	}
-	loader := func(ctx context.Context, playerID int64) ([]T, error) {
+	loader := func(ctx context.Context, playerID int64) ([]*M, error) {
 		db, err := svc.Ctx().DB()
 		if err != nil {
 			return nil, err
 		}
-		var list []T
+		var list []M
 		if err := db.WithContext(ctx).Find(&list, "player_id = ?", playerID).Error; err != nil {
 			return nil, err
 		}
-		return list, nil
+		rows := make([]*M, 0, len(list))
+		for i := range list {
+			rows = append(rows, &list[i])
+		}
+		return rows, nil
 	}
-	saver := func(ctx context.Context, entries []CacheEntry[int64, []T]) error {
+	saver := func(ctx context.Context, entries []CacheEntry[int64, []*M]) error {
 		db, err := svc.Ctx().DB()
 		if err != nil {
 			return err
 		}
-		rows := make([]T, 0, len(entries))
+		rows := make([]*M, 0, len(entries))
 		for _, e := range entries {
 			rows = append(rows, e.Value...)
 		}
@@ -185,7 +195,7 @@ func NewPlayerRowsCache[T PlayerTableModel](cfg CacherConfig) *Cache[int64, []T]
 		if err != nil {
 			return err
 		}
-		return db.WithContext(ctx).Delete(new(T), "player_id IN ?", ids).Error
+		return db.WithContext(ctx).Delete(new(M), "player_id IN ?", ids).Error
 	}
-	return NewCache[int64, []T](cfg, loader, saver, deleter)
+	return NewCache[int64, []*M](cfg, loader, saver, deleter)
 }

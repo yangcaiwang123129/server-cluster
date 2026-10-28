@@ -8,11 +8,11 @@ import (
 	"server-cluster/share/pb"
 )
 
-// RegisterSkill 向 node proxy 注册技能相关客户端路由。
-func RegisterSkill(proxy *node.Proxy) {
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_SKILL_LIST), handleSkillList, node.StatefulRoute)
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_SKILL_ADD), handleSkillAdd, node.StatefulRoute)
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_SKILL_UPDATE), handleSkillUpdate, node.StatefulRoute)
+// init 注册技能路由（业务在玩家 actor 内串行执行）。
+func init() {
+	onActor(pb.RouteCode_ROUTE_CODE_SKILL_LIST, handleSkillList)
+	onActor(pb.RouteCode_ROUTE_CODE_SKILL_ADD, handleSkillAdd)
+	onActor(pb.RouteCode_ROUTE_CODE_SKILL_UPDATE, handleSkillUpdate)
 }
 
 // handleSkillList 技能列表。
