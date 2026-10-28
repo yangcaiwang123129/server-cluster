@@ -6,7 +6,7 @@ import "common.proto";
 
 option go_package = "server-cluster/share/pb";
 
-// 英雄列表请求（路由 10040）
+// 英雄列表请求（路由 10020）
 message HeroListReq {
 }
 
@@ -14,4 +14,9 @@ message HeroListReq {
 message HeroListResp {
   Result result = 1;
   repeated HeroEntry hero_entries = 2;
+}
+
+// 英雄变化通知（路由 10021）
+message HeroChangeNotify {
+  HeroEntry hero_entry = 1;
 }

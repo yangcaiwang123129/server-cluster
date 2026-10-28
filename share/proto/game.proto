@@ -23,10 +23,11 @@ message EnterGameReq {
 
 // 进入游戏响应（登录成功后返回给客户端的结构体）
 message EnterGameResp {
-  PlayerBase base = 1;              // 玩家基础信息
-  int64 server_time = 2;            // 服务器毫秒时间戳
-  MagicAttr player_magic_attr = 3;  // 玩家属性
-  Result result = 4;
+  Result result = 1;               // 业务结果
+  MagicAttr player_magic_attr = 2; // 玩家属性
+  HeroEntry hero_entry = 3;        // 当前英雄
+  WeaponEntry weapon_entry = 4;    // 当前武器
+  int64 server_time = 5;           // 服务器毫秒时间戳
 }
 
 // 离开游戏请求（路由 10002）
@@ -36,4 +37,10 @@ message LeaveGameReq {
 // 离开游戏响应
 message LeaveGameResp {
   Result result = 1;
+}
+
+// 系统通知
+message ServerNotify {
+  NOTIFY_TYPE notify_type = 1;     // 通知类型
+  string content = 2; // 通知内容
 }

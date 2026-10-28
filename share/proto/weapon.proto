@@ -15,3 +15,8 @@ message WeaponListResp {
   Result result = 1;
   repeated WeaponEntry weapon_entries = 2;
 }
+
+// 武器变化通知（路由 10031）
+message WeaponChangeNotify {
+  WeaponEntry weapon_entry = 1;
+}

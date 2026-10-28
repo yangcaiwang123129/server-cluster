@@ -29,25 +29,28 @@ const (
 	// 游戏大厅服 10000~49999
 	RouteCode_ROUTE_CODE_UNSPECIFIED RouteCode = 0
 	// 玩家 10000~10009
-	RouteCode_ROUTE_CODE_VERIFY     RouteCode = 10000 // 首包，验证账号令牌，用于绑定节点和网关
-	RouteCode_ROUTE_CODE_ENTER_GAME RouteCode = 10001 // 进入游戏
-	RouteCode_ROUTE_CODE_LEAVE_GAME RouteCode = 10002 // 离开游戏
+	RouteCode_ROUTE_CODE_VERIFY       RouteCode = 10000 // 首包，验证账号令牌，用于绑定节点和网关
+	RouteCode_ROUTE_CODE_ENTER_GAME   RouteCode = 10001 // 进入游戏
+	RouteCode_ROUTE_CODE_LEAVE_GAME   RouteCode = 10002 // 离开游戏
+	RouteCode_ROUTE_CODE_SEVER_NOTIFY RouteCode = 10003 // 服务器通知
 	// 玩家容器 10010~10019
-	RouteCode_ROUTE_CODE_CONTAINER_LIST          RouteCode = 10010  // 容器列表
-	RouteCode_ROUTE_CODE_CONTAINER_CHANGE_NOTIFY RouteCode = 10011  // 技能变化通知
-	RouteCode_ROUTE_CODE_CONTAINER_MOVE          RouteCode = 100112 // 移动物品
-	RouteCode_ROUTE_CODE_CONTAINER_ROTATE        RouteCode = 10013  // 旋转物品
-	RouteCode_ROUTE_CODE_CONTAINER_REMOVE        RouteCode = 10014  // 删除物品
-	RouteCode_ROUTE_CODE_CONTAINER_SORT          RouteCode = 10015  // 一键整理
-	// 技能 10020~10029
-	RouteCode_ROUTE_CODE_SKILL_LIST          RouteCode = 10020 // 技能列表
-	RouteCode_ROUTE_CODE_SKILL_CHANGE_NOTIFY RouteCode = 10021 // 技能变化通知
+	RouteCode_ROUTE_CODE_CONTAINER_LIST   RouteCode = 10010  // 容器列表
+	RouteCode_ROUTE_CODE_CONTAINER_NOTIFY RouteCode = 10011  // 容器内变化通知
+	RouteCode_ROUTE_CODE_CONTAINER_MOVE   RouteCode = 100112 // 容器内物品移动
+	RouteCode_ROUTE_CODE_CONTAINER_ROTATE RouteCode = 10013  // 容器内物品旋转
+	RouteCode_ROUTE_CODE_CONTAINER_SORT   RouteCode = 10014  // 容器一键整理物品
+	// 英雄 10020~10029
+	RouteCode_ROUTE_CODE_HERO_LIST   RouteCode = 10020 // 英雄列表
+	RouteCode_ROUTE_CODE_HERO_NOTIFY RouteCode = 10021 // 英雄变化通知
 	// 武器 10030~10039
-	RouteCode_ROUTE_CODE_WEAPON_LIST          RouteCode = 10030 // 武器列表
-	RouteCode_ROUTE_CODE_WEAPON_CHANGE_NOTIFY RouteCode = 10031 // 武器变化通知
-	// 英雄 10040~10049
-	RouteCode_ROUTE_CODE_HERO_LIST          RouteCode = 10040 // 英雄列表
-	RouteCode_ROUTE_CODE_HERO_CHANGE_NOTIFY RouteCode = 10041 // 英雄变化通知
+	RouteCode_ROUTE_CODE_WEAPON_LIST   RouteCode = 10030 // 武器列表
+	RouteCode_ROUTE_CODE_WEAPON_NOTIFY RouteCode = 10031 // 武器变化通知
+	// 技能 10040~10049
+	RouteCode_ROUTE_CODE_SKILL_LIST   RouteCode = 10040 // 技能列表
+	RouteCode_ROUTE_CODE_SKILL_NOTIFY RouteCode = 10041 // 技能变化通知
+	// 装备 10050~10059
+	RouteCode_ROUTE_CODE_GEAR_LIST   RouteCode = 10050 // 装备列表
+	RouteCode_ROUTE_CODE_GEAR_NOTIFY RouteCode = 10051 // 装备变化通知
 )
 
 // Enum value maps for RouteCode.
@@ -57,36 +60,40 @@ var (
 		10000:  "ROUTE_CODE_VERIFY",
 		10001:  "ROUTE_CODE_ENTER_GAME",
 		10002:  "ROUTE_CODE_LEAVE_GAME",
+		10003:  "ROUTE_CODE_SEVER_NOTIFY",
 		10010:  "ROUTE_CODE_CONTAINER_LIST",
-		10011:  "ROUTE_CODE_CONTAINER_CHANGE_NOTIFY",
+		10011:  "ROUTE_CODE_CONTAINER_NOTIFY",
 		100112: "ROUTE_CODE_CONTAINER_MOVE",
 		10013:  "ROUTE_CODE_CONTAINER_ROTATE",
-		10014:  "ROUTE_CODE_CONTAINER_REMOVE",
-		10015:  "ROUTE_CODE_CONTAINER_SORT",
-		10020:  "ROUTE_CODE_SKILL_LIST",
-		10021:  "ROUTE_CODE_SKILL_CHANGE_NOTIFY",
+		10014:  "ROUTE_CODE_CONTAINER_SORT",
+		10020:  "ROUTE_CODE_HERO_LIST",
+		10021:  "ROUTE_CODE_HERO_NOTIFY",
 		10030:  "ROUTE_CODE_WEAPON_LIST",
-		10031:  "ROUTE_CODE_WEAPON_CHANGE_NOTIFY",
-		10040:  "ROUTE_CODE_HERO_LIST",
-		10041:  "ROUTE_CODE_HERO_CHANGE_NOTIFY",
+		10031:  "ROUTE_CODE_WEAPON_NOTIFY",
+		10040:  "ROUTE_CODE_SKILL_LIST",
+		10041:  "ROUTE_CODE_SKILL_NOTIFY",
+		10050:  "ROUTE_CODE_GEAR_LIST",
+		10051:  "ROUTE_CODE_GEAR_NOTIFY",
 	}
 	RouteCode_value = map[string]int32{
-		"ROUTE_CODE_UNSPECIFIED":             0,
-		"ROUTE_CODE_VERIFY":                  10000,
-		"ROUTE_CODE_ENTER_GAME":              10001,
-		"ROUTE_CODE_LEAVE_GAME":              10002,
-		"ROUTE_CODE_CONTAINER_LIST":          10010,
-		"ROUTE_CODE_CONTAINER_CHANGE_NOTIFY": 10011,
-		"ROUTE_CODE_CONTAINER_MOVE":          100112,
-		"ROUTE_CODE_CONTAINER_ROTATE":        10013,
-		"ROUTE_CODE_CONTAINER_REMOVE":        10014,
-		"ROUTE_CODE_CONTAINER_SORT":          10015,
-		"ROUTE_CODE_SKILL_LIST":              10020,
-		"ROUTE_CODE_SKILL_CHANGE_NOTIFY":     10021,
-		"ROUTE_CODE_WEAPON_LIST":             10030,
-		"ROUTE_CODE_WEAPON_CHANGE_NOTIFY":    10031,
-		"ROUTE_CODE_HERO_LIST":               10040,
-		"ROUTE_CODE_HERO_CHANGE_NOTIFY":      10041,
+		"ROUTE_CODE_UNSPECIFIED":      0,
+		"ROUTE_CODE_VERIFY":           10000,
+		"ROUTE_CODE_ENTER_GAME":       10001,
+		"ROUTE_CODE_LEAVE_GAME":       10002,
+		"ROUTE_CODE_SEVER_NOTIFY":     10003,
+		"ROUTE_CODE_CONTAINER_LIST":   10010,
+		"ROUTE_CODE_CONTAINER_NOTIFY": 10011,
+		"ROUTE_CODE_CONTAINER_MOVE":   100112,
+		"ROUTE_CODE_CONTAINER_ROTATE": 10013,
+		"ROUTE_CODE_CONTAINER_SORT":   10014,
+		"ROUTE_CODE_HERO_LIST":        10020,
+		"ROUTE_CODE_HERO_NOTIFY":      10021,
+		"ROUTE_CODE_WEAPON_LIST":      10030,
+		"ROUTE_CODE_WEAPON_NOTIFY":    10031,
+		"ROUTE_CODE_SKILL_LIST":       10040,
+		"ROUTE_CODE_SKILL_NOTIFY":     10041,
+		"ROUTE_CODE_GEAR_LIST":        10050,
+		"ROUTE_CODE_GEAR_NOTIFY":      10051,
 	}
 )
 
@@ -117,7 +124,7 @@ func (RouteCode) EnumDescriptor() ([]byte, []int) {
 	return file_common_proto_rawDescGZIP(), []int{0}
 }
 
-// 业务错误码枚举（1000~9999）。
+// ========== 业务错误码枚举（1000~9999） ==========
 type ErrCode int32
 
 const (
@@ -182,7 +189,109 @@ func (ErrCode) EnumDescriptor() ([]byte, []int) {
 	return file_common_proto_rawDescGZIP(), []int{1}
 }
 
-// 玩家属性枚举（与 PlayerBase 字段对应）
+// ========== 通知类型 ==========
+type NOTIFY_TYPE int32
+
+const (
+	NOTIFY_TYPE_NOTIFY_TYPE_KICK      NOTIFY_TYPE = 0 // 踢下线
+	NOTIFY_TYPE_NOTIFY_TYPE_MAINTAIN  NOTIFY_TYPE = 2 // 维护
+	NOTIFY_TYPE_NOTIFY_TYPE_BROADCAST NOTIFY_TYPE = 3 // 公告
+)
+
+// Enum value maps for NOTIFY_TYPE.
+var (
+	NOTIFY_TYPE_name = map[int32]string{
+		0: "NOTIFY_TYPE_KICK",
+		2: "NOTIFY_TYPE_MAINTAIN",
+		3: "NOTIFY_TYPE_BROADCAST",
+	}
+	NOTIFY_TYPE_value = map[string]int32{
+		"NOTIFY_TYPE_KICK":      0,
+		"NOTIFY_TYPE_MAINTAIN":  2,
+		"NOTIFY_TYPE_BROADCAST": 3,
+	}
+)
+
+func (x NOTIFY_TYPE) Enum() *NOTIFY_TYPE {
+	p := new(NOTIFY_TYPE)
+	*p = x
+	return p
+}
+
+func (x NOTIFY_TYPE) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (NOTIFY_TYPE) Descriptor() protoreflect.EnumDescriptor {
+	return file_common_proto_enumTypes[2].Descriptor()
+}
+
+func (NOTIFY_TYPE) Type() protoreflect.EnumType {
+	return &file_common_proto_enumTypes[2]
+}
+
+func (x NOTIFY_TYPE) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use NOTIFY_TYPE.Descriptor instead.
+func (NOTIFY_TYPE) EnumDescriptor() ([]byte, []int) {
+	return file_common_proto_rawDescGZIP(), []int{2}
+}
+
+type ContainerType int32
+
+const (
+	ContainerType_CONTAINER_TYPE_UNSPECIFIED ContainerType = 0
+	ContainerType_CONTAINER_TYPE_BACKPACK    ContainerType = 1 // 背包（局内随身，死亡掉落）
+	ContainerType_CONTAINER_TYPE_STASH       ContainerType = 2 // 仓库（局外固定，不掉落）
+	ContainerType_CONTAINER_TYPE_SECURE      ContainerType = 3 // 保险箱（局内随身，不掉落）
+)
+
+// Enum value maps for ContainerType.
+var (
+	ContainerType_name = map[int32]string{
+		0: "CONTAINER_TYPE_UNSPECIFIED",
+		1: "CONTAINER_TYPE_BACKPACK",
+		2: "CONTAINER_TYPE_STASH",
+		3: "CONTAINER_TYPE_SECURE",
+	}
+	ContainerType_value = map[string]int32{
+		"CONTAINER_TYPE_UNSPECIFIED": 0,
+		"CONTAINER_TYPE_BACKPACK":    1,
+		"CONTAINER_TYPE_STASH":       2,
+		"CONTAINER_TYPE_SECURE":      3,
+	}
+)
+
+func (x ContainerType) Enum() *ContainerType {
+	p := new(ContainerType)
+	*p = x
+	return p
+}
+
+func (x ContainerType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ContainerType) Descriptor() protoreflect.EnumDescriptor {
+	return file_common_proto_enumTypes[3].Descriptor()
+}
+
+func (ContainerType) Type() protoreflect.EnumType {
+	return &file_common_proto_enumTypes[3]
+}
+
+func (x ContainerType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ContainerType.Descriptor instead.
+func (ContainerType) EnumDescriptor() ([]byte, []int) {
+	return file_common_proto_rawDescGZIP(), []int{3}
+}
+
+// ========== 属性枚举 ==========
 type MagicAttr int32
 
 const (
@@ -191,8 +300,10 @@ const (
 	MagicAttr_PLAYER_ATTR_NAME        MagicAttr = 1 // 昵称
 	MagicAttr_PLAYER_ATTR_LEVEL       MagicAttr = 2 // 等级
 	MagicAttr_PLAYER_ATTR_EXP         MagicAttr = 3 // 经验
-	MagicAttr_PLAYER_ATTR_GOLD        MagicAttr = 4 // 金币
-	MagicAttr_PLAYER_ATTR_DIAMOND     MagicAttr = 5 // 钻石
+	MagicAttr_PLAYER_ATTR_VIP_LEVEL   MagicAttr = 4 // vip等级
+	MagicAttr_PLAYER_ATTR_VIP_EXP     MagicAttr = 5 // vip经验
+	MagicAttr_PLAYER_ATTR_COIN        MagicAttr = 6 // 币
+	MagicAttr_PLAYER_ATTR_GOLD        MagicAttr = 7 // 金
 )
 
 // Enum value maps for MagicAttr.
@@ -202,16 +313,20 @@ var (
 		1: "PLAYER_ATTR_NAME",
 		2: "PLAYER_ATTR_LEVEL",
 		3: "PLAYER_ATTR_EXP",
-		4: "PLAYER_ATTR_GOLD",
-		5: "PLAYER_ATTR_DIAMOND",
+		4: "PLAYER_ATTR_VIP_LEVEL",
+		5: "PLAYER_ATTR_VIP_EXP",
+		6: "PLAYER_ATTR_COIN",
+		7: "PLAYER_ATTR_GOLD",
 	}
 	MagicAttr_value = map[string]int32{
 		"PLAYER_ATTR_UNSPECIFIED": 0,
 		"PLAYER_ATTR_NAME":        1,
 		"PLAYER_ATTR_LEVEL":       2,
 		"PLAYER_ATTR_EXP":         3,
-		"PLAYER_ATTR_GOLD":        4,
-		"PLAYER_ATTR_DIAMOND":     5,
+		"PLAYER_ATTR_VIP_LEVEL":   4,
+		"PLAYER_ATTR_VIP_EXP":     5,
+		"PLAYER_ATTR_COIN":        6,
+		"PLAYER_ATTR_GOLD":        7,
 	}
 )
 
@@ -226,11 +341,11 @@ func (x MagicAttr) String() string {
 }
 
 func (MagicAttr) Descriptor() protoreflect.EnumDescriptor {
-	return file_common_proto_enumTypes[2].Descriptor()
+	return file_common_proto_enumTypes[4].Descriptor()
 }
 
 func (MagicAttr) Type() protoreflect.EnumType {
-	return &file_common_proto_enumTypes[2]
+	return &file_common_proto_enumTypes[4]
 }
 
 func (x MagicAttr) Number() protoreflect.EnumNumber {
@@ -239,65 +354,11 @@ func (x MagicAttr) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use MagicAttr.Descriptor instead.
 func (MagicAttr) EnumDescriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{2}
-}
-
-// 系统通知（路由 1901，服务端主动推送）
-type ServerNotify struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Kind          string                 `protobuf:"bytes,1,opt,name=kind,proto3" json:"kind,omitempty"`       // 通知类型：kick（踢下线）/ maintain（维护）/ broadcast（公告）
-	Content       string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"` // 通知内容
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ServerNotify) Reset() {
-	*x = ServerNotify{}
-	mi := &file_common_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ServerNotify) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ServerNotify) ProtoMessage() {}
-
-func (x *ServerNotify) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ServerNotify.ProtoReflect.Descriptor instead.
-func (*ServerNotify) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *ServerNotify) GetKind() string {
-	if x != nil {
-		return x.Kind
-	}
-	return ""
-}
-
-func (x *ServerNotify) GetContent() string {
-	if x != nil {
-		return x.Content
-	}
-	return ""
+	return file_common_proto_rawDescGZIP(), []int{4}
 }
 
 // 通用业务结果：每个响应包统一携带。
 // code 用于客户端逻辑分支；msg 为空时按 code 取默认文案；args 为可变参数，
-// 按顺序填充 msg 的占位符（如「物品[0]数量不足，需要[1]」）。
 type Result struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Code          ErrCode                `protobuf:"varint,1,opt,name=code,proto3,enum=pb.ErrCode" json:"code,omitempty"` // 业务错误码，ERR_CODE_OK 表示成功
@@ -309,7 +370,7 @@ type Result struct {
 
 func (x *Result) Reset() {
 	*x = Result{}
-	mi := &file_common_proto_msgTypes[1]
+	mi := &file_common_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -321,7 +382,7 @@ func (x *Result) String() string {
 func (*Result) ProtoMessage() {}
 
 func (x *Result) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[1]
+	mi := &file_common_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -334,7 +395,7 @@ func (x *Result) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Result.ProtoReflect.Descriptor instead.
 func (*Result) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{1}
+	return file_common_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Result) GetCode() ErrCode {
@@ -358,28 +419,29 @@ func (x *Result) GetArgs() []string {
 	return nil
 }
 
-type PlayerData struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	PlayerBase    *PlayerBase            `protobuf:"bytes,1,opt,name=player_base,json=playerBase,proto3" json:"player_base,omitempty"`
+// 通用对象：等价于 JSON object，键为字段名，值为动态类型。
+type Object struct {
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	Values        map[string]*ObjectValue `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"` // 映射
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *PlayerData) Reset() {
-	*x = PlayerData{}
-	mi := &file_common_proto_msgTypes[2]
+func (x *Object) Reset() {
+	*x = Object{}
+	mi := &file_common_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *PlayerData) String() string {
+func (x *Object) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*PlayerData) ProtoMessage() {}
+func (*Object) ProtoMessage() {}
 
-func (x *PlayerData) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[2]
+func (x *Object) ProtoReflect() protoreflect.Message {
+	mi := &file_common_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -390,45 +452,92 @@ func (x *PlayerData) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PlayerData.ProtoReflect.Descriptor instead.
-func (*PlayerData) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{2}
+// Deprecated: Use Object.ProtoReflect.Descriptor instead.
+func (*Object) Descriptor() ([]byte, []int) {
+	return file_common_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *PlayerData) GetPlayerBase() *PlayerBase {
+func (x *Object) GetValues() map[string]*ObjectValue {
 	if x != nil {
-		return x.PlayerBase
+		return x.Values
 	}
 	return nil
 }
 
-// 玩家基础信息（登录进入游戏时下发的通用结构）
-type PlayerBase struct {
+// 动态值数组。
+type ObjectList struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`                          // 昵称
-	Level         int32                  `protobuf:"varint,3,opt,name=level,proto3" json:"level,omitempty"`                       // 等级
-	Exp           int64                  `protobuf:"varint,4,opt,name=exp,proto3" json:"exp,omitempty"`                           // 经验
-	Gold          int64                  `protobuf:"varint,5,opt,name=gold,proto3" json:"gold,omitempty"`                         // 金币
-	Diamond       int64                  `protobuf:"varint,6,opt,name=diamond,proto3" json:"diamond,omitempty"`                   // 钻石
+	Values        []*ObjectValue         `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty"` // 列表
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *PlayerBase) Reset() {
-	*x = PlayerBase{}
+func (x *ObjectList) Reset() {
+	*x = ObjectList{}
+	mi := &file_common_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ObjectList) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ObjectList) ProtoMessage() {}
+
+func (x *ObjectList) ProtoReflect() protoreflect.Message {
+	mi := &file_common_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ObjectList.ProtoReflect.Descriptor instead.
+func (*ObjectList) Descriptor() ([]byte, []int) {
+	return file_common_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *ObjectList) GetValues() []*ObjectValue {
+	if x != nil {
+		return x.Values
+	}
+	return nil
+}
+
+// 动态值：oneof 通用基本类型。
+type ObjectValue struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Kind:
+	//
+	//	*ObjectValue_BoolValue
+	//	*ObjectValue_IntValue
+	//	*ObjectValue_BigintValue
+	//	*ObjectValue_DoubleValue
+	//	*ObjectValue_StringValue
+	Kind          isObjectValue_Kind `protobuf_oneof:"kind"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ObjectValue) Reset() {
+	*x = ObjectValue{}
 	mi := &file_common_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *PlayerBase) String() string {
+func (x *ObjectValue) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*PlayerBase) ProtoMessage() {}
+func (*ObjectValue) ProtoMessage() {}
 
-func (x *PlayerBase) ProtoReflect() protoreflect.Message {
+func (x *ObjectValue) ProtoReflect() protoreflect.Message {
 	mi := &file_common_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -440,51 +549,265 @@ func (x *PlayerBase) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PlayerBase.ProtoReflect.Descriptor instead.
-func (*PlayerBase) Descriptor() ([]byte, []int) {
+// Deprecated: Use ObjectValue.ProtoReflect.Descriptor instead.
+func (*ObjectValue) Descriptor() ([]byte, []int) {
 	return file_common_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *PlayerBase) GetPlayerId() int64 {
+func (x *ObjectValue) GetKind() isObjectValue_Kind {
 	if x != nil {
-		return x.PlayerId
+		return x.Kind
+	}
+	return nil
+}
+
+func (x *ObjectValue) GetBoolValue() bool {
+	if x != nil {
+		if x, ok := x.Kind.(*ObjectValue_BoolValue); ok {
+			return x.BoolValue
+		}
+	}
+	return false
+}
+
+func (x *ObjectValue) GetIntValue() int32 {
+	if x != nil {
+		if x, ok := x.Kind.(*ObjectValue_IntValue); ok {
+			return x.IntValue
+		}
 	}
 	return 0
 }
 
-func (x *PlayerBase) GetName() string {
+func (x *ObjectValue) GetBigintValue() int64 {
 	if x != nil {
-		return x.Name
+		if x, ok := x.Kind.(*ObjectValue_BigintValue); ok {
+			return x.BigintValue
+		}
+	}
+	return 0
+}
+
+func (x *ObjectValue) GetDoubleValue() float64 {
+	if x != nil {
+		if x, ok := x.Kind.(*ObjectValue_DoubleValue); ok {
+			return x.DoubleValue
+		}
+	}
+	return 0
+}
+
+func (x *ObjectValue) GetStringValue() string {
+	if x != nil {
+		if x, ok := x.Kind.(*ObjectValue_StringValue); ok {
+			return x.StringValue
+		}
 	}
 	return ""
 }
 
-func (x *PlayerBase) GetLevel() int32 {
+type isObjectValue_Kind interface {
+	isObjectValue_Kind()
+}
+
+type ObjectValue_BoolValue struct {
+	BoolValue bool `protobuf:"varint,1,opt,name=bool_value,json=boolValue,proto3,oneof"` // 布尔
+}
+
+type ObjectValue_IntValue struct {
+	IntValue int32 `protobuf:"varint,2,opt,name=int_value,json=intValue,proto3,oneof"` // 整数
+}
+
+type ObjectValue_BigintValue struct {
+	BigintValue int64 `protobuf:"varint,3,opt,name=Bigint_value,json=BigintValue,proto3,oneof"` // 整数
+}
+
+type ObjectValue_DoubleValue struct {
+	DoubleValue float64 `protobuf:"fixed64,4,opt,name=double_value,json=doubleValue,proto3,oneof"` // 浮点数
+}
+
+type ObjectValue_StringValue struct {
+	StringValue string `protobuf:"bytes,5,opt,name=string_value,json=stringValue,proto3,oneof"` // 字符串
+}
+
+func (*ObjectValue_BoolValue) isObjectValue_Kind() {}
+
+func (*ObjectValue_IntValue) isObjectValue_Kind() {}
+
+func (*ObjectValue_BigintValue) isObjectValue_Kind() {}
+
+func (*ObjectValue_DoubleValue) isObjectValue_Kind() {}
+
+func (*ObjectValue_StringValue) isObjectValue_Kind() {}
+
+// 容器中的物品
+type ItemEntry struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ItemId        int64                  `protobuf:"varint,1,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"`            // 物品唯一实例ID
+	ItemCfgId     int32                  `protobuf:"varint,2,opt,name=item_cfg_id,json=itemCfgId,proto3" json:"item_cfg_id,omitempty"` // 物品配置ID
+	Count         int32                  `protobuf:"varint,3,opt,name=count,proto3" json:"count,omitempty"`                            // 堆叠数量
+	GridX         int32                  `protobuf:"varint,4,opt,name=grid_x,json=gridX,proto3" json:"grid_x,omitempty"`               // 网格 X
+	GridY         int32                  `protobuf:"varint,5,opt,name=grid_y,json=gridY,proto3" json:"grid_y,omitempty"`               // 网格 Y
+	Rotated       bool                   `protobuf:"varint,6,opt,name=rotated,proto3" json:"rotated,omitempty"`                        // 是否旋转
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ItemEntry) Reset() {
+	*x = ItemEntry{}
+	mi := &file_common_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ItemEntry) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ItemEntry) ProtoMessage() {}
+
+func (x *ItemEntry) ProtoReflect() protoreflect.Message {
+	mi := &file_common_proto_msgTypes[4]
 	if x != nil {
-		return x.Level
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ItemEntry.ProtoReflect.Descriptor instead.
+func (*ItemEntry) Descriptor() ([]byte, []int) {
+	return file_common_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *ItemEntry) GetItemId() int64 {
+	if x != nil {
+		return x.ItemId
 	}
 	return 0
 }
 
-func (x *PlayerBase) GetExp() int64 {
+func (x *ItemEntry) GetItemCfgId() int32 {
 	if x != nil {
-		return x.Exp
+		return x.ItemCfgId
 	}
 	return 0
 }
 
-func (x *PlayerBase) GetGold() int64 {
+func (x *ItemEntry) GetCount() int32 {
 	if x != nil {
-		return x.Gold
+		return x.Count
 	}
 	return 0
 }
 
-func (x *PlayerBase) GetDiamond() int64 {
+func (x *ItemEntry) GetGridX() int32 {
 	if x != nil {
-		return x.Diamond
+		return x.GridX
 	}
 	return 0
+}
+
+func (x *ItemEntry) GetGridY() int32 {
+	if x != nil {
+		return x.GridY
+	}
+	return 0
+}
+
+func (x *ItemEntry) GetRotated() bool {
+	if x != nil {
+		return x.Rotated
+	}
+	return false
+}
+
+// 容器条目
+type ContainerEntry struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ContainerId   int64                  `protobuf:"varint,1,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"` // 容器实例ID（=playerID + type 编码）
+	Type          ContainerType          `protobuf:"varint,2,opt,name=type,proto3,enum=pb.ContainerType" json:"type,omitempty"`            // 容器类型
+	GridW         int32                  `protobuf:"varint,3,opt,name=grid_w,json=gridW,proto3" json:"grid_w,omitempty"`                   // 网格宽度
+	GridH         int32                  `protobuf:"varint,4,opt,name=grid_h,json=gridH,proto3" json:"grid_h,omitempty"`                   // 网格高度
+	Version       int32                  `protobuf:"varint,5,opt,name=version,proto3" json:"version,omitempty"`                            // 操作版本号（每次修改+1）
+	ItemEntries   []*ItemEntry           `protobuf:"bytes,6,rep,name=item_entries,json=itemEntries,proto3" json:"item_entries,omitempty"`  // 物品列表
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ContainerEntry) Reset() {
+	*x = ContainerEntry{}
+	mi := &file_common_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ContainerEntry) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ContainerEntry) ProtoMessage() {}
+
+func (x *ContainerEntry) ProtoReflect() protoreflect.Message {
+	mi := &file_common_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ContainerEntry.ProtoReflect.Descriptor instead.
+func (*ContainerEntry) Descriptor() ([]byte, []int) {
+	return file_common_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ContainerEntry) GetContainerId() int64 {
+	if x != nil {
+		return x.ContainerId
+	}
+	return 0
+}
+
+func (x *ContainerEntry) GetType() ContainerType {
+	if x != nil {
+		return x.Type
+	}
+	return ContainerType_CONTAINER_TYPE_UNSPECIFIED
+}
+
+func (x *ContainerEntry) GetGridW() int32 {
+	if x != nil {
+		return x.GridW
+	}
+	return 0
+}
+
+func (x *ContainerEntry) GetGridH() int32 {
+	if x != nil {
+		return x.GridH
+	}
+	return 0
+}
+
+func (x *ContainerEntry) GetVersion() int32 {
+	if x != nil {
+		return x.Version
+	}
+	return 0
+}
+
+func (x *ContainerEntry) GetItemEntries() []*ItemEntry {
+	if x != nil {
+		return x.ItemEntries
+	}
+	return nil
 }
 
 // 英雄条目
@@ -506,7 +829,7 @@ type HeroEntry struct {
 
 func (x *HeroEntry) Reset() {
 	*x = HeroEntry{}
-	mi := &file_common_proto_msgTypes[4]
+	mi := &file_common_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -518,7 +841,7 @@ func (x *HeroEntry) String() string {
 func (*HeroEntry) ProtoMessage() {}
 
 func (x *HeroEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[4]
+	mi := &file_common_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -531,7 +854,7 @@ func (x *HeroEntry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HeroEntry.ProtoReflect.Descriptor instead.
 func (*HeroEntry) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{4}
+	return file_common_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *HeroEntry) GetId() int32 {
@@ -625,7 +948,7 @@ type WeaponEntry struct {
 
 func (x *WeaponEntry) Reset() {
 	*x = WeaponEntry{}
-	mi := &file_common_proto_msgTypes[5]
+	mi := &file_common_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -637,7 +960,7 @@ func (x *WeaponEntry) String() string {
 func (*WeaponEntry) ProtoMessage() {}
 
 func (x *WeaponEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[5]
+	mi := &file_common_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -650,7 +973,7 @@ func (x *WeaponEntry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WeaponEntry.ProtoReflect.Descriptor instead.
 func (*WeaponEntry) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{5}
+	return file_common_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *WeaponEntry) GetId() int32 {
@@ -756,7 +1079,7 @@ type SkillEntry struct {
 
 func (x *SkillEntry) Reset() {
 	*x = SkillEntry{}
-	mi := &file_common_proto_msgTypes[6]
+	mi := &file_common_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -768,7 +1091,7 @@ func (x *SkillEntry) String() string {
 func (*SkillEntry) ProtoMessage() {}
 
 func (x *SkillEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[6]
+	mi := &file_common_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -781,7 +1104,7 @@ func (x *SkillEntry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SkillEntry.ProtoReflect.Descriptor instead.
 func (*SkillEntry) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{6}
+	return file_common_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *SkillEntry) GetId() int32 {
@@ -854,251 +1177,45 @@ func (x *SkillEntry) GetCapacity() int32 {
 	return 0
 }
 
-// 通用对象：等价于 JSON object，键为字段名，值为动态类型。
-type Object struct {
-	state         protoimpl.MessageState  `protogen:"open.v1"`
-	Values        map[string]*ObjectValue `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"` // 映射
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Object) Reset() {
-	*x = Object{}
-	mi := &file_common_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Object) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Object) ProtoMessage() {}
-
-func (x *Object) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Object.ProtoReflect.Descriptor instead.
-func (*Object) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *Object) GetValues() map[string]*ObjectValue {
-	if x != nil {
-		return x.Values
-	}
-	return nil
-}
-
-// 动态值数组。
-type ObjectList struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Values        []*ObjectValue         `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty"` // 列表
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ObjectList) Reset() {
-	*x = ObjectList{}
-	mi := &file_common_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ObjectList) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ObjectList) ProtoMessage() {}
-
-func (x *ObjectList) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ObjectList.ProtoReflect.Descriptor instead.
-func (*ObjectList) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *ObjectList) GetValues() []*ObjectValue {
-	if x != nil {
-		return x.Values
-	}
-	return nil
-}
-
-// 动态值：oneof 通用基本类型。
-type ObjectValue struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Kind:
-	//
-	//	*ObjectValue_BoolValue
-	//	*ObjectValue_IntValue
-	//	*ObjectValue_BigintValue
-	//	*ObjectValue_DoubleValue
-	//	*ObjectValue_StringValue
-	Kind          isObjectValue_Kind `protobuf_oneof:"kind"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ObjectValue) Reset() {
-	*x = ObjectValue{}
-	mi := &file_common_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ObjectValue) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ObjectValue) ProtoMessage() {}
-
-func (x *ObjectValue) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ObjectValue.ProtoReflect.Descriptor instead.
-func (*ObjectValue) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *ObjectValue) GetKind() isObjectValue_Kind {
-	if x != nil {
-		return x.Kind
-	}
-	return nil
-}
-
-func (x *ObjectValue) GetBoolValue() bool {
-	if x != nil {
-		if x, ok := x.Kind.(*ObjectValue_BoolValue); ok {
-			return x.BoolValue
-		}
-	}
-	return false
-}
-
-func (x *ObjectValue) GetIntValue() int32 {
-	if x != nil {
-		if x, ok := x.Kind.(*ObjectValue_IntValue); ok {
-			return x.IntValue
-		}
-	}
-	return 0
-}
-
-func (x *ObjectValue) GetBigintValue() int64 {
-	if x != nil {
-		if x, ok := x.Kind.(*ObjectValue_BigintValue); ok {
-			return x.BigintValue
-		}
-	}
-	return 0
-}
-
-func (x *ObjectValue) GetDoubleValue() float64 {
-	if x != nil {
-		if x, ok := x.Kind.(*ObjectValue_DoubleValue); ok {
-			return x.DoubleValue
-		}
-	}
-	return 0
-}
-
-func (x *ObjectValue) GetStringValue() string {
-	if x != nil {
-		if x, ok := x.Kind.(*ObjectValue_StringValue); ok {
-			return x.StringValue
-		}
-	}
-	return ""
-}
-
-type isObjectValue_Kind interface {
-	isObjectValue_Kind()
-}
-
-type ObjectValue_BoolValue struct {
-	BoolValue bool `protobuf:"varint,1,opt,name=bool_value,json=boolValue,proto3,oneof"` // 布尔
-}
-
-type ObjectValue_IntValue struct {
-	IntValue int32 `protobuf:"varint,2,opt,name=int_value,json=intValue,proto3,oneof"` // 整数
-}
-
-type ObjectValue_BigintValue struct {
-	BigintValue int64 `protobuf:"varint,3,opt,name=Bigint_value,json=BigintValue,proto3,oneof"` // 整数
-}
-
-type ObjectValue_DoubleValue struct {
-	DoubleValue float64 `protobuf:"fixed64,4,opt,name=double_value,json=doubleValue,proto3,oneof"` // 浮点数
-}
-
-type ObjectValue_StringValue struct {
-	StringValue string `protobuf:"bytes,5,opt,name=string_value,json=stringValue,proto3,oneof"` // 字符串
-}
-
-func (*ObjectValue_BoolValue) isObjectValue_Kind() {}
-
-func (*ObjectValue_IntValue) isObjectValue_Kind() {}
-
-func (*ObjectValue_BigintValue) isObjectValue_Kind() {}
-
-func (*ObjectValue_DoubleValue) isObjectValue_Kind() {}
-
-func (*ObjectValue_StringValue) isObjectValue_Kind() {}
-
 var File_common_proto protoreflect.FileDescriptor
 
 const file_common_proto_rawDesc = "" +
 	"\n" +
-	"\fcommon.proto\x12\x02pb\"<\n" +
-	"\fServerNotify\x12\x12\n" +
-	"\x04kind\x18\x01 \x01(\tR\x04kind\x12\x18\n" +
-	"\acontent\x18\x02 \x01(\tR\acontent\"O\n" +
+	"\fcommon.proto\x12\x02pb\"O\n" +
 	"\x06Result\x12\x1f\n" +
 	"\x04code\x18\x01 \x01(\x0e2\v.pb.ErrCodeR\x04code\x12\x10\n" +
 	"\x03msg\x18\x02 \x01(\tR\x03msg\x12\x12\n" +
-	"\x04args\x18\x03 \x03(\tR\x04args\"=\n" +
+	"\x04args\x18\x03 \x03(\tR\x04args\"\x84\x01\n" +
+	"\x06Object\x12.\n" +
+	"\x06values\x18\x01 \x03(\v2\x16.pb.Object.ValuesEntryR\x06values\x1aJ\n" +
+	"\vValuesEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12%\n" +
+	"\x05value\x18\x02 \x01(\v2\x0f.pb.ObjectValueR\x05value:\x028\x01\"5\n" +
 	"\n" +
-	"PlayerData\x12/\n" +
-	"\vplayer_base\x18\x01 \x01(\v2\x0e.pb.PlayerBaseR\n" +
-	"playerBase\"\x93\x01\n" +
+	"ObjectList\x12'\n" +
+	"\x06values\x18\x01 \x03(\v2\x0f.pb.ObjectValueR\x06values\"\xc4\x01\n" +
+	"\vObjectValue\x12\x1f\n" +
 	"\n" +
-	"PlayerBase\x12\x1b\n" +
-	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
-	"\x05level\x18\x03 \x01(\x05R\x05level\x12\x10\n" +
-	"\x03exp\x18\x04 \x01(\x03R\x03exp\x12\x12\n" +
-	"\x04gold\x18\x05 \x01(\x03R\x04gold\x12\x18\n" +
-	"\adiamond\x18\x06 \x01(\x03R\adiamond\"\xa7\x02\n" +
+	"bool_value\x18\x01 \x01(\bH\x00R\tboolValue\x12\x1d\n" +
+	"\tint_value\x18\x02 \x01(\x05H\x00R\bintValue\x12#\n" +
+	"\fBigint_value\x18\x03 \x01(\x03H\x00R\vBigintValue\x12#\n" +
+	"\fdouble_value\x18\x04 \x01(\x01H\x00R\vdoubleValue\x12#\n" +
+	"\fstring_value\x18\x05 \x01(\tH\x00R\vstringValueB\x06\n" +
+	"\x04kind\"\xa2\x01\n" +
+	"\tItemEntry\x12\x17\n" +
+	"\aitem_id\x18\x01 \x01(\x03R\x06itemId\x12\x1e\n" +
+	"\vitem_cfg_id\x18\x02 \x01(\x05R\titemCfgId\x12\x14\n" +
+	"\x05count\x18\x03 \x01(\x05R\x05count\x12\x15\n" +
+	"\x06grid_x\x18\x04 \x01(\x05R\x05gridX\x12\x15\n" +
+	"\x06grid_y\x18\x05 \x01(\x05R\x05gridY\x12\x18\n" +
+	"\arotated\x18\x06 \x01(\bR\arotated\"\xd4\x01\n" +
+	"\x0eContainerEntry\x12!\n" +
+	"\fcontainer_id\x18\x01 \x01(\x03R\vcontainerId\x12%\n" +
+	"\x04type\x18\x02 \x01(\x0e2\x11.pb.ContainerTypeR\x04type\x12\x15\n" +
+	"\x06grid_w\x18\x03 \x01(\x05R\x05gridW\x12\x15\n" +
+	"\x06grid_h\x18\x04 \x01(\x05R\x05gridH\x12\x18\n" +
+	"\aversion\x18\x05 \x01(\x05R\aversion\x120\n" +
+	"\fitem_entries\x18\x06 \x03(\v2\r.pb.ItemEntryR\vitemEntries\"\xa7\x02\n" +
 	"\tHeroEntry\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x10\n" +
@@ -1142,40 +1259,26 @@ const file_common_proto_rawDesc = "" +
 	"\x11auto_fire_angle_y\x18\b \x01(\x02R\x0eautoFireAngleY\x12,\n" +
 	"\x12auto_fire_distance\x18\t \x01(\x02R\x10autoFireDistance\x12\x1a\n" +
 	"\bcapacity\x18\n" +
-	" \x01(\x05R\bcapacity\"\x84\x01\n" +
-	"\x06Object\x12.\n" +
-	"\x06values\x18\x01 \x03(\v2\x16.pb.Object.ValuesEntryR\x06values\x1aJ\n" +
-	"\vValuesEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12%\n" +
-	"\x05value\x18\x02 \x01(\v2\x0f.pb.ObjectValueR\x05value:\x028\x01\"5\n" +
-	"\n" +
-	"ObjectList\x12'\n" +
-	"\x06values\x18\x01 \x03(\v2\x0f.pb.ObjectValueR\x06values\"\xc4\x01\n" +
-	"\vObjectValue\x12\x1f\n" +
-	"\n" +
-	"bool_value\x18\x01 \x01(\bH\x00R\tboolValue\x12\x1d\n" +
-	"\tint_value\x18\x02 \x01(\x05H\x00R\bintValue\x12#\n" +
-	"\fBigint_value\x18\x03 \x01(\x03H\x00R\vBigintValue\x12#\n" +
-	"\fdouble_value\x18\x04 \x01(\x01H\x00R\vdoubleValue\x12#\n" +
-	"\fstring_value\x18\x05 \x01(\tH\x00R\vstringValueB\x06\n" +
-	"\x04kind*\x88\x04\n" +
+	" \x01(\x05R\bcapacity*\xa0\x04\n" +
 	"\tRouteCode\x12\x1a\n" +
 	"\x16ROUTE_CODE_UNSPECIFIED\x10\x00\x12\x16\n" +
 	"\x11ROUTE_CODE_VERIFY\x10\x90N\x12\x1a\n" +
 	"\x15ROUTE_CODE_ENTER_GAME\x10\x91N\x12\x1a\n" +
-	"\x15ROUTE_CODE_LEAVE_GAME\x10\x92N\x12\x1e\n" +
-	"\x19ROUTE_CODE_CONTAINER_LIST\x10\x9aN\x12'\n" +
-	"\"ROUTE_CODE_CONTAINER_CHANGE_NOTIFY\x10\x9bN\x12\x1f\n" +
+	"\x15ROUTE_CODE_LEAVE_GAME\x10\x92N\x12\x1c\n" +
+	"\x17ROUTE_CODE_SEVER_NOTIFY\x10\x93N\x12\x1e\n" +
+	"\x19ROUTE_CODE_CONTAINER_LIST\x10\x9aN\x12 \n" +
+	"\x1bROUTE_CODE_CONTAINER_NOTIFY\x10\x9bN\x12\x1f\n" +
 	"\x19ROUTE_CODE_CONTAINER_MOVE\x10\x90\x8e\x06\x12 \n" +
-	"\x1bROUTE_CODE_CONTAINER_ROTATE\x10\x9dN\x12 \n" +
-	"\x1bROUTE_CODE_CONTAINER_REMOVE\x10\x9eN\x12\x1e\n" +
-	"\x19ROUTE_CODE_CONTAINER_SORT\x10\x9fN\x12\x1a\n" +
-	"\x15ROUTE_CODE_SKILL_LIST\x10\xa4N\x12#\n" +
-	"\x1eROUTE_CODE_SKILL_CHANGE_NOTIFY\x10\xa5N\x12\x1b\n" +
-	"\x16ROUTE_CODE_WEAPON_LIST\x10\xaeN\x12$\n" +
-	"\x1fROUTE_CODE_WEAPON_CHANGE_NOTIFY\x10\xafN\x12\x19\n" +
-	"\x14ROUTE_CODE_HERO_LIST\x10\xb8N\x12\"\n" +
-	"\x1dROUTE_CODE_HERO_CHANGE_NOTIFY\x10\xb9N*\xea\x01\n" +
+	"\x1bROUTE_CODE_CONTAINER_ROTATE\x10\x9dN\x12\x1e\n" +
+	"\x19ROUTE_CODE_CONTAINER_SORT\x10\x9eN\x12\x19\n" +
+	"\x14ROUTE_CODE_HERO_LIST\x10\xa4N\x12\x1b\n" +
+	"\x16ROUTE_CODE_HERO_NOTIFY\x10\xa5N\x12\x1b\n" +
+	"\x16ROUTE_CODE_WEAPON_LIST\x10\xaeN\x12\x1d\n" +
+	"\x18ROUTE_CODE_WEAPON_NOTIFY\x10\xafN\x12\x1a\n" +
+	"\x15ROUTE_CODE_SKILL_LIST\x10\xb8N\x12\x1c\n" +
+	"\x17ROUTE_CODE_SKILL_NOTIFY\x10\xb9N\x12\x19\n" +
+	"\x14ROUTE_CODE_GEAR_LIST\x10\xc2N\x12\x1b\n" +
+	"\x16ROUTE_CODE_GEAR_NOTIFY\x10\xc3N*\xea\x01\n" +
 	"\aErrCode\x12\x0f\n" +
 	"\vERR_CODE_OK\x10\x00\x12\x1c\n" +
 	"\x17ERR_CODE_INTERNAL_ERROR\x10\xe8\a\x12\x1c\n" +
@@ -1184,14 +1287,25 @@ const file_common_proto_rawDesc = "" +
 	"\x19ERR_CODE_PLAYER_NOT_FOUND\x10\xd0\x0f\x12\x1b\n" +
 	"\x16ERR_CODE_PLAYER_EXISTS\x10\xd1\x0f\x12\x1c\n" +
 	"\x17ERR_CODE_PASSWORD_WRONG\x10\xd2\x0f\x12\x1b\n" +
-	"\x16ERR_CODE_TOKEN_INVALID\x10\xd3\x0f*\x99\x01\n" +
+	"\x16ERR_CODE_TOKEN_INVALID\x10\xd3\x0f*X\n" +
+	"\vNOTIFY_TYPE\x12\x14\n" +
+	"\x10NOTIFY_TYPE_KICK\x10\x00\x12\x18\n" +
+	"\x14NOTIFY_TYPE_MAINTAIN\x10\x02\x12\x19\n" +
+	"\x15NOTIFY_TYPE_BROADCAST\x10\x03*\x81\x01\n" +
+	"\rContainerType\x12\x1e\n" +
+	"\x1aCONTAINER_TYPE_UNSPECIFIED\x10\x00\x12\x1b\n" +
+	"\x17CONTAINER_TYPE_BACKPACK\x10\x01\x12\x18\n" +
+	"\x14CONTAINER_TYPE_STASH\x10\x02\x12\x19\n" +
+	"\x15CONTAINER_TYPE_SECURE\x10\x03*\xca\x01\n" +
 	"\tMagicAttr\x12\x1b\n" +
 	"\x17PLAYER_ATTR_UNSPECIFIED\x10\x00\x12\x14\n" +
 	"\x10PLAYER_ATTR_NAME\x10\x01\x12\x15\n" +
 	"\x11PLAYER_ATTR_LEVEL\x10\x02\x12\x13\n" +
-	"\x0fPLAYER_ATTR_EXP\x10\x03\x12\x14\n" +
-	"\x10PLAYER_ATTR_GOLD\x10\x04\x12\x17\n" +
-	"\x13PLAYER_ATTR_DIAMOND\x10\x05B\x19Z\x17server-cluster/share/pbb\x06proto3"
+	"\x0fPLAYER_ATTR_EXP\x10\x03\x12\x19\n" +
+	"\x15PLAYER_ATTR_VIP_LEVEL\x10\x04\x12\x17\n" +
+	"\x13PLAYER_ATTR_VIP_EXP\x10\x05\x12\x14\n" +
+	"\x10PLAYER_ATTR_COIN\x10\x06\x12\x14\n" +
+	"\x10PLAYER_ATTR_GOLD\x10\aB\x19Z\x17server-cluster/share/pbb\x06proto3"
 
 var (
 	file_common_proto_rawDescOnce sync.Once
@@ -1205,35 +1319,37 @@ func file_common_proto_rawDescGZIP() []byte {
 	return file_common_proto_rawDescData
 }
 
-var file_common_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_common_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_common_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
+var file_common_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_common_proto_goTypes = []any{
-	(RouteCode)(0),       // 0: pb.RouteCode
-	(ErrCode)(0),         // 1: pb.ErrCode
-	(MagicAttr)(0),       // 2: pb.MagicAttr
-	(*ServerNotify)(nil), // 3: pb.ServerNotify
-	(*Result)(nil),       // 4: pb.Result
-	(*PlayerData)(nil),   // 5: pb.PlayerData
-	(*PlayerBase)(nil),   // 6: pb.PlayerBase
-	(*HeroEntry)(nil),    // 7: pb.HeroEntry
-	(*WeaponEntry)(nil),  // 8: pb.WeaponEntry
-	(*SkillEntry)(nil),   // 9: pb.SkillEntry
-	(*Object)(nil),       // 10: pb.Object
-	(*ObjectList)(nil),   // 11: pb.ObjectList
-	(*ObjectValue)(nil),  // 12: pb.ObjectValue
-	nil,                  // 13: pb.Object.ValuesEntry
+	(RouteCode)(0),         // 0: pb.RouteCode
+	(ErrCode)(0),           // 1: pb.ErrCode
+	(NOTIFY_TYPE)(0),       // 2: pb.NOTIFY_TYPE
+	(ContainerType)(0),     // 3: pb.ContainerType
+	(MagicAttr)(0),         // 4: pb.MagicAttr
+	(*Result)(nil),         // 5: pb.Result
+	(*Object)(nil),         // 6: pb.Object
+	(*ObjectList)(nil),     // 7: pb.ObjectList
+	(*ObjectValue)(nil),    // 8: pb.ObjectValue
+	(*ItemEntry)(nil),      // 9: pb.ItemEntry
+	(*ContainerEntry)(nil), // 10: pb.ContainerEntry
+	(*HeroEntry)(nil),      // 11: pb.HeroEntry
+	(*WeaponEntry)(nil),    // 12: pb.WeaponEntry
+	(*SkillEntry)(nil),     // 13: pb.SkillEntry
+	nil,                    // 14: pb.Object.ValuesEntry
 }
 var file_common_proto_depIdxs = []int32{
 	1,  // 0: pb.Result.code:type_name -> pb.ErrCode
-	6,  // 1: pb.PlayerData.player_base:type_name -> pb.PlayerBase
-	13, // 2: pb.Object.values:type_name -> pb.Object.ValuesEntry
-	12, // 3: pb.ObjectList.values:type_name -> pb.ObjectValue
-	12, // 4: pb.Object.ValuesEntry.value:type_name -> pb.ObjectValue
-	5,  // [5:5] is the sub-list for method output_type
-	5,  // [5:5] is the sub-list for method input_type
-	5,  // [5:5] is the sub-list for extension type_name
-	5,  // [5:5] is the sub-list for extension extendee
-	0,  // [0:5] is the sub-list for field type_name
+	14, // 1: pb.Object.values:type_name -> pb.Object.ValuesEntry
+	8,  // 2: pb.ObjectList.values:type_name -> pb.ObjectValue
+	3,  // 3: pb.ContainerEntry.type:type_name -> pb.ContainerType
+	9,  // 4: pb.ContainerEntry.item_entries:type_name -> pb.ItemEntry
+	8,  // 5: pb.Object.ValuesEntry.value:type_name -> pb.ObjectValue
+	6,  // [6:6] is the sub-list for method output_type
+	6,  // [6:6] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_common_proto_init() }
@@ -1241,7 +1357,7 @@ func file_common_proto_init() {
 	if File_common_proto != nil {
 		return
 	}
-	file_common_proto_msgTypes[9].OneofWrappers = []any{
+	file_common_proto_msgTypes[3].OneofWrappers = []any{
 		(*ObjectValue_BoolValue)(nil),
 		(*ObjectValue_IntValue)(nil),
 		(*ObjectValue_BigintValue)(nil),
@@ -1253,8 +1369,8 @@ func file_common_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_common_proto_rawDesc), len(file_common_proto_rawDesc)),
-			NumEnums:      3,
-			NumMessages:   11,
+			NumEnums:      5,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

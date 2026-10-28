@@ -159,10 +159,11 @@ func (x *EnterGameReq) GetToken() string {
 // 进入游戏响应（登录成功后返回给客户端的结构体）
 type EnterGameResp struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
-	Base            *PlayerBase            `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`                                                                   // 玩家基础信息
-	ServerTime      int64                  `protobuf:"varint,2,opt,name=server_time,json=serverTime,proto3" json:"server_time,omitempty"`                                    // 服务器毫秒时间戳
-	PlayerMagicAttr MagicAttr              `protobuf:"varint,3,opt,name=player_magic_attr,json=playerMagicAttr,proto3,enum=pb.MagicAttr" json:"player_magic_attr,omitempty"` // 玩家属性
-	Result          *Result                `protobuf:"bytes,4,opt,name=result,proto3" json:"result,omitempty"`
+	Result          *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`                                                               // 业务结果
+	PlayerMagicAttr MagicAttr              `protobuf:"varint,2,opt,name=player_magic_attr,json=playerMagicAttr,proto3,enum=pb.MagicAttr" json:"player_magic_attr,omitempty"` // 玩家属性
+	HeroEntry       *HeroEntry             `protobuf:"bytes,3,opt,name=hero_entry,json=heroEntry,proto3" json:"hero_entry,omitempty"`                                        // 当前英雄
+	WeaponEntry     *WeaponEntry           `protobuf:"bytes,4,opt,name=weapon_entry,json=weaponEntry,proto3" json:"weapon_entry,omitempty"`                                  // 当前武器
+	ServerTime      int64                  `protobuf:"varint,5,opt,name=server_time,json=serverTime,proto3" json:"server_time,omitempty"`                                    // 服务器毫秒时间戳
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -197,18 +198,11 @@ func (*EnterGameResp) Descriptor() ([]byte, []int) {
 	return file_game_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *EnterGameResp) GetBase() *PlayerBase {
+func (x *EnterGameResp) GetResult() *Result {
 	if x != nil {
-		return x.Base
+		return x.Result
 	}
 	return nil
-}
-
-func (x *EnterGameResp) GetServerTime() int64 {
-	if x != nil {
-		return x.ServerTime
-	}
-	return 0
 }
 
 func (x *EnterGameResp) GetPlayerMagicAttr() MagicAttr {
@@ -218,11 +212,25 @@ func (x *EnterGameResp) GetPlayerMagicAttr() MagicAttr {
 	return MagicAttr_PLAYER_ATTR_UNSPECIFIED
 }
 
-func (x *EnterGameResp) GetResult() *Result {
+func (x *EnterGameResp) GetHeroEntry() *HeroEntry {
 	if x != nil {
-		return x.Result
+		return x.HeroEntry
 	}
 	return nil
+}
+
+func (x *EnterGameResp) GetWeaponEntry() *WeaponEntry {
+	if x != nil {
+		return x.WeaponEntry
+	}
+	return nil
+}
+
+func (x *EnterGameResp) GetServerTime() int64 {
+	if x != nil {
+		return x.ServerTime
+	}
+	return 0
 }
 
 // 离开游戏请求（路由 10002）
@@ -307,6 +315,59 @@ func (x *LeaveGameResp) GetResult() *Result {
 	return nil
 }
 
+// 系统通知
+type ServerNotify struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	NotifyType    NOTIFY_TYPE            `protobuf:"varint,1,opt,name=notify_type,json=notifyType,proto3,enum=pb.NOTIFY_TYPE" json:"notify_type,omitempty"` // 通知类型
+	Content       string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`                                              // 通知内容
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ServerNotify) Reset() {
+	*x = ServerNotify{}
+	mi := &file_game_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ServerNotify) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ServerNotify) ProtoMessage() {}
+
+func (x *ServerNotify) ProtoReflect() protoreflect.Message {
+	mi := &file_game_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ServerNotify.ProtoReflect.Descriptor instead.
+func (*ServerNotify) Descriptor() ([]byte, []int) {
+	return file_game_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ServerNotify) GetNotifyType() NOTIFY_TYPE {
+	if x != nil {
+		return x.NotifyType
+	}
+	return NOTIFY_TYPE_NOTIFY_TYPE_KICK
+}
+
+func (x *ServerNotify) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
 var File_game_proto protoreflect.FileDescriptor
 
 const file_game_proto_rawDesc = "" +
@@ -320,18 +381,24 @@ const file_game_proto_rawDesc = "" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\"$\n" +
 	"\fEnterGameReq\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\"\xb3\x01\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\"\xf1\x01\n" +
 	"\rEnterGameResp\x12\"\n" +
-	"\x04base\x18\x01 \x01(\v2\x0e.pb.PlayerBaseR\x04base\x12\x1f\n" +
-	"\vserver_time\x18\x02 \x01(\x03R\n" +
-	"serverTime\x129\n" +
-	"\x11player_magic_attr\x18\x03 \x01(\x0e2\r.pb.MagicAttrR\x0fplayerMagicAttr\x12\"\n" +
-	"\x06result\x18\x04 \x01(\v2\n" +
-	".pb.ResultR\x06result\"\x0e\n" +
+	"\x06result\x18\x01 \x01(\v2\n" +
+	".pb.ResultR\x06result\x129\n" +
+	"\x11player_magic_attr\x18\x02 \x01(\x0e2\r.pb.MagicAttrR\x0fplayerMagicAttr\x12,\n" +
+	"\n" +
+	"hero_entry\x18\x03 \x01(\v2\r.pb.HeroEntryR\theroEntry\x122\n" +
+	"\fweapon_entry\x18\x04 \x01(\v2\x0f.pb.WeaponEntryR\vweaponEntry\x12\x1f\n" +
+	"\vserver_time\x18\x05 \x01(\x03R\n" +
+	"serverTime\"\x0e\n" +
 	"\fLeaveGameReq\"3\n" +
 	"\rLeaveGameResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
-	".pb.ResultR\x06resultB\x19Z\x17server-cluster/share/pbb\x06proto3"
+	".pb.ResultR\x06result\"Z\n" +
+	"\fServerNotify\x120\n" +
+	"\vnotify_type\x18\x01 \x01(\x0e2\x0f.pb.NOTIFY_TYPER\n" +
+	"notifyType\x12\x18\n" +
+	"\acontent\x18\x02 \x01(\tR\acontentB\x19Z\x17server-cluster/share/pbb\x06proto3"
 
 var (
 	file_game_proto_rawDescOnce sync.Once
@@ -345,7 +412,7 @@ func file_game_proto_rawDescGZIP() []byte {
 	return file_game_proto_rawDescData
 }
 
-var file_game_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_game_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_game_proto_goTypes = []any{
 	(*VerifyReq)(nil),     // 0: pb.VerifyReq
 	(*VerifyResp)(nil),    // 1: pb.VerifyResp
@@ -353,21 +420,26 @@ var file_game_proto_goTypes = []any{
 	(*EnterGameResp)(nil), // 3: pb.EnterGameResp
 	(*LeaveGameReq)(nil),  // 4: pb.LeaveGameReq
 	(*LeaveGameResp)(nil), // 5: pb.LeaveGameResp
-	(*Result)(nil),        // 6: pb.Result
-	(*PlayerBase)(nil),    // 7: pb.PlayerBase
+	(*ServerNotify)(nil),  // 6: pb.ServerNotify
+	(*Result)(nil),        // 7: pb.Result
 	(MagicAttr)(0),        // 8: pb.MagicAttr
+	(*HeroEntry)(nil),     // 9: pb.HeroEntry
+	(*WeaponEntry)(nil),   // 10: pb.WeaponEntry
+	(NOTIFY_TYPE)(0),      // 11: pb.NOTIFY_TYPE
 }
 var file_game_proto_depIdxs = []int32{
-	6, // 0: pb.VerifyResp.result:type_name -> pb.Result
-	7, // 1: pb.EnterGameResp.base:type_name -> pb.PlayerBase
-	8, // 2: pb.EnterGameResp.player_magic_attr:type_name -> pb.MagicAttr
-	6, // 3: pb.EnterGameResp.result:type_name -> pb.Result
-	6, // 4: pb.LeaveGameResp.result:type_name -> pb.Result
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	7,  // 0: pb.VerifyResp.result:type_name -> pb.Result
+	7,  // 1: pb.EnterGameResp.result:type_name -> pb.Result
+	8,  // 2: pb.EnterGameResp.player_magic_attr:type_name -> pb.MagicAttr
+	9,  // 3: pb.EnterGameResp.hero_entry:type_name -> pb.HeroEntry
+	10, // 4: pb.EnterGameResp.weapon_entry:type_name -> pb.WeaponEntry
+	7,  // 5: pb.LeaveGameResp.result:type_name -> pb.Result
+	11, // 6: pb.ServerNotify.notify_type:type_name -> pb.NOTIFY_TYPE
+	7,  // [7:7] is the sub-list for method output_type
+	7,  // [7:7] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_game_proto_init() }
@@ -382,7 +454,7 @@ func file_game_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_proto_rawDesc), len(file_game_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -34,9 +34,9 @@ func Hero() global.HeroLogic { return heroLogicInst.MustGet() }
 func (this *heroLogic) HeroList(context.Context) (*pb.HeroListResp, error) {
 	this.once.Do(func() {
 		cfgs := tpl.T().RoleInfo.GetDataList()
-		items := make([]*pb.HeroItem, 0, len(cfgs))
+		items := make([]*pb.HeroEntry, 0, len(cfgs))
 		for _, cfg := range cfgs {
-			items = append(items, &pb.HeroItem{
+			items = append(items, &pb.HeroEntry{
 				Id:                cfg.Id,
 				Name:              cfg.Name,
 				Job:               int32(cfg.Job),
@@ -45,11 +45,11 @@ func (this *heroLogic) HeroList(context.Context) (*pb.HeroListResp, error) {
 				CharacterShards:   cfg.CharacterShards,
 				Rarity:            cfg.Rarity,
 				CharacterId:       cfg.CharacterId,
-				SkillId:           cfg.SkillID,
-				GearId:            cfg.GearID,
+				SkillId:           firstInt32(cfg.SkillID),
+				GearId:            firstInt32(cfg.GearID),
 			})
 		}
-		this.resp = &pb.HeroListResp{Items: items}
+		this.resp = &pb.HeroListResp{HeroEntries: items}
 	})
 	return this.resp, nil
 }
@@ -86,4 +86,12 @@ func loadPlayerHero(ctx context.Context, playerID int64) (model.PlayerHero, erro
 		row.Heroes = util.NewSafeMap[int32, model.HeroInfo]()
 	}
 	return row, nil
+}
+
+// firstInt32 取多值配置的首个元素；配置为多档/多段，pb 当前为单值，空列表返回 0。
+func firstInt32(values []int32) int32 {
+	if len(values) == 0 {
+		return 0
+	}
+	return values[0]
 }

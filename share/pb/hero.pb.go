@@ -21,7 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// 英雄列表请求（路由 10040）
+// 英雄列表请求（路由 10020）
 type HeroListReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -111,6 +111,51 @@ func (x *HeroListResp) GetHeroEntries() []*HeroEntry {
 	return nil
 }
 
+// 英雄变化通知（路由 10021）
+type HeroChangeNotify struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	HeroEntry     *HeroEntry             `protobuf:"bytes,1,opt,name=hero_entry,json=heroEntry,proto3" json:"hero_entry,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HeroChangeNotify) Reset() {
+	*x = HeroChangeNotify{}
+	mi := &file_hero_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HeroChangeNotify) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HeroChangeNotify) ProtoMessage() {}
+
+func (x *HeroChangeNotify) ProtoReflect() protoreflect.Message {
+	mi := &file_hero_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HeroChangeNotify.ProtoReflect.Descriptor instead.
+func (*HeroChangeNotify) Descriptor() ([]byte, []int) {
+	return file_hero_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *HeroChangeNotify) GetHeroEntry() *HeroEntry {
+	if x != nil {
+		return x.HeroEntry
+	}
+	return nil
+}
+
 var File_hero_proto protoreflect.FileDescriptor
 
 const file_hero_proto_rawDesc = "" +
@@ -121,7 +166,10 @@ const file_hero_proto_rawDesc = "" +
 	"\fHeroListResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\x120\n" +
-	"\fhero_entries\x18\x02 \x03(\v2\r.pb.HeroEntryR\vheroEntriesB\x19Z\x17server-cluster/share/pbb\x06proto3"
+	"\fhero_entries\x18\x02 \x03(\v2\r.pb.HeroEntryR\vheroEntries\"@\n" +
+	"\x10HeroChangeNotify\x12,\n" +
+	"\n" +
+	"hero_entry\x18\x01 \x01(\v2\r.pb.HeroEntryR\theroEntryB\x19Z\x17server-cluster/share/pbb\x06proto3"
 
 var (
 	file_hero_proto_rawDescOnce sync.Once
@@ -135,21 +183,23 @@ func file_hero_proto_rawDescGZIP() []byte {
 	return file_hero_proto_rawDescData
 }
 
-var file_hero_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_hero_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_hero_proto_goTypes = []any{
-	(*HeroListReq)(nil),  // 0: pb.HeroListReq
-	(*HeroListResp)(nil), // 1: pb.HeroListResp
-	(*Result)(nil),       // 2: pb.Result
-	(*HeroEntry)(nil),    // 3: pb.HeroEntry
+	(*HeroListReq)(nil),      // 0: pb.HeroListReq
+	(*HeroListResp)(nil),     // 1: pb.HeroListResp
+	(*HeroChangeNotify)(nil), // 2: pb.HeroChangeNotify
+	(*Result)(nil),           // 3: pb.Result
+	(*HeroEntry)(nil),        // 4: pb.HeroEntry
 }
 var file_hero_proto_depIdxs = []int32{
-	2, // 0: pb.HeroListResp.result:type_name -> pb.Result
-	3, // 1: pb.HeroListResp.hero_entries:type_name -> pb.HeroEntry
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	3, // 0: pb.HeroListResp.result:type_name -> pb.Result
+	4, // 1: pb.HeroListResp.hero_entries:type_name -> pb.HeroEntry
+	4, // 2: pb.HeroChangeNotify.hero_entry:type_name -> pb.HeroEntry
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_hero_proto_init() }
@@ -164,7 +214,7 @@ func file_hero_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_hero_proto_rawDesc), len(file_hero_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

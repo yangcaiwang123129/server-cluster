@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package pb;
+
+import "common.proto";
+
+option go_package = "server-cluster/share/pb";
+
+// 装备列表请求（路由 10020）
+message GearListReq {
+}
+
+// 装备列表响应
+message GearListResp {
+  Result result = 1;
+}
+
+// 装备变化通知（路由 10051）
+message GearChangeNotify {
+}

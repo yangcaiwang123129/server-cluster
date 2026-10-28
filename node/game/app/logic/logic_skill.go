@@ -34,9 +34,9 @@ func Skill() global.SkillLogic { return skillLogicInst.MustGet() }
 func (this *skillLogic) SkillList(context.Context) (*pb.SkillListResp, error) {
 	this.once.Do(func() {
 		cfgs := tpl.T().Skill.GetDataList()
-		items := make([]*pb.SkillItem, 0, len(cfgs))
+		items := make([]*pb.SkillEntry, 0, len(cfgs))
 		for _, cfg := range cfgs {
-			item := &pb.SkillItem{
+			item := &pb.SkillEntry{
 				Id:               cfg.Id,
 				SkillTemplate:    cfg.SkillTemplate,
 				SkillName:        cfg.SkillName,
@@ -52,7 +52,7 @@ func (this *skillLogic) SkillList(context.Context) (*pb.SkillListResp, error) {
 			}
 			items = append(items, item)
 		}
-		this.resp = &pb.SkillListResp{Items: items}
+		this.resp = &pb.SkillListResp{SkillEntries: items}
 	})
 	return this.resp, nil
 }

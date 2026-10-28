@@ -34,24 +34,24 @@ func Weapon() global.WeaponLogic { return weaponLogicInst.MustGet() }
 func (this *weaponLogic) WeaponList(context.Context) (*pb.WeaponListResp, error) {
 	this.once.Do(func() {
 		cfgs := tpl.T().Weapon.GetDataList()
-		items := make([]*pb.WeaponItem, 0, len(cfgs))
+		items := make([]*pb.WeaponEntry, 0, len(cfgs))
 		for _, cfg := range cfgs {
-			items = append(items, &pb.WeaponItem{
+			items = append(items, &pb.WeaponEntry{
 				Id:             cfg.Id,
 				WeaponName:     cfg.WeaponName,
 				Icon:           cfg.Icon,
-				WeaponDamage:   cfg.WeaponDamage,
-				PenetrateLevel: cfg.PenetrateLevel,
-				FireRate:       cfg.FireRate,
-				ReloadTime:     cfg.ReloadTime,
-				FieldAttack:    cfg.FieldAttack,
-				ScatterAttack:  cfg.ScatterAttack,
-				ScatterMove:    cfg.ScatterMove,
-				ScatterAim:     cfg.ScatterAim,
-				TimeAim:        cfg.TimeAim,
+				WeaponDamage:   firstInt32(cfg.WeaponDamage),
+				PenetrateLevel: firstInt32(cfg.PenetrateLevel),
+				FireRate:       firstInt32(cfg.FireRate),
+				ReloadTime:     firstInt32(cfg.ReloadTime),
+				FieldAttack:    firstInt32(cfg.FieldAttack),
+				ScatterAttack:  firstInt32(cfg.ScatterAttack),
+				ScatterMove:    firstInt32(cfg.ScatterMove),
+				ScatterAim:     firstInt32(cfg.ScatterAim),
+				TimeAim:        firstInt32(cfg.TimeAim),
 			})
 		}
-		this.resp = &pb.WeaponListResp{Items: items}
+		this.resp = &pb.WeaponListResp{WeaponEntries: items}
 	})
 	return this.resp, nil
 }

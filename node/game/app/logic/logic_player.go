@@ -39,15 +39,13 @@ func PlayerLogic() global.PlayerLogic { return playerLogicInst.MustGet() }
 // EnterGame 进入游戏：playerID 由 handler 层从 ctx.UID() 取得（首包 verify 已完成绑定）。
 // 先加载核心数据并驱动各玩家模块预热/建档，全部成功后才创建在线 actor。
 func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.EnterGameReq) (*pb.EnterGameResp, error) {
-	core, err := global.PlayerCoreCache.Get(ctx, playerID)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
+	if _, err := global.PlayerCoreCache.Get(ctx, playerID); errors.Is(err, gorm.ErrRecordNotFound) {
 		// 首次进入，建档并异步落库
-		core = model.PlayerCore{
+		global.PlayerCoreCache.Set(playerID, model.PlayerCore{
 			PlayerID: playerID,
 			Nickname: "player_" + strconv.FormatInt(playerID, 10),
 			Level:    1,
-		}
-		global.PlayerCoreCache.Set(playerID, core)
+		})
 	} else if err != nil {
 		return nil, err
 	}
@@ -65,7 +63,7 @@ func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.
 	}
 
 	return &pb.EnterGameResp{
-		Base:       toPlayerBase(&core),
+		Result:     &pb.Result{Code: pb.ErrCode_ERR_CODE_OK},
 		ServerTime: xtime.Now().UnixMilli(),
 	}, nil
 }
@@ -142,18 +140,6 @@ func (p *OnlineProvider) KickPlayer(ctx context.Context, req *pb.KickPlayerReq) 
 		}
 	}
 	return resp, nil
-}
-
-// toPlayerBase 玩家核心数据 → wire 基础信息。
-func toPlayerBase(m *model.PlayerCore) *pb.PlayerBase {
-	return &pb.PlayerBase{
-		PlayerId: m.PlayerID,
-		Name:     m.Nickname,
-		Level:    m.Level,
-		Exp:      m.Exp,
-		Gold:     m.Gold,
-		Diamond:  m.Diamond,
-	}
 }
 
 // ── 在线登记（due actor）────────────────────────────────────────────

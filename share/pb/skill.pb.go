@@ -111,6 +111,51 @@ func (x *SkillListResp) GetSkillEntries() []*SkillEntry {
 	return nil
 }
 
+// 技能变化通知（路由 10021）
+type SkillChangeNotify struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SkillEntry    *SkillEntry            `protobuf:"bytes,1,opt,name=skill_entry,json=skillEntry,proto3" json:"skill_entry,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SkillChangeNotify) Reset() {
+	*x = SkillChangeNotify{}
+	mi := &file_skill_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SkillChangeNotify) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SkillChangeNotify) ProtoMessage() {}
+
+func (x *SkillChangeNotify) ProtoReflect() protoreflect.Message {
+	mi := &file_skill_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SkillChangeNotify.ProtoReflect.Descriptor instead.
+func (*SkillChangeNotify) Descriptor() ([]byte, []int) {
+	return file_skill_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *SkillChangeNotify) GetSkillEntry() *SkillEntry {
+	if x != nil {
+		return x.SkillEntry
+	}
+	return nil
+}
+
 var File_skill_proto protoreflect.FileDescriptor
 
 const file_skill_proto_rawDesc = "" +
@@ -120,7 +165,10 @@ const file_skill_proto_rawDesc = "" +
 	"\rSkillListResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\x123\n" +
-	"\rskill_entries\x18\x02 \x03(\v2\x0e.pb.SkillEntryR\fskillEntriesB\x19Z\x17server-cluster/share/pbb\x06proto3"
+	"\rskill_entries\x18\x02 \x03(\v2\x0e.pb.SkillEntryR\fskillEntries\"D\n" +
+	"\x11SkillChangeNotify\x12/\n" +
+	"\vskill_entry\x18\x01 \x01(\v2\x0e.pb.SkillEntryR\n" +
+	"skillEntryB\x19Z\x17server-cluster/share/pbb\x06proto3"
 
 var (
 	file_skill_proto_rawDescOnce sync.Once
@@ -134,21 +182,23 @@ func file_skill_proto_rawDescGZIP() []byte {
 	return file_skill_proto_rawDescData
 }
 
-var file_skill_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_skill_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_skill_proto_goTypes = []any{
-	(*SkillListReq)(nil),  // 0: pb.SkillListReq
-	(*SkillListResp)(nil), // 1: pb.SkillListResp
-	(*Result)(nil),        // 2: pb.Result
-	(*SkillEntry)(nil),    // 3: pb.SkillEntry
+	(*SkillListReq)(nil),      // 0: pb.SkillListReq
+	(*SkillListResp)(nil),     // 1: pb.SkillListResp
+	(*SkillChangeNotify)(nil), // 2: pb.SkillChangeNotify
+	(*Result)(nil),            // 3: pb.Result
+	(*SkillEntry)(nil),        // 4: pb.SkillEntry
 }
 var file_skill_proto_depIdxs = []int32{
-	2, // 0: pb.SkillListResp.result:type_name -> pb.Result
-	3, // 1: pb.SkillListResp.skill_entries:type_name -> pb.SkillEntry
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	3, // 0: pb.SkillListResp.result:type_name -> pb.Result
+	4, // 1: pb.SkillListResp.skill_entries:type_name -> pb.SkillEntry
+	4, // 2: pb.SkillChangeNotify.skill_entry:type_name -> pb.SkillEntry
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_skill_proto_init() }
@@ -163,7 +213,7 @@ func file_skill_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_skill_proto_rawDesc), len(file_skill_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

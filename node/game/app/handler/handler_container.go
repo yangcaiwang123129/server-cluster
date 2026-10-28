@@ -10,11 +10,11 @@ import (
 
 // RegisterPlayerContainer 向 node proxy 注册玩家容器相关客户端路由。
 func RegisterPlayerContainer(proxy *node.Proxy) {
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_GET_CONTAINER), handleGetContainer, node.StatefulRoute)
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_MOVE_ITEM), handleMoveItem, node.StatefulRoute)
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_ROTATE_ITEM), handleRotateItem, node.StatefulRoute)
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_REMOVE_ITEM), handleRemoveItem, node.StatefulRoute)
-	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_SORT_CONTAINER), handleSortContainer, node.StatefulRoute)
+	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_CONTAINER_LIST), handleGetContainer, node.StatefulRoute)
+	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_CONTAINER_MOVE), handleMoveItem, node.StatefulRoute)
+	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_CONTAINER_ROTATE), handleRotateItem, node.StatefulRoute)
+	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_CONTAINER_REMOVE), handleRemoveItem, node.StatefulRoute)
+	proxy.AddRouteHandler(int32(pb.RouteCode_ROUTE_CODE_CONTAINER_SORT), handleSortContainer, node.StatefulRoute)
 }
 
 // handleGetContainer 拉取容器快照。

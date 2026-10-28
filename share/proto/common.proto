@@ -4,12 +4,6 @@ package pb;
 
 option go_package = "server-cluster/share/pb";
 
-// 系统通知（路由 1901，服务端主动推送）
-message ServerNotify {
-  string kind = 1;    // 通知类型：kick（踢下线）/ maintain（维护）/ broadcast（公告）
-  string content = 2; // 通知内容
-}
-
 // 客户端路由号枚举
 // 按业务分号段：每个业务 10 个号，便于后续在同段内扩展。
 enum RouteCode {
@@ -17,36 +11,40 @@ enum RouteCode {
   ROUTE_CODE_UNSPECIFIED = 0;
 
   // 玩家 10000~10009
-  ROUTE_CODE_VERIFY = 10000;            // 首包，验证账号令牌，用于绑定节点和网关
-  ROUTE_CODE_ENTER_GAME = 10001;        // 进入游戏
-  ROUTE_CODE_LEAVE_GAME = 10002;        // 离开游戏
+  ROUTE_CODE_VERIFY = 10000;  // 首包，验证账号令牌，用于绑定节点和网关
+  ROUTE_CODE_ENTER_GAME = 10001;  // 进入游戏
+  ROUTE_CODE_LEAVE_GAME = 10002;  // 离开游戏
+  ROUTE_CODE_SEVER_NOTIFY = 10003;  // 服务器通知
 
   // 玩家容器 10010~10019
-  ROUTE_CODE_CONTAINER_LIST = 10010;     // 容器列表
-  ROUTE_CODE_CONTAINER_CHANGE_NOTIFY = 10011;        // 技能变化通知
-  ROUTE_CODE_CONTAINER_MOVE = 100112;         // 移动物品
-  ROUTE_CODE_CONTAINER_ROTATE = 10013;       // 旋转物品
-  ROUTE_CODE_CONTAINER_REMOVE = 10014;       // 删除物品
-  ROUTE_CODE_CONTAINER_SORT = 10015;    // 一键整理
+  ROUTE_CODE_CONTAINER_LIST = 10010;  // 容器列表
+  ROUTE_CODE_CONTAINER_NOTIFY = 10011;  // 容器内变化通知
+  ROUTE_CODE_CONTAINER_MOVE = 100112; // 容器内物品移动
+  ROUTE_CODE_CONTAINER_ROTATE = 10013;  // 容器内物品旋转
+  ROUTE_CODE_CONTAINER_SORT = 10014;  // 容器一键整理物品
 
-  // 技能 10020~10029
-  ROUTE_CODE_SKILL_LIST = 10020;        // 技能列表
-  ROUTE_CODE_SKILL_CHANGE_NOTIFY = 10021;        // 技能变化通知
+  // 英雄 10020~10029
+  ROUTE_CODE_HERO_LIST = 10020;  // 英雄列表
+  ROUTE_CODE_HERO_NOTIFY = 10021;  // 英雄变化通知
 
   // 武器 10030~10039
-  ROUTE_CODE_WEAPON_LIST = 10030;       // 武器列表
-  ROUTE_CODE_WEAPON_CHANGE_NOTIFY = 10031;        // 武器变化通知
+  ROUTE_CODE_WEAPON_LIST = 10030;  // 武器列表
+  ROUTE_CODE_WEAPON_NOTIFY = 10031;  // 武器变化通知
 
-  // 英雄 10040~10049
-  ROUTE_CODE_HERO_LIST = 10040;         // 英雄列表
-  ROUTE_CODE_HERO_CHANGE_NOTIFY = 10041;        // 英雄变化通知
+  // 技能 10040~10049
+  ROUTE_CODE_SKILL_LIST = 10040;  // 技能列表
+  ROUTE_CODE_SKILL_NOTIFY = 10041;  // 技能变化通知
+
+  // 装备 10050~10059
+  ROUTE_CODE_GEAR_LIST = 10050;  // 装备列表
+  ROUTE_CODE_GEAR_NOTIFY = 10051;  // 装备变化通知
 
   // 战斗服 50000~59999
 
   // 社交服 60000~69999
 }
 
-// 业务错误码枚举（1000~9999）。
+//  ========== 业务错误码枚举（1000~9999） ==========
 enum ErrCode {
   ERR_CODE_OK = 0; // 成功
   ERR_CODE_INTERNAL_ERROR = 1000;
@@ -58,53 +56,97 @@ enum ErrCode {
   ERR_CODE_TOKEN_INVALID = 2003;
 }
 
+//  ========== 通知类型 ==========
+enum NOTIFY_TYPE {
+  NOTIFY_TYPE_KICK = 0; // 踢下线
+  NOTIFY_TYPE_MAINTAIN = 2; // 维护
+  NOTIFY_TYPE_BROADCAST = 3; // 公告
+}
+
+// ========== 容器类型枚举 ==========
+
+enum ContainerType {
+  CONTAINER_TYPE_UNSPECIFIED = 0;
+  CONTAINER_TYPE_BACKPACK = 1; // 背包（局内随身，死亡掉落）
+  CONTAINER_TYPE_STASH = 2;    // 仓库（局外固定，不掉落）
+  CONTAINER_TYPE_SECURE = 3;   // 保险箱（局内随身，不掉落）
+}
+
+//  ========== 属性枚举 ==========
+enum MagicAttr {
+  // 0~10000 玩家相关属性
+  PLAYER_ATTR_UNSPECIFIED = 0;
+  PLAYER_ATTR_NAME = 1; // 昵称
+  PLAYER_ATTR_LEVEL = 2; // 等级
+  PLAYER_ATTR_EXP = 3; // 经验
+  PLAYER_ATTR_VIP_LEVEL = 4; // vip等级
+  PLAYER_ATTR_VIP_EXP = 5; // vip经验
+  PLAYER_ATTR_COIN = 6; // 币
+  PLAYER_ATTR_GOLD = 7; // 金
+  // 10001~20000 红点相关属性
+}
+
 // 通用业务结果：每个响应包统一携带。
 // code 用于客户端逻辑分支；msg 为空时按 code 取默认文案；args 为可变参数，
-// 按顺序填充 msg 的占位符（如「物品[0]数量不足，需要[1]」）。
 message Result {
   ErrCode code = 1;         // 业务错误码，ERR_CODE_OK 表示成功
   string msg = 2;           // 错误描述（服务端可覆盖默认文案）
   repeated string args = 3; // 可变参数
 }
 
-message PlayerData {
-  PlayerBase player_base = 1;
-
-}
-// 玩家基础信息（登录进入游戏时下发的通用结构）
-message PlayerBase {
-  int64 player_id = 1;     // 玩家ID
-  string name = 2;   // 昵称
-  int32 level = 3;   // 等级
-  int64 exp = 4;     // 经验
-  int64 gold = 5;    // 金币
-  int64 diamond = 6; // 钻石
+// 通用对象：等价于 JSON object，键为字段名，值为动态类型。
+message Object {
+  map<string, ObjectValue> values = 1; // 映射
 }
 
-// 玩家属性枚举（与 PlayerBase 字段对应）
-enum MagicAttr{
-  // 0~10000 玩家相关属性
-  PLAYER_ATTR_UNSPECIFIED = 0;
-  PLAYER_ATTR_NAME = 1;    // 昵称
-  PLAYER_ATTR_LEVEL = 2;   // 等级
-  PLAYER_ATTR_EXP = 3;     // 经验
-  PLAYER_ATTR_GOLD = 4;    // 金币
-  PLAYER_ATTR_DIAMOND = 5; // 钻石
-  // 10001~20000 红点相关属性
+// 动态值数组。
+message ObjectList {
+  repeated ObjectValue values = 1; // 列表
+}
+
+// 动态值：oneof 通用基本类型。
+message ObjectValue {
+  oneof kind {
+    bool bool_value = 1; // 布尔
+    int32 int_value = 2; // 整数
+    int64 Bigint_value = 3; // 整数
+    double double_value = 4; // 浮点数
+    string string_value = 5; // 字符串
+  }
+}
+
+// 容器中的物品
+message ItemEntry {
+  int64 item_id = 1;    // 物品唯一实例ID
+  int32 item_cfg_id = 2; // 物品配置ID
+  int32 count = 3;  // 堆叠数量
+  int32 grid_x = 4;      // 网格 X
+  int32 grid_y = 5;      // 网格 Y
+  bool rotated = 6; // 是否旋转
+}
+
+// 容器条目
+message ContainerEntry {
+  int64 container_id = 1;           // 容器实例ID（=playerID + type 编码）
+  ContainerType type = 2;           // 容器类型
+  int32 grid_w = 3;                 // 网格宽度
+  int32 grid_h = 4;                 // 网格高度
+  int32 version = 5;                // 操作版本号（每次修改+1）
+  repeated ItemEntry item_entries = 6; // 物品列表
 }
 
 // 英雄条目
 message HeroEntry {
-  int32 id = 1;                     // 英雄ID
-  string name = 2;                  // 名字
-  int32 job = 3;                    // 职业
-  int32 weapon_id = 4;              // 默认武器
-  int32 control_difficulty = 5;     // 操控难度
-  int32 character_shards = 6;       // 角色碎片
-  int32 rarity = 7;                 // 稀有度
-  int32 character_id = 8;           // 角色配置
-  int32 skill_id = 9;               // 携带技能
-  int32 gear_id = 10;                // 穿戴装备
+  int32 id = 1;                 // 英雄ID
+  string name = 2;              // 名字
+  int32 job = 3;                // 职业
+  int32 weapon_id = 4;          // 默认武器
+  int32 control_difficulty = 5; // 操控难度
+  int32 character_shards = 6;   // 角色碎片
+  int32 rarity = 7;             // 稀有度
+  int32 character_id = 8;       // 角色配置
+  int32 skill_id = 9;           // 携带技能
+  int32 gear_id = 10;           // 穿戴装备
 }
 
 // 武器条目
@@ -125,35 +167,14 @@ message WeaponEntry {
 
 // 技能条目
 message SkillEntry {
-  int32 id = 1;                     // 技能ID
-  int32 skill_template = 2;         // 技能模版
-  string skill_name = 3;            // 技能名字
-  string desc = 4;                  // 技能简述
-  string desc_detail = 5;           // 技能详情
-  int32 damage = 6;                 // 伤害
-  float auto_fire_angle_x = 7;      // 自动攻击角度 X
-  float auto_fire_angle_y = 8;      // 自动攻击角度 Y
-  float auto_fire_distance = 9;     // 自动攻击距离
-  int32 capacity = 10;              // 容量
-}
-
-// 通用对象：等价于 JSON object，键为字段名，值为动态类型。
-message Object {
-  map<string, ObjectValue> values = 1; // 映射
-}
-
-// 动态值数组。
-message ObjectList {
-  repeated ObjectValue values = 1; // 列表
-}
-
-// 动态值：oneof 通用基本类型。
-message ObjectValue {
-  oneof kind {
-    bool bool_value = 1;          // 布尔
-    int32 int_value = 2;          // 整数
-    int64 Bigint_value = 3;       // 整数
-    double double_value = 4;      // 浮点数
-    string string_value = 5;      // 字符串
-  }
+  int32 id = 1;                 // 技能ID
+  int32 skill_template = 2;     // 技能模版
+  string skill_name = 3;        // 技能名字
+  string desc = 4;              // 技能简述
+  string desc_detail = 5;       // 技能详情
+  int32 damage = 6;             // 伤害
+  float auto_fire_angle_x = 7;  // 自动攻击角度 X
+  float auto_fire_angle_y = 8;  // 自动攻击角度 Y
+  float auto_fire_distance = 9; // 自动攻击距离
+  int32 capacity = 10;          // 容量
 }

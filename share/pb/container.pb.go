@@ -21,85 +21,28 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type ContainerType int32
-
-const (
-	ContainerType_CONTAINER_TYPE_UNSPECIFIED ContainerType = 0
-	ContainerType_CONTAINER_TYPE_BACKPACK    ContainerType = 1 // 背包（局内随身，死亡掉落）
-	ContainerType_CONTAINER_TYPE_STASH       ContainerType = 2 // 仓库（局外固定，不掉落）
-	ContainerType_CONTAINER_TYPE_SECURE      ContainerType = 3 // 保险箱（局内随身，不掉落）
-)
-
-// Enum value maps for ContainerType.
-var (
-	ContainerType_name = map[int32]string{
-		0: "CONTAINER_TYPE_UNSPECIFIED",
-		1: "CONTAINER_TYPE_BACKPACK",
-		2: "CONTAINER_TYPE_STASH",
-		3: "CONTAINER_TYPE_SECURE",
-	}
-	ContainerType_value = map[string]int32{
-		"CONTAINER_TYPE_UNSPECIFIED": 0,
-		"CONTAINER_TYPE_BACKPACK":    1,
-		"CONTAINER_TYPE_STASH":       2,
-		"CONTAINER_TYPE_SECURE":      3,
-	}
-)
-
-func (x ContainerType) Enum() *ContainerType {
-	p := new(ContainerType)
-	*p = x
-	return p
-}
-
-func (x ContainerType) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (ContainerType) Descriptor() protoreflect.EnumDescriptor {
-	return file_container_proto_enumTypes[0].Descriptor()
-}
-
-func (ContainerType) Type() protoreflect.EnumType {
-	return &file_container_proto_enumTypes[0]
-}
-
-func (x ContainerType) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use ContainerType.Descriptor instead.
-func (ContainerType) EnumDescriptor() ([]byte, []int) {
-	return file_container_proto_rawDescGZIP(), []int{0}
-}
-
-// 容器中的物品（不含尺寸 w/h，客户端查 ItemDef 算）
-type ContainerItem struct {
+// 容器列表（路由 10010）
+type ContainerListReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Uid           int64                  `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`                  // 物品唯一实例ID
-	DefId         int32                  `protobuf:"varint,2,opt,name=def_id,json=defId,proto3" json:"def_id,omitempty"` // 物品配置ID
-	Count         int32                  `protobuf:"varint,3,opt,name=count,proto3" json:"count,omitempty"`              // 堆叠数量
-	X             int32                  `protobuf:"varint,4,opt,name=x,proto3" json:"x,omitempty"`                      // 网格 X
-	Y             int32                  `protobuf:"varint,5,opt,name=y,proto3" json:"y,omitempty"`                      // 网格 Y
-	Rotated       bool                   `protobuf:"varint,6,opt,name=rotated,proto3" json:"rotated,omitempty"`          // 是否旋转
+	ContainerType ContainerType          `protobuf:"varint,1,opt,name=container_type,json=containerType,proto3,enum=pb.ContainerType" json:"container_type,omitempty"` // 容器类型
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ContainerItem) Reset() {
-	*x = ContainerItem{}
+func (x *ContainerListReq) Reset() {
+	*x = ContainerListReq{}
 	mi := &file_container_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ContainerItem) String() string {
+func (x *ContainerListReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ContainerItem) ProtoMessage() {}
+func (*ContainerListReq) ProtoMessage() {}
 
-func (x *ContainerItem) ProtoReflect() protoreflect.Message {
+func (x *ContainerListReq) ProtoReflect() protoreflect.Message {
 	mi := &file_container_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -111,80 +54,41 @@ func (x *ContainerItem) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ContainerItem.ProtoReflect.Descriptor instead.
-func (*ContainerItem) Descriptor() ([]byte, []int) {
+// Deprecated: Use ContainerListReq.ProtoReflect.Descriptor instead.
+func (*ContainerListReq) Descriptor() ([]byte, []int) {
 	return file_container_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *ContainerItem) GetUid() int64 {
+func (x *ContainerListReq) GetContainerType() ContainerType {
 	if x != nil {
-		return x.Uid
+		return x.ContainerType
 	}
-	return 0
+	return ContainerType_CONTAINER_TYPE_UNSPECIFIED
 }
 
-func (x *ContainerItem) GetDefId() int32 {
-	if x != nil {
-		return x.DefId
-	}
-	return 0
+// 容器列表响应
+type ContainerListResp struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Result           *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	ContainerEntries []*ContainerEntry      `protobuf:"bytes,2,rep,name=container_entries,json=containerEntries,proto3" json:"container_entries,omitempty"` // 容器列表
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
-func (x *ContainerItem) GetCount() int32 {
-	if x != nil {
-		return x.Count
-	}
-	return 0
-}
-
-func (x *ContainerItem) GetX() int32 {
-	if x != nil {
-		return x.X
-	}
-	return 0
-}
-
-func (x *ContainerItem) GetY() int32 {
-	if x != nil {
-		return x.Y
-	}
-	return 0
-}
-
-func (x *ContainerItem) GetRotated() bool {
-	if x != nil {
-		return x.Rotated
-	}
-	return false
-}
-
-// 容器完整快照（成功时返回给客户端）
-type ContainerSnapshot struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ContainerId   int64                  `protobuf:"varint,1,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"` // 容器实例ID（=playerID + type 编码）
-	Type          ContainerType          `protobuf:"varint,2,opt,name=type,proto3,enum=pb.ContainerType" json:"type,omitempty"`            // 容器类型
-	GridW         int32                  `protobuf:"varint,3,opt,name=grid_w,json=gridW,proto3" json:"grid_w,omitempty"`                   // 网格宽度
-	GridH         int32                  `protobuf:"varint,4,opt,name=grid_h,json=gridH,proto3" json:"grid_h,omitempty"`                   // 网格高度
-	Version       int32                  `protobuf:"varint,5,opt,name=version,proto3" json:"version,omitempty"`                            // 操作版本号（每次修改+1）
-	Items         []*ContainerItem       `protobuf:"bytes,6,rep,name=items,proto3" json:"items,omitempty"`                                 // 物品列表
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ContainerSnapshot) Reset() {
-	*x = ContainerSnapshot{}
+func (x *ContainerListResp) Reset() {
+	*x = ContainerListResp{}
 	mi := &file_container_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ContainerSnapshot) String() string {
+func (x *ContainerListResp) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ContainerSnapshot) ProtoMessage() {}
+func (*ContainerListResp) ProtoMessage() {}
 
-func (x *ContainerSnapshot) ProtoReflect() protoreflect.Message {
+func (x *ContainerListResp) ProtoReflect() protoreflect.Message {
 	mi := &file_container_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -196,153 +100,80 @@ func (x *ContainerSnapshot) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ContainerSnapshot.ProtoReflect.Descriptor instead.
-func (*ContainerSnapshot) Descriptor() ([]byte, []int) {
+// Deprecated: Use ContainerListResp.ProtoReflect.Descriptor instead.
+func (*ContainerListResp) Descriptor() ([]byte, []int) {
 	return file_container_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *ContainerSnapshot) GetContainerId() int64 {
-	if x != nil {
-		return x.ContainerId
-	}
-	return 0
-}
-
-func (x *ContainerSnapshot) GetType() ContainerType {
-	if x != nil {
-		return x.Type
-	}
-	return ContainerType_CONTAINER_TYPE_UNSPECIFIED
-}
-
-func (x *ContainerSnapshot) GetGridW() int32 {
-	if x != nil {
-		return x.GridW
-	}
-	return 0
-}
-
-func (x *ContainerSnapshot) GetGridH() int32 {
-	if x != nil {
-		return x.GridH
-	}
-	return 0
-}
-
-func (x *ContainerSnapshot) GetVersion() int32 {
-	if x != nil {
-		return x.Version
-	}
-	return 0
-}
-
-func (x *ContainerSnapshot) GetItems() []*ContainerItem {
-	if x != nil {
-		return x.Items
-	}
-	return nil
-}
-
-// 拉取容器（路由 10010）
-type GetContainerReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Type          ContainerType          `protobuf:"varint,1,opt,name=type,proto3,enum=pb.ContainerType" json:"type,omitempty"` // 容器类型
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetContainerReq) Reset() {
-	*x = GetContainerReq{}
-	mi := &file_container_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetContainerReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetContainerReq) ProtoMessage() {}
-
-func (x *GetContainerReq) ProtoReflect() protoreflect.Message {
-	mi := &file_container_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetContainerReq.ProtoReflect.Descriptor instead.
-func (*GetContainerReq) Descriptor() ([]byte, []int) {
-	return file_container_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *GetContainerReq) GetType() ContainerType {
-	if x != nil {
-		return x.Type
-	}
-	return ContainerType_CONTAINER_TYPE_UNSPECIFIED
-}
-
-// 拉取容器响应
-type GetContainerResp struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Snapshot      *ContainerSnapshot     `protobuf:"bytes,1,opt,name=snapshot,proto3" json:"snapshot,omitempty"`
-	Result        *Result                `protobuf:"bytes,2,opt,name=result,proto3" json:"result,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetContainerResp) Reset() {
-	*x = GetContainerResp{}
-	mi := &file_container_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetContainerResp) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetContainerResp) ProtoMessage() {}
-
-func (x *GetContainerResp) ProtoReflect() protoreflect.Message {
-	mi := &file_container_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetContainerResp.ProtoReflect.Descriptor instead.
-func (*GetContainerResp) Descriptor() ([]byte, []int) {
-	return file_container_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *GetContainerResp) GetSnapshot() *ContainerSnapshot {
-	if x != nil {
-		return x.Snapshot
-	}
-	return nil
-}
-
-func (x *GetContainerResp) GetResult() *Result {
+func (x *ContainerListResp) GetResult() *Result {
 	if x != nil {
 		return x.Result
 	}
 	return nil
 }
 
-// 移动物品（路由 10011）
-type MoveItemReq struct {
+func (x *ContainerListResp) GetContainerEntries() []*ContainerEntry {
+	if x != nil {
+		return x.ContainerEntries
+	}
+	return nil
+}
+
+// 容器内物品变化（路由 10011）
+type ContainerNotify struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ContainerType ContainerType          `protobuf:"varint,1,opt,name=container_type,json=containerType,proto3,enum=pb.ContainerType" json:"container_type,omitempty"` // 容器类型
+	ItemEntry     *ItemEntry             `protobuf:"bytes,2,opt,name=item_entry,json=itemEntry,proto3" json:"item_entry,omitempty"`                                    // 容器内物品
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ContainerNotify) Reset() {
+	*x = ContainerNotify{}
+	mi := &file_container_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ContainerNotify) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ContainerNotify) ProtoMessage() {}
+
+func (x *ContainerNotify) ProtoReflect() protoreflect.Message {
+	mi := &file_container_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ContainerNotify.ProtoReflect.Descriptor instead.
+func (*ContainerNotify) Descriptor() ([]byte, []int) {
+	return file_container_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *ContainerNotify) GetContainerType() ContainerType {
+	if x != nil {
+		return x.ContainerType
+	}
+	return ContainerType_CONTAINER_TYPE_UNSPECIFIED
+}
+
+func (x *ContainerNotify) GetItemEntry() *ItemEntry {
+	if x != nil {
+		return x.ItemEntry
+	}
+	return nil
+}
+
+// 容器内移动物品请求（路由 10012）
+type ContainerMoveReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Type          ContainerType          `protobuf:"varint,1,opt,name=type,proto3,enum=pb.ContainerType" json:"type,omitempty"` // 容器类型
 	Uid           int64                  `protobuf:"varint,2,opt,name=uid,proto3" json:"uid,omitempty"`                         // 物品实例ID
@@ -353,21 +184,21 @@ type MoveItemReq struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *MoveItemReq) Reset() {
-	*x = MoveItemReq{}
-	mi := &file_container_proto_msgTypes[4]
+func (x *ContainerMoveReq) Reset() {
+	*x = ContainerMoveReq{}
+	mi := &file_container_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *MoveItemReq) String() string {
+func (x *ContainerMoveReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*MoveItemReq) ProtoMessage() {}
+func (*ContainerMoveReq) ProtoMessage() {}
 
-func (x *MoveItemReq) ProtoReflect() protoreflect.Message {
-	mi := &file_container_proto_msgTypes[4]
+func (x *ContainerMoveReq) ProtoReflect() protoreflect.Message {
+	mi := &file_container_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -378,48 +209,93 @@ func (x *MoveItemReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use MoveItemReq.ProtoReflect.Descriptor instead.
-func (*MoveItemReq) Descriptor() ([]byte, []int) {
-	return file_container_proto_rawDescGZIP(), []int{4}
+// Deprecated: Use ContainerMoveReq.ProtoReflect.Descriptor instead.
+func (*ContainerMoveReq) Descriptor() ([]byte, []int) {
+	return file_container_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *MoveItemReq) GetType() ContainerType {
+func (x *ContainerMoveReq) GetType() ContainerType {
 	if x != nil {
 		return x.Type
 	}
 	return ContainerType_CONTAINER_TYPE_UNSPECIFIED
 }
 
-func (x *MoveItemReq) GetUid() int64 {
+func (x *ContainerMoveReq) GetUid() int64 {
 	if x != nil {
 		return x.Uid
 	}
 	return 0
 }
 
-func (x *MoveItemReq) GetToX() int32 {
+func (x *ContainerMoveReq) GetToX() int32 {
 	if x != nil {
 		return x.ToX
 	}
 	return 0
 }
 
-func (x *MoveItemReq) GetToY() int32 {
+func (x *ContainerMoveReq) GetToY() int32 {
 	if x != nil {
 		return x.ToY
 	}
 	return 0
 }
 
-func (x *MoveItemReq) GetRotated() bool {
+func (x *ContainerMoveReq) GetRotated() bool {
 	if x != nil {
 		return x.Rotated
 	}
 	return false
 }
 
-// 旋转物品（路由 10012）
-type RotateItemReq struct {
+// 容器内移动物品响应
+type ContainerMoveResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ContainerMoveResp) Reset() {
+	*x = ContainerMoveResp{}
+	mi := &file_container_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ContainerMoveResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ContainerMoveResp) ProtoMessage() {}
+
+func (x *ContainerMoveResp) ProtoReflect() protoreflect.Message {
+	mi := &file_container_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ContainerMoveResp.ProtoReflect.Descriptor instead.
+func (*ContainerMoveResp) Descriptor() ([]byte, []int) {
+	return file_container_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *ContainerMoveResp) GetResult() *Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
+// 容器内旋转物品请求（路由 10013）
+type ContainerRotateReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Type          ContainerType          `protobuf:"varint,1,opt,name=type,proto3,enum=pb.ContainerType" json:"type,omitempty"` // 容器类型
 	Uid           int64                  `protobuf:"varint,2,opt,name=uid,proto3" json:"uid,omitempty"`                         // 物品实例ID
@@ -427,20 +303,20 @@ type RotateItemReq struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *RotateItemReq) Reset() {
-	*x = RotateItemReq{}
+func (x *ContainerRotateReq) Reset() {
+	*x = ContainerRotateReq{}
 	mi := &file_container_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *RotateItemReq) String() string {
+func (x *ContainerRotateReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*RotateItemReq) ProtoMessage() {}
+func (*ContainerRotateReq) ProtoMessage() {}
 
-func (x *RotateItemReq) ProtoReflect() protoreflect.Message {
+func (x *ContainerRotateReq) ProtoReflect() protoreflect.Message {
 	mi := &file_container_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -452,48 +328,47 @@ func (x *RotateItemReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RotateItemReq.ProtoReflect.Descriptor instead.
-func (*RotateItemReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use ContainerRotateReq.ProtoReflect.Descriptor instead.
+func (*ContainerRotateReq) Descriptor() ([]byte, []int) {
 	return file_container_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *RotateItemReq) GetType() ContainerType {
+func (x *ContainerRotateReq) GetType() ContainerType {
 	if x != nil {
 		return x.Type
 	}
 	return ContainerType_CONTAINER_TYPE_UNSPECIFIED
 }
 
-func (x *RotateItemReq) GetUid() int64 {
+func (x *ContainerRotateReq) GetUid() int64 {
 	if x != nil {
 		return x.Uid
 	}
 	return 0
 }
 
-// 删除物品（路由 10013）
-type RemoveItemReq struct {
+// 容器内旋转物品响应
+type ContainerRotateResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Type          ContainerType          `protobuf:"varint,1,opt,name=type,proto3,enum=pb.ContainerType" json:"type,omitempty"` // 容器类型
-	Uid           int64                  `protobuf:"varint,2,opt,name=uid,proto3" json:"uid,omitempty"`                         // 物品实例ID
+	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *RemoveItemReq) Reset() {
-	*x = RemoveItemReq{}
+func (x *ContainerRotateResp) Reset() {
+	*x = ContainerRotateResp{}
 	mi := &file_container_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *RemoveItemReq) String() string {
+func (x *ContainerRotateResp) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*RemoveItemReq) ProtoMessage() {}
+func (*ContainerRotateResp) ProtoMessage() {}
 
-func (x *RemoveItemReq) ProtoReflect() protoreflect.Message {
+func (x *ContainerRotateResp) ProtoReflect() protoreflect.Message {
 	mi := &file_container_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -505,29 +380,22 @@ func (x *RemoveItemReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RemoveItemReq.ProtoReflect.Descriptor instead.
-func (*RemoveItemReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use ContainerRotateResp.ProtoReflect.Descriptor instead.
+func (*ContainerRotateResp) Descriptor() ([]byte, []int) {
 	return file_container_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *RemoveItemReq) GetType() ContainerType {
+func (x *ContainerRotateResp) GetResult() *Result {
 	if x != nil {
-		return x.Type
+		return x.Result
 	}
-	return ContainerType_CONTAINER_TYPE_UNSPECIFIED
+	return nil
 }
 
-func (x *RemoveItemReq) GetUid() int64 {
-	if x != nil {
-		return x.Uid
-	}
-	return 0
-}
-
-// 一键整理（路由 10014）
+// 容器一键整理（路由 10014）
 type SortContainerReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Type          ContainerType          `protobuf:"varint,1,opt,name=type,proto3,enum=pb.ContainerType" json:"type,omitempty"` // 容器类型
+	ContainerType ContainerType          `protobuf:"varint,1,opt,name=container_type,json=containerType,proto3,enum=pb.ContainerType" json:"container_type,omitempty"` // 容器类型
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -562,115 +430,45 @@ func (*SortContainerReq) Descriptor() ([]byte, []int) {
 	return file_container_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *SortContainerReq) GetType() ContainerType {
+func (x *SortContainerReq) GetContainerType() ContainerType {
 	if x != nil {
-		return x.Type
+		return x.ContainerType
 	}
 	return ContainerType_CONTAINER_TYPE_UNSPECIFIED
-}
-
-// ========== 操作统一响应 ==========
-// Move/Rotate/Remove/Sort 成功都返回容器快照
-type ContainerOpResp struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Snapshot      *ContainerSnapshot     `protobuf:"bytes,1,opt,name=snapshot,proto3" json:"snapshot,omitempty"`
-	Result        *Result                `protobuf:"bytes,2,opt,name=result,proto3" json:"result,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ContainerOpResp) Reset() {
-	*x = ContainerOpResp{}
-	mi := &file_container_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ContainerOpResp) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ContainerOpResp) ProtoMessage() {}
-
-func (x *ContainerOpResp) ProtoReflect() protoreflect.Message {
-	mi := &file_container_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ContainerOpResp.ProtoReflect.Descriptor instead.
-func (*ContainerOpResp) Descriptor() ([]byte, []int) {
-	return file_container_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *ContainerOpResp) GetSnapshot() *ContainerSnapshot {
-	if x != nil {
-		return x.Snapshot
-	}
-	return nil
-}
-
-func (x *ContainerOpResp) GetResult() *Result {
-	if x != nil {
-		return x.Result
-	}
-	return nil
 }
 
 var File_container_proto protoreflect.FileDescriptor
 
 const file_container_proto_rawDesc = "" +
 	"\n" +
-	"\x0fcontainer.proto\x12\x02pb\x1a\fcommon.proto\"\x84\x01\n" +
-	"\rContainerItem\x12\x10\n" +
-	"\x03uid\x18\x01 \x01(\x03R\x03uid\x12\x15\n" +
-	"\x06def_id\x18\x02 \x01(\x05R\x05defId\x12\x14\n" +
-	"\x05count\x18\x03 \x01(\x05R\x05count\x12\f\n" +
-	"\x01x\x18\x04 \x01(\x05R\x01x\x12\f\n" +
-	"\x01y\x18\x05 \x01(\x05R\x01y\x12\x18\n" +
-	"\arotated\x18\x06 \x01(\bR\arotated\"\xce\x01\n" +
-	"\x11ContainerSnapshot\x12!\n" +
-	"\fcontainer_id\x18\x01 \x01(\x03R\vcontainerId\x12%\n" +
-	"\x04type\x18\x02 \x01(\x0e2\x11.pb.ContainerTypeR\x04type\x12\x15\n" +
-	"\x06grid_w\x18\x03 \x01(\x05R\x05gridW\x12\x15\n" +
-	"\x06grid_h\x18\x04 \x01(\x05R\x05gridH\x12\x18\n" +
-	"\aversion\x18\x05 \x01(\x05R\aversion\x12'\n" +
-	"\x05items\x18\x06 \x03(\v2\x11.pb.ContainerItemR\x05items\"8\n" +
-	"\x0fGetContainerReq\x12%\n" +
-	"\x04type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\x04type\"i\n" +
-	"\x10GetContainerResp\x121\n" +
-	"\bsnapshot\x18\x01 \x01(\v2\x15.pb.ContainerSnapshotR\bsnapshot\x12\"\n" +
-	"\x06result\x18\x02 \x01(\v2\n" +
-	".pb.ResultR\x06result\"\x86\x01\n" +
-	"\vMoveItemReq\x12%\n" +
+	"\x0fcontainer.proto\x12\x02pb\x1a\fcommon.proto\"L\n" +
+	"\x10ContainerListReq\x128\n" +
+	"\x0econtainer_type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\rcontainerType\"x\n" +
+	"\x11ContainerListResp\x12\"\n" +
+	"\x06result\x18\x01 \x01(\v2\n" +
+	".pb.ResultR\x06result\x12?\n" +
+	"\x11container_entries\x18\x02 \x03(\v2\x12.pb.ContainerEntryR\x10containerEntries\"y\n" +
+	"\x0fContainerNotify\x128\n" +
+	"\x0econtainer_type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\rcontainerType\x12,\n" +
+	"\n" +
+	"item_entry\x18\x02 \x01(\v2\r.pb.ItemEntryR\titemEntry\"\x8b\x01\n" +
+	"\x10ContainerMoveReq\x12%\n" +
 	"\x04type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\x04type\x12\x10\n" +
 	"\x03uid\x18\x02 \x01(\x03R\x03uid\x12\x11\n" +
 	"\x04to_x\x18\x03 \x01(\x05R\x03toX\x12\x11\n" +
 	"\x04to_y\x18\x04 \x01(\x05R\x03toY\x12\x18\n" +
-	"\arotated\x18\x05 \x01(\bR\arotated\"H\n" +
-	"\rRotateItemReq\x12%\n" +
-	"\x04type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\x04type\x12\x10\n" +
-	"\x03uid\x18\x02 \x01(\x03R\x03uid\"H\n" +
-	"\rRemoveItemReq\x12%\n" +
+	"\arotated\x18\x05 \x01(\bR\arotated\"7\n" +
+	"\x11ContainerMoveResp\x12\"\n" +
+	"\x06result\x18\x01 \x01(\v2\n" +
+	".pb.ResultR\x06result\"M\n" +
+	"\x12ContainerRotateReq\x12%\n" +
 	"\x04type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\x04type\x12\x10\n" +
 	"\x03uid\x18\x02 \x01(\x03R\x03uid\"9\n" +
-	"\x10SortContainerReq\x12%\n" +
-	"\x04type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\x04type\"h\n" +
-	"\x0fContainerOpResp\x121\n" +
-	"\bsnapshot\x18\x01 \x01(\v2\x15.pb.ContainerSnapshotR\bsnapshot\x12\"\n" +
-	"\x06result\x18\x02 \x01(\v2\n" +
-	".pb.ResultR\x06result*\x81\x01\n" +
-	"\rContainerType\x12\x1e\n" +
-	"\x1aCONTAINER_TYPE_UNSPECIFIED\x10\x00\x12\x1b\n" +
-	"\x17CONTAINER_TYPE_BACKPACK\x10\x01\x12\x18\n" +
-	"\x14CONTAINER_TYPE_STASH\x10\x02\x12\x19\n" +
-	"\x15CONTAINER_TYPE_SECURE\x10\x03B\x19Z\x17server-cluster/share/pbb\x06proto3"
+	"\x13ContainerRotateResp\x12\"\n" +
+	"\x06result\x18\x01 \x01(\v2\n" +
+	".pb.ResultR\x06result\"L\n" +
+	"\x10SortContainerReq\x128\n" +
+	"\x0econtainer_type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\rcontainerTypeB\x19Z\x17server-cluster/share/pbb\x06proto3"
 
 var (
 	file_container_proto_rawDescOnce sync.Once
@@ -684,38 +482,37 @@ func file_container_proto_rawDescGZIP() []byte {
 	return file_container_proto_rawDescData
 }
 
-var file_container_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_container_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_container_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_container_proto_goTypes = []any{
-	(ContainerType)(0),        // 0: pb.ContainerType
-	(*ContainerItem)(nil),     // 1: pb.ContainerItem
-	(*ContainerSnapshot)(nil), // 2: pb.ContainerSnapshot
-	(*GetContainerReq)(nil),   // 3: pb.GetContainerReq
-	(*GetContainerResp)(nil),  // 4: pb.GetContainerResp
-	(*MoveItemReq)(nil),       // 5: pb.MoveItemReq
-	(*RotateItemReq)(nil),     // 6: pb.RotateItemReq
-	(*RemoveItemReq)(nil),     // 7: pb.RemoveItemReq
-	(*SortContainerReq)(nil),  // 8: pb.SortContainerReq
-	(*ContainerOpResp)(nil),   // 9: pb.ContainerOpResp
-	(*Result)(nil),            // 10: pb.Result
+	(*ContainerListReq)(nil),    // 0: pb.ContainerListReq
+	(*ContainerListResp)(nil),   // 1: pb.ContainerListResp
+	(*ContainerNotify)(nil),     // 2: pb.ContainerNotify
+	(*ContainerMoveReq)(nil),    // 3: pb.ContainerMoveReq
+	(*ContainerMoveResp)(nil),   // 4: pb.ContainerMoveResp
+	(*ContainerRotateReq)(nil),  // 5: pb.ContainerRotateReq
+	(*ContainerRotateResp)(nil), // 6: pb.ContainerRotateResp
+	(*SortContainerReq)(nil),    // 7: pb.SortContainerReq
+	(ContainerType)(0),          // 8: pb.ContainerType
+	(*Result)(nil),              // 9: pb.Result
+	(*ContainerEntry)(nil),      // 10: pb.ContainerEntry
+	(*ItemEntry)(nil),           // 11: pb.ItemEntry
 }
 var file_container_proto_depIdxs = []int32{
-	0,  // 0: pb.ContainerSnapshot.type:type_name -> pb.ContainerType
-	1,  // 1: pb.ContainerSnapshot.items:type_name -> pb.ContainerItem
-	0,  // 2: pb.GetContainerReq.type:type_name -> pb.ContainerType
-	2,  // 3: pb.GetContainerResp.snapshot:type_name -> pb.ContainerSnapshot
-	10, // 4: pb.GetContainerResp.result:type_name -> pb.Result
-	0,  // 5: pb.MoveItemReq.type:type_name -> pb.ContainerType
-	0,  // 6: pb.RotateItemReq.type:type_name -> pb.ContainerType
-	0,  // 7: pb.RemoveItemReq.type:type_name -> pb.ContainerType
-	0,  // 8: pb.SortContainerReq.type:type_name -> pb.ContainerType
-	2,  // 9: pb.ContainerOpResp.snapshot:type_name -> pb.ContainerSnapshot
-	10, // 10: pb.ContainerOpResp.result:type_name -> pb.Result
-	11, // [11:11] is the sub-list for method output_type
-	11, // [11:11] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	8,  // 0: pb.ContainerListReq.container_type:type_name -> pb.ContainerType
+	9,  // 1: pb.ContainerListResp.result:type_name -> pb.Result
+	10, // 2: pb.ContainerListResp.container_entries:type_name -> pb.ContainerEntry
+	8,  // 3: pb.ContainerNotify.container_type:type_name -> pb.ContainerType
+	11, // 4: pb.ContainerNotify.item_entry:type_name -> pb.ItemEntry
+	8,  // 5: pb.ContainerMoveReq.type:type_name -> pb.ContainerType
+	9,  // 6: pb.ContainerMoveResp.result:type_name -> pb.Result
+	8,  // 7: pb.ContainerRotateReq.type:type_name -> pb.ContainerType
+	9,  // 8: pb.ContainerRotateResp.result:type_name -> pb.Result
+	8,  // 9: pb.SortContainerReq.container_type:type_name -> pb.ContainerType
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_container_proto_init() }
@@ -729,14 +526,13 @@ func file_container_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_container_proto_rawDesc), len(file_container_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   9,
+			NumEnums:      0,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_container_proto_goTypes,
 		DependencyIndexes: file_container_proto_depIdxs,
-		EnumInfos:         file_container_proto_enumTypes,
 		MessageInfos:      file_container_proto_msgTypes,
 	}.Build()
 	File_container_proto = out.File

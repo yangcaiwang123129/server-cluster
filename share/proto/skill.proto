@@ -15,3 +15,8 @@ message SkillListResp {
   Result result = 1;
   repeated SkillEntry skill_entries = 2;
 }
+
+// 技能变化通知（路由 10021）
+message SkillChangeNotify {
+  SkillEntry skill_entry = 1;
+}

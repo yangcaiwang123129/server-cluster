@@ -20,17 +20,9 @@ message GetOnlinePlayersResp {
   repeated OnlinePlayer players = 1; // 在线玩家列表
 }
 
-// KickType 踢下线类型。
-enum KickType {
-  KICK_TYPE_UNSPECIFIED = 0; // 未指定
-  KICK_TYPE_ACTIVE = 1;      // 主动踢下线
-  KICK_TYPE_BAN = 2;         // 封号踢下线
-}
-
 // KickPlayerReq 踢玩家下线请求（调用方按 game 实例分组定向调用，每实例一批玩家）。
 message KickPlayerReq {
   repeated int64 player_ids = 1; // 玩家ID列表
-  KickType kick_type = 2;        // 踢下线类型
 }
 
 // KickPlayerResp 踢玩家下线响应。

@@ -111,6 +111,51 @@ func (x *WeaponListResp) GetWeaponEntries() []*WeaponEntry {
 	return nil
 }
 
+// 武器变化通知（路由 10031）
+type WeaponChangeNotify struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	WeaponEntry   *WeaponEntry           `protobuf:"bytes,1,opt,name=weapon_entry,json=weaponEntry,proto3" json:"weapon_entry,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WeaponChangeNotify) Reset() {
+	*x = WeaponChangeNotify{}
+	mi := &file_weapon_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WeaponChangeNotify) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WeaponChangeNotify) ProtoMessage() {}
+
+func (x *WeaponChangeNotify) ProtoReflect() protoreflect.Message {
+	mi := &file_weapon_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WeaponChangeNotify.ProtoReflect.Descriptor instead.
+func (*WeaponChangeNotify) Descriptor() ([]byte, []int) {
+	return file_weapon_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *WeaponChangeNotify) GetWeaponEntry() *WeaponEntry {
+	if x != nil {
+		return x.WeaponEntry
+	}
+	return nil
+}
+
 var File_weapon_proto protoreflect.FileDescriptor
 
 const file_weapon_proto_rawDesc = "" +
@@ -120,7 +165,9 @@ const file_weapon_proto_rawDesc = "" +
 	"\x0eWeaponListResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\x126\n" +
-	"\x0eweapon_entries\x18\x02 \x03(\v2\x0f.pb.WeaponEntryR\rweaponEntriesB\x19Z\x17server-cluster/share/pbb\x06proto3"
+	"\x0eweapon_entries\x18\x02 \x03(\v2\x0f.pb.WeaponEntryR\rweaponEntries\"H\n" +
+	"\x12WeaponChangeNotify\x122\n" +
+	"\fweapon_entry\x18\x01 \x01(\v2\x0f.pb.WeaponEntryR\vweaponEntryB\x19Z\x17server-cluster/share/pbb\x06proto3"
 
 var (
 	file_weapon_proto_rawDescOnce sync.Once
@@ -134,21 +181,23 @@ func file_weapon_proto_rawDescGZIP() []byte {
 	return file_weapon_proto_rawDescData
 }
 
-var file_weapon_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_weapon_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_weapon_proto_goTypes = []any{
-	(*WeaponListReq)(nil),  // 0: pb.WeaponListReq
-	(*WeaponListResp)(nil), // 1: pb.WeaponListResp
-	(*Result)(nil),         // 2: pb.Result
-	(*WeaponEntry)(nil),    // 3: pb.WeaponEntry
+	(*WeaponListReq)(nil),      // 0: pb.WeaponListReq
+	(*WeaponListResp)(nil),     // 1: pb.WeaponListResp
+	(*WeaponChangeNotify)(nil), // 2: pb.WeaponChangeNotify
+	(*Result)(nil),             // 3: pb.Result
+	(*WeaponEntry)(nil),        // 4: pb.WeaponEntry
 }
 var file_weapon_proto_depIdxs = []int32{
-	2, // 0: pb.WeaponListResp.result:type_name -> pb.Result
-	3, // 1: pb.WeaponListResp.weapon_entries:type_name -> pb.WeaponEntry
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	3, // 0: pb.WeaponListResp.result:type_name -> pb.Result
+	4, // 1: pb.WeaponListResp.weapon_entries:type_name -> pb.WeaponEntry
+	4, // 2: pb.WeaponChangeNotify.weapon_entry:type_name -> pb.WeaponEntry
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_weapon_proto_init() }
@@ -163,7 +212,7 @@ func file_weapon_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_weapon_proto_rawDesc), len(file_weapon_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
