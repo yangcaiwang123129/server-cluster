@@ -3,15 +3,17 @@ package global
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/cors"
+	"gorm.io/gorm"
 
-	"server-cluster/mesh/admin/app/logic"
-	"server-cluster/mesh/admin/app/repo"
+	"server-cluster/internal/svc"
+	"server-cluster/share/consts"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
 )
@@ -55,7 +57,7 @@ func CORSMiddleware() fiber.Handler {
 
 // RequireDB 数据库未配置时直接拒绝请求，避免空句柄穿透到业务层。
 func RequireDB(c fiber.Ctx) error {
-	if !repo.R().Available() {
+	if _, err := svc.Ctx().DB(); err != nil {
 		return errs.FailCtx(c, 500, "数据库未配置")
 	}
 	return c.Next()
@@ -70,7 +72,7 @@ func AuthMiddleware(c fiber.Ctx) error {
 	if token == "" {
 		return errs.FailCtx(c, 401, "未登录或登录已过期")
 	}
-	user, role, err := logic.Authenticate(token)
+	user, role, err := Authenticate(token)
 	if err != nil {
 		return errs.FailCtxErr(c, err)
 	}
@@ -91,7 +93,7 @@ func PermissionMiddleware(c fiber.Ctx) error {
 	if _, skip := alwaysAllowed[c.Path()]; skip {
 		return c.Next()
 	}
-	allowed, err := logic.Allow(role.RoleKey, c.Path(), c.Method())
+	allowed, err := Allow(role.RoleKey, c.Path(), c.Method())
 	if err != nil {
 		return errs.FailCtx(c, 500, "权限校验失败")
 	}
@@ -114,7 +116,7 @@ func OperaLogMiddleware(c fiber.Ctx) error {
 		RequestMethod: c.Method(),
 		OperUrl:       c.Path(),
 		OperIp:        c.IP(),
-		Status:        "2",
+		Status:        consts.LogStatusSuccess,
 		OperTime:      start,
 		OperLocation:  "内网",
 		OperParam:     truncate(string(c.Body()), 2000),
@@ -125,10 +127,99 @@ func OperaLogMiddleware(c fiber.Ctx) error {
 		entry.OperName = user.Username
 	}
 	if nextErr != nil || responseCode(c) != 200 {
-		entry.Status = "1"
+		entry.Status = consts.LogStatusFail
 	}
-	logic.RecordOpera(entry)
+	RecordOpera(entry)
 	return nextErr
+}
+
+// Authenticate 解析令牌并加载用户与角色，供鉴权中间件使用。
+// 查询逻辑与 repo 中的 GetUser/RoleForUser 保持一致，此处内联以避免 middleware 依赖 repo。
+func Authenticate(token string) (*model.SysUser, *model.SysRole, error) {
+	payload, err := svc.JWT().ExtractPayload(token)
+	if err != nil {
+		return nil, nil, errs.NewError(401, "未登录或登录已过期")
+	}
+	uid, ok := payload["uid"].(float64)
+	if !ok {
+		return nil, nil, errs.NewError(401, "令牌无效")
+	}
+	d, err := svc.Ctx().DB()
+	if err != nil {
+		return nil, nil, errs.NewError(500, "数据库未配置")
+	}
+	var user model.SysUser
+	if err := d.First(&user, "user_id = ?", int(uid)).Error; err != nil {
+		return nil, nil, errs.NewError(401, "账号不存在")
+	}
+	if user.Status != consts.StatusEnabled {
+		return nil, nil, errs.NewError(403, "账号已停用")
+	}
+	var role model.SysRole
+	if err := d.First(&role, "role_id = ?", user.RoleId).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil, errs.NewError(403, "账号未绑定角色")
+		}
+		return nil, nil, errs.NewError(500, "查询角色失败")
+	}
+	if role.Status != consts.StatusEnabled {
+		return nil, nil, errs.NewError(403, "角色已停用")
+	}
+	return &user, &role, nil
+}
+
+// Allow 判断角色是否可访问指定接口；角色标识为 admin 时全部放行。
+// 规则中的路径是路由模板（如 /api/v1/sys-user/:userId），需按模板匹配实际请求路径。
+func Allow(roleKey, path, method string) (bool, error) {
+	if roleKey == consts.AdminRoleKey {
+		return true, nil
+	}
+	d, err := svc.Ctx().DB()
+	if err != nil {
+		return false, err
+	}
+	var rules []model.SysCasbinRule
+	if err := d.
+		Where("ptype = ? AND v0 = ? AND v2 = ?", "p", roleKey, method).
+		Find(&rules).Error; err != nil {
+		return false, err
+	}
+	for _, rule := range rules {
+		if matchRulePath(rule.V1, path) {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+// matchRulePath 按路由模板匹配实际请求路径，模板中的 :param / * 段匹配任意单段。
+func matchRulePath(pattern, path string) bool {
+	if pattern == path {
+		return true
+	}
+	ps := strings.Split(strings.Trim(pattern, "/"), "/")
+	as := strings.Split(strings.Trim(path, "/"), "/")
+	if len(ps) != len(as) {
+		return false
+	}
+	for i, p := range ps {
+		if strings.HasPrefix(p, ":") || strings.HasPrefix(p, "*") {
+			continue
+		}
+		if p != as[i] {
+			return false
+		}
+	}
+	return true
+}
+
+// RecordOpera 写入操作审计；失败不影响主流程。
+func RecordOpera(m *model.SysOperaLog) {
+	d, err := svc.Ctx().DB()
+	if err != nil {
+		return
+	}
+	_ = d.Create(m).Error
 }
 
 // CurrentUser 取当前登录用户。

@@ -4,6 +4,7 @@ import (
 	"github.com/dobyte/due/component/http/v2"
 
 	"server-cluster/mesh/admin/app/global"
+	"server-cluster/mesh/admin/app/logic"
 	"server-cluster/share/dto"
 	"server-cluster/share/errs"
 )
@@ -40,7 +41,7 @@ func handlePlayerList(ctx http.Context) error {
 		"playerId":  "player_id",
 		"createdAt": "created_at",
 	})
-	list, total, err := global.Player().PlayerList(req)
+	list, total, err := logic.Player().PlayerList(req)
 	if err != nil {
 		return errs.FailErr(ctx, err)
 	}
@@ -54,7 +55,7 @@ func handlePlayerList(ctx http.Context) error {
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/player/online [get]
 func handlePlayerOnline(ctx http.Context) error {
-	list, err := global.Player().PlayerOnline()
+	list, err := logic.Player().PlayerOnline()
 	if err != nil {
 		return errs.FailErr(ctx, err)
 	}

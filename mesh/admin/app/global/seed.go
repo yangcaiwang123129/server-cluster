@@ -6,6 +6,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 
+	"server-cluster/share/consts"
 	"server-cluster/share/model"
 )
 
@@ -39,7 +40,7 @@ func seed(gdb *gorm.DB) error {
 		if err := seedDicts(tx); err != nil {
 			return err
 		}
-		role := model.SysRole{RoleName: "超级管理员", RoleKey: "admin", RoleSort: 1, Status: "2", Remark: "拥有全部权限"}
+		role := model.SysRole{RoleName: "超级管理员", RoleKey: consts.AdminRoleKey, RoleSort: 1, Status: consts.StatusEnabled, Remark: "拥有全部权限"}
 		if err := tx.Create(&role).Error; err != nil {
 			return err
 		}
@@ -53,7 +54,7 @@ func seed(gdb *gorm.DB) error {
 			NickName: "管理员",
 			RoleId:   role.RoleId,
 			Sex:      "1",
-			Status:   "2",
+			Status:   consts.StatusEnabled,
 			Remark:   "初始超级管理员",
 		}
 		if err := tx.Create(&admin).Error; err != nil {
@@ -66,11 +67,11 @@ func seed(gdb *gorm.DB) error {
 // seedConfigs 写入内置系统配置。
 func seedConfigs(tx *gorm.DB) error {
 	configs := []model.SysConfig{
-		{ConfigName: "应用名称", ConfigKey: "sys_app_name", ConfigValue: "游戏运营后台", ConfigType: "Y", IsFrontend: "1", Remark: "登录页与侧边栏标题"},
-		{ConfigName: "应用Logo", ConfigKey: "sys_app_logo", ConfigValue: "", ConfigType: "Y", IsFrontend: "1", Remark: "留空使用内置图标"},
-		{ConfigName: "用户初始密码", ConfigKey: "sys_user_initPassword", ConfigValue: "123456", ConfigType: "Y", IsFrontend: "0", Remark: "新增用户未填密码时使用"},
-		{ConfigName: "皮肤主题", ConfigKey: "sys_index_skinName", ConfigValue: "default", ConfigType: "Y", IsFrontend: "0"},
-		{ConfigName: "侧边栏主题", ConfigKey: "sys_index_sideTheme", ConfigValue: "theme-dark", ConfigType: "Y", IsFrontend: "0"},
+		{ConfigName: "应用名称", ConfigKey: consts.ConfigKeyAppName, ConfigValue: "游戏运营后台", ConfigType: consts.FlagYes, IsFrontend: "1", Remark: "登录页与侧边栏标题"},
+		{ConfigName: "应用Logo", ConfigKey: consts.ConfigKeyAppLogo, ConfigValue: "", ConfigType: consts.FlagYes, IsFrontend: "1", Remark: "留空使用内置图标"},
+		{ConfigName: "用户初始密码", ConfigKey: consts.ConfigKeyInitPassword, ConfigValue: consts.DefaultInitPassword, ConfigType: consts.FlagYes, IsFrontend: "0", Remark: "新增用户未填密码时使用"},
+		{ConfigName: "皮肤主题", ConfigKey: consts.ConfigKeyIndexSkinName, ConfigValue: "default", ConfigType: consts.FlagYes, IsFrontend: "0"},
+		{ConfigName: "侧边栏主题", ConfigKey: consts.ConfigKeyIndexSideTheme, ConfigValue: "theme-dark", ConfigType: consts.FlagYes, IsFrontend: "0"},
 	}
 	return tx.Create(&configs).Error
 }

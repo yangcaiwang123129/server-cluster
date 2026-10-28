@@ -12,10 +12,12 @@ require (
 	github.com/dobyte/due/v2 v2.6.4
 	github.com/dobyte/jwt v0.1.4
 	github.com/gofiber/fiber/v3 v3.5.0
+	github.com/lafriks/go-tiled v0.15.0
+	github.com/quasilyte/pathing v0.0.0-20260812090109-6fc0d53186b5
 	github.com/redis/go-redis/v9 v9.22.0
 	github.com/swaggo/swag v1.16.6
-	github.com/tidwall/wal v1.2.1
 	golang.org/x/crypto v0.58.0
+	google.golang.org/grpc v1.83.1
 	google.golang.org/protobuf v1.36.12
 	gorm.io/driver/mysql v1.6.0
 	gorm.io/gorm v1.31.2
@@ -81,10 +83,6 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/shamaton/msgpack/v2 v2.4.1 // indirect
 	github.com/stretchr/testify v1.11.1 // indirect
-	github.com/tidwall/gjson v1.10.2 // indirect
-	github.com/tidwall/match v1.1.1 // indirect
-	github.com/tidwall/pretty v1.2.0 // indirect
-	github.com/tidwall/tinylru v1.1.0 // indirect
 	github.com/tinylib/msgp v1.6.4 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
@@ -106,6 +104,5 @@ require (
 	golang.org/x/tools v0.51.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20261019180522-ce908d29299b // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20261019180522-ce908d29299b // indirect
-	google.golang.org/grpc v1.83.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

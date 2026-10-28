@@ -14,6 +14,7 @@ import (
 
 	"server-cluster/internal/svc"
 	"server-cluster/mesh/admin/app/repo"
+	"server-cluster/share/consts"
 	"server-cluster/share/dto"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
@@ -183,7 +184,7 @@ func Login(req dto.AdminLoginReq, ip, ua string) (string, error) {
 		RecordLogin(req.Username, ip, ua, false, "用户名或密码错误")
 		return "", errs.NewError(400, "用户名或密码错误")
 	}
-	if user.Status != "2" {
+	if user.Status != consts.StatusEnabled {
 		RecordLogin(req.Username, ip, ua, false, "账号已停用")
 		return "", errs.NewError(400, "账号已停用")
 	}
@@ -192,7 +193,7 @@ func Login(req dto.AdminLoginReq, ip, ua string) (string, error) {
 		RecordLogin(req.Username, ip, ua, false, "账号未绑定角色")
 		return "", errs.NewError(400, "账号未绑定角色")
 	}
-	if role.Status != "2" {
+	if role.Status != consts.StatusEnabled {
 		RecordLogin(req.Username, ip, ua, false, "角色已停用")
 		return "", errs.NewError(400, "角色已停用")
 	}
@@ -203,39 +204,6 @@ func Login(req dto.AdminLoginReq, ip, ua string) (string, error) {
 	RecordLogin(req.Username, ip, ua, true, "登录成功")
 	return token.Token, nil
 }
-
-// Authenticate 解析令牌并加载用户与角色，供鉴权中间件使用。
-func Authenticate(token string) (*model.SysUser, *model.SysRole, error) {
-	payload, err := svc.JWT().ExtractPayload(token)
-	if err != nil {
-		return nil, nil, errs.NewError(401, "未登录或登录已过期")
-	}
-	uid, ok := payload["uid"].(float64)
-	if !ok {
-		return nil, nil, errs.NewError(401, "令牌无效")
-	}
-	user, err := repo.R().GetUser(int(uid))
-	if err != nil {
-		return nil, nil, errs.NewError(401, "账号不存在")
-	}
-	if user.Status != "2" {
-		return nil, nil, errs.NewError(403, "账号已停用")
-	}
-	role, err := repo.R().RoleForUser(user.UserId)
-	if err != nil {
-		return nil, nil, errs.NewError(500, "查询角色失败")
-	}
-	if role == nil {
-		return nil, nil, errs.NewError(403, "账号未绑定角色")
-	}
-	if role.Status != "2" {
-		return nil, nil, errs.NewError(403, "角色已停用")
-	}
-	return user, role, nil
-}
-
-// Allow 判断角色是否可访问指定接口。
-func Allow(roleKey, path, method string) (bool, error) { return repo.R().Allow(roleKey, path, method) }
 
 // GetInfo 当前登录用户的角色、权限与资料。
 func GetInfo(user *model.SysUser, role *model.SysRole) dto.GetInfoResp {
@@ -270,11 +238,11 @@ func MenuRole(role *model.SysRole) ([]model.SysMenu, error) {
 
 // settingKeys 系统配置页展示的内置键。
 var settingKeys = []string{
-	"sys_app_name",
-	"sys_app_logo",
-	"sys_user_initPassword",
-	"sys_index_skinName",
-	"sys_index_sideTheme",
+	consts.ConfigKeyAppName,
+	consts.ConfigKeyAppLogo,
+	consts.ConfigKeyInitPassword,
+	consts.ConfigKeyIndexSkinName,
+	consts.ConfigKeyIndexSideTheme,
 }
 
 // ConfigList 系统配置分页列表。
@@ -470,7 +438,7 @@ func DictDataOptions(dictType string) ([]dto.Option, error) {
 // statusText 数字状态转库内字符串（1 停用 / 2 正常，0 视为正常）。
 func statusText(status int) string {
 	if status <= 0 {
-		return "2"
+		return consts.StatusEnabled
 	}
 	return strconv.Itoa(status)
 }
@@ -479,7 +447,7 @@ func statusText(status int) string {
 func dictDataModel(req dto.DictDataSaveReq, dictCode int) *model.SysDictData {
 	isDefault := req.IsDefault
 	if isDefault == "" {
-		isDefault = "N"
+		isDefault = consts.FlagNo
 	}
 	return &model.SysDictData{
 		DictCode:  dictCode,
@@ -498,9 +466,9 @@ func dictDataModel(req dto.DictDataSaveReq, dictCode int) *model.SysDictData {
 // RecordLogin 写入登录审计；失败不影响主流程。
 func RecordLogin(username, ip, ua string, success bool, msg string) {
 	browser, osName := parseUserAgent(ua)
-	status := "1"
+	status := consts.LogStatusFail
 	if success {
-		status = "2"
+		status = consts.LogStatusSuccess
 	}
 	_ = repo.R().CreateLoginLog(&model.SysLoginLog{
 		Username:      username,
@@ -514,9 +482,6 @@ func RecordLogin(username, ip, ua string, success bool, msg string) {
 		LoginTime:     time.Now(),
 	})
 }
-
-// RecordOpera 写入操作审计；失败不影响主流程。
-func RecordOpera(m *model.SysOperaLog) { _ = repo.R().CreateOperaLog(m) }
 
 // LoginLogList 登录日志分页列表。
 func LoginLogList(req dto.LoginLogListReq) ([]model.SysLoginLog, int64, error) {
@@ -686,7 +651,7 @@ func RoleCreate(req dto.RoleSaveReq) (*model.SysRole, error) {
 	if req.RoleName == "" || req.RoleKey == "" {
 		return nil, errs.NewError(400, "角色名称与角色标识不能为空")
 	}
-	if req.RoleKey == repo.AdminRoleKey {
+	if req.RoleKey == consts.AdminRoleKey {
 		return nil, errs.NewError(400, "角色标识 admin 为系统保留")
 	}
 	m := roleModel(req)
@@ -711,7 +676,7 @@ func RoleUpdate(id int, req dto.RoleSaveReq) (*model.SysRole, error) {
 
 // RoleDelete 批量删除角色；超级管理员角色不可删除。
 func RoleDelete(ids []int) error {
-	adminRole, err := repo.R().GetRoleByKey(repo.AdminRoleKey)
+	adminRole, err := repo.R().GetRoleByKey(consts.AdminRoleKey)
 	if err == nil {
 		for _, id := range ids {
 			if id == adminRole.RoleId {

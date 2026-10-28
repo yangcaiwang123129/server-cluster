@@ -2,22 +2,14 @@ package repo
 
 import (
 	"sort"
-	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 
 	"server-cluster/internal/svc"
+	"server-cluster/share/consts"
 	"server-cluster/share/model"
 	"server-cluster/share/util"
-)
-
-// 用户相关常量。
-const (
-	// configKeyInitPassword 系统配置表中初始密码的键
-	configKeyInitPassword = "sys_user_initPassword"
-	// defaultInitPassword 系统配置表缺失该键时的回退初始密码
-	defaultInitPassword = "123456"
 )
 
 // Repo 管理后台数据访问单例。
@@ -30,9 +22,6 @@ func R() *Repo { return inst }
 
 // db 默认 MySQL 实例的 gorm 句柄；实例未配置时返回错误。
 func (r *Repo) db() (*gorm.DB, error) { return svc.Ctx().DB() }
-
-// Available 数据库是否已配置并完成初始化。
-func (r *Repo) Available() bool { _, err := r.db(); return err == nil }
 
 // ApiQuery 接口列表过滤条件。
 type ApiQuery struct {
@@ -125,62 +114,8 @@ func (r *Repo) DeleteApis(ids []int) error {
 	})
 }
 
-// Allow 判断角色是否可访问指定接口；角色标识为 admin 时全部放行。
-// 规则中的路径是路由模板（如 /api/v1/sys-user/:userId），需按模板匹配实际请求路径。
-func (r *Repo) Allow(roleKey, path, method string) (bool, error) {
-	if roleKey == AdminRoleKey {
-		return true, nil
-	}
-	d, err := r.db()
-	if err != nil {
-		return false, err
-	}
-	var rules []model.SysCasbinRule
-	if err := d.
-		Where("ptype = ? AND v0 = ? AND v2 = ?", "p", roleKey, method).
-		Find(&rules).Error; err != nil {
-		return false, err
-	}
-	for _, rule := range rules {
-		if matchRulePath(rule.V1, path) {
-			return true, nil
-		}
-	}
-	return false, nil
-}
-
-// matchRulePath 按路由模板匹配实际请求路径，模板中的 :param / * 段匹配任意单段。
-func matchRulePath(pattern, path string) bool {
-	if pattern == path {
-		return true
-	}
-	ps := strings.Split(strings.Trim(pattern, "/"), "/")
-	as := strings.Split(strings.Trim(path, "/"), "/")
-	if len(ps) != len(as) {
-		return false
-	}
-	for i, p := range ps {
-		if strings.HasPrefix(p, ":") || strings.HasPrefix(p, "*") {
-			continue
-		}
-		if p != as[i] {
-			return false
-		}
-	}
-	return true
-}
-
 // CreateLoginLog 写入登录审计。
 func (r *Repo) CreateLoginLog(m *model.SysLoginLog) error {
-	d, err := r.db()
-	if err != nil {
-		return err
-	}
-	return d.Create(m).Error
-}
-
-// CreateOperaLog 写入操作审计。
-func (r *Repo) CreateOperaLog(m *model.SysOperaLog) error {
 	d, err := r.db()
 	if err != nil {
 		return err
@@ -268,7 +203,7 @@ func (r *Repo) CreateConfig(m *model.SysConfig) error {
 		return err
 	}
 	if m.ConfigType == "" {
-		m.ConfigType = "N"
+		m.ConfigType = consts.FlagNo
 	}
 	return d.Create(m).Error
 }
@@ -431,7 +366,7 @@ func (r *Repo) CreateDictType(m *model.SysDictType) error {
 		return err
 	}
 	if m.Status == "" {
-		m.Status = "2"
+		m.Status = consts.StatusEnabled
 	}
 	return d.Create(m).Error
 }
@@ -520,7 +455,7 @@ func (r *Repo) CreateDictData(m *model.SysDictData) error {
 		return err
 	}
 	if m.Status == "" {
-		m.Status = "2"
+		m.Status = consts.StatusEnabled
 	}
 	return d.Create(m).Error
 }
@@ -811,9 +746,6 @@ func (r *Repo) RoleMenuTreeselect(roleId int) ([]MenuNode, []int, error) {
 	return buildMenuNodeTree(menus, 0), checked, nil
 }
 
-// AdminRoleKey 超级管理员角色标识：持有全部权限，无需菜单授权。
-const AdminRoleKey = "admin"
-
 // MenusForRoute 当前角色的路由菜单树；按钮型（F）不参与路由。
 func (r *Repo) MenusForRoute(role *model.SysRole) ([]model.SysMenu, error) {
 	d, err := r.db()
@@ -821,7 +753,7 @@ func (r *Repo) MenusForRoute(role *model.SysRole) ([]model.SysMenu, error) {
 		return nil, err
 	}
 	var menus []model.SysMenu
-	if role.RoleKey == AdminRoleKey {
+	if role.RoleKey == consts.AdminRoleKey {
 		err = d.Order("sort asc").Find(&menus).Error
 	} else {
 		menus, err = r.roleMenus(role.RoleId)
@@ -849,7 +781,7 @@ func (r *Repo) PermissionCodes(role *model.SysRole) ([]string, error) {
 		return nil, err
 	}
 	var codes []string
-	if role.RoleKey == AdminRoleKey {
+	if role.RoleKey == consts.AdminRoleKey {
 		err = d.Model(&model.SysMenu{}).Where("permission <> ''").Pluck("permission", &codes).Error
 		return codes, err
 	}
@@ -1055,7 +987,7 @@ func (r *Repo) CreateRole(m *model.SysRole, menuIds []int) error {
 		return err
 	}
 	if m.Status == "" {
-		m.Status = "2"
+		m.Status = consts.StatusEnabled
 	}
 	return d.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(m).Error; err != nil {
@@ -1205,7 +1137,7 @@ func SyncAllRoleRules(tx *gorm.DB) error {
 		return err
 	}
 	for _, role := range roles {
-		if role.RoleKey == AdminRoleKey {
+		if role.RoleKey == consts.AdminRoleKey {
 			continue // 超级管理员直接放行，不写规则
 		}
 		if err := syncRoleRules(tx, role.RoleId, role.RoleKey); err != nil {
@@ -1284,10 +1216,10 @@ func (r *Repo) CreateUser(m *model.SysUser) error {
 		return err
 	}
 	if m.Status == "" {
-		m.Status = "2"
+		m.Status = consts.StatusEnabled
 	}
 	if m.Password == "" {
-		m.Password = r.ConfigValue(configKeyInitPassword, defaultInitPassword)
+		m.Password = r.ConfigValue(consts.ConfigKeyInitPassword, consts.DefaultInitPassword)
 	}
 	hash, err := bcrypt.GenerateFromPassword([]byte(m.Password), bcrypt.DefaultCost)
 	if err != nil {
