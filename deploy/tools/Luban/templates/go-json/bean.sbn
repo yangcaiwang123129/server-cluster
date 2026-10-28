@@ -10,6 +10,6 @@ package {{__top_module}}
 
 type {{go_full_name}} struct {
     {{~for field in hierarchy_fields ~}}
-    {{format_field_name __code_style field.name}} {{declaring_type_name field.ctype}} `json:"{{field.name}}"`{{-if field.comment != ''}} // {{escape_comment field.comment}}{{end}}
+    {{format_field_name __code_style field.name}} {{if field.ctype.is_map}}Map[{{declaring_type_name field.ctype.key_type}}, {{declaring_type_name field.ctype.value_type}}]{{else}}{{declaring_type_name field.ctype}}{{end}} `json:"{{field.name}}"`{{-if field.comment != ''}} // {{escape_comment field.comment}}{{end}}
     {{~end~}}
 }

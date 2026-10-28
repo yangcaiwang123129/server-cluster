@@ -8,14 +8,5 @@
 
 package tpl
 
-/**
- * 使用方式
- */
-type UseWay int32
-
-const (
-	/**
-	 * 无
-	 */
-	UseWay_None UseWay = 0
-)
+type UseWay struct {
+}

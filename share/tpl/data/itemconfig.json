@@ -7,7 +7,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "1,1",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 0,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -24,7 +27,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "1,1",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 0,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -41,7 +47,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "1,1",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 0,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -58,7 +67,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "1,1",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 0,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -75,7 +87,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "1,1",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 0,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -92,7 +107,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "1,1",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 0,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -109,7 +127,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "1,1",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 0,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -126,7 +147,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "1,1",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 0,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -143,7 +167,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "1,1",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 0,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -160,7 +187,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,2",
+    "size": {
+      "x": 1,
+      "y": 2
+    },
     "rarity": 0,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -177,7 +207,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,2",
+    "size": {
+      "x": 1,
+      "y": 2
+    },
     "rarity": 0,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -194,7 +227,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 0,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -211,7 +247,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 0,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -228,7 +267,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 0,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -245,7 +287,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 0,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -262,7 +307,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 0,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -279,7 +327,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,2",
+    "size": {
+      "x": 1,
+      "y": 2
+    },
     "rarity": 1,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -296,7 +347,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,2",
+    "size": {
+      "x": 1,
+      "y": 2
+    },
     "rarity": 1,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -313,7 +367,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 1,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -330,7 +387,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,2",
+    "size": {
+      "x": 1,
+      "y": 2
+    },
     "rarity": 1,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -347,7 +407,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "2,2",
+    "size": {
+      "x": 2,
+      "y": 2
+    },
     "rarity": 1,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -364,7 +427,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,2",
+    "size": {
+      "x": 1,
+      "y": 2
+    },
     "rarity": 1,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -381,7 +447,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "2,2",
+    "size": {
+      "x": 2,
+      "y": 2
+    },
     "rarity": 2,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -398,7 +467,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,2",
+    "size": {
+      "x": 1,
+      "y": 2
+    },
     "rarity": 2,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -415,7 +487,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "3,2",
+    "size": {
+      "x": 3,
+      "y": 2
+    },
     "rarity": 2,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -432,7 +507,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "2,2",
+    "size": {
+      "x": 2,
+      "y": 2
+    },
     "rarity": 2,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -449,7 +527,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "2,3",
+    "size": {
+      "x": 2,
+      "y": 3
+    },
     "rarity": 2,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -466,7 +547,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "2,2",
+    "size": {
+      "x": 2,
+      "y": 2
+    },
     "rarity": 2,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -483,7 +567,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,2",
+    "size": {
+      "x": 1,
+      "y": 2
+    },
     "rarity": 3,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -500,7 +587,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "2,2",
+    "size": {
+      "x": 2,
+      "y": 2
+    },
     "rarity": 3,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -517,7 +607,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 3,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -534,7 +627,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 3,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -551,7 +647,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "2,2",
+    "size": {
+      "x": 2,
+      "y": 2
+    },
     "rarity": 3,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -568,7 +667,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "2,3",
+    "size": {
+      "x": 2,
+      "y": 3
+    },
     "rarity": 3,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -585,7 +687,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 4,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -602,7 +707,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "2,2",
+    "size": {
+      "x": 2,
+      "y": 2
+    },
     "rarity": 4,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -619,7 +727,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 4,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -636,7 +747,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 4,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -653,7 +767,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,2",
+    "size": {
+      "x": 1,
+      "y": 2
+    },
     "rarity": 4,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -670,7 +787,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 5,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -687,7 +807,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,2",
+    "size": {
+      "x": 1,
+      "y": 2
+    },
     "rarity": 5,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -704,7 +827,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "2,2",
+    "size": {
+      "x": 2,
+      "y": 2
+    },
     "rarity": 5,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -721,7 +847,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,2",
+    "size": {
+      "x": 1,
+      "y": 2
+    },
     "rarity": 5,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -738,7 +867,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 0,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -755,7 +887,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 2,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -772,7 +907,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 1,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -789,7 +927,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 2,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -806,7 +947,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 0,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -823,7 +967,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 3,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -840,7 +987,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 1,
     "maxCount": 0,
     "overlayMaxCount": 0,
@@ -857,7 +1007,10 @@
     "useWays": [],
     "itemkey": "",
     "iconKey": "Icons[Icons_]",
-    "size": "1,1",
+    "size": {
+      "x": 1,
+      "y": 1
+    },
     "rarity": 3,
     "maxCount": 0,
     "overlayMaxCount": 0,

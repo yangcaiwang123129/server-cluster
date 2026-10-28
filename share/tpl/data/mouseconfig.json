@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1001,
+    "name": "普通光标",
+    "cursorType": 1,
+    "key": "NormalCursor",
+    "hotspot": {
+      "x": 0,
+      "y": 0
+    }
+  },
+  {
+    "id": 1002,
+    "name": "选中光标",
+    "cursorType": 2,
+    "key": "HandCursor",
+    "hotspot": {
+      "x": 0,
+      "y": 0
+    }
+  }
+]

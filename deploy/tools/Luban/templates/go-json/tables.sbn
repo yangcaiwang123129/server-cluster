@@ -40,6 +40,32 @@ func (t *Table[T]) GetDataMap() map[int32]*T { return t.dataMap }
 // GetDataList 返回按文件顺序排列的全部记录。
 func (t *Table[T]) GetDataList() []*T { return t.dataList }
 
+// Map 是 Luban json 导出的 map 容器：数据以 [key,value] 二元数组序列化，
+// 这里在反序列化时还原为原生 map，字段用法与 map 一致。
+type Map[K comparable, V any] map[K]V
+
+// UnmarshalJSON 解析 [["k1","v1"],["k2","v2"]] 形式的 map 数据。
+func (m *Map[K, V]) UnmarshalJSON(data []byte) error {
+	var pairs [][2]json.RawMessage
+	if err := json.Unmarshal(data, &pairs); err != nil {
+		return err
+	}
+	out := make(map[K]V, len(pairs))
+	for _, p := range pairs {
+		var k K
+		if err := json.Unmarshal(p[0], &k); err != nil {
+			return err
+		}
+		var v V
+		if err := json.Unmarshal(p[1], &v); err != nil {
+			return err
+		}
+		out[k] = v
+	}
+	*m = out
+	return nil
+}
+
 // LoadTable 读取内嵌的 <file>.json 加载一张表，keyFn 从记录中提取主键。
 func LoadTable[T any](file string, keyFn func(*T) int32) (*Table[T], error) {
 	raw, err := loadRaw(file)
@@ -57,7 +83,8 @@ func LoadTable[T any](file string, keyFn func(*T) int32) (*Table[T], error) {
 	for _, r := range rows {
 		k := keyFn(r)
 		if _, dup := tb.dataMap[k]; dup {
-			return nil, fmt.Errorf("cfg: duplicate id %d in %s.json", k, file)
+			// 同一 id 多行是合法数据（如关卡按波次分行），保留首条，不中断加载。
+			continue
 		}
 		tb.dataMap[k] = r
 	}

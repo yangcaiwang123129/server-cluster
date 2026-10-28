@@ -1,0 +1,80 @@
+[
+  {
+    "id": 1001,
+    "groupName": "主角",
+    "skillName": "冲锋枪",
+    "skillType": 0,
+    "isFaceTarget": false,
+    "skillTurnType": 0,
+    "faceTargetSpeed": 360,
+    "skillDistance": 3,
+    "cd": 0.2,
+    "duration": 0.033333335,
+    "clipDataKey": "skill_1001"
+  },
+  {
+    "id": 1002,
+    "groupName": "主角",
+    "skillName": "手枪",
+    "skillType": 0,
+    "isFaceTarget": false,
+    "skillTurnType": 0,
+    "faceTargetSpeed": 360,
+    "skillDistance": 3,
+    "cd": 0.5,
+    "duration": 0.033333335,
+    "clipDataKey": "skill_1002"
+  },
+  {
+    "id": 1003,
+    "groupName": "主角",
+    "skillName": "女警",
+    "skillType": 0,
+    "isFaceTarget": false,
+    "skillTurnType": 0,
+    "faceTargetSpeed": 0,
+    "skillDistance": 0,
+    "cd": 0,
+    "duration": 0,
+    "clipDataKey": "skill_1003"
+  },
+  {
+    "id": 2001,
+    "groupName": "狙击手",
+    "skillName": "三重狙击",
+    "skillType": 0,
+    "isFaceTarget": false,
+    "skillTurnType": 0,
+    "faceTargetSpeed": 360,
+    "skillDistance": 3,
+    "cd": 5,
+    "duration": 0.6333333,
+    "clipDataKey": "skill_2001"
+  },
+  {
+    "id": 1004,
+    "groupName": "主角",
+    "skillName": "超感知",
+    "skillType": 0,
+    "isFaceTarget": false,
+    "skillTurnType": 1,
+    "faceTargetSpeed": 0,
+    "skillDistance": 0,
+    "cd": 10,
+    "duration": 0.1,
+    "clipDataKey": "skill_1004"
+  },
+  {
+    "id": 3001,
+    "groupName": "山",
+    "skillName": "护盾",
+    "skillType": 0,
+    "isFaceTarget": false,
+    "skillTurnType": 1,
+    "faceTargetSpeed": 360,
+    "skillDistance": 3,
+    "cd": 10,
+    "duration": 4,
+    "clipDataKey": "skill_3001"
+  }
+]

@@ -12,12 +12,12 @@ import (
 
 // Context 基础设施句柄集合，以后扩展 etcd、kafka 等都挂在这里。
 type Context struct {
+	HTTP      *http.Proxy   // HTTP 组件代理；须由 http 服在组件创建后注入
+	Node      *node.Proxy   // 节点组件代理；须由 node 服在组件创建后注入
 	MySQL     *MySQLManager // 命名 MySQL 实例
 	Redis     *RedisManager // 命名 Redis 实例（不同业务可用不同 db 号）
 	JWT       *jwt.JWT      // 令牌签发/校验器；etc.jwt.secret 未配置的服务为 nil
 	Snowflake *Snowflake    // 雪花 ID 生成器
-	HTTP      *http.Proxy   // HTTP 组件代理；须由 http 服在组件创建后注入
-	Node      *node.Proxy   // 节点组件代理；须由 node 服在组件创建后注入
 }
 
 var ctx *Context

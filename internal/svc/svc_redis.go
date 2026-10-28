@@ -11,6 +11,9 @@ import (
 
 const keyRedisInstances = "etc.redis.instances"
 
+// defaultRedisAddr 未配置 addrs 时的回退地址。
+const defaultRedisAddr = "127.0.0.1:6379"
+
 // RedisConfig 单个 Redis 实例配置（对应 [[redis.instances]]）。
 // 不同业务可按实例使用不同 db 号或不同集群，业务按 name 获取。
 type RedisConfig struct {
@@ -46,7 +49,7 @@ func NewRedisManager() (*RedisManager, error) {
 		}
 		addrs := cfg.Addrs
 		if len(addrs) == 0 {
-			addrs = []string{"127.0.0.1:6379"}
+			addrs = []string{defaultRedisAddr}
 		}
 		m.insts[cfg.Name] = redis.NewUniversalClient(&redis.UniversalOptions{
 			Addrs:    addrs,

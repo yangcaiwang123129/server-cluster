@@ -1,0 +1,20 @@
+[
+  {
+    "id": 10001,
+    "key": "FX_Explosion_E_1",
+    "duration": 1,
+    "posType": 0,
+    "isBind": false,
+    "bindType": "None",
+    "posOffset": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "rotOffset": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  }
+]

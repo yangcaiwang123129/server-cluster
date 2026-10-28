@@ -49,7 +49,7 @@ func handleEnterGame(ctx node.Context) {
 		_ = ctx.Response(err)
 		return
 	}
-	resp, err := logic.Player().EnterGame(ctx.Context(), ctx.UID(), req)
+	resp, err := logic.PlayerLogic().EnterGame(ctx.Context(), ctx.UID(), req)
 	if err != nil {
 		_ = ctx.Response(err)
 		return
@@ -64,7 +64,7 @@ func handleLeaveGame(ctx node.Context) {
 		_ = ctx.Response(err)
 		return
 	}
-	resp, err := logic.Player().LeaveGame(ctx.Context(), ctx.UID(), req)
+	resp, err := logic.PlayerLogic().LeaveGame(ctx.Context(), ctx.UID(), req)
 	if err != nil {
 		_ = ctx.Response(err)
 		return

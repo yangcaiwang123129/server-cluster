@@ -14,4 +14,5 @@ const (
 	CtrlType_PreShake   CtrlType = 0
 	CtrlType_AfterShake CtrlType = 1
 	CtrlType_Combo      CtrlType = 2
+	CtrlType_VeryHigh   CtrlType = 3
 )

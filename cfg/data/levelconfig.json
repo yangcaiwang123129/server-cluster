@@ -1,0 +1,196 @@
+[
+  {
+    "id": 1,
+    "pointId": 1,
+    "pointData": {
+      "$type": "CreatePoint",
+      "pos": {
+        "x": 0,
+        "y": 1
+      },
+      "entityType": 0,
+      "characterId": 1003,
+      "isRandom": true,
+      "characterIds": [
+        1,
+        2
+      ],
+      "isLoop": false,
+      "loopTimes": 0,
+      "loopInterval": 100
+    }
+  },
+  {
+    "id": 1,
+    "pointId": 2,
+    "pointData": {
+      "$type": "CreatePoint",
+      "pos": {
+        "x": 0,
+        "y": 1
+      },
+      "entityType": 0,
+      "characterId": 1003,
+      "isRandom": true,
+      "characterIds": [
+        1,
+        2
+      ],
+      "isLoop": false,
+      "loopTimes": 0,
+      "loopInterval": 100
+    }
+  },
+  {
+    "id": 1,
+    "pointId": 3,
+    "pointData": {
+      "$type": "CreateTrigger",
+      "pos": {
+        "x": 0,
+        "y": 1
+      },
+      "triggerType": 0,
+      "triggerId": 1003,
+      "rangeType": 0,
+      "circleRange": 1,
+      "rectRange": {
+        "x": 1,
+        "y": 2
+      },
+      "angle": 1
+    }
+  },
+  {
+    "id": 2,
+    "pointId": 1,
+    "pointData": {
+      "$type": "CreatePoint",
+      "pos": {
+        "x": 3.29,
+        "y": -0.1
+      },
+      "entityType": 0,
+      "characterId": 1003,
+      "isRandom": true,
+      "characterIds": [
+        1,
+        2
+      ],
+      "isLoop": false,
+      "loopTimes": 0,
+      "loopInterval": 100
+    }
+  },
+  {
+    "id": 2,
+    "pointId": 2,
+    "pointData": {
+      "$type": "CreatePoint",
+      "pos": {
+        "x": -2.62,
+        "y": 3.46
+      },
+      "entityType": 0,
+      "characterId": 1003,
+      "isRandom": true,
+      "characterIds": [
+        1,
+        2
+      ],
+      "isLoop": false,
+      "loopTimes": 0,
+      "loopInterval": 100
+    }
+  },
+  {
+    "id": 2,
+    "pointId": 3,
+    "pointData": {
+      "$type": "CreatePoint",
+      "pos": {
+        "x": 4.34,
+        "y": 2.6
+      },
+      "entityType": 0,
+      "characterId": 1003,
+      "isRandom": true,
+      "characterIds": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "isLoop": false,
+      "loopTimes": 0,
+      "loopInterval": 100
+    }
+  },
+  {
+    "id": 2,
+    "pointId": 4,
+    "pointData": {
+      "$type": "CreatePoint",
+      "pos": {
+        "x": -2.43,
+        "y": -0.49
+      },
+      "entityType": 0,
+      "characterId": 1003,
+      "isRandom": true,
+      "characterIds": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "isLoop": false,
+      "loopTimes": 0,
+      "loopInterval": 100
+    }
+  },
+  {
+    "id": 2,
+    "pointId": 5,
+    "pointData": {
+      "$type": "CreatePoint",
+      "pos": {
+        "x": 1.99,
+        "y": 4.07
+      },
+      "entityType": 0,
+      "characterId": 1003,
+      "isRandom": true,
+      "characterIds": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "isLoop": false,
+      "loopTimes": 0,
+      "loopInterval": 100
+    }
+  },
+  {
+    "id": 3,
+    "pointId": 1,
+    "pointData": {
+      "$type": "CreatePoint",
+      "pos": {
+        "x": 10,
+        "y": 0
+      },
+      "entityType": 0,
+      "characterId": 1003,
+      "isRandom": false,
+      "characterIds": [
+        0
+      ],
+      "isLoop": true,
+      "loopTimes": -1,
+      "loopInterval": 3000
+    }
+  }
+]

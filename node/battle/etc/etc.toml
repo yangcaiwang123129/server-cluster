@@ -1,4 +1,4 @@
-﻿# 战斗逻辑服（node 集群）配置
+﻿﻿# 战斗逻辑服（node 集群）配置
 # due 自动加载 ./etc/etc.toml。
 
 pid = "../../pid/battle.pid"
@@ -11,6 +11,17 @@ timezone = "Local"
     addr = "127.0.0.1:"
     codec = "proto"
     [cluster.node.linker]
+        callTimeout = "3s"
+
+# 本进程自带的网关组件（与 node 同容器，客户端直连此地址，不再经独立网关服转发）
+[cluster.gate]
+    # 实例ID，网关集群中唯一
+    id = "battle-gate-1"
+    # 实例名称
+    name = "gate"
+    # 内建RPC服务器监听地址（gate 与 node 的内部通信口）。不填写默认随机监听
+    addr = "127.0.0.1:"
+    [cluster.gate.linker]
         callTimeout = "3s"
 
 [log]
@@ -48,9 +59,24 @@ timezone = "Local"
     nonblocking = true
     disablePurge = true
 
+# gRPC 传输服务端（node 对外提供内部 RPC；固定回环地址，
+# 默认 ":0" 会自动探测私网 IP，本机网卡为公网段 IP 时探测失败）
+[transport.grpc.server]
+    addr = "127.0.0.1:0"
+
 [transport.grpc.client]
     caFile = ""
     serverName = ""
+
+# WebSocket 客户端接入（battle 自带的 gate 监听地址）。
+# 对外部署时改成公网/内网可达地址，并同步 login 服的 etc.gate.addr。
+[network.ws.server]
+    addr = "127.0.0.1:9001"
+    path = "/"
+    maxConnNum = 5000
+    origins = ["*"]
+    heartbeatInterval = "10s"
+    heartbeatMechanism = "resp"
 
 # MySQL 命名实例（多数据源；dsn 为空则跳过该实例，模板可无 MySQL 启动）
 [[db.mysql.instances]]

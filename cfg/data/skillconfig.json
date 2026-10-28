@@ -1,0 +1,352 @@
+[
+  {
+    "id": 1001,
+    "skillTemplate": 1001,
+    "skillName": "主动技能",
+    "desc": "获取一定范围内的视野",
+    "descDetail": "开启感知系统扫描500范围，可以感知到敌方单位或者交互点，视野维持5秒，CD20s",
+    "damage": 10,
+    "autoFireAngle": {
+      "x": 35,
+      "y": 20
+    },
+    "autoFireDistance": 4,
+    "capacity": 30
+  },
+  {
+    "id": 1002,
+    "skillTemplate": 1002,
+    "skillName": "被动技能",
+    "desc": "视野内角色移速降低",
+    "descDetail": "被扫描到的用户降低移动速度10%持续3秒",
+    "damage": 11,
+    "autoFireAngle": {
+      "x": 35,
+      "y": 21
+    },
+    "autoFireDistance": 5,
+    "capacity": 31
+  },
+  {
+    "id": 1003,
+    "skillTemplate": 1003,
+    "skillName": "被动技能",
+    "desc": "提升自身伤害",
+    "descDetail": "每发现1个敌人，基础伤害增加5%",
+    "damage": 12,
+    "autoFireAngle": {
+      "x": 35,
+      "y": 22
+    },
+    "autoFireDistance": 6,
+    "capacity": 32
+  },
+  {
+    "id": 2001,
+    "skillTemplate": 2001,
+    "skillName": "主动技能",
+    "desc": "发射伤害更高的子弹",
+    "descDetail": "向当前朝向发射三发穿越地图的重狙子弹，可以穿越敌人造成伤害，技能子弹的穿透等级+1，造成基础伤害125%的伤害，CD20秒",
+    "damage": 13,
+    "autoFireAngle": {
+      "x": 35,
+      "y": 23
+    },
+    "autoFireDistance": 7,
+    "capacity": 33
+  },
+  {
+    "id": 2002,
+    "skillTemplate": 2002,
+    "skillName": "被动技能",
+    "desc": "瞄准时间缩短",
+    "descDetail": "瞄准时间缩短30%",
+    "damage": 14,
+    "autoFireAngle": {
+      "x": 35,
+      "y": 24
+    },
+    "autoFireDistance": 8,
+    "capacity": 34
+  },
+  {
+    "id": 2003,
+    "skillTemplate": 2003,
+    "skillName": "被动技能",
+    "desc": "对命中单位造成减速效果",
+    "descDetail": "对命中单位造成20%减速效果持续2秒",
+    "damage": 15,
+    "autoFireAngle": {
+      "x": 35,
+      "y": 25
+    },
+    "autoFireDistance": 9,
+    "capacity": 35
+  },
+  {
+    "id": 3001,
+    "skillTemplate": 3001,
+    "skillName": "主动技能",
+    "desc": "受伤降低",
+    "descDetail": "护盾激活（技能期间受伤降低50%），并且架起机枪疯狂射击，在4秒内总计打出20发子弹，每发子弹造成30%基础伤害，CD25秒",
+    "damage": 16,
+    "autoFireAngle": {
+      "x": 35,
+      "y": 26
+    },
+    "autoFireDistance": 10,
+    "capacity": 36
+  },
+  {
+    "id": 3002,
+    "skillTemplate": 3002,
+    "skillName": "被动技能",
+    "desc": "护甲恢复速度提高",
+    "descDetail": "护甲恢复速度提高20%",
+    "damage": 17,
+    "autoFireAngle": {
+      "x": 35,
+      "y": 27
+    },
+    "autoFireDistance": 11,
+    "capacity": 37
+  },
+  {
+    "id": 3003,
+    "skillTemplate": 3003,
+    "skillName": "被动技能",
+    "desc": "受到的护甲伤害降低",
+    "descDetail": "受到的护甲伤害降低50%",
+    "damage": 18,
+    "autoFireAngle": {
+      "x": 35,
+      "y": 28
+    },
+    "autoFireDistance": 12,
+    "capacity": 38
+  },
+  {
+    "id": 4001,
+    "skillTemplate": 4001,
+    "skillName": "主动技能",
+    "desc": "部署自动攻击的炮台",
+    "descDetail": "使用大锤在地上部署一门 炮台，炮台会自动攻击，炮台生命值为60，最多持续8秒，CD20秒",
+    "damage": 19,
+    "autoFireAngle": {
+      "x": 35,
+      "y": 29
+    },
+    "autoFireDistance": 13,
+    "capacity": 39
+  },
+  {
+    "id": 4002,
+    "skillTemplate": 4002,
+    "skillName": "被动技能",
+    "desc": "炮台获得强化",
+    "descDetail": "增加炮台20%瞄准范围，降低20%瞄准时间",
+    "damage": 20,
+    "autoFireAngle": {
+      "x": 35,
+      "y": 30
+    },
+    "autoFireDistance": 14,
+    "capacity": 40
+  },
+  {
+    "id": 4003,
+    "skillTemplate": 4003,
+    "skillName": "被动技能",
+    "desc": "受到爆炸物伤害降低",
+    "descDetail": "受到爆炸物伤害降低30%",
+    "damage": 21,
+    "autoFireAngle": {
+      "x": 35,
+      "y": 31
+    },
+    "autoFireDistance": 15,
+    "capacity": 41
+  },
+  {
+    "id": 5001,
+    "skillTemplate": 5001,
+    "skillName": "主动技能",
+    "desc": "丢出手雷并喷射熔岩",
+    "descDetail": "丢出3个熔岩手雷延迟引爆或者再次激活技能引爆，在前方260范围内喷射熔岩对敌人每0.5秒造成50%基础伤害，对范围内敌人造成20%减速效果，持续5秒，CD20秒",
+    "damage": 22,
+    "autoFireAngle": {
+      "x": 35,
+      "y": 32
+    },
+    "autoFireDistance": 16,
+    "capacity": 42
+  },
+  {
+    "id": 5002,
+    "skillTemplate": 5002,
+    "skillName": "被动技能",
+    "desc": "熔岩枪会留下火焰",
+    "descDetail": "熔岩枪在地上留下火焰持续燃烧每1秒造成30%基础伤害",
+    "damage": 23,
+    "autoFireAngle": {
+      "x": 35,
+      "y": 33
+    },
+    "autoFireDistance": 17,
+    "capacity": 43
+  },
+  {
+    "id": 5003,
+    "skillTemplate": 5003,
+    "skillName": "被动技能",
+    "desc": "受到火焰类伤害降低",
+    "descDetail": "受到火焰和燃烧伤害降低40%",
+    "damage": 24,
+    "autoFireAngle": {
+      "x": 35,
+      "y": 34
+    },
+    "autoFireDistance": 18,
+    "capacity": 44
+  },
+  {
+    "id": 6001,
+    "skillTemplate": 6001,
+    "skillName": "主动技能",
+    "desc": "释放自爆无人机",
+    "descDetail": "向前方释放一个自爆无人机，向前飞行4秒，遇到敌人则自爆，对范围200内的敌人造成150%基础伤害，再次激活技能按钮可以使用移动摇杆控制无人机飞行方向，CD20秒",
+    "damage": 25,
+    "autoFireAngle": {
+      "x": 35,
+      "y": 35
+    },
+    "autoFireDistance": 19,
+    "capacity": 45
+  },
+  {
+    "id": 6002,
+    "skillTemplate": 6002,
+    "skillName": "被动技能",
+    "desc": "拥有可攻击的无人机",
+    "descDetail": "拥有2个侦查无人机，无人机拥有机炮，每5秒对范围310内敌人进行攻击造成50%基础伤害",
+    "damage": 26,
+    "autoFireAngle": {
+      "x": 35,
+      "y": 36
+    },
+    "autoFireDistance": 20,
+    "capacity": 46
+  },
+  {
+    "id": 6003,
+    "skillTemplate": 6003,
+    "skillName": "被动技能",
+    "desc": "移动速度提高",
+    "descDetail": "角色追击敌人或者被人追击时移动速度提高5%",
+    "damage": 27,
+    "autoFireAngle": {
+      "x": 35,
+      "y": 37
+    },
+    "autoFireDistance": 21,
+    "capacity": 47
+  },
+  {
+    "id": 7001,
+    "skillTemplate": 7001,
+    "skillName": "主动技能",
+    "desc": "治疗范围内的队友",
+    "descDetail": "在地上喷射净化气体，对范围150内队友进行生命恢复每秒恢复10%最大生命值数值+攻速增加10%持续3秒，CD25秒",
+    "damage": 28,
+    "autoFireAngle": {
+      "x": 35,
+      "y": 38
+    },
+    "autoFireDistance": 22,
+    "capacity": 48
+  },
+  {
+    "id": 7002,
+    "skillTemplate": 7002,
+    "skillName": "被动技能",
+    "desc": "钉刺可穿透敌人",
+    "descDetail": "改装大马力空压机，使钉刺可以穿透敌人，对后方敌人造成50%基础伤害",
+    "damage": 29,
+    "autoFireAngle": {
+      "x": 35,
+      "y": 39
+    },
+    "autoFireDistance": 23,
+    "capacity": 49
+  },
+  {
+    "id": 7003,
+    "skillTemplate": 7003,
+    "skillName": "被动技能",
+    "desc": "复活队友的CD减少",
+    "descDetail": "复活队友的CD减少50%",
+    "damage": 30,
+    "autoFireAngle": {
+      "x": 35,
+      "y": 40
+    },
+    "autoFireDistance": 24,
+    "capacity": 50
+  },
+  {
+    "id": 8001,
+    "skillTemplate": 8001,
+    "skillName": "主动技能",
+    "desc": "可放置地雷",
+    "descDetail": "在地图上布置地雷，最多布置3个，地雷造成100%基础伤害+25%减速效果持续2秒，CD15秒",
+    "damage": 31,
+    "autoFireAngle": {
+      "x": 35,
+      "y": 41
+    },
+    "autoFireDistance": 25,
+    "capacity": 51
+  },
+  {
+    "id": 8002,
+    "skillTemplate": 8002,
+    "skillName": "被动技能",
+    "desc": "地雷命中增加攻速",
+    "descDetail": "地雷每成功命中一个敌人，增加10%攻速持续3秒",
+    "damage": 32,
+    "autoFireAngle": {
+      "x": 35,
+      "y": 42
+    },
+    "autoFireDistance": 26,
+    "capacity": 52
+  },
+  {
+    "id": 8003,
+    "skillTemplate": 8003,
+    "skillName": "被动技能",
+    "desc": "使敌人受伤增加",
+    "descDetail": "对被炸伤的目标造成伤害增加10%持续3秒",
+    "damage": 33,
+    "autoFireAngle": {
+      "x": 35,
+      "y": 43
+    },
+    "autoFireDistance": 27,
+    "capacity": 53
+  },
+  {
+    "id": 1004,
+    "skillTemplate": 1004,
+    "skillName": "被动技能",
+    "desc": "超感知",
+    "descDetail": "对被炸伤的目标造成伤害增加10%持续3秒",
+    "damage": 33,
+    "autoFireAngle": {
+      "x": 35,
+      "y": 43
+    },
+    "autoFireDistance": 27,
+    "capacity": 53
+  }
+]

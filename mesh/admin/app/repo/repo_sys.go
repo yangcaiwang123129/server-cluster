@@ -12,6 +12,14 @@ import (
 	"server-cluster/share/util"
 )
 
+// 用户相关常量。
+const (
+	// configKeyInitPassword 系统配置表中初始密码的键
+	configKeyInitPassword = "sys_user_initPassword"
+	// defaultInitPassword 系统配置表缺失该键时的回退初始密码
+	defaultInitPassword = "123456"
+)
+
 // Repo 管理后台数据访问单例。
 type Repo struct{}
 
@@ -1279,7 +1287,7 @@ func (r *Repo) CreateUser(m *model.SysUser) error {
 		m.Status = "2"
 	}
 	if m.Password == "" {
-		m.Password = r.ConfigValue("sys_user_initPassword", "123456")
+		m.Password = r.ConfigValue(configKeyInitPassword, defaultInitPassword)
 	}
 	hash, err := bcrypt.GenerateFromPassword([]byte(m.Password), bcrypt.DefaultCost)
 	if err != nil {

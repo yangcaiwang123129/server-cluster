@@ -5,11 +5,10 @@ package model
 import (
 	"errors"
 	"fmt"
+	"math"
 	"server-cluster/share/enum"
 	"server-cluster/share/tpl"
 	"sort"
-	"strconv"
-	"strings"
 	"sync"
 	"sync/atomic"
 )
@@ -108,21 +107,20 @@ func GetItemCfgById(itemCfgID int32) *tpl.ItemCfg {
 		return nil
 	}
 
-	return tpl.GetTables().Item.GetDataMap()[itemCfgID]
+	return tpl.T().Item.GetDataMap()[itemCfgID]
 }
 
-// itemSize 解析配置占格 "W,H"，异常时退回 1x1。
+// itemSize 读取配置占格（vector2），异常时退回 1x1。
 func itemSize(def *tpl.ItemCfg) (int32, int32) {
-	parts := strings.SplitN(def.Size, ",", 2)
-	if len(parts) != 2 {
+	if def.Size == nil {
 		return 1, 1
 	}
-	w, errW := strconv.Atoi(strings.TrimSpace(parts[0]))
-	h, errH := strconv.Atoi(strings.TrimSpace(parts[1]))
-	if errW != nil || errH != nil || w <= 0 || h <= 0 {
+	w := int32(math.Round(float64(def.Size.X)))
+	h := int32(math.Round(float64(def.Size.Y)))
+	if w <= 0 || h <= 0 {
 		return 1, 1
 	}
-	return int32(w), int32(h)
+	return w, h
 }
 
 // GetWHByItemCfgId 按配置 id 取占格宽高；配置缺失返回 0,0。

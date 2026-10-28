@@ -5,6 +5,12 @@ import (
 	"gorm.io/gorm"
 )
 
+// 分页参数默认值/上限。
+const (
+	DefaultPageSize = 10
+	MaxPageSize     = 10000
+)
+
 // PageResp 分页响应体。
 type PageResp[T any] struct {
 	List      []T   `json:"list"`
@@ -34,10 +40,10 @@ func NormalizePage(pageIndex, pageSize int) (offset, limit int) {
 		pageIndex = 1
 	}
 	if pageSize <= 0 {
-		pageSize = 10
+		pageSize = DefaultPageSize
 	}
-	if pageSize > 10000 {
-		pageSize = 10000
+	if pageSize > MaxPageSize {
+		pageSize = MaxPageSize
 	}
 	return (pageIndex - 1) * pageSize, pageSize
 }

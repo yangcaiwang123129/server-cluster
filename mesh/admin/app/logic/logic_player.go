@@ -2,6 +2,8 @@ package logic
 
 import (
 	"context"
+	"server-cluster/mesh/admin/app/global"
+	"server-cluster/share/singleton"
 	"time"
 
 	"server-cluster/internal/rpc"
@@ -10,14 +12,21 @@ import (
 	"server-cluster/share/pb"
 )
 
-// playerService game 节点经 mesh 广播的 provider 服务名。
-const playerService = "internal.PlayerService"
+// rpcTimeout 服务间调用超时。
+const rpcTimeout = 3 * time.Second
 
 // playerLogic 玩家管理业务实现。
 type playerLogic struct{}
 
-// NewPlayer 创建玩家管理业务实例（main.go 装配期注册到 global）。
-func NewPlayer() *playerLogic { return &playerLogic{} }
+var playerLogicInst = singleton.NewContainer[global.PlayerLogic]("PlayerLogic")
+
+// init 装配期自注册实现。
+func init() {
+	playerLogicInst.Register(&playerLogic{})
+}
+
+// PlayerLogic 获取玩家模块业务单例。
+func PlayerLogic() global.PlayerLogic { return playerLogicInst.MustGet() }
 
 // PlayerList 玩家分页列表（直查 player_base）。
 func (this *playerLogic) PlayerList(req dto.PlayerListReq) ([]dto.PlayerResp, int64, error) {
@@ -29,10 +38,10 @@ func (this *playerLogic) PlayerList(req dto.PlayerListReq) ([]dto.PlayerResp, in
 
 // PlayerOnline 在线玩家列表（经 mesh 调 game 服内部 RPC）。
 func (this *playerLogic) PlayerOnline() ([]dto.OnlinePlayerResp, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), rpcTimeout)
 	defer cancel()
 	resp := &pb.GetOnlinePlayersResp{}
-	if err := rpc.Invoke(ctx, playerService, "GetOnlinePlayers", &pb.GetOnlinePlayersReq{}, resp); err != nil {
+	if err := rpc.Invoke(ctx, pb.PlayerService_ServiceDesc.ServiceName, pb.PlayerService_GetOnlinePlayers_FullMethodName, &pb.GetOnlinePlayersReq{}, resp); err != nil {
 		return nil, err
 	}
 	list := make([]dto.OnlinePlayerResp, 0, len(resp.Players))

@@ -1,0 +1,114 @@
+[
+  {
+    "id": 1001,
+    "chinese": "继续",
+    "traditionalChinese": "繼續",
+    "english": "Continue",
+    "japanese": ""
+  },
+  {
+    "id": 1002,
+    "chinese": "新游戏",
+    "traditionalChinese": "新遊戲",
+    "english": "New Game",
+    "japanese": ""
+  },
+  {
+    "id": 1003,
+    "chinese": "读取",
+    "traditionalChinese": "讀取",
+    "english": "Load",
+    "japanese": ""
+  },
+  {
+    "id": 1004,
+    "chinese": "设置",
+    "traditionalChinese": "設定",
+    "english": "Setting",
+    "japanese": ""
+  },
+  {
+    "id": 1005,
+    "chinese": "退出",
+    "traditionalChinese": "退出",
+    "english": "Exit",
+    "japanese": ""
+  },
+  {
+    "id": 1006,
+    "chinese": "语言",
+    "traditionalChinese": "語言",
+    "english": "Language",
+    "japanese": ""
+  },
+  {
+    "id": 1007,
+    "chinese": "图像",
+    "traditionalChinese": "影像",
+    "english": "Graphics",
+    "japanese": ""
+  },
+  {
+    "id": 1008,
+    "chinese": "声音",
+    "traditionalChinese": "聲音",
+    "english": "Sound",
+    "japanese": ""
+  },
+  {
+    "id": 1009,
+    "chinese": "游戏",
+    "traditionalChinese": "遊戲",
+    "english": "Game",
+    "japanese": ""
+  },
+  {
+    "id": 1011,
+    "chinese": "*客服*",
+    "traditionalChinese": "*客服*",
+    "english": "*Help*",
+    "japanese": ""
+  },
+  {
+    "id": 1012,
+    "chinese": "是",
+    "traditionalChinese": "是",
+    "english": "Yes",
+    "japanese": ""
+  },
+  {
+    "id": 1013,
+    "chinese": "否",
+    "traditionalChinese": "否",
+    "english": "No",
+    "japanese": ""
+  },
+  {
+    "id": 1014,
+    "chinese": "这是游戏正式开始前的序章，有一段比较长的剧情，不会很快进入战斗和自由探索，确认继续?",
+    "traditionalChinese": "這是遊戲正式開始前的序章，有一段比較長的劇情，不會很快進入戰鬥和自由探索，確認繼續？",
+    "english": "This is the prologue before the official start of the game, with a relatively long plot that will not soon enter into battles and free exploration. Are you sure to continue?",
+    "japanese": ""
+  },
+  {
+    "id": 5001,
+    "chinese": "这是游戏正式开始前的序章，有一段比较长的剧情，不会很快进入战斗和自由探索，确认继续?",
+    "traditionalChinese": "這是遊戲正式開始前的序章，有一段比較長的劇情，不會很快進入戰鬥和自由探索，確認繼續？",
+    "english": "This is the prologue before the official start of the game, with a relatively long plot that will not soon enter into battles and free exploration. Are you sure to continue?",
+    "japanese": ""
+  },
+  {
+    "id": 5002,
+    "chinese": "这是游戏正式开始前的序章，有一段比较长的剧情，不会很快进入战斗和自由探索，确认继续222?",
+    "traditionalChinese": "這是遊戲正式開始前的序章，有一段比較長的劇情，不會很快進入戰鬥和自由探索，確認繼續222？",
+    "english": "This is the prologue before the official start of the game, with a relatively long plot that will not soon enter into battles and free exploration. Are you sure to continue222?",
+    "japanese": ""
+  },
+  {
+    "id": 5003,
+    "chinese": "这是游戏正式开始前的序章，有一段比较长的剧情，不会很快进入战斗和自由探索，确认继续333?",
+    "traditionalChinese": "這是遊戲正式開始前的序章，有一段比較長的劇情，不會很快進入戰鬥和自由探索，確認繼續333？",
+    "english": "This is the prologue before the official start of the game, with a relatively long plot that will not soon enter into battles and free exploration. Are you sure to continue333?",
+    "japanese": ""
+  }
+]

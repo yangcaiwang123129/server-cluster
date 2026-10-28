@@ -13,13 +13,23 @@ import (
 	"server-cluster/share/model"
 	"server-cluster/share/singleton"
 
+	"github.com/dobyte/due/v2/etc"
 	"github.com/dobyte/due/v2/utils/xtime"
 	"github.com/dobyte/jwt"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
-const GateAddr = "127.0.0.1:9000"
+// defaultGateAddr 未配置 etc.gate.addr 时的回退网关地址。
+const defaultGateAddr = "127.0.0.1:9000"
+
+// gateAddr 下发给客户端的网关地址，优先取 etc.gate.addr。
+func gateAddr() string {
+	if addr := etc.Get("etc.gate.addr").String(); addr != "" {
+		return addr
+	}
+	return defaultGateAddr
+}
 
 type playerBaseLogic struct{}
 
@@ -57,20 +67,20 @@ func (this *playerBaseLogic) PlayerRegister(ctx context.Context, req *dto.Player
 		return nil, err
 	}
 	// 注册成功后直接自动登录签发 token
-	token, err := svc.JWT().GenerateToken(jwt.Payload{"player_id": m.PlayerID})
+	token, err := svc.JWT().GenerateToken(jwt.Payload{svc.PayloadPlayerID: m.PlayerID})
 	if err != nil {
 		return nil, err
 	}
-	return &dto.PlayerRegisterResp{Token: token.Token, GateAddr: GateAddr}, nil
+	return &dto.PlayerRegisterResp{Token: token.Token, GateAddr: gateAddr()}, nil
 }
 
 func (this *playerBaseLogic) PlayerLogin(ctx context.Context, req *dto.PlayerLoginReq) (*dto.PlayerLoginResp, error) {
 	switch req.LoginType {
-	case 0: // 账号密码登录
+	case dto.LoginTypePassword:
 		return this.loginByUsername(ctx, req)
-	case 1: // 手机号登录
+	case dto.LoginTypePhone:
 		return nil, errors.New("该登录方式暂不支持")
-	case 2: // 微信授权登录
+	case dto.LoginTypeWechat:
 		return nil, errors.New("该登录方式暂不支持")
 	default:
 		return nil, errs.ErrInvalidParams
@@ -89,9 +99,9 @@ func (this *playerBaseLogic) loginByUsername(ctx context.Context, req *dto.Playe
 	if err := bcrypt.CompareHashAndPassword([]byte(m.Password), []byte(req.Password)); err != nil {
 		return nil, errs.ErrPasswordWrong
 	}
-	token, err := svc.JWT().GenerateToken(jwt.Payload{"playerID": m.PlayerID})
+	token, err := svc.JWT().GenerateToken(jwt.Payload{svc.PayloadPlayerID: m.PlayerID})
 	if err != nil {
 		return nil, err
 	}
-	return &dto.PlayerLoginResp{Token: token.Token, GateAddr: GateAddr}, nil
+	return &dto.PlayerLoginResp{Token: token.Token, GateAddr: gateAddr()}, nil
 }

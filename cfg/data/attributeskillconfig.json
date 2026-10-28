@@ -1,0 +1,1478 @@
+[
+  {
+    "id": 1001005,
+    "level": {
+      "x": 1,
+      "y": 3
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 10,
+    "skillBoost": [
+      {
+        "$type": "CDSkill",
+        "cd": 20
+      },
+      {
+        "$type": "AreaSkill",
+        "area": 500
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 5
+      }
+    ],
+    "growUGMaterial": 10,
+    "growSkillMutiplier": [
+      {
+        "$type": "CDSkill",
+        "cd": -0.5
+      },
+      {
+        "$type": "AreaSkill",
+        "area": 10
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 0.2
+      }
+    ]
+  },
+  {
+    "id": 1002005,
+    "level": {
+      "x": 3,
+      "y": 5
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 35,
+    "skillBoost": [
+      {
+        "$type": "CDSkill",
+        "cd": 19
+      },
+      {
+        "$type": "AreaSkill",
+        "area": 520
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 5.4
+      }
+    ],
+    "growUGMaterial": 15,
+    "growSkillMutiplier": [
+      {
+        "$type": "CDSkill",
+        "cd": -0.5
+      },
+      {
+        "$type": "AreaSkill",
+        "area": 15
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 0.3
+      }
+    ]
+  },
+  {
+    "id": 1003005,
+    "level": {
+      "x": 5,
+      "y": 7
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 70,
+    "skillBoost": [
+      {
+        "$type": "CDSkill",
+        "cd": 18
+      },
+      {
+        "$type": "AreaSkill",
+        "area": 550
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 6
+      }
+    ],
+    "growUGMaterial": 20,
+    "growSkillMutiplier": [
+      {
+        "$type": "CDSkill",
+        "cd": -0.5
+      },
+      {
+        "$type": "AreaSkill",
+        "area": 20
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 0.3
+      }
+    ]
+  },
+  {
+    "id": 1004005,
+    "level": {
+      "x": 7,
+      "y": 8
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 135,
+    "skillBoost": [
+      {
+        "$type": "CDSkill",
+        "cd": 17
+      },
+      {
+        "$type": "AreaSkill",
+        "area": 590
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 6.6
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "CDSkill",
+        "cd": -0.5
+      },
+      {
+        "$type": "AreaSkill",
+        "area": 25
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 0.3
+      }
+    ]
+  },
+  {
+    "id": 1005005,
+    "level": {
+      "x": 8,
+      "y": 9
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 165,
+    "skillBoost": [
+      {
+        "$type": "CDSkill",
+        "cd": 16.5
+      },
+      {
+        "$type": "AreaSkill",
+        "area": 615
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 6.9
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "CDSkill",
+        "cd": -0.5
+      },
+      {
+        "$type": "AreaSkill",
+        "area": 30
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 0.5
+      }
+    ]
+  },
+  {
+    "id": 1006005,
+    "level": {
+      "x": 9,
+      "y": 10
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 200,
+    "skillBoost": [
+      {
+        "$type": "CDSkill",
+        "cd": 16
+      },
+      {
+        "$type": "AreaSkill",
+        "area": 645
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 7.4
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "CDSkill",
+        "cd": -1
+      },
+      {
+        "$type": "AreaSkill",
+        "area": 35
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 0.6
+      }
+    ]
+  },
+  {
+    "id": 2001005,
+    "level": {
+      "x": 1,
+      "y": 3
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 10,
+    "skillBoost": [
+      {
+        "$type": "CDSkill",
+        "cd": 20
+      },
+      {
+        "$type": "DamageSkill",
+        "damage": 75
+      }
+    ],
+    "growUGMaterial": 10,
+    "growSkillMutiplier": [
+      {
+        "$type": "CDSkill",
+        "cd": -0.5
+      },
+      {
+        "$type": "DamageSkill",
+        "damage": 5
+      }
+    ]
+  },
+  {
+    "id": 2002005,
+    "level": {
+      "x": 3,
+      "y": 5
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 35,
+    "skillBoost": [
+      {
+        "$type": "CDSkill",
+        "cd": 19
+      },
+      {
+        "$type": "DamageSkill",
+        "damage": 85
+      }
+    ],
+    "growUGMaterial": 15,
+    "growSkillMutiplier": [
+      {
+        "$type": "CDSkill",
+        "cd": -0.5
+      },
+      {
+        "$type": "DamageSkill",
+        "damage": 5
+      }
+    ]
+  },
+  {
+    "id": 2003005,
+    "level": {
+      "x": 5,
+      "y": 7
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 70,
+    "skillBoost": [
+      {
+        "$type": "CDSkill",
+        "cd": 18
+      },
+      {
+        "$type": "DamageSkill",
+        "damage": 95
+      }
+    ],
+    "growUGMaterial": 20,
+    "growSkillMutiplier": [
+      {
+        "$type": "CDSkill",
+        "cd": -0.5
+      },
+      {
+        "$type": "DamageSkill",
+        "damage": 10
+      }
+    ]
+  },
+  {
+    "id": 2004005,
+    "level": {
+      "x": 7,
+      "y": 8
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 135,
+    "skillBoost": [
+      {
+        "$type": "CDSkill",
+        "cd": 17
+      },
+      {
+        "$type": "DamageSkill",
+        "damage": 115
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "CDSkill",
+        "cd": -0.5
+      },
+      {
+        "$type": "DamageSkill",
+        "damage": 15
+      }
+    ]
+  },
+  {
+    "id": 2005005,
+    "level": {
+      "x": 8,
+      "y": 9
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 165,
+    "skillBoost": [
+      {
+        "$type": "CDSkill",
+        "cd": 16.5
+      },
+      {
+        "$type": "DamageSkill",
+        "damage": 130
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "CDSkill",
+        "cd": -0.5
+      },
+      {
+        "$type": "DamageSkill",
+        "damage": 15
+      }
+    ]
+  },
+  {
+    "id": 2006005,
+    "level": {
+      "x": 9,
+      "y": 10
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 200,
+    "skillBoost": [
+      {
+        "$type": "CDSkill",
+        "cd": 16
+      },
+      {
+        "$type": "DamageSkill",
+        "damage": 145
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "CDSkill",
+        "cd": -0.5
+      },
+      {
+        "$type": "DamageSkill",
+        "damage": 15
+      }
+    ]
+  },
+  {
+    "id": 3001005,
+    "level": {
+      "x": 1,
+      "y": 3
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 10,
+    "skillBoost": [
+      {
+        "$type": "CDSkill",
+        "cd": 25
+      },
+      {
+        "$type": "DamageSkill",
+        "damage": 30
+      }
+    ],
+    "growUGMaterial": 10,
+    "growSkillMutiplier": [
+      {
+        "$type": "CDSkill",
+        "cd": -0.5
+      },
+      {
+        "$type": "DamageSkill",
+        "damage": 5
+      }
+    ]
+  },
+  {
+    "id": 3002005,
+    "level": {
+      "x": 3,
+      "y": 5
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 35,
+    "skillBoost": [
+      {
+        "$type": "CDSkill",
+        "cd": 24
+      },
+      {
+        "$type": "DamageSkill",
+        "damage": 40
+      }
+    ],
+    "growUGMaterial": 15,
+    "growSkillMutiplier": [
+      {
+        "$type": "CDSkill",
+        "cd": -0.5
+      },
+      {
+        "$type": "DamageSkill",
+        "damage": 5
+      }
+    ]
+  },
+  {
+    "id": 3003005,
+    "level": {
+      "x": 5,
+      "y": 7
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 70,
+    "skillBoost": [
+      {
+        "$type": "CDSkill",
+        "cd": 23
+      },
+      {
+        "$type": "DamageSkill",
+        "damage": 50
+      }
+    ],
+    "growUGMaterial": 20,
+    "growSkillMutiplier": [
+      {
+        "$type": "CDSkill",
+        "cd": -0.5
+      },
+      {
+        "$type": "DamageSkill",
+        "damage": 10
+      }
+    ]
+  },
+  {
+    "id": 3004005,
+    "level": {
+      "x": 7,
+      "y": 8
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 135,
+    "skillBoost": [
+      {
+        "$type": "CDSkill",
+        "cd": 22
+      },
+      {
+        "$type": "DamageSkill",
+        "damage": 70
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "CDSkill",
+        "cd": -0.5
+      },
+      {
+        "$type": "DamageSkill",
+        "damage": 10
+      }
+    ]
+  },
+  {
+    "id": 3005005,
+    "level": {
+      "x": 8,
+      "y": 9
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 165,
+    "skillBoost": [
+      {
+        "$type": "CDSkill",
+        "cd": 21.5
+      },
+      {
+        "$type": "DamageSkill",
+        "damage": 80
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "CDSkill",
+        "cd": -0.5
+      },
+      {
+        "$type": "DamageSkill",
+        "damage": 15
+      }
+    ]
+  },
+  {
+    "id": 3006005,
+    "level": {
+      "x": 9,
+      "y": 10
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 200,
+    "skillBoost": [
+      {
+        "$type": "CDSkill",
+        "cd": 25
+      },
+      {
+        "$type": "DamageSkill",
+        "damage": 95
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "CDSkill",
+        "cd": -1
+      },
+      {
+        "$type": "DamageSkill",
+        "damage": 15
+      }
+    ]
+  },
+  {
+    "id": 1001006,
+    "level": {
+      "x": 1,
+      "y": 3
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 10,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 10
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 3
+      }
+    ],
+    "growUGMaterial": 10,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 1
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 0.2
+      }
+    ]
+  },
+  {
+    "id": 1002006,
+    "level": {
+      "x": 3,
+      "y": 5
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 35,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 12
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 3.4
+      }
+    ],
+    "growUGMaterial": 15,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 1
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 0.2
+      }
+    ]
+  },
+  {
+    "id": 1003006,
+    "level": {
+      "x": 5,
+      "y": 7
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 70,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 14
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 3.8
+      }
+    ],
+    "growUGMaterial": 20,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 1
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 0.3
+      }
+    ]
+  },
+  {
+    "id": 1004006,
+    "level": {
+      "x": 7,
+      "y": 8
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 135,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 16
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 4.4
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 2
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 0.4
+      }
+    ]
+  },
+  {
+    "id": 1005006,
+    "level": {
+      "x": 8,
+      "y": 9
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 165,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 18
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 4.8
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 2
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 0.5
+      }
+    ]
+  },
+  {
+    "id": 1006006,
+    "level": {
+      "x": 9,
+      "y": 10
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 200,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 20
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 5.3
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 5
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 0.7
+      }
+    ]
+  },
+  {
+    "id": 2001006,
+    "level": {
+      "x": 1,
+      "y": 3
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 10,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 10
+      }
+    ],
+    "growUGMaterial": 10,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 2
+      }
+    ]
+  },
+  {
+    "id": 2002006,
+    "level": {
+      "x": 3,
+      "y": 5
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 35,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 14
+      }
+    ],
+    "growUGMaterial": 15,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 2
+      }
+    ]
+  },
+  {
+    "id": 2003006,
+    "level": {
+      "x": 5,
+      "y": 7
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 70,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 18
+      }
+    ],
+    "growUGMaterial": 20,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 3
+      }
+    ]
+  },
+  {
+    "id": 2004006,
+    "level": {
+      "x": 7,
+      "y": 8
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 135,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 24
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 3
+      }
+    ]
+  },
+  {
+    "id": 2005006,
+    "level": {
+      "x": 8,
+      "y": 9
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 165,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 27
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 5
+      }
+    ]
+  },
+  {
+    "id": 2006006,
+    "level": {
+      "x": 9,
+      "y": 10
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 200,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 32
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 8
+      }
+    ]
+  },
+  {
+    "id": 3001006,
+    "level": {
+      "x": 1,
+      "y": 3
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 10,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 10
+      }
+    ],
+    "growUGMaterial": 10,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 2
+      }
+    ]
+  },
+  {
+    "id": 3002006,
+    "level": {
+      "x": 3,
+      "y": 5
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 35,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 14
+      }
+    ],
+    "growUGMaterial": 15,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 2
+      }
+    ]
+  },
+  {
+    "id": 3003006,
+    "level": {
+      "x": 5,
+      "y": 7
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 70,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 18
+      }
+    ],
+    "growUGMaterial": 20,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 3
+      }
+    ]
+  },
+  {
+    "id": 3004006,
+    "level": {
+      "x": 7,
+      "y": 8
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 135,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 24
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 4
+      }
+    ]
+  },
+  {
+    "id": 3005006,
+    "level": {
+      "x": 8,
+      "y": 9
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 165,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 28
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 5
+      }
+    ]
+  },
+  {
+    "id": 3006006,
+    "level": {
+      "x": 9,
+      "y": 10
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 200,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 33
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 7
+      }
+    ]
+  },
+  {
+    "id": 1001007,
+    "level": {
+      "x": 1,
+      "y": 3
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 10,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 2
+      }
+    ],
+    "growUGMaterial": 10,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 1
+      }
+    ]
+  },
+  {
+    "id": 1002007,
+    "level": {
+      "x": 3,
+      "y": 5
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 35,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 4
+      }
+    ],
+    "growUGMaterial": 15,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 1
+      }
+    ]
+  },
+  {
+    "id": 1003007,
+    "level": {
+      "x": 5,
+      "y": 7
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 70,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 6
+      }
+    ],
+    "growUGMaterial": 20,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 2
+      }
+    ]
+  },
+  {
+    "id": 1004007,
+    "level": {
+      "x": 7,
+      "y": 8
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 135,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 10
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 2
+      }
+    ]
+  },
+  {
+    "id": 1005007,
+    "level": {
+      "x": 8,
+      "y": 9
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 165,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 12
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 3
+      }
+    ]
+  },
+  {
+    "id": 1006007,
+    "level": {
+      "x": 9,
+      "y": 10
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 200,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 15
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 5
+      }
+    ]
+  },
+  {
+    "id": 2001007,
+    "level": {
+      "x": 1,
+      "y": 3
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 10,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 5
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 0.5
+      }
+    ],
+    "growUGMaterial": 10,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 1
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 0.1
+      }
+    ]
+  },
+  {
+    "id": 2002007,
+    "level": {
+      "x": 3,
+      "y": 5
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 35,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 7
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 0.7
+      }
+    ],
+    "growUGMaterial": 15,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 1
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 0.1
+      }
+    ]
+  },
+  {
+    "id": 2003007,
+    "level": {
+      "x": 5,
+      "y": 7
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 70,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 9
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 0.9
+      }
+    ],
+    "growUGMaterial": 20,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 1
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 0.2
+      }
+    ]
+  },
+  {
+    "id": 2004007,
+    "level": {
+      "x": 7,
+      "y": 8
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 135,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 11
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 1.2
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 2
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 0.2
+      }
+    ]
+  },
+  {
+    "id": 2005007,
+    "level": {
+      "x": 8,
+      "y": 9
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 165,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 13
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 1.4
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 2
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 0.3
+      }
+    ]
+  },
+  {
+    "id": 2006007,
+    "level": {
+      "x": 9,
+      "y": 10
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 200,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 15
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 1.7
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 5
+      },
+      {
+        "$type": "TimeSkill",
+        "time": 0.3
+      }
+    ]
+  },
+  {
+    "id": 3001007,
+    "level": {
+      "x": 1,
+      "y": 3
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 10,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 20
+      }
+    ],
+    "growUGMaterial": 10,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 2
+      }
+    ]
+  },
+  {
+    "id": 3002007,
+    "level": {
+      "x": 3,
+      "y": 5
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 35,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 24
+      }
+    ],
+    "growUGMaterial": 15,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 2
+      }
+    ]
+  },
+  {
+    "id": 3003007,
+    "level": {
+      "x": 5,
+      "y": 7
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 70,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 28
+      }
+    ],
+    "growUGMaterial": 20,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 3
+      }
+    ]
+  },
+  {
+    "id": 3004007,
+    "level": {
+      "x": 7,
+      "y": 8
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 135,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 34
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 4
+      }
+    ]
+  },
+  {
+    "id": 3005007,
+    "level": {
+      "x": 8,
+      "y": 9
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 165,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 38
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 5
+      }
+    ]
+  },
+  {
+    "id": 3006007,
+    "level": {
+      "x": 9,
+      "y": 10
+    },
+    "upgradeMaterial": 7,
+    "upgradeUse": 200,
+    "skillBoost": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 43
+      }
+    ],
+    "growUGMaterial": 0,
+    "growSkillMutiplier": [
+      {
+        "$type": "MagnificationSkill",
+        "magnification": 7
+      }
+    ]
+  }
+]

@@ -34,6 +34,12 @@ echo [gen-config] code out : %CODE_OUT%
 echo [gen-config] data out : %DATA_OUT%
 echo.
 
+rem --- 0. Backup hand-written files in code dir (Luban removes unknown files there) ---
+set "EMBED_BAK=%TEMP%\server-cluster-embed.go.bak"
+if exist "%CODE_OUT%\embed.go" (
+    copy /y "%CODE_OUT%\embed.go" "%EMBED_BAK%" >nul
+)
+
 rem --- 1. Clean data dir (code dir is overwritten by Luban, no need to pre-clean) ---
 if not exist "%DATA_OUT%" mkdir "%DATA_OUT%"
 
@@ -51,7 +57,13 @@ if errorlevel 1 (
     exit /b 1
 )
 
-rem --- 2.5 Sync data into embed dir (share\tpl\data, loaded via go:embed) ---
+rem --- 2.5 Restore hand-written files removed by Luban's output-dir cleanup ---
+if exist "%EMBED_BAK%" (
+    copy /y "%EMBED_BAK%" "%CODE_OUT%\embed.go" >nul
+    del "%EMBED_BAK%" >nul 2>nul
+)
+
+rem --- 2.6 Sync data into embed dir (share\tpl\data, loaded via go:embed) ---
 echo [gen-config] sync data to embed dir...
 if not exist "share\tpl\data" mkdir "share\tpl\data"
 copy /y "%DATA_OUT%\*.json" "share\tpl\data\" >nul

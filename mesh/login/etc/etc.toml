@@ -84,3 +84,7 @@ timezone = "Local"
 [jwt]
     secret = "cluster-secret"
     valid_duration = 7200 # 秒
+
+# 网关地址：登录成功后下发给客户端连接
+[gate]
+    addr = "127.0.0.1:9000"

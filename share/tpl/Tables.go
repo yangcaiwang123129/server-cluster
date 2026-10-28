@@ -22,22 +22,48 @@ type Table[T any] struct {
 }
 
 // Get 按 id 查询，不存在返回 nil。
-func (this *Table[T]) Get(id int32) *T { return this.dataMap[id] }
+func (t *Table[T]) Get(id int32) *T { return t.dataMap[id] }
 
 // Has 判断 id 是否存在。
-func (this *Table[T]) Has(id int32) bool {
-	_, ok := this.dataMap[id]
+func (t *Table[T]) Has(id int32) bool {
+	_, ok := t.dataMap[id]
 	return ok
 }
 
 // Len 返回记录数。
-func (this *Table[T]) Len() int { return len(this.dataMap) }
+func (t *Table[T]) Len() int { return len(t.dataMap) }
 
 // GetDataMap 返回全部记录的 id→记录 map。
-func (this *Table[T]) GetDataMap() map[int32]*T { return this.dataMap }
+func (t *Table[T]) GetDataMap() map[int32]*T { return t.dataMap }
 
 // GetDataList 返回按文件顺序排列的全部记录。
-func (this *Table[T]) GetDataList() []*T { return this.dataList }
+func (t *Table[T]) GetDataList() []*T { return t.dataList }
+
+// Map 是 Luban json 导出的 map 容器：数据以 [key,value] 二元数组序列化，
+// 这里在反序列化时还原为原生 map，字段用法与 map 一致。
+type Map[K comparable, V any] map[K]V
+
+// UnmarshalJSON 解析 [["k1","v1"],["k2","v2"]] 形式的 map 数据。
+func (m *Map[K, V]) UnmarshalJSON(data []byte) error {
+	var pairs [][2]json.RawMessage
+	if err := json.Unmarshal(data, &pairs); err != nil {
+		return err
+	}
+	out := make(map[K]V, len(pairs))
+	for _, p := range pairs {
+		var k K
+		if err := json.Unmarshal(p[0], &k); err != nil {
+			return err
+		}
+		var v V
+		if err := json.Unmarshal(p[1], &v); err != nil {
+			return err
+		}
+		out[k] = v
+	}
+	*m = out
+	return nil
+}
 
 // LoadTable 读取内嵌的 <file>.json 加载一张表，keyFn 从记录中提取主键。
 func LoadTable[T any](file string, keyFn func(*T) int32) (*Table[T], error) {
@@ -56,7 +82,8 @@ func LoadTable[T any](file string, keyFn func(*T) int32) (*Table[T], error) {
 	for _, r := range rows {
 		k := keyFn(r)
 		if _, dup := tb.dataMap[k]; dup {
-			return nil, fmt.Errorf("cfg: duplicate id %d in %s.json", k, file)
+			// 同一 id 多行是合法数据（如关卡按波次分行），保留首条，不中断加载。
+			continue
 		}
 		tb.dataMap[k] = r
 	}
@@ -69,7 +96,30 @@ func LoadTable[T any](file string, keyFn func(*T) int32) (*Table[T], error) {
 
 // Tables 持有全部配置表实例，由 Load 初始化。
 type Tables struct {
-	Item *Table[ItemCfg] //
+	Effect          *Table[EffectCfg]          //
+	Level           *Table[LevelCfg]           //
+	Scene           *Table[SceneCfg]           //
+	SkillTemplate   *Table[SkillTemplateCfg]   //
+	Item            *Table[ItemCfg]            //
+	BuildingItem    *Table[BuildingItemCfg]    //
+	Mouse           *Table[MouseCfg]           //
+	Language        *Table[LanguageCfg]        //
+	Dialogue        *Table[DialogueCfg]        //
+	Character       *Table[CharacterCfg]       //
+	Input           *Table[InputCfg]           //
+	Global          *Table[GlobalCfg]          //
+	Skill           *Table[SkillCfg]           //
+	Activity        *Table[ActivityCfg]        //
+	Function        *Table[FunctionCfg]        //
+	Collection      *Table[CollectionCfg]      //
+	RoleInfo        *Table[RoleInfoCfg]        //
+	AttributeRole   *Table[AttributeRoleCfg]   //
+	AttributeWeapon *Table[AttributeWeaponCfg] //
+	AttributeGear   *Table[AttributeGearCfg]   //
+	AttributeSkill  *Table[AttributeSkillCfg]  //
+	Weapon          *Table[WeaponCfg]          //
+	Gear            *Table[GearCfg]            //
+	Damage          *Table[DamageCfg]          //
 }
 
 var (
@@ -87,7 +137,76 @@ func Load() error {
 	}
 	t := &Tables{}
 	var err error
+	if t.Effect, err = LoadTable("effectconfig", func(r *EffectCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.Level, err = LoadTable("levelconfig", func(r *LevelCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.Scene, err = LoadTable("sceneconfig", func(r *SceneCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.SkillTemplate, err = LoadTable("skilltemplateconfig", func(r *SkillTemplateCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
 	if t.Item, err = LoadTable("itemconfig", func(r *ItemCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.BuildingItem, err = LoadTable("buildingitemconfig", func(r *BuildingItemCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.Mouse, err = LoadTable("mouseconfig", func(r *MouseCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.Language, err = LoadTable("languageconfig", func(r *LanguageCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.Dialogue, err = LoadTable("dialogueconfig", func(r *DialogueCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.Character, err = LoadTable("characterconfig", func(r *CharacterCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.Input, err = LoadTable("inputconfig", func(r *InputCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.Global, err = LoadTable("globalconfig", func(r *GlobalCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.Skill, err = LoadTable("skillconfig", func(r *SkillCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.Activity, err = LoadTable("activityconfig", func(r *ActivityCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.Function, err = LoadTable("functionconfig", func(r *FunctionCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.Collection, err = LoadTable("collectionconfig", func(r *CollectionCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.RoleInfo, err = LoadTable("roleinfoconfig", func(r *RoleInfoCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.AttributeRole, err = LoadTable("attributeroleconfig", func(r *AttributeRoleCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.AttributeWeapon, err = LoadTable("attributeweaponconfig", func(r *AttributeWeaponCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.AttributeGear, err = LoadTable("attributegearconfig", func(r *AttributeGearCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.AttributeSkill, err = LoadTable("attributeskillconfig", func(r *AttributeSkillCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.Weapon, err = LoadTable("weaponconfig", func(r *WeaponCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.Gear, err = LoadTable("gearconfig", func(r *GearCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.Damage, err = LoadTable("damageconfig", func(r *DamageCfg) int32 { return r.Id }); err != nil {
 		return err
 	}
 	tables = t
@@ -102,8 +221,8 @@ func MustLoad() {
 	}
 }
 
-// GetTables 获取全局配置表；须先 Load 成功，否则 panic。
-func GetTables() *Tables {
+// T 获取全局配置表；须先 Load 成功，否则 panic。
+func T() *Tables {
 	if tables == nil {
 		panic("cfg: T() called before Load()/MustLoad()")
 	}

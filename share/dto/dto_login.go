@@ -1,5 +1,12 @@
 package dto
 
+// 登录类型（客户端协议约定）。
+const (
+	LoginTypePassword int32 = iota // 账号密码登录
+	LoginTypePhone                 // 手机号登录
+	LoginTypeWechat                // 微信授权登录
+)
+
 // PlayerRegisterReq 注册请求。
 type PlayerRegisterReq struct {
 	Username string `json:"username"`

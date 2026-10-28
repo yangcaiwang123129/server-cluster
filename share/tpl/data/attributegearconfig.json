@@ -1,0 +1,1082 @@
+[
+  {
+    "id": 1001002,
+    "level": {
+      "x": 1,
+      "y": 10
+    },
+    "hp": 10,
+    "armor": 5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100,
+    "growHp": 2,
+    "growArmor": 1,
+    "armorLevel": 0,
+    "growUGMaterial": 50,
+    "upRankMaterial": 9,
+    "upRankUse": 0,
+    "maxSpeed": 0,
+    "fieldView": 10,
+    "angleView": 1.05
+  },
+  {
+    "id": 1002002,
+    "level": {
+      "x": 10,
+      "y": 20
+    },
+    "hp": 38,
+    "armor": 24,
+    "upgradeMaterial": 3,
+    "upgradeUse": 550,
+    "growHp": 3,
+    "growArmor": 2,
+    "armorLevel": 1,
+    "growUGMaterial": 50,
+    "upRankMaterial": 9,
+    "upRankUse": 20,
+    "maxSpeed": 0,
+    "fieldView": 20,
+    "angleView": 1.1
+  },
+  {
+    "id": 1003002,
+    "level": {
+      "x": 20,
+      "y": 30
+    },
+    "hp": 79,
+    "armor": 55,
+    "upgradeMaterial": 3,
+    "upgradeUse": 1050,
+    "growHp": 4,
+    "growArmor": 3,
+    "armorLevel": 1,
+    "growUGMaterial": 100,
+    "upRankMaterial": 9,
+    "upRankUse": 30,
+    "maxSpeed": 0,
+    "fieldView": 30,
+    "angleView": 1.15
+  },
+  {
+    "id": 1004002,
+    "level": {
+      "x": 30,
+      "y": 40
+    },
+    "hp": 131,
+    "armor": 97,
+    "upgradeMaterial": 3,
+    "upgradeUse": 2050,
+    "growHp": 5,
+    "growArmor": 4,
+    "armorLevel": 2,
+    "growUGMaterial": 100,
+    "upRankMaterial": 9,
+    "upRankUse": 60,
+    "maxSpeed": 0,
+    "fieldView": 40,
+    "angleView": 1.2
+  },
+  {
+    "id": 1005002,
+    "level": {
+      "x": 40,
+      "y": 50
+    },
+    "hp": 195,
+    "armor": 151,
+    "upgradeMaterial": 3,
+    "upgradeUse": 3050,
+    "growHp": 6,
+    "growArmor": 5,
+    "armorLevel": 2,
+    "growUGMaterial": 150,
+    "upRankMaterial": 9,
+    "upRankUse": 100,
+    "maxSpeed": 0,
+    "fieldView": 50,
+    "angleView": 1.25
+  },
+  {
+    "id": 1006002,
+    "level": {
+      "x": 50,
+      "y": 60
+    },
+    "hp": 271,
+    "armor": 217,
+    "upgradeMaterial": 3,
+    "upgradeUse": 4550,
+    "growHp": 8,
+    "growArmor": 7,
+    "armorLevel": 3,
+    "growUGMaterial": 300,
+    "upRankMaterial": 9,
+    "upRankUse": 120,
+    "maxSpeed": 0,
+    "fieldView": 60,
+    "angleView": 1.3
+  },
+  {
+    "id": 2001002,
+    "level": {
+      "x": 1,
+      "y": 10
+    },
+    "hp": 5,
+    "armor": 3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100,
+    "growHp": 1,
+    "growArmor": 1,
+    "armorLevel": 0,
+    "growUGMaterial": 50,
+    "upRankMaterial": 9,
+    "upRankUse": 0,
+    "maxSpeed": 0,
+    "fieldView": 20,
+    "angleView": 1.1
+  },
+  {
+    "id": 2002002,
+    "level": {
+      "x": 10,
+      "y": 20
+    },
+    "hp": 20,
+    "armor": 18,
+    "upgradeMaterial": 3,
+    "upgradeUse": 550,
+    "growHp": 2,
+    "growArmor": 2,
+    "armorLevel": 1,
+    "growUGMaterial": 50,
+    "upRankMaterial": 9,
+    "upRankUse": 20,
+    "maxSpeed": 0,
+    "fieldView": 30,
+    "angleView": 1.2
+  },
+  {
+    "id": 2003002,
+    "level": {
+      "x": 20,
+      "y": 30
+    },
+    "hp": 47,
+    "armor": 45,
+    "upgradeMaterial": 3,
+    "upgradeUse": 1050,
+    "growHp": 3,
+    "growArmor": 3,
+    "armorLevel": 1,
+    "growUGMaterial": 100,
+    "upRankMaterial": 9,
+    "upRankUse": 30,
+    "maxSpeed": 0,
+    "fieldView": 40,
+    "angleView": 1.3
+  },
+  {
+    "id": 2004002,
+    "level": {
+      "x": 30,
+      "y": 40
+    },
+    "hp": 85,
+    "armor": 83,
+    "upgradeMaterial": 3,
+    "upgradeUse": 2050,
+    "growHp": 4,
+    "growArmor": 4,
+    "armorLevel": 2,
+    "growUGMaterial": 100,
+    "upRankMaterial": 9,
+    "upRankUse": 60,
+    "maxSpeed": 0,
+    "fieldView": 50,
+    "angleView": 1.4
+  },
+  {
+    "id": 2005002,
+    "level": {
+      "x": 40,
+      "y": 50
+    },
+    "hp": 134,
+    "armor": 132,
+    "upgradeMaterial": 3,
+    "upgradeUse": 3050,
+    "growHp": 5,
+    "growArmor": 5,
+    "armorLevel": 2,
+    "growUGMaterial": 150,
+    "upRankMaterial": 9,
+    "upRankUse": 100,
+    "maxSpeed": 0,
+    "fieldView": 60,
+    "angleView": 1.5
+  },
+  {
+    "id": 2006002,
+    "level": {
+      "x": 50,
+      "y": 60
+    },
+    "hp": 194,
+    "armor": 192,
+    "upgradeMaterial": 3,
+    "upgradeUse": 4550,
+    "growHp": 7,
+    "growArmor": 7,
+    "armorLevel": 3,
+    "growUGMaterial": 300,
+    "upRankMaterial": 9,
+    "upRankUse": 120,
+    "maxSpeed": 0,
+    "fieldView": 70,
+    "angleView": 1.6
+  },
+  {
+    "id": 3001002,
+    "level": {
+      "x": 1,
+      "y": 10
+    },
+    "hp": 15,
+    "armor": 10,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100,
+    "growHp": 3,
+    "growArmor": 2,
+    "armorLevel": 0,
+    "growUGMaterial": 50,
+    "upRankMaterial": 9,
+    "upRankUse": 0,
+    "maxSpeed": 0,
+    "fieldView": 5,
+    "angleView": 1.05
+  },
+  {
+    "id": 3002002,
+    "level": {
+      "x": 10,
+      "y": 20
+    },
+    "hp": 58,
+    "armor": 44,
+    "upgradeMaterial": 3,
+    "upgradeUse": 550,
+    "growHp": 4,
+    "growArmor": 3,
+    "armorLevel": 1,
+    "growUGMaterial": 50,
+    "upRankMaterial": 9,
+    "upRankUse": 20,
+    "maxSpeed": 0,
+    "fieldView": 10,
+    "angleView": 1.08
+  },
+  {
+    "id": 3003002,
+    "level": {
+      "x": 20,
+      "y": 30
+    },
+    "hp": 115,
+    "armor": 91,
+    "upgradeMaterial": 3,
+    "upgradeUse": 1050,
+    "growHp": 5,
+    "growArmor": 4,
+    "armorLevel": 1,
+    "growUGMaterial": 100,
+    "upRankMaterial": 9,
+    "upRankUse": 30,
+    "maxSpeed": 0,
+    "fieldView": 15,
+    "angleView": 1.11
+  },
+  {
+    "id": 3004002,
+    "level": {
+      "x": 30,
+      "y": 40
+    },
+    "hp": 184,
+    "armor": 150,
+    "upgradeMaterial": 3,
+    "upgradeUse": 2050,
+    "growHp": 6,
+    "growArmor": 5,
+    "armorLevel": 2,
+    "growUGMaterial": 100,
+    "upRankMaterial": 9,
+    "upRankUse": 60,
+    "maxSpeed": 0,
+    "fieldView": 20,
+    "angleView": 1.14
+  },
+  {
+    "id": 3005002,
+    "level": {
+      "x": 40,
+      "y": 50
+    },
+    "hp": 266,
+    "armor": 222,
+    "upgradeMaterial": 3,
+    "upgradeUse": 3050,
+    "growHp": 7,
+    "growArmor": 6,
+    "armorLevel": 2,
+    "growUGMaterial": 150,
+    "upRankMaterial": 9,
+    "upRankUse": 100,
+    "maxSpeed": 0,
+    "fieldView": 25,
+    "angleView": 1.17
+  },
+  {
+    "id": 3006002,
+    "level": {
+      "x": 50,
+      "y": 60
+    },
+    "hp": 361,
+    "armor": 307,
+    "upgradeMaterial": 3,
+    "upgradeUse": 4550,
+    "growHp": 9,
+    "growArmor": 8,
+    "armorLevel": 3,
+    "growUGMaterial": 300,
+    "upRankMaterial": 9,
+    "upRankUse": 120,
+    "maxSpeed": 0,
+    "fieldView": 30,
+    "angleView": 1.2
+  },
+  {
+    "id": 1001003,
+    "level": {
+      "x": 1,
+      "y": 10
+    },
+    "hp": 50,
+    "armor": 20,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100,
+    "growHp": 5,
+    "growArmor": 1,
+    "armorLevel": 0,
+    "growUGMaterial": 50,
+    "upRankMaterial": 9,
+    "upRankUse": 0,
+    "maxSpeed": 0,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 1002003,
+    "level": {
+      "x": 10,
+      "y": 20
+    },
+    "hp": 105,
+    "armor": 39,
+    "upgradeMaterial": 3,
+    "upgradeUse": 550,
+    "growHp": 6,
+    "growArmor": 2,
+    "armorLevel": 1,
+    "growUGMaterial": 50,
+    "upRankMaterial": 9,
+    "upRankUse": 20,
+    "maxSpeed": 0,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 1003003,
+    "level": {
+      "x": 20,
+      "y": 30
+    },
+    "hp": 176,
+    "armor": 70,
+    "upgradeMaterial": 3,
+    "upgradeUse": 1050,
+    "growHp": 7,
+    "growArmor": 3,
+    "armorLevel": 1,
+    "growUGMaterial": 100,
+    "upRankMaterial": 9,
+    "upRankUse": 30,
+    "maxSpeed": 0,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 1004003,
+    "level": {
+      "x": 30,
+      "y": 40
+    },
+    "hp": 258,
+    "armor": 112,
+    "upgradeMaterial": 3,
+    "upgradeUse": 2050,
+    "growHp": 8,
+    "growArmor": 4,
+    "armorLevel": 2,
+    "growUGMaterial": 100,
+    "upRankMaterial": 9,
+    "upRankUse": 60,
+    "maxSpeed": 0,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 1005003,
+    "level": {
+      "x": 40,
+      "y": 50
+    },
+    "hp": 352,
+    "armor": 166,
+    "upgradeMaterial": 3,
+    "upgradeUse": 3050,
+    "growHp": 9,
+    "growArmor": 5,
+    "armorLevel": 2,
+    "growUGMaterial": 150,
+    "upRankMaterial": 9,
+    "upRankUse": 100,
+    "maxSpeed": 0,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 1006003,
+    "level": {
+      "x": 50,
+      "y": 60
+    },
+    "hp": 458,
+    "armor": 232,
+    "upgradeMaterial": 3,
+    "upgradeUse": 4550,
+    "growHp": 11,
+    "growArmor": 7,
+    "armorLevel": 3,
+    "growUGMaterial": 300,
+    "upRankMaterial": 9,
+    "upRankUse": 120,
+    "maxSpeed": 0,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 2001003,
+    "level": {
+      "x": 1,
+      "y": 10
+    },
+    "hp": 30,
+    "armor": 10,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100,
+    "growHp": 3,
+    "growArmor": 1,
+    "armorLevel": 0,
+    "growUGMaterial": 50,
+    "upRankMaterial": 9,
+    "upRankUse": 0,
+    "maxSpeed": 0,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 2002003,
+    "level": {
+      "x": 10,
+      "y": 20
+    },
+    "hp": 63,
+    "armor": 25,
+    "upgradeMaterial": 3,
+    "upgradeUse": 550,
+    "growHp": 4,
+    "growArmor": 2,
+    "armorLevel": 1,
+    "growUGMaterial": 50,
+    "upRankMaterial": 9,
+    "upRankUse": 20,
+    "maxSpeed": 0,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 2003003,
+    "level": {
+      "x": 20,
+      "y": 30
+    },
+    "hp": 110,
+    "armor": 52,
+    "upgradeMaterial": 3,
+    "upgradeUse": 1050,
+    "growHp": 5,
+    "growArmor": 3,
+    "armorLevel": 1,
+    "growUGMaterial": 100,
+    "upRankMaterial": 9,
+    "upRankUse": 30,
+    "maxSpeed": 0,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 2004003,
+    "level": {
+      "x": 30,
+      "y": 40
+    },
+    "hp": 168,
+    "armor": 90,
+    "upgradeMaterial": 3,
+    "upgradeUse": 2050,
+    "growHp": 6,
+    "growArmor": 4,
+    "armorLevel": 2,
+    "growUGMaterial": 100,
+    "upRankMaterial": 9,
+    "upRankUse": 60,
+    "maxSpeed": 0,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 2005003,
+    "level": {
+      "x": 40,
+      "y": 50
+    },
+    "hp": 237,
+    "armor": 139,
+    "upgradeMaterial": 3,
+    "upgradeUse": 3050,
+    "growHp": 7,
+    "growArmor": 5,
+    "armorLevel": 2,
+    "growUGMaterial": 150,
+    "upRankMaterial": 9,
+    "upRankUse": 100,
+    "maxSpeed": 0,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 2006003,
+    "level": {
+      "x": 50,
+      "y": 60
+    },
+    "hp": 317,
+    "armor": 199,
+    "upgradeMaterial": 3,
+    "upgradeUse": 4550,
+    "growHp": 9,
+    "growArmor": 6,
+    "armorLevel": 3,
+    "growUGMaterial": 300,
+    "upRankMaterial": 9,
+    "upRankUse": 120,
+    "maxSpeed": 0,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 3001003,
+    "level": {
+      "x": 1,
+      "y": 10
+    },
+    "hp": 70,
+    "armor": 30,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100,
+    "growHp": 7,
+    "growArmor": 2,
+    "armorLevel": 0,
+    "growUGMaterial": 50,
+    "upRankMaterial": 9,
+    "upRankUse": 0,
+    "maxSpeed": 0,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 3002003,
+    "level": {
+      "x": 10,
+      "y": 20
+    },
+    "hp": 149,
+    "armor": 64,
+    "upgradeMaterial": 3,
+    "upgradeUse": 550,
+    "growHp": 8,
+    "growArmor": 3,
+    "armorLevel": 1,
+    "growUGMaterial": 50,
+    "upRankMaterial": 9,
+    "upRankUse": 20,
+    "maxSpeed": 0,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 3003003,
+    "level": {
+      "x": 20,
+      "y": 30
+    },
+    "hp": 246,
+    "armor": 111,
+    "upgradeMaterial": 3,
+    "upgradeUse": 1050,
+    "growHp": 9,
+    "growArmor": 4,
+    "armorLevel": 1,
+    "growUGMaterial": 100,
+    "upRankMaterial": 9,
+    "upRankUse": 30,
+    "maxSpeed": 0,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 3004003,
+    "level": {
+      "x": 30,
+      "y": 40
+    },
+    "hp": 355,
+    "armor": 170,
+    "upgradeMaterial": 3,
+    "upgradeUse": 2050,
+    "growHp": 10,
+    "growArmor": 5,
+    "armorLevel": 2,
+    "growUGMaterial": 100,
+    "upRankMaterial": 9,
+    "upRankUse": 60,
+    "maxSpeed": 0,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 3005003,
+    "level": {
+      "x": 40,
+      "y": 50
+    },
+    "hp": 477,
+    "armor": 242,
+    "upgradeMaterial": 3,
+    "upgradeUse": 3050,
+    "growHp": 11,
+    "growArmor": 6,
+    "armorLevel": 2,
+    "growUGMaterial": 150,
+    "upRankMaterial": 9,
+    "upRankUse": 100,
+    "maxSpeed": 0,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 3006003,
+    "level": {
+      "x": 50,
+      "y": 60
+    },
+    "hp": 612,
+    "armor": 327,
+    "upgradeMaterial": 3,
+    "upgradeUse": 4550,
+    "growHp": 13,
+    "growArmor": 7,
+    "armorLevel": 3,
+    "growUGMaterial": 300,
+    "upRankMaterial": 9,
+    "upRankUse": 120,
+    "maxSpeed": 0,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 1001004,
+    "level": {
+      "x": 1,
+      "y": 10
+    },
+    "hp": 5,
+    "armor": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100,
+    "growHp": 1,
+    "growArmor": 1,
+    "armorLevel": 0,
+    "growUGMaterial": 50,
+    "upRankMaterial": 9,
+    "upRankUse": 0,
+    "maxSpeed": 10,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 1002004,
+    "level": {
+      "x": 10,
+      "y": 20
+    },
+    "hp": 16,
+    "armor": 12,
+    "upgradeMaterial": 3,
+    "upgradeUse": 550,
+    "growHp": 2,
+    "growArmor": 2,
+    "armorLevel": 0,
+    "growUGMaterial": 50,
+    "upRankMaterial": 9,
+    "upRankUse": 20,
+    "maxSpeed": 10,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 1003004,
+    "level": {
+      "x": 20,
+      "y": 30
+    },
+    "hp": 40,
+    "armor": 36,
+    "upgradeMaterial": 3,
+    "upgradeUse": 1050,
+    "growHp": 3,
+    "growArmor": 3,
+    "armorLevel": 0,
+    "growUGMaterial": 100,
+    "upRankMaterial": 9,
+    "upRankUse": 30,
+    "maxSpeed": 20,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 1004004,
+    "level": {
+      "x": 30,
+      "y": 40
+    },
+    "hp": 76,
+    "armor": 72,
+    "upgradeMaterial": 3,
+    "upgradeUse": 2050,
+    "growHp": 4,
+    "growArmor": 4,
+    "armorLevel": 0,
+    "growUGMaterial": 100,
+    "upRankMaterial": 9,
+    "upRankUse": 60,
+    "maxSpeed": 30,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 1005004,
+    "level": {
+      "x": 40,
+      "y": 50
+    },
+    "hp": 124,
+    "armor": 120,
+    "upgradeMaterial": 3,
+    "upgradeUse": 3050,
+    "growHp": 5,
+    "growArmor": 5,
+    "armorLevel": 0,
+    "growUGMaterial": 150,
+    "upRankMaterial": 9,
+    "upRankUse": 100,
+    "maxSpeed": 40,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 1006004,
+    "level": {
+      "x": 50,
+      "y": 60
+    },
+    "hp": 184,
+    "armor": 180,
+    "upgradeMaterial": 3,
+    "upgradeUse": 4550,
+    "growHp": 7,
+    "growArmor": 7,
+    "armorLevel": 0,
+    "growUGMaterial": 300,
+    "upRankMaterial": 9,
+    "upRankUse": 120,
+    "maxSpeed": 50,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 2001004,
+    "level": {
+      "x": 1,
+      "y": 10
+    },
+    "hp": 3,
+    "armor": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100,
+    "growHp": 1,
+    "growArmor": 1,
+    "armorLevel": 0,
+    "growUGMaterial": 50,
+    "upRankMaterial": 9,
+    "upRankUse": 0,
+    "maxSpeed": 5,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 2002004,
+    "level": {
+      "x": 10,
+      "y": 20
+    },
+    "hp": 14,
+    "armor": 12,
+    "upgradeMaterial": 3,
+    "upgradeUse": 550,
+    "growHp": 2,
+    "growArmor": 2,
+    "armorLevel": 0,
+    "growUGMaterial": 50,
+    "upRankMaterial": 9,
+    "upRankUse": 20,
+    "maxSpeed": 5,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 2003004,
+    "level": {
+      "x": 20,
+      "y": 30
+    },
+    "hp": 38,
+    "armor": 36,
+    "upgradeMaterial": 3,
+    "upgradeUse": 1050,
+    "growHp": 3,
+    "growArmor": 3,
+    "armorLevel": 0,
+    "growUGMaterial": 100,
+    "upRankMaterial": 9,
+    "upRankUse": 30,
+    "maxSpeed": 15,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 2004004,
+    "level": {
+      "x": 30,
+      "y": 40
+    },
+    "hp": 74,
+    "armor": 72,
+    "upgradeMaterial": 3,
+    "upgradeUse": 2050,
+    "growHp": 4,
+    "growArmor": 4,
+    "armorLevel": 0,
+    "growUGMaterial": 100,
+    "upRankMaterial": 9,
+    "upRankUse": 60,
+    "maxSpeed": 25,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 2005004,
+    "level": {
+      "x": 40,
+      "y": 50
+    },
+    "hp": 122,
+    "armor": 120,
+    "upgradeMaterial": 3,
+    "upgradeUse": 3050,
+    "growHp": 5,
+    "growArmor": 5,
+    "armorLevel": 0,
+    "growUGMaterial": 150,
+    "upRankMaterial": 9,
+    "upRankUse": 100,
+    "maxSpeed": 35,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 2006004,
+    "level": {
+      "x": 50,
+      "y": 60
+    },
+    "hp": 182,
+    "armor": 180,
+    "upgradeMaterial": 3,
+    "upgradeUse": 4550,
+    "growHp": 7,
+    "growArmor": 7,
+    "armorLevel": 0,
+    "growUGMaterial": 300,
+    "upRankMaterial": 9,
+    "upRankUse": 120,
+    "maxSpeed": 45,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 3001004,
+    "level": {
+      "x": 1,
+      "y": 10
+    },
+    "hp": 7,
+    "armor": 2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100,
+    "growHp": 1,
+    "growArmor": 1,
+    "armorLevel": 0,
+    "growUGMaterial": 50,
+    "upRankMaterial": 9,
+    "upRankUse": 0,
+    "maxSpeed": 5,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 3002004,
+    "level": {
+      "x": 10,
+      "y": 20
+    },
+    "hp": 18,
+    "armor": 13,
+    "upgradeMaterial": 3,
+    "upgradeUse": 550,
+    "growHp": 2,
+    "growArmor": 2,
+    "armorLevel": 0,
+    "growUGMaterial": 50,
+    "upRankMaterial": 9,
+    "upRankUse": 20,
+    "maxSpeed": 10,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 3003004,
+    "level": {
+      "x": 20,
+      "y": 30
+    },
+    "hp": 42,
+    "armor": 37,
+    "upgradeMaterial": 3,
+    "upgradeUse": 1050,
+    "growHp": 3,
+    "growArmor": 3,
+    "armorLevel": 0,
+    "growUGMaterial": 100,
+    "upRankMaterial": 9,
+    "upRankUse": 30,
+    "maxSpeed": 15,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 3004004,
+    "level": {
+      "x": 30,
+      "y": 40
+    },
+    "hp": 78,
+    "armor": 73,
+    "upgradeMaterial": 3,
+    "upgradeUse": 2050,
+    "growHp": 4,
+    "growArmor": 4,
+    "armorLevel": 0,
+    "growUGMaterial": 100,
+    "upRankMaterial": 9,
+    "upRankUse": 60,
+    "maxSpeed": 20,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 3005004,
+    "level": {
+      "x": 40,
+      "y": 50
+    },
+    "hp": 126,
+    "armor": 121,
+    "upgradeMaterial": 3,
+    "upgradeUse": 3050,
+    "growHp": 5,
+    "growArmor": 5,
+    "armorLevel": 0,
+    "growUGMaterial": 150,
+    "upRankMaterial": 9,
+    "upRankUse": 100,
+    "maxSpeed": 25,
+    "fieldView": 0,
+    "angleView": 0
+  },
+  {
+    "id": 3006004,
+    "level": {
+      "x": 50,
+      "y": 60
+    },
+    "hp": 186,
+    "armor": 181,
+    "upgradeMaterial": 3,
+    "upgradeUse": 4550,
+    "growHp": 7,
+    "growArmor": 7,
+    "armorLevel": 0,
+    "growUGMaterial": 300,
+    "upRankMaterial": 9,
+    "upRankUse": 120,
+    "maxSpeed": 30,
+    "fieldView": 0,
+    "angleView": 0
+  }
+]

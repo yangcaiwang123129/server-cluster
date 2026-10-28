@@ -1,0 +1,141 @@
+[
+  {
+    "id": 1001,
+    "desc": "给玩家加弹药",
+    "name": "弹夹",
+    "collectionType": 0,
+    "characterId": 1006,
+    "collectionTime": 2,
+    "collection": {
+      "$type": "BulletCollection",
+      "count": 60
+    },
+    "tips": "弹药",
+    "tipsTween": "+60弹药",
+    "useWays": [],
+    "rarity": 0,
+    "type": 0,
+    "maxCount": 0,
+    "overlayMaxCount": 0,
+    "storageType": 0,
+    "price": 0,
+    "sellingPrice": 0,
+    "usedInBackpack": false
+  },
+  {
+    "id": 1002,
+    "desc": "给玩家加护甲",
+    "name": "护甲",
+    "collectionType": 2,
+    "characterId": 1007,
+    "collectionTime": 2,
+    "collection": {
+      "$type": "ArmorCollection",
+      "value": 50
+    },
+    "tips": "护甲",
+    "tipsTween": "+50护甲",
+    "useWays": [],
+    "rarity": 0,
+    "type": 0,
+    "maxCount": 0,
+    "overlayMaxCount": 0,
+    "storageType": 0,
+    "price": 0,
+    "sellingPrice": 0,
+    "usedInBackpack": false
+  },
+  {
+    "id": 1003,
+    "desc": "给玩家加血包",
+    "name": "血包",
+    "collectionType": 1,
+    "characterId": 1008,
+    "collectionTime": 2,
+    "collection": {
+      "$type": "CureCollection",
+      "value": 30,
+      "duration": 2
+    },
+    "tips": "血包",
+    "tipsTween": "+30血包",
+    "useWays": [],
+    "rarity": 0,
+    "type": 0,
+    "maxCount": 0,
+    "overlayMaxCount": 0,
+    "storageType": 0,
+    "price": 0,
+    "sellingPrice": 0,
+    "usedInBackpack": false
+  },
+  {
+    "id": 1004,
+    "desc": "给玩家加防弹衣",
+    "name": "防弹衣",
+    "collectionType": 3,
+    "characterId": 1009,
+    "collectionTime": 2,
+    "collection": {
+      "$type": "BodyArmorCollection",
+      "level": 1
+    },
+    "tips": "防弹衣",
+    "tipsTween": "+1级防弹衣",
+    "useWays": [],
+    "rarity": 0,
+    "type": 0,
+    "maxCount": 0,
+    "overlayMaxCount": 0,
+    "storageType": 0,
+    "price": 0,
+    "sellingPrice": 0,
+    "usedInBackpack": false
+  },
+  {
+    "id": 1005,
+    "desc": "给玩家加防弹衣",
+    "name": "防弹衣",
+    "collectionType": 3,
+    "characterId": 1009,
+    "collectionTime": 2,
+    "collection": {
+      "$type": "BodyArmorCollection",
+      "level": 2
+    },
+    "tips": "防弹衣",
+    "tipsTween": "+2级防弹衣",
+    "useWays": [],
+    "rarity": 0,
+    "type": 0,
+    "maxCount": 0,
+    "overlayMaxCount": 0,
+    "storageType": 0,
+    "price": 0,
+    "sellingPrice": 0,
+    "usedInBackpack": false
+  },
+  {
+    "id": 1006,
+    "desc": "给玩家加防弹衣",
+    "name": "防弹衣",
+    "collectionType": 3,
+    "characterId": 1009,
+    "collectionTime": 2,
+    "collection": {
+      "$type": "BodyArmorCollection",
+      "level": 3
+    },
+    "tips": "血包",
+    "tipsTween": "+3级防弹衣",
+    "useWays": [],
+    "rarity": 0,
+    "type": 0,
+    "maxCount": 0,
+    "overlayMaxCount": 0,
+    "storageType": 0,
+    "price": 0,
+    "sellingPrice": 0,
+    "usedInBackpack": false
+  }
+]

@@ -1,0 +1,162 @@
+[
+  {
+    "id": 1000,
+    "name": "西部女警",
+    "job": 1,
+    "weaponId": 1001,
+    "controlDifficulty": 1,
+    "characterShards": 200101,
+    "rarity": 0,
+    "characterId": 1001,
+    "skillID": [
+      1001,
+      1002,
+      1003
+    ],
+    "gearID": [
+      1001,
+      1002,
+      1003
+    ]
+  },
+  {
+    "id": 2000,
+    "name": "白袍",
+    "job": 3,
+    "weaponId": 2001,
+    "controlDifficulty": 3,
+    "characterShards": 200201,
+    "rarity": 2,
+    "characterId": 1001,
+    "skillID": [
+      2001,
+      2002,
+      2003
+    ],
+    "gearID": [
+      2001,
+      2002,
+      2003
+    ]
+  },
+  {
+    "id": 3000,
+    "name": "山",
+    "job": 2,
+    "weaponId": 3001,
+    "controlDifficulty": 2,
+    "characterShards": 200301,
+    "rarity": 1,
+    "characterId": 1001,
+    "skillID": [
+      3001,
+      3002,
+      3003
+    ],
+    "gearID": [
+      3001,
+      3002,
+      3003
+    ]
+  },
+  {
+    "id": 4000,
+    "name": "锤哥",
+    "job": 0,
+    "weaponId": 4001,
+    "controlDifficulty": 5,
+    "characterShards": 200401,
+    "rarity": 2,
+    "characterId": 1001,
+    "skillID": [
+      4001,
+      4002,
+      4003
+    ],
+    "gearID": [
+      4001,
+      4002,
+      4003
+    ]
+  },
+  {
+    "id": 5000,
+    "name": "机械师",
+    "job": 2,
+    "weaponId": 5001,
+    "controlDifficulty": 3,
+    "characterShards": 200501,
+    "rarity": 0,
+    "characterId": 1001,
+    "skillID": [
+      5001,
+      5002,
+      5003
+    ],
+    "gearID": [
+      5001,
+      5002,
+      5003
+    ]
+  },
+  {
+    "id": 6000,
+    "name": "魅影",
+    "job": 4,
+    "weaponId": 6001,
+    "controlDifficulty": 2,
+    "characterShards": 200601,
+    "rarity": 3,
+    "characterId": 1001,
+    "skillID": [
+      6001,
+      6002,
+      6003
+    ],
+    "gearID": [
+      6001,
+      6002,
+      6003
+    ]
+  },
+  {
+    "id": 7000,
+    "name": "博士",
+    "job": 0,
+    "weaponId": 7001,
+    "controlDifficulty": 4,
+    "characterShards": 200701,
+    "rarity": 1,
+    "characterId": 1001,
+    "skillID": [
+      7001,
+      7002,
+      7003
+    ],
+    "gearID": [
+      7001,
+      7002,
+      7003
+    ]
+  },
+  {
+    "id": 8000,
+    "name": "阿尔法",
+    "job": 0,
+    "weaponId": 8001,
+    "controlDifficulty": 2,
+    "characterShards": 200801,
+    "rarity": 3,
+    "characterId": 1001,
+    "skillID": [
+      8001,
+      8002,
+      8003
+    ],
+    "gearID": [
+      8001,
+      8002,
+      8003
+    ]
+  }
+]

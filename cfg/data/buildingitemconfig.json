@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1001,
+    "name": "桌子",
+    "inventory": [
+      {
+        "itemId": 1001,
+        "count": 10
+      },
+      {
+        "itemId": 1002,
+        "count": 20
+      },
+      {
+        "itemId": 1002,
+        "count": 20
+      },
+      {
+        "itemId": 1002,
+        "count": 20
+      },
+      {
+        "itemId": 1002,
+        "count": 20
+      }
+    ],
+    "tips": "打开（桌子）",
+    "hudPosOffset": {
+      "x": 53,
+      "y": 0,
+      "z": 0
+    }
+  }
+]

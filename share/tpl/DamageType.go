@@ -11,8 +11,6 @@ package tpl
 type DamageType int32
 
 const (
-	DamageType_Low      DamageType = 0
-	DamageType_Medium   DamageType = 1
-	DamageType_High     DamageType = 2
-	DamageType_VeryHigh DamageType = 3
+	DamageType_Attribute DamageType = 0
+	DamageType_Normal    DamageType = 1
 )

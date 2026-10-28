@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1001,
+    "name": "角色",
+    "keyword": "RoleView",
+    "icon": ""
+  },
+  {
+    "id": 1002,
+    "name": "仓库",
+    "keyword": "InventoryView",
+    "icon": ""
+  },
+  {
+    "id": 1003,
+    "name": "藏品室",
+    "keyword": "",
+    "icon": ""
+  },
+  {
+    "id": 1005,
+    "name": "商城",
+    "keyword": "ShopView",
+    "icon": ""
+  },
+  {
+    "id": 1006,
+    "name": "交易行",
+    "keyword": "",
+    "icon": ""
+  }
+]

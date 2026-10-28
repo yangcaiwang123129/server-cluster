@@ -5,8 +5,8 @@ import (
 	"errors"
 	"strconv"
 
-	"gorm.io/gorm"
 	"github.com/dobyte/due/v2/utils/xtime"
+	"gorm.io/gorm"
 
 	"server-cluster/node/game/app/global"
 	"server-cluster/share/model"
@@ -23,8 +23,8 @@ func init() {
 	playerLogicInst.Register(&playerLogic{})
 }
 
-// Player 获取玩家模块业务单例。
-func Player() global.PlayerLogic { return playerLogicInst.MustGet() }
+// PlayerLogic 获取玩家模块业务单例。
+func PlayerLogic() global.PlayerLogic { return playerLogicInst.MustGet() }
 
 // EnterGame 进入游戏：playerID 由 handler 层从 ctx.UID() 取得（首包 verify 已完成绑定）。
 func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.EnterGameReq) (*pb.EnterGameResp, error) {

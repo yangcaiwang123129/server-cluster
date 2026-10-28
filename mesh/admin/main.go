@@ -17,7 +17,6 @@ import (
 	"server-cluster/internal/svc"
 	"server-cluster/mesh/admin/app/global"
 	"server-cluster/mesh/admin/app/handler"
-	"server-cluster/mesh/admin/app/logic"
 )
 
 func main() {
@@ -39,8 +38,6 @@ func main() {
 	}
 	// 注入组件代理（服务间 RPC 用）
 	svc.SetHTTPProxy(httpComponent.Proxy())
-	// 注册业务实现（避免 global ↔ logic 循环依赖）
-	global.RegisterPlayerLogic(logic.NewPlayer())
 	// 注册 HTTP 路由
 	handler.RegisterSys(httpComponent.Proxy().Router())
 	handler.RegisterPlayer(httpComponent.Proxy().Router())
