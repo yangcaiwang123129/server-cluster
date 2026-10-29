@@ -6,13 +6,12 @@ type Table string
 
 const (
 	TablePlayerBase      Table = "player_base"      // 玩家账号（1:1）
-	TablePlayerCore      Table = "player_core"      // 玩家核心数值（1:1）
-	TablePlayerProfile   Table = "player_profile"   // 玩家展示资料（1:1）
-	TablePlayerAsset     Table = "player_asset"     // 玩家资产（1:N，player_id + asset_type）
+	TablePlayerExtra     Table = "player_extra"     // 玩家拓展（1:1）
+	TablePlayerAsset     Table = "player_asset"     // 玩家资产（1:1）
 	TablePlayerHero      Table = "player_hero"      // 玩家英雄持有（1:1，英雄数组 JSON）
 	TablePlayerSkill     Table = "player_skill"     // 玩家技能持有（1:1，技能数组 JSON）
 	TablePlayerWeapon    Table = "player_weapon"    // 玩家武器持有（1:1，武器数组 JSON）
-	TablePlayerEquip      Table = "player_equip"      // 玩家装备持有（1:1，装备数组 JSON）
+	TablePlayerEquip     Table = "player_equip"     // 玩家装备持有（1:1，装备数组 JSON）
 	TablePlayerContainer Table = "player_container" // 玩家容器（1:1）
 )
 

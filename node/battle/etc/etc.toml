@@ -1,4 +1,4 @@
-﻿﻿# 战斗逻辑服（node 集群）配置
+﻿﻿﻿﻿# 战斗逻辑服（node 集群）配置
 # due 自动加载 ./etc/etc.toml。
 
 pid = "../../pid/battle.pid"

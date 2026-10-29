@@ -1,6 +1,8 @@
 package model
 
 import (
+	"database/sql/driver"
+	"encoding/json"
 	"server-cluster/share/enum"
 	"server-cluster/share/util"
 )
@@ -20,7 +22,11 @@ type PlayerSkill struct {
 	TableModel `gorm:"embedded"`
 }
 
-func (PlayerSkill) TableName() string { return enum.TablePlayerSkill.String() }
+func (this *PlayerSkill) Marshal() ([]byte, error)    { return json.Marshal(this) }
+func (this *PlayerSkill) Unmarshal(data []byte) error { return json.Unmarshal(data, this) }
+func (this *PlayerSkill) Scan(src any) error          { return ScanJSON(src, this) }
+func (this PlayerSkill) Value() (driver.Value, error) { return ValueJSON(this) }
+func (PlayerSkill) TableName() string                 { return enum.TablePlayerSkill.String() }
 
 // AddSkill 新增技能持有；已拥有返回 false。
 func (p *PlayerSkill) AddSkill(s SkillInfo) bool { return addOwned(p.Skills, s.SkillID, s) }

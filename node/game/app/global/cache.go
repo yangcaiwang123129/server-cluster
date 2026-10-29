@@ -10,7 +10,7 @@ var (
 	// PlayerBaseCache 玩家账号（player_base，一玩家一行）
 	PlayerBaseCache = cache.NewPlayerTableCache[model.PlayerBase](cache.CacherConfig{Name: "player_base"})
 	// PlayerCoreCache 玩家核心数值（player_core，一玩家一行）
-	PlayerCoreCache = cache.NewPlayerTableCache[model.PlayerCore](cache.CacherConfig{Name: "player_core"})
+	PlayerCoreCache = cache.NewPlayerTableCache[model.PlayerExtra](cache.CacherConfig{Name: "player_core"})
 	// PlayerProfileCache 玩家展示资料（player_profile，一玩家一行）
 	PlayerProfileCache = cache.NewPlayerTableCache[model.PlayerProfile](cache.CacherConfig{Name: "player_profile"})
 	// PlayerAssetCache 玩家资产（player_asset，一玩家多行）

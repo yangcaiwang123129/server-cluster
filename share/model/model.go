@@ -60,10 +60,6 @@ func (t *TableModel) BeforeUpdate(tx *gorm.DB) error {
 	return nil
 }
 
-func (this *TableModel) Marshal() ([]byte, error)    { return json.Marshal(this) }
-func (this *TableModel) Unmarshal(data []byte) error { return json.Unmarshal(data, this) }
-func (this *TableModel) Scan(src any) error          { return ScanJSON(src, this) }
-func (this TableModel) Value() (driver.Value, error) { return ValueJSON(this) }
 func (this TableModel) TableName() string {
 	return ""
 }

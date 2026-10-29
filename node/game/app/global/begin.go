@@ -24,7 +24,7 @@ func Init() error {
 	if inst, err := svc.Ctx().MySQL.Default(); err == nil {
 		if err = svc.AutoMigrate(inst.Gorm(),
 			&model.PlayerBase{},
-			&model.PlayerCore{},
+			&model.PlayerExtra{},
 			&model.PlayerProfile{},
 			&model.PlayerAsset{},
 			&model.PlayerHero{},

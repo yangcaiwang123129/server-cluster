@@ -1,6 +1,8 @@
 package model
 
 import (
+	"database/sql/driver"
+	"encoding/json"
 	"server-cluster/share/enum"
 	"server-cluster/share/util"
 )
@@ -21,7 +23,11 @@ type PlayerWeapon struct {
 	TableModel `gorm:"embedded"`
 }
 
-func (PlayerWeapon) TableName() string { return enum.TablePlayerWeapon.String() }
+func (this *PlayerWeapon) Marshal() ([]byte, error)    { return json.Marshal(this) }
+func (this *PlayerWeapon) Unmarshal(data []byte) error { return json.Unmarshal(data, this) }
+func (this *PlayerWeapon) Scan(src any) error          { return ScanJSON(src, this) }
+func (this PlayerWeapon) Value() (driver.Value, error) { return ValueJSON(this) }
+func (PlayerWeapon) TableName() string                 { return enum.TablePlayerWeapon.String() }
 
 // AddWeapon 新增武器持有；已拥有返回 false。
 func (p *PlayerWeapon) AddWeapon(w WeaponInfo) bool { return addOwned(p.Weapons, w.WeaponID, w) }

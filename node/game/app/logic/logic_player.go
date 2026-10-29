@@ -51,7 +51,7 @@ func PlayerLogic() global.PlayerLogic { return playerLogicInst.MustGet() }
 func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.EnterGameReq) (*pb.EnterGameResp, error) {
 	if _, err := global.PlayerCoreCache.Get(ctx, playerID); errors.Is(err, gorm.ErrRecordNotFound) {
 		// 首次进入，建档并异步落库
-		global.PlayerCoreCache.Set(playerID, &model.PlayerCore{
+		global.PlayerCoreCache.Set(playerID, &model.PlayerExtra{
 			PlayerID: playerID,
 			Nickname: "player_" + strconv.FormatInt(playerID, 10),
 			Level:    1,

@@ -1,4 +1,4 @@
-﻿// 内部服务间 RPC：由各节点以 grpc provider 形式提供，后台/网格服务调用。
+﻿﻿// 内部服务间 RPC：由各节点以 grpc provider 形式提供，后台/网格服务调用。
 syntax = "proto3";
 
 package internal;

@@ -56,20 +56,18 @@ func (m *CombatMsg) MsgType() string { return m.Type }
 type CombatRoom struct {
 	ID               int64
 	AOI              *AOIManager
-	Grid             *PathGrid
-	Map              *GameMap
+	Grid             *RuntimeGrid
 	Players          map[int64]*PlayerState
 	Projectiles      []*Projectile
 	nextProjectileID int64
 }
 
 // NewCombatRoom 创建战斗房间。
-func NewCombatRoom(id int64, gameMap *GameMap, grid *PathGrid) *CombatRoom {
+func NewCombatRoom(id int64, grid *RuntimeGrid) *CombatRoom {
 	return &CombatRoom{
 		ID:      id,
-		Map:     gameMap,
 		Grid:    grid,
-		AOI:     NewAOIManager(gameMap.Width, gameMap.Height),
+		AOI:     NewAOIManager(grid.Width, grid.Depth),
 		Players: make(map[int64]*PlayerState),
 	}
 }

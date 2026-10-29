@@ -33,7 +33,7 @@ func NewRoomManager(maxRooms int) *RoomManager {
 }
 
 // CreateRoom 创建并启动房间 actor；房间数达上限或 ID 已存在时返回 false。
-func (m *RoomManager) CreateRoom(id int64, gameMap *GameMap, grid *PathGrid) bool {
+func (m *RoomManager) CreateRoom(id int64, grid *RuntimeGrid) bool {
 	m.mu.Lock()
 	if len(m.rooms) >= m.maxRooms {
 		m.mu.Unlock()
@@ -43,7 +43,7 @@ func (m *RoomManager) CreateRoom(id int64, gameMap *GameMap, grid *PathGrid) boo
 		m.mu.Unlock()
 		return false
 	}
-	room := NewCombatRoom(id, gameMap, grid)
+	room := NewCombatRoom(id, grid)
 	a := actor.New(room, defaultTickRate, defaultQueueSize)
 	m.rooms[id] = a
 	m.mu.Unlock()

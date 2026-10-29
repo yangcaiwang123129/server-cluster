@@ -12,8 +12,6 @@ require (
 	github.com/dobyte/due/v2 v2.6.4
 	github.com/dobyte/jwt v0.1.4
 	github.com/gofiber/fiber/v3 v3.5.0
-	github.com/lafriks/go-tiled v0.15.0
-	github.com/quasilyte/pathing v0.0.0-20260812090109-6fc0d53186b5
 	github.com/redis/go-redis/v9 v9.22.0
 	github.com/shopspring/decimal v1.6.0
 	github.com/swaggo/swag v1.16.6
