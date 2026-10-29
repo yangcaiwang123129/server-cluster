@@ -12,9 +12,9 @@ import (
 // 命名规范：全部单数、player_ 前缀；1:1 表以 player_id 为主键，1:N 表以 (player_id, 业务ID) 为复合主键。
 // 所有玩家表都挂 version 乐观锁与 created_at/updated_at，便于缓存异步落库与并发控制。
 
-// PlayerTableBase 玩家表公共字段：乐观锁版本号 + 毫秒时间戳，以 gorm:"embedded" 展开为三列。
+// TableBase 玩家表公共字段：乐观锁版本号 + 毫秒时间戳，以 gorm:"embedded" 展开为三列。
 // 更新时请同步递增 Version，缓存异步落库依赖它做并发控制。
-type PlayerTableBase struct {
+type TableBase struct {
 	Version   uint64 `gorm:"column:version;type:bigint unsigned;not null;default:0;comment:版本号(乐观锁)" json:"version"`
 	CreatedAt int64  `gorm:"column:created_at;type:bigint;not null;default:0;comment:创建时间(毫秒时间戳)" json:"created_at"`
 	UpdatedAt int64  `gorm:"column:updated_at;type:bigint;not null;default:0;comment:更新时间(毫秒时间戳)" json:"updated_at"`
@@ -40,13 +40,13 @@ func (this PlayerBase) Value() (driver.Value, error) { return ValueJSON(this) }
 
 // PlayerCore 玩家核心数值（1:1），热数据，对应 player_core 表。
 type PlayerCore struct {
-	PlayerID        int64  `gorm:"column:player_id;type:bigint;not null;primaryKey;comment:玩家ID" json:"player_id"`
-	Nickname        string `gorm:"column:nickname;type:varchar(64);not null;default:'';comment:昵称" json:"nickname"`
-	Level           int32  `gorm:"column:level;type:int;not null;default:1;comment:等级" json:"level"`
-	Exp             int64  `gorm:"column:exp;type:bigint;not null;default:0;comment:经验" json:"exp"`
-	Gold            int64  `gorm:"column:gold;type:bigint;not null;default:0;comment:金币" json:"gold"`
-	Diamond         int64  `gorm:"column:diamond;type:bigint;not null;default:0;comment:钻石" json:"diamond"`
-	PlayerTableBase `gorm:"embedded"`
+	PlayerID  int64  `gorm:"column:player_id;type:bigint;not null;primaryKey;comment:玩家ID" json:"player_id"`
+	Nickname  string `gorm:"column:nickname;type:varchar(64);not null;default:'';comment:昵称" json:"nickname"`
+	Level     int32  `gorm:"column:level;type:int;not null;default:1;comment:等级" json:"level"`
+	Exp       int64  `gorm:"column:exp;type:bigint;not null;default:0;comment:经验" json:"exp"`
+	Gold      int64  `gorm:"column:gold;type:bigint;not null;default:0;comment:金币" json:"gold"`
+	Diamond   int64  `gorm:"column:diamond;type:bigint;not null;default:0;comment:钻石" json:"diamond"`
+	TableBase `gorm:"embedded"`
 }
 
 func (this *PlayerCore) Marshal() ([]byte, error)    { return json.Marshal(this) }
@@ -57,11 +57,11 @@ func (PlayerCore) TableName() string                 { return enum.TablePlayerCo
 
 // PlayerProfile 玩家展示资料（1:1），对应 player_profile 表。
 type PlayerProfile struct {
-	PlayerID        int64  `gorm:"column:player_id;type:bigint;not null;primaryKey;comment:玩家ID" json:"player_id"`
-	Signature       string `gorm:"column:signature;type:varchar(256);not null;default:'';comment:个性签名" json:"signature"`
-	AvatarID        int32  `gorm:"column:avatar_id;type:int;not null;default:0;comment:头像ID" json:"avatar_id"`
-	SettingsJSON    string `gorm:"column:settings_json;type:json;comment:个性化设置(JSON)" json:"settings_json"`
-	PlayerTableBase `gorm:"embedded"`
+	PlayerID     int64  `gorm:"column:player_id;type:bigint;not null;primaryKey;comment:玩家ID" json:"player_id"`
+	Signature    string `gorm:"column:signature;type:varchar(256);not null;default:'';comment:个性签名" json:"signature"`
+	AvatarID     int32  `gorm:"column:avatar_id;type:int;not null;default:0;comment:头像ID" json:"avatar_id"`
+	SettingsJSON string `gorm:"column:settings_json;type:json;comment:个性化设置(JSON)" json:"settings_json"`
+	TableBase    `gorm:"embedded"`
 }
 
 func (this *PlayerProfile) Marshal() ([]byte, error)    { return json.Marshal(this) }
@@ -72,10 +72,10 @@ func (PlayerProfile) TableName() string                 { return enum.TablePlaye
 
 // PlayerAsset 玩家资产（1:N），一行一种资产，对应 player_asset 表。
 type PlayerAsset struct {
-	PlayerID        int64 `gorm:"column:player_id;type:bigint;not null;primaryKey;priority:1;comment:玩家ID" json:"player_id"`
-	AssetType       int32 `gorm:"column:asset_type;type:int;not null;primaryKey;priority:2;comment:资产类型(enum.AssetType)" json:"asset_type"`
-	Amount          int64 `gorm:"column:amount;type:bigint;not null;default:0;comment:数量" json:"amount"`
-	PlayerTableBase `gorm:"embedded"`
+	PlayerID  int64 `gorm:"column:player_id;type:bigint;not null;primaryKey;priority:1;comment:玩家ID" json:"player_id"`
+	AssetType int32 `gorm:"column:asset_type;type:int;not null;primaryKey;priority:2;comment:资产类型(enum.AssetType)" json:"asset_type"`
+	Amount    int64 `gorm:"column:amount;type:bigint;not null;default:0;comment:数量" json:"amount"`
+	TableBase `gorm:"embedded"`
 }
 
 func (this *PlayerAsset) Marshal() ([]byte, error)    { return json.Marshal(this) }

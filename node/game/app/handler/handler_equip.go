@@ -2,6 +2,8 @@
 package handler
 
 import (
+	"server-cluster/internal/router"
+
 	"github.com/dobyte/due/v2/cluster/node"
 
 	"server-cluster/node/game/app/logic"
@@ -10,19 +12,19 @@ import (
 
 // init 注册装备路由（业务在玩家 actor 内串行执行）。
 func init() {
-	onActor(pb.RouteCode_ROUTE_CODE_GEAR_LIST, handleGearList)
-	onActor(pb.RouteCode_ROUTE_CODE_GEAR_ADD, handleGearAdd)
-	onActor(pb.RouteCode_ROUTE_CODE_GEAR_UPDATE, handleGearUpdate)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_EQUIP_LIST, handleEquipList)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_EQUIP_ADD, handleEquipAdd)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_EQUIP_UPDATE, handleEquipUpdate)
 }
 
-// handleGearList 装备列表。
-func handleGearList(ctx node.Context) {
-	req := &pb.GearListReq{}
+// handleEquipList 装备列表。
+func handleEquipList(ctx node.Context) {
+	req := &pb.EquipListReq{}
 	if err := ctx.Parse(req); err != nil {
 		_ = ctx.Response(err)
 		return
 	}
-	resp, err := logic.Gear().GearList(ctx.Context(), ctx.UID())
+	resp, err := logic.Equip().EquipList(ctx.Context(), ctx.UID())
 	if err != nil {
 		_ = ctx.Response(err)
 		return
@@ -30,14 +32,14 @@ func handleGearList(ctx node.Context) {
 	_ = ctx.Response(resp)
 }
 
-// handleGearAdd 新增装备。
-func handleGearAdd(ctx node.Context) {
-	req := &pb.GearAddReq{}
+// handleEquipAdd 新增装备。
+func handleEquipAdd(ctx node.Context) {
+	req := &pb.EquipAddReq{}
 	if err := ctx.Parse(req); err != nil {
 		_ = ctx.Response(err)
 		return
 	}
-	resp, err := logic.Gear().GearAdd(ctx.Context(), ctx.UID(), req)
+	resp, err := logic.Equip().EquipAdd(ctx.Context(), ctx.UID(), req)
 	if err != nil {
 		_ = ctx.Response(err)
 		return
@@ -45,14 +47,14 @@ func handleGearAdd(ctx node.Context) {
 	_ = ctx.Response(resp)
 }
 
-// handleGearUpdate 更新装备。
-func handleGearUpdate(ctx node.Context) {
-	req := &pb.GearUpdateReq{}
+// handleEquipUpdate 更新装备。
+func handleEquipUpdate(ctx node.Context) {
+	req := &pb.EquipUpdateReq{}
 	if err := ctx.Parse(req); err != nil {
 		_ = ctx.Response(err)
 		return
 	}
-	resp, err := logic.Gear().GearUpdate(ctx.Context(), ctx.UID(), req)
+	resp, err := logic.Equip().EquipUpdate(ctx.Context(), ctx.UID(), req)
 	if err != nil {
 		_ = ctx.Response(err)
 		return

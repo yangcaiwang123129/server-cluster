@@ -115,10 +115,10 @@ type Tables struct {
 	RoleInfo        *Table[RoleInfoCfg]        //
 	AttributeRole   *Table[AttributeRoleCfg]   //
 	AttributeWeapon *Table[AttributeWeaponCfg] //
-	AttributeGear   *Table[AttributeGearCfg]   //
+	AttributeEquip   *Table[AttributeEquipCfg]   //
 	AttributeSkill  *Table[AttributeSkillCfg]  //
 	Weapon          *Table[WeaponCfg]          //
-	Gear            *Table[GearCfg]            //
+	Equip            *Table[EquipCfg]            //
 	Damage          *Table[DamageCfg]          //
 }
 
@@ -194,7 +194,7 @@ func Load() error {
 	if t.AttributeWeapon, err = LoadTable("attributeweaponconfig", func(r *AttributeWeaponCfg) int32 { return r.Id }); err != nil {
 		return err
 	}
-	if t.AttributeGear, err = LoadTable("attributegearconfig", func(r *AttributeGearCfg) int32 { return r.Id }); err != nil {
+	if t.AttributeEquip, err = LoadTable("attributeequipconfig", func(r *AttributeEquipCfg) int32 { return r.Id }); err != nil {
 		return err
 	}
 	if t.AttributeSkill, err = LoadTable("attributeskillconfig", func(r *AttributeSkillCfg) int32 { return r.Id }); err != nil {
@@ -203,7 +203,7 @@ func Load() error {
 	if t.Weapon, err = LoadTable("weaponconfig", func(r *WeaponCfg) int32 { return r.Id }); err != nil {
 		return err
 	}
-	if t.Gear, err = LoadTable("gearconfig", func(r *GearCfg) int32 { return r.Id }); err != nil {
+	if t.Equip, err = LoadTable("equipconfig", func(r *EquipCfg) int32 { return r.Id }); err != nil {
 		return err
 	}
 	if t.Damage, err = LoadTable("damageconfig", func(r *DamageCfg) int32 { return r.Id }); err != nil {

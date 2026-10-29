@@ -7,10 +7,10 @@ import (
 // defaultMenus 初始菜单树：只包含管理后台保留的业务模块。
 var defaultMenus = []seedMenu{
 	{
-		Menu: model.SysMenu{MenuName: "Admin", Title: "系统管理", Path: "/admin", MenuType: "M", Component: "Layout", Sort: 1, Visible: "0", IsFrame: "1"},
+		Menu: model.SysMenu{MenuName: "Admin", Title: "系统管理", Path: "/admin", MenuType: "M", Component: "Layout", Icon: "system", Sort: 1, Visible: "0", IsFrame: "1"},
 		Children: []seedMenu{
 			{
-				Menu: model.SysMenu{MenuName: "SysUserManage", Title: "用户管理", Path: "/admin/sys-user/index", Component: "/admin/sys-user/index", MenuType: "C", Permission: "sys:user:list", Sort: 1, Visible: "0", IsFrame: "1"},
+				Menu: model.SysMenu{MenuName: "SysUserManage", Title: "用户管理", Path: "/admin/sys-user/index", Component: "/admin/sys-user/index", MenuType: "C", Icon: "user", Permission: "sys:user:list", Sort: 1, Visible: "0", IsFrame: "1"},
 				Apis: []seedAPI{
 					{"用户列表", "/api/v1/sys-user", "GET"},
 					{"用户详情", "/api/v1/sys-user/:userId", "GET"},
@@ -22,7 +22,7 @@ var defaultMenus = []seedMenu{
 				},
 			},
 			{
-				Menu: model.SysMenu{MenuName: "SysRoleManage", Title: "角色管理", Path: "/admin/sys-role/index", Component: "/admin/sys-role/index", MenuType: "C", Permission: "sys:role:list", Sort: 2, Visible: "0", IsFrame: "1"},
+				Menu: model.SysMenu{MenuName: "SysRoleManage", Title: "角色管理", Path: "/admin/sys-role/index", Component: "/admin/sys-role/index", MenuType: "C", Icon: "peoples", Permission: "sys:role:list", Sort: 2, Visible: "0", IsFrame: "1"},
 				Apis: []seedAPI{
 					{"角色列表", "/api/v1/role", "GET"},
 					{"角色详情", "/api/v1/role/:roleId", "GET"},
@@ -34,7 +34,7 @@ var defaultMenus = []seedMenu{
 				},
 			},
 			{
-				Menu: model.SysMenu{MenuName: "SysMenuManage", Title: "菜单管理", Path: "/admin/sys-menu/index", Component: "/admin/sys-menu/index", MenuType: "C", Permission: "sys:menu:list", Sort: 3, Visible: "0", IsFrame: "1"},
+				Menu: model.SysMenu{MenuName: "SysMenuManage", Title: "菜单管理", Path: "/admin/sys-menu/index", Component: "/admin/sys-menu/index", MenuType: "C", Icon: "nested", Permission: "sys:menu:list", Sort: 3, Visible: "0", IsFrame: "1"},
 				Apis: []seedAPI{
 					{"菜单列表", "/api/v1/menu", "GET"},
 					{"菜单详情", "/api/v1/menu/:menuId", "GET"},
@@ -44,7 +44,7 @@ var defaultMenus = []seedMenu{
 				},
 			},
 			{
-				Menu: model.SysMenu{MenuName: "SysApiManage", Title: "接口管理", Path: "/admin/sys-api/index", Component: "/admin/sys-api/index", MenuType: "C", Permission: "sys:api:list", Sort: 4, Visible: "0", IsFrame: "1"},
+				Menu: model.SysMenu{MenuName: "SysApiManage", Title: "接口管理", Path: "/admin/sys-api/index", Component: "/admin/sys-api/index", MenuType: "C", Icon: "api-server", Permission: "sys:api:list", Sort: 4, Visible: "0", IsFrame: "1"},
 				Apis: []seedAPI{
 					{"接口列表", "/api/v1/sys-api", "GET"},
 					{"接口详情", "/api/v1/sys-api/:id", "GET"},
@@ -54,7 +54,7 @@ var defaultMenus = []seedMenu{
 				},
 			},
 			{
-				Menu: model.SysMenu{MenuName: "Dict", Title: "字典管理", Path: "/admin/dict/index", Component: "/admin/dict/index", MenuType: "C", Permission: "sys:dict:list", Sort: 5, Visible: "0", IsFrame: "1"},
+				Menu: model.SysMenu{MenuName: "Dict", Title: "字典管理", Path: "/admin/dict/index", Component: "/admin/dict/index", MenuType: "C", Icon: "dict", Permission: "sys:dict:list", Sort: 5, Visible: "0", IsFrame: "1"},
 				Apis: []seedAPI{
 					{"字典类型列表", "/api/v1/dict/type", "GET"},
 					{"字典类型详情", "/api/v1/dict/type/:id", "GET"},
@@ -65,7 +65,7 @@ var defaultMenus = []seedMenu{
 				},
 				Children: []seedMenu{
 					{
-						Menu: model.SysMenu{MenuName: "SysDictDataManage", Title: "字典数据", Path: "/admin/dict/data/:dictId", Component: "/admin/dict/data", MenuType: "C", Permission: "sys:dict:data", Sort: 1, Visible: "1", IsFrame: "1"},
+						Menu: model.SysMenu{MenuName: "SysDictDataManage", Title: "字典数据", Path: "/admin/dict/data/:dictId", Component: "/admin/dict/data", MenuType: "C", Icon: "list", Permission: "sys:dict:data", Sort: 1, Visible: "1", IsFrame: "1"},
 						Apis: []seedAPI{
 							{"字典数据列表", "/api/v1/dict/data", "GET"},
 							{"字典数据详情", "/api/v1/dict/data/:dictCode", "GET"},
@@ -78,18 +78,18 @@ var defaultMenus = []seedMenu{
 				},
 			},
 			{
-				Menu: model.SysMenu{MenuName: "SysConfigManage", Title: "参数管理", Path: "/admin/sys-config/index", Component: "/admin/sys-config/index", MenuType: "C", Permission: "sys:config:list", Sort: 6, Visible: "0", IsFrame: "1"},
+				Menu: model.SysMenu{MenuName: "SysConfigManage", Title: "参数管理", Path: "/admin/sys-config/index", Component: "/admin/sys-config/index", MenuType: "C", Icon: "base-info", Permission: "sys:config:list", Sort: 6, Visible: "0", IsFrame: "1"},
 				Apis: []seedAPI{
 					{"参数列表", "/api/v1/config", "GET"},
 					{"参数详情", "/api/v1/config/:id", "GET"},
 					{"按键取值", "/api/v1/configKey/:key", "GET"},
 					{"新增参数", "/api/v1/config", "POST"},
-					{"修改参数", "/api/v1/config/:id", "PUT"},
+					{"修改参数", "/api/v1/config", "PUT"},
 					{"删除参数", "/api/v1/config", "DELETE"},
 				},
 			},
 			{
-				Menu: model.SysMenu{MenuName: "SysConfigSet", Title: "参数设置", Path: "/admin/sys-config/set", Component: "/admin/sys-config/set", MenuType: "C", Permission: "sys:config:set", Sort: 7, Visible: "0", IsFrame: "1"},
+				Menu: model.SysMenu{MenuName: "SysConfigSet", Title: "参数设置", Path: "/admin/sys-config/set", Component: "/admin/sys-config/set", MenuType: "C", Icon: "info-setting", Permission: "sys:config:set", Sort: 7, Visible: "0", IsFrame: "1"},
 				Apis: []seedAPI{
 					{"读取参数设置", "/api/v1/set-config", "GET"},
 					{"保存参数设置", "/api/v1/set-config", "PUT"},
@@ -98,10 +98,10 @@ var defaultMenus = []seedMenu{
 		},
 	},
 	{
-		Menu: model.SysMenu{MenuName: "Log", Title: "日志管理", Path: "/log", MenuType: "M", Component: "Layout", Sort: 2, Visible: "0", IsFrame: "1"},
+		Menu: model.SysMenu{MenuName: "Log", Title: "日志管理", Path: "/log", MenuType: "M", Component: "Layout", Icon: "log", Sort: 2, Visible: "0", IsFrame: "1"},
 		Children: []seedMenu{
 			{
-				Menu: model.SysMenu{MenuName: "SysLoginLogManage", Title: "登录日志", Path: "/log/sys-login-log/index", Component: "/admin/sys-login-log/index", MenuType: "C", Permission: "sys:login-log:list", Sort: 1, Visible: "0", IsFrame: "1"},
+				Menu: model.SysMenu{MenuName: "SysLoginLogManage", Title: "登录日志", Path: "/log/sys-login-log/index", Component: "/admin/sys-login-log/index", MenuType: "C", Icon: "logininfor", Permission: "sys:login-log:list", Sort: 1, Visible: "0", IsFrame: "1"},
 				Apis: []seedAPI{
 					{"登录日志列表", "/api/v1/sys-login-log", "GET"},
 					{"登录日志详情", "/api/v1/sys-login-log/:id", "GET"},
@@ -109,7 +109,7 @@ var defaultMenus = []seedMenu{
 				},
 			},
 			{
-				Menu: model.SysMenu{MenuName: "OperLog", Title: "操作日志", Path: "/log/sys-oper-log/index", Component: "/admin/sys-oper-log/index", MenuType: "C", Permission: "sys:opera-log:list", Sort: 2, Visible: "0", IsFrame: "1"},
+				Menu: model.SysMenu{MenuName: "OperLog", Title: "操作日志", Path: "/log/sys-oper-log/index", Component: "/admin/sys-oper-log/index", MenuType: "C", Icon: "err-list", Permission: "sys:opera-log:list", Sort: 2, Visible: "0", IsFrame: "1"},
 				Apis: []seedAPI{
 					{"操作日志列表", "/api/v1/sys-opera-log", "GET"},
 					{"删除操作日志", "/api/v1/sys-opera-log", "DELETE"},
@@ -119,10 +119,10 @@ var defaultMenus = []seedMenu{
 		},
 	},
 	{
-		Menu: model.SysMenu{MenuName: "Game", Title: "游戏管理", Path: "/game", MenuType: "M", Component: "Layout", Sort: 3, Visible: "0", IsFrame: "1"},
+		Menu: model.SysMenu{MenuName: "Game", Title: "游戏管理", Path: "/game", MenuType: "M", Component: "Layout", Icon: "star", Sort: 3, Visible: "0", IsFrame: "1"},
 		Children: []seedMenu{
 			{
-				Menu: model.SysMenu{MenuName: "PlayerManage", Title: "玩家列表", Path: "/game/player/index", Component: "/admin/player/index", MenuType: "C", Permission: "game:player:list", Sort: 1, Visible: "0", IsFrame: "1"},
+				Menu: model.SysMenu{MenuName: "PlayerManage", Title: "玩家列表", Path: "/game/player/index", Component: "/admin/player/index", MenuType: "C", Icon: "user-info", Permission: "game:player:list", Sort: 1, Visible: "0", IsFrame: "1"},
 				Apis: []seedAPI{
 					{"玩家列表", "/api/v1/player", "GET"},
 					{"在线玩家", "/api/v1/player/online", "GET"},
@@ -130,7 +130,7 @@ var defaultMenus = []seedMenu{
 				},
 			},
 			{
-				Menu: model.SysMenu{MenuName: "GameContainerManage", Title: "容器管理", Path: "/game/container/index", Component: "/admin/game-container/index", MenuType: "C", Permission: "game:gm:container:list", Sort: 2, Visible: "0", IsFrame: "1"},
+				Menu: model.SysMenu{MenuName: "GameContainerManage", Title: "容器管理", Path: "/game/container/index", Component: "/admin/game-container/index", MenuType: "C", Icon: "component", Permission: "game:gm:container:list", Sort: 2, Visible: "0", IsFrame: "1"},
 				Apis: []seedAPI{
 					{"物品配置列表", "/api/v1/item", "GET"},
 					{"GM容器列表", "/api/v1/game/container", "GET"},
@@ -142,7 +142,7 @@ var defaultMenus = []seedMenu{
 				},
 			},
 			{
-				Menu: model.SysMenu{MenuName: "GameHeroManage", Title: "英雄管理", Path: "/game/hero/index", Component: "/admin/game-hero/index", MenuType: "C", Permission: "game:gm:hero:list", Sort: 4, Visible: "0", IsFrame: "1"},
+				Menu: model.SysMenu{MenuName: "GameHeroManage", Title: "英雄管理", Path: "/game/hero/index", Component: "/admin/game-hero/index", MenuType: "C", Icon: "vip", Permission: "game:gm:hero:list", Sort: 4, Visible: "0", IsFrame: "1"},
 				Apis: []seedAPI{
 					{"游戏配置目录", "/api/v1/game/catalog", "GET"},
 					{"GM英雄列表", "/api/v1/game/hero", "GET"},
@@ -151,7 +151,7 @@ var defaultMenus = []seedMenu{
 				},
 			},
 			{
-				Menu: model.SysMenu{MenuName: "GameWeaponManage", Title: "武器管理", Path: "/game/weapon/index", Component: "/admin/game-weapon/index", MenuType: "C", Permission: "game:gm:weapon:list", Sort: 5, Visible: "0", IsFrame: "1"},
+				Menu: model.SysMenu{MenuName: "GameWeaponManage", Title: "武器管理", Path: "/game/weapon/index", Component: "/admin/game-weapon/index", MenuType: "C", Icon: "tool", Permission: "game:gm:weapon:list", Sort: 5, Visible: "0", IsFrame: "1"},
 				Apis: []seedAPI{
 					{"游戏配置目录", "/api/v1/game/catalog", "GET"},
 					{"GM武器列表", "/api/v1/game/weapon", "GET"},
@@ -160,7 +160,7 @@ var defaultMenus = []seedMenu{
 				},
 			},
 			{
-				Menu: model.SysMenu{MenuName: "GameSkillManage", Title: "技能管理", Path: "/game/skill/index", Component: "/admin/game-skill/index", MenuType: "C", Permission: "game:gm:skill:list", Sort: 6, Visible: "0", IsFrame: "1"},
+				Menu: model.SysMenu{MenuName: "GameSkillManage", Title: "技能管理", Path: "/game/skill/index", Component: "/admin/game-skill/index", MenuType: "C", Icon: "skill", Permission: "game:gm:skill:list", Sort: 6, Visible: "0", IsFrame: "1"},
 				Apis: []seedAPI{
 					{"游戏配置目录", "/api/v1/game/catalog", "GET"},
 					{"GM技能列表", "/api/v1/game/skill", "GET"},
@@ -169,12 +169,12 @@ var defaultMenus = []seedMenu{
 				},
 			},
 			{
-				Menu: model.SysMenu{MenuName: "GameGearManage", Title: "装备管理", Path: "/game/gear/index", Component: "/admin/game-gear/index", MenuType: "C", Permission: "game:gm:gear:list", Sort: 7, Visible: "0", IsFrame: "1"},
+				Menu: model.SysMenu{MenuName: "GameEquipManage", Title: "装备管理", Path: "/game/equip/index", Component: "/admin/game-equip/index", MenuType: "C", Icon: "component", Permission: "game:gm:equip:list", Sort: 7, Visible: "0", IsFrame: "1"},
 				Apis: []seedAPI{
 					{"游戏配置目录", "/api/v1/game/catalog", "GET"},
-					{"GM装备列表", "/api/v1/game/gear", "GET"},
-					{"GM新增装备", "/api/v1/game/gear", "POST"},
-					{"GM更新装备", "/api/v1/game/gear", "PUT"},
+					{"GM装备列表", "/api/v1/game/equip", "GET"},
+					{"GM新增装备", "/api/v1/game/equip", "POST"},
+					{"GM更新装备", "/api/v1/game/equip", "PUT"},
 				},
 			},
 		},

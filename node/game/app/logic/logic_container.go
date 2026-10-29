@@ -9,7 +9,6 @@ import (
 
 	"server-cluster/internal/svc"
 	"server-cluster/node/game/app/global"
-	"server-cluster/share/consts"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
@@ -49,25 +48,27 @@ func containerID(playerID int64, typ int32) int64 {
 }
 
 // containerToEntry 容器 → wire 容器条目。
-func containerToEntry(playerID int64, c *model.Container) *pb.ContainerEntry {
-	items := c.ItemsCopy()
+// c 参数类型 *model.ItemContainer = *model.BaseContainer[*Item]。
+func containerToEntry(playerID int64, c *model.ItemContainer) *pb.ContainerEntry {
+	meta := c.Meta()
+	items := c.Items()
 	entries := make([]*pb.ItemEntry, 0, len(items))
-	for i := range items {
+	for _, it := range items {
 		entries = append(entries, &pb.ItemEntry{
-			ItemId:    items[i].ItemID,
-			ItemCfgId: items[i].ItemCfgID,
-			Count:     items[i].Count,
-			GridX:     items[i].GridX,
-			GridY:     items[i].GridY,
-			Rotated:   items[i].Rotated,
+			ItemId:    it.ItemID,
+			ItemCfgId: it.ItemCfgID,
+			Count:     it.Count,
+			GridX:     it.GridX,
+			GridY:     it.GridY,
+			Rotated:   it.Rotated,
 		})
 	}
 	return &pb.ContainerEntry{
-		ContainerId: containerID(playerID, c.Type),
-		Type:        pb.ContainerType(c.Type),
-		GridW:       c.GridW,
-		GridH:       c.GridH,
-		Version:     c.Version,
+		ContainerId: containerID(playerID, meta.Type),
+		Type:        pb.ContainerType(meta.Type),
+		GridW:       meta.GridW,
+		GridH:       meta.GridH,
+		Version:     meta.Ver,
 		ItemEntries: entries,
 	}
 }
@@ -76,11 +77,11 @@ func containerToEntry(playerID int64, c *model.Container) *pb.ContainerEntry {
 func containerErr(err error) error {
 	switch {
 	case errors.Is(err, model.ErrItemNotFound):
-		return errs.WithMessage(consts.CodeInvalidParams, "物品不存在")
+		return errs.WithMessage(errs.CodeInvalidParams, "物品不存在")
 	case errors.Is(err, model.ErrItemExists):
-		return errs.WithMessage(consts.CodeInvalidParams, "物品已存在")
+		return errs.WithMessage(errs.CodeInvalidParams, "物品已存在")
 	case errors.Is(err, model.ErrPositionConflict):
-		return errs.WithMessage(consts.CodeInvalidParams, "目标位置不可放置")
+		return errs.WithMessage(errs.CodeInvalidParams, "目标位置不可放置")
 	default:
 		return fmt.Errorf("logic: container op failed: %w", err)
 	}
@@ -97,7 +98,7 @@ func loadContainer(ctx context.Context, playerID int64) (*model.PlayerContainer,
 	if err != nil {
 		return nil, err
 	}
-	// JSON 反序列化不含 index，需重建
+	// JSON 反序列化后需回填运行时字段（GlobalID/OwnerID/OwnerType）
 	pc.Rebuild()
 	return pc, nil
 }
@@ -107,8 +108,8 @@ func saveContainer(playerID int64, pc *model.PlayerContainer) {
 	global.PlayerContainerCache.Set(playerID, pc)
 }
 
-// containerOf 加载玩家容器集合并取出指定类型的容器。
-func containerOf(ctx context.Context, playerID int64, t pb.ContainerType) (*model.PlayerContainer, *model.Container, error) {
+// containerOf 加载玩家容器集合并取出指定类型的容器（返回 *ItemContainer）。
+func containerOf(ctx context.Context, playerID int64, t pb.ContainerType) (*model.PlayerContainer, *model.ItemContainer, error) {
 	pc, err := loadContainer(ctx, playerID)
 	if err != nil {
 		return nil, nil, err
@@ -206,6 +207,7 @@ func (this *containerLogic) ContainerSort(ctx context.Context, playerID int64, r
 }
 
 // ContainerTransfer 容器间移动物品：目标容器放不下时源容器不变。
+// 新实现：调用目标容器的 TransferFrom 方法（跨容器按 GlobalID 升序加锁）。
 func (this *containerLogic) ContainerTransfer(ctx context.Context, playerID int64, req *pb.ContainerTransferReq) (*pb.ContainerTransferResp, error) {
 	fromType, okFrom := containerTypeToModel(req.GetFromType())
 	toType, okTo := containerTypeToModel(req.GetToType())
@@ -222,7 +224,8 @@ func (this *containerLogic) ContainerTransfer(ctx context.Context, playerID int6
 		return nil, errs.ErrInvalidParams
 	}
 
-	if err := pc.TransferItem(fromType, toType, req.GetItemId(), req.GetToX(), req.GetToY(), req.GetRotated()); err != nil {
+	// 新接口：目标容器调 TransferFrom 把源容器的物品搬过来
+	if err := toC.TransferFrom(fromC, req.GetItemId(), req.GetToX(), req.GetToY(), req.GetRotated()); err != nil {
 		return nil, containerErr(err)
 	}
 
@@ -236,17 +239,17 @@ func (this *containerLogic) ContainerTransfer(ctx context.Context, playerID int6
 // ContainerAddItem 向容器放入物品（GM）：校验配置与占格后挂缓存待落库。
 func (this *containerLogic) ContainerAddItem(ctx context.Context, playerID int64, req *pb.GmContainerAddItemReq) (*pb.ContainerListResp, error) {
 	if !tpl.T().Item.Has(req.GetItemCfgId()) {
-		return nil, errs.WithMessage(consts.CodeInvalidParams, "物品配置不存在")
+		return nil, errs.WithMessage(errs.CodeInvalidParams, "物品配置不存在")
 	}
 
 	pc, c, err := containerOf(ctx, playerID, pb.ContainerType(req.GetContainerType()))
 	if err != nil {
 		return nil, err
 	}
-	// 存量脏数据缺配置时占格计算会 panic，先校验
-	for _, it := range c.ItemsCopy() {
+	// 存量脏数据缺配置时占格计算会 panic，先校验（新接口 Items() 返回 []*Item）
+	for _, it := range c.Items() {
 		if !tpl.T().Item.Has(it.ItemCfgID) {
-			return nil, errs.WithMessage(consts.CodeInvalidParams, fmt.Sprintf("容器内物品配置缺失，物品配置ID: %d", it.ItemCfgID))
+			return nil, errs.WithMessage(errs.CodeInvalidParams, fmt.Sprintf("容器内物品配置缺失，物品配置ID: %d", it.ItemCfgID))
 		}
 	}
 
@@ -254,7 +257,8 @@ func (this *containerLogic) ContainerAddItem(ctx context.Context, playerID int64
 	if count <= 0 {
 		count = 1
 	}
-	if err := c.AddItem(model.Item{
+	// 新接口 AddItem 接收 *Item（指针化）
+	if err := c.AddItem(&model.ItemEntry{
 		ItemID:    svc.NextID(),
 		ItemCfgID: req.GetItemCfgId(),
 		Count:     count,

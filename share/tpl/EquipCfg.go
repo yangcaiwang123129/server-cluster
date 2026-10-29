@@ -8,9 +8,9 @@
 
 package tpl
 
-type GearCfg struct {
+type EquipCfg struct {
 	Id       int32  `json:"id"`       // id
-	GearName string `json:"gearName"` // 装备名字
+	EquipName string `json:"equipName"` // 装备名字
 	Icon     string `json:"icon"`     // 装备icon
 	Desc     string `json:"desc"`     // 描述
 }

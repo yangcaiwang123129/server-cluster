@@ -12,7 +12,7 @@ const (
 	TablePlayerHero      Table = "player_hero"      // 玩家英雄持有（1:1，英雄数组 JSON）
 	TablePlayerSkill     Table = "player_skill"     // 玩家技能持有（1:1，技能数组 JSON）
 	TablePlayerWeapon    Table = "player_weapon"    // 玩家武器持有（1:1，武器数组 JSON）
-	TablePlayerGear      Table = "player_gear"      // 玩家装备持有（1:1，装备数组 JSON）
+	TablePlayerEquip      Table = "player_equip"      // 玩家装备持有（1:1，装备数组 JSON）
 	TablePlayerContainer Table = "player_container" // 玩家容器（1:1）
 )
 

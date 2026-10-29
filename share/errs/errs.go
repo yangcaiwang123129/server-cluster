@@ -11,18 +11,16 @@ import (
 	"github.com/dobyte/due/v2/codes"
 	"github.com/gofiber/fiber/v3"
 	"gorm.io/gorm"
-
-	"server-cluster/share/consts"
 )
 
 var (
-	ErrInternal       = consts.CodeInternalError.Err()
-	ErrInvalidParams  = consts.CodeInvalidParams.Err()
-	ErrUnauthorized   = consts.CodeUnauthorized.Err()
-	ErrPlayerNotFound = consts.CodePlayerNotFound.Err()
-	ErrPlayerExists   = consts.CodePlayerExists.Err()
-	ErrPasswordWrong  = consts.CodePasswordWrong.Err()
-	ErrTokenInvalid   = consts.CodeTokenInvalid.Err()
+	ErrInternal       = CodeInternalError.Err()
+	ErrInvalidParams  = CodeInvalidParams.Err()
+	ErrUnauthorized   = CodeUnauthorized.Err()
+	ErrPlayerNotFound = CodePlayerNotFound.Err()
+	ErrPlayerExists   = CodePlayerExists.Err()
+	ErrPasswordWrong  = CodePasswordWrong.Err()
+	ErrTokenInvalid   = CodeTokenInvalid.Err()
 )
 
 // WithMessage 基于既有错误码改写提示文案，返回新的 error（不影响原码）。

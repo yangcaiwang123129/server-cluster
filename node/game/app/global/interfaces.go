@@ -82,13 +82,13 @@ type HeroLogic interface {
 	HeroUpdate(ctx context.Context, playerID int64, req *pb.HeroUpdateReq) (*pb.HeroUpdateResp, error)
 }
 
-// GearLogic 装备业务接口：玩家装备持有数据生命周期。
-type GearLogic interface {
+// EquipLogic 装备业务接口：玩家装备持有数据生命周期。
+type EquipLogic interface {
 	ModuleLogic
-	// GearList 装备列表
-	GearList(ctx context.Context, playerID int64) (*pb.GearListResp, error)
-	// GearAdd 新增装备
-	GearAdd(ctx context.Context, playerID int64, req *pb.GearAddReq) (*pb.GearAddResp, error)
-	// GearUpdate 更新装备
-	GearUpdate(ctx context.Context, playerID int64, req *pb.GearUpdateReq) (*pb.GearUpdateResp, error)
+	// EquipList 装备列表
+	EquipList(ctx context.Context, playerID int64) (*pb.EquipListResp, error)
+	// EquipAdd 新增装备
+	EquipAdd(ctx context.Context, playerID int64, req *pb.EquipAddReq) (*pb.EquipAddResp, error)
+	// EquipUpdate 更新装备
+	EquipUpdate(ctx context.Context, playerID int64, req *pb.EquipUpdateReq) (*pb.EquipUpdateResp, error)
 }

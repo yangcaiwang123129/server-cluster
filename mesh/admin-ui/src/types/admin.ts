@@ -314,8 +314,8 @@ export interface GmSkill {
   desc?: string
 }
 
-export interface GmGear {
-  gearId?: number
+export interface GmEquip {
+  equipId?: number
   level?: number
   equipped?: boolean
   /** config-derived display info */
@@ -324,7 +324,7 @@ export interface GmGear {
   desc?: string
 }
 
-/** A row from the game config catalog (hero/weapon/skill/gear), for pickers. */
+/** A row from the game config catalog (hero/weapon/skill/equip), for pickers. */
 export interface GameCatalogEntry {
   id?: number
   name?: string

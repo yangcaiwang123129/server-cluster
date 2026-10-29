@@ -8,7 +8,7 @@
 
 package tpl
 
-type AttributeGearCfg struct {
+type AttributeEquipCfg struct {
 	Id              int32    `json:"id"`              // id
 	Level           *vector2 `json:"level"`           // 等级
 	Hp              int32    `json:"hp"`              // 生命值

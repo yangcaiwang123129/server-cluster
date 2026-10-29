@@ -95,122 +95,122 @@ func NewCache[K comparable, V any](cfg CacherConfig, loader Loader[K, V], saver 
 }
 
 // Get 读缓存；miss 时回源并回填。
-func (s *Cache[K, V]) Get(ctx context.Context, key K) (V, error) {
-	return s.cache.Get(ctx, key)
+func (this *Cache[K, V]) Get(ctx context.Context, key K) (V, error) {
+	return this.cache.Get(ctx, key)
 }
 
 // Set 写缓存并挂入待落库队列（后台异步批量落库）。
-func (s *Cache[K, V]) Set(key K, val V) {
-	s.cache.SetWithTTL(key, val, 1, s.ttl)
-	if s.saver == nil {
+func (this *Cache[K, V]) Set(key K, val V) {
+	this.cache.SetWithTTL(key, val, 1, this.ttl)
+	if this.saver == nil {
 		return
 	}
-	s.mu.Lock()
-	s.pending[key] = val
-	s.mu.Unlock()
+	this.mu.Lock()
+	this.pending[key] = val
+	this.mu.Unlock()
 }
 
 // Delete 删除：摘除待落库值并逐出缓存，同步调 deleter 落库（nil 则跳过）。
-func (s *Cache[K, V]) Delete(ctx context.Context, key K) error {
-	s.mu.Lock()
-	delete(s.pending, key)
-	s.mu.Unlock()
-	s.cache.Delete(key)
-	if s.deleter == nil {
+func (this *Cache[K, V]) Delete(ctx context.Context, key K) error {
+	this.mu.Lock()
+	delete(this.pending, key)
+	this.mu.Unlock()
+	this.cache.Delete(key)
+	if this.deleter == nil {
 		return nil
 	}
-	return s.deleter(ctx, []K{key})
+	return this.deleter(ctx, []K{key})
 }
 
 // Flush 立即同步落库全部待写条目；失败时整批回队并返回错误。
 // 用于下线等必须确定性落库的场景（后台协程的周期落库失败只记录日志）。
-func (s *Cache[K, V]) Flush(ctx context.Context) error {
-	if s.saver == nil {
+func (this *Cache[K, V]) Flush(ctx context.Context) error {
+	if this.saver == nil {
 		return nil
 	}
-	s.mu.Lock()
-	if len(s.pending) == 0 {
-		s.mu.Unlock()
+	this.mu.Lock()
+	if len(this.pending) == 0 {
+		this.mu.Unlock()
 		return nil
 	}
-	entries := make([]CacheEntry[K, V], 0, len(s.pending))
-	for k, v := range s.pending {
+	entries := make([]CacheEntry[K, V], 0, len(this.pending))
+	for k, v := range this.pending {
 		entries = append(entries, CacheEntry[K, V]{Key: k, Value: v})
 	}
-	s.pending = make(map[K]V)
-	s.mu.Unlock()
+	this.pending = make(map[K]V)
+	this.mu.Unlock()
 
-	if err := s.saver(ctx, entries); err != nil {
-		s.mu.Lock()
+	if err := this.saver(ctx, entries); err != nil {
+		this.mu.Lock()
 		for _, e := range entries {
-			if _, ok := s.pending[e.Key]; !ok {
-				s.pending[e.Key] = e.Value
+			if _, ok := this.pending[e.Key]; !ok {
+				this.pending[e.Key] = e.Value
 			}
 		}
-		s.mu.Unlock()
+		this.mu.Unlock()
 		return err
 	}
 	return nil
 }
 
 // FlushKey 立即同步落库单个 key 的待写值；该 key 无待写值时直接返回 nil。
-func (s *Cache[K, V]) FlushKey(ctx context.Context, key K) error {
-	if s.saver == nil {
+func (this *Cache[K, V]) FlushKey(ctx context.Context, key K) error {
+	if this.saver == nil {
 		return nil
 	}
-	s.mu.Lock()
-	val, ok := s.pending[key]
+	this.mu.Lock()
+	val, ok := this.pending[key]
 	if ok {
-		delete(s.pending, key)
+		delete(this.pending, key)
 	}
-	s.mu.Unlock()
+	this.mu.Unlock()
 	if !ok {
 		return nil
 	}
-	if err := s.saver(ctx, []CacheEntry[K, V]{{Key: key, Value: val}}); err != nil {
-		s.mu.Lock()
-		if _, exists := s.pending[key]; !exists {
-			s.pending[key] = val
+	if err := this.saver(ctx, []CacheEntry[K, V]{{Key: key, Value: val}}); err != nil {
+		this.mu.Lock()
+		if _, exists := this.pending[key]; !exists {
+			this.pending[key] = val
 		}
-		s.mu.Unlock()
+		this.mu.Unlock()
 		return err
 	}
 	return nil
 }
 
 // Evict 仅逐出内存缓存，不落库也不删库（下线清理内存用）。
-func (s *Cache[K, V]) Evict(key K) {
-	s.cache.Delete(key)
+func (this *Cache[K, V]) Evict(key K) {
+	this.cache.Delete(key)
 }
 
 // Close 停止后台协程，剩余 pending 全部落库后释放缓存。
-func (s *Cache[K, V]) Close() {
-	s.closeOnce.Do(func() {
-		close(s.stop)
-		<-s.done
-		s.flushPending()
-		s.cache.Close()
+func (this *Cache[K, V]) Close() {
+	this.closeOnce.Do(func() {
+		close(this.stop)
+		<-this.done
+		this.flushPending()
+		this.cache.Close()
 	})
 }
 
 // flushLoop 周期触发批量落库，收到 stop 后退出。
-func (s *Cache[K, V]) flushLoop() {
-	defer close(s.done)
-	ticker := time.NewTicker(s.flushInterval)
+func (this *Cache[K, V]) flushLoop() {
+	defer close(this.done)
+	ticker := time.NewTicker(this.flushInterval)
 	defer ticker.Stop()
 	for {
 		select {
-		case <-s.stop:
+		case <-this.stop:
 			return
 		case <-ticker.C:
-			s.flushPending()
+			this.flushPending()
 		}
 	}
 }
 
 // flushPending 周期落库：走 Flush，失败整批回队下轮重试。
-func (s *Cache[K, V]) flushPending() {
-	if err := s.Flush(context.Background()); err != nil {
-		log.Errorf("cache: %s flush failed: %v", s.name, err)
+func (this *Cache[K, V]) flushPending() {
+	if err := this.Flush(context.Background()); err != nil {
+		log.Errorf("cache: %s flush failed: %v", this.name, err)
 	}
 }

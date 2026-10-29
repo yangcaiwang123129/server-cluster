@@ -13,13 +13,13 @@ import (
 
 // Context 基础设施句柄集合，以后扩展 etcd、kafka 等都挂在这里。
 type Context struct {
-	HTTP      *http.Proxy        // HTTP 组件代理；须由 http 服在组件创建后注入
-	Node      *node.Proxy        // 节点组件代理；须由 node 服在组件创建后注入
-	Registry  registry.Registry  // 服务注册发现；须由使用方在创建后注入
-	MySQL     *MySQLManager      // 命名 MySQL 实例
-	Redis     *RedisManager      // 命名 Redis 实例（不同业务可用不同 db 号）
-	JWT       *jwt.JWT           // 令牌签发/校验器；etc.jwt.secret 未配置的服务为 nil
-	Snowflake *Snowflake         // 雪花 ID 生成器
+	Http      *http.Proxy       // Http 组件代理；须由 http 服在组件创建后注入
+	Node      *node.Proxy       // 节点组件代理；须由 node 服在组件创建后注入
+	Registry  registry.Registry // 服务注册发现；须由使用方在创建后注入
+	MySQL     *MySQLManager     // 命名 MySQL 实例
+	Redis     *RedisManager     // 命名 Redis 实例（不同业务可用不同 db 号）
+	JWT       *jwt.JWT          // 令牌签发/校验器；etc.jwt.secret 未配置的服务为 nil
+	Snowflake *Snowflake        // 雪花 ID 生成器
 }
 
 var ctx *Context
@@ -86,11 +86,11 @@ func (c *Context) DB() (*gorm.DB, error) {
 func NextID() int64 { return Ctx().Snowflake.Next() }
 
 // SetHTTPProxy 注入 HTTP 组件代理（http 服在组件创建后调用）。
-func SetHTTPProxy(p *http.Proxy) { Ctx().HTTP = p }
+func SetHTTPProxy(p *http.Proxy) { Ctx().Http = p }
 
 // HTTPProxy 获取 HTTP 组件代理；未注入直接 panic。
 func HTTPProxy() *http.Proxy {
-	p := Ctx().HTTP
+	p := Ctx().Http
 	if p == nil {
 		panic("svc: http proxy is not injected")
 	}

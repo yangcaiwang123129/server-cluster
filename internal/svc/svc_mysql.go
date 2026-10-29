@@ -70,10 +70,10 @@ func NewMySQLManager() (*MySQLManager, error) {
 }
 
 // Get 获取指定名称的 MySQL 实例。
-func (m *MySQLManager) Get(name string) (*MySQL, error) {
-	m.mu.RLock()
-	defer m.mu.RUnlock()
-	inst, ok := m.instMap[name]
+func (this *MySQLManager) Get(name string) (*MySQL, error) {
+	this.mu.RLock()
+	defer this.mu.RUnlock()
+	inst, ok := this.instMap[name]
 	if !ok {
 		return nil, fmt.Errorf("svc: mysql instance %q is not configured", name)
 	}
@@ -81,7 +81,7 @@ func (m *MySQLManager) Get(name string) (*MySQL, error) {
 }
 
 // Default 获取默认 MySQL 实例。
-func (m *MySQLManager) Default() (*MySQL, error) { return m.Get(DefaultInstance) }
+func (this *MySQLManager) Default() (*MySQL, error) { return this.Get(DefaultInstance) }
 
 // AutoMigrate 自动构建表：对给定实体执行 gorm AutoMigrate（只增不删，已存在的表做增量补列）。
 // entities 为表模型指针（实现 TableName，如 &model.AccountModel{}）；gdb 为空或无实体时直接返回。
@@ -93,16 +93,16 @@ func AutoMigrate(gdb *gorm.DB, entities ...any) error {
 }
 
 // Close 关闭全部实例连接池。
-func (m *MySQLManager) Close() error {
-	m.mu.Lock()
-	defer m.mu.Unlock()
+func (this *MySQLManager) Close() error {
+	this.mu.Lock()
+	defer this.mu.Unlock()
 	var err error
-	for name, inst := range m.instMap {
+	for name, inst := range this.instMap {
 		if e := inst.sql.Close(); e != nil && err == nil {
 			err = fmt.Errorf("svc: close mysql instance %q failed: %w", name, e)
 		}
 	}
-	m.instMap = make(map[string]*MySQL)
+	this.instMap = make(map[string]*MySQL)
 	return err
 }
 

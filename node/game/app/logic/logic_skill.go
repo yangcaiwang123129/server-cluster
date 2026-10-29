@@ -8,7 +8,6 @@ import (
 	"gorm.io/gorm"
 
 	"server-cluster/node/game/app/global"
-	"server-cluster/share/consts"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
@@ -68,7 +67,7 @@ func (this *skillLogic) SkillAdd(ctx context.Context, playerID int64, req *pb.Sk
 
 	s := model.SkillInfo{SkillID: req.GetSkillId()}
 	if !row.AddSkill(s) {
-		return nil, errs.WithMessage(consts.CodeInvalidParams, "技能已拥有")
+		return nil, errs.WithMessage(errs.CodeInvalidParams, "技能已拥有")
 	}
 
 	global.PlayerSkillCache.Set(playerID, row)
@@ -88,7 +87,7 @@ func (this *skillLogic) SkillUpdate(ctx context.Context, playerID int64, req *pb
 		Equipped: req.GetEquipped(),
 	}
 	if !row.UpdateSkill(s) {
-		return nil, errs.WithMessage(consts.CodeInvalidParams, "技能未拥有")
+		return nil, errs.WithMessage(errs.CodeInvalidParams, "技能未拥有")
 	}
 
 	global.PlayerSkillCache.Set(playerID, row)

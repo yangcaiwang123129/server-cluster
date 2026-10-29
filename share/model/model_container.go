@@ -1,101 +1,111 @@
 // Package model 业务模型：与存储/传输解耦的领域结构。
-// 三个容器（backpack/stash/secure）共用 Container 结构，通过 Type 区分。
+// 容器通用逻辑（BaseContainer[T] 泛型实现、GridItem 约束、错误、
+// Container 类型常量、TransferFrom 跨容器锁）在 internal/container 包里。
+// 本文件只放：
+//   - ItemEntry struct（实现 container.Grid，具体物品业务类型）
+//   - PlayerContainer（玩家三容器聚合，gorm 持久化）
+//   - container 包常量/错误的重新导出（保持调用方引用面稳定）
+//   - SizeOf/RawSizeOf 注入（依赖 share/tpl 配置表）
+//   - NewItemContainer / NewPlayerContainer / NewWorldItemContainer 构造包装
+//
+// import container "server-cluster/internal/container"
 package model
 
 import (
-	"errors"
 	"fmt"
 	"math"
+
+	"server-cluster/internal/container"
 	"server-cluster/share/enum"
 	"server-cluster/share/tpl"
-	"sort"
-	"sync"
 )
 
-// 容器类型。
+// ============ 容器类型常量：从 container 包重新导出 ============
 const (
-	TypeBackpack = 1 // 背包（局内随身，死亡掉落）
-	TypeStash    = 2 // 仓库（局外固定，不掉落）
-	TypeSecure   = 3 // 保险箱（局内随身，不掉落）
+	TypeBackpack  = container.TypeBackpack
+	TypeStash     = container.TypeStash
+	TypeSecure    = container.TypeSecure
+	TypeWorldDrop = container.TypeWorldDrop
+	TypeCabinet   = container.TypeCabinet
+	TypeLoot      = container.TypeLoot
 )
 
+// ============ 拥有者类型常量 ============
+const (
+	OwnerPlayer = container.OwnerPlayer
+	OwnerWorld  = container.OwnerWorld
+)
+
+// ============ 领域错误：从 container 包重新导出 ============
 var (
-	ErrItemNotFound     = errors.New("item not found in container")
-	ErrItemExists       = errors.New("item already exists in container")
-	ErrPositionConflict = errors.New("position conflict")
+	ErrItemNotFound     = container.ErrItemNotFound
+	ErrItemExists       = container.ErrItemExists
+	ErrPositionConflict = container.ErrPositionConflict
+	ErrContainerLocked  = container.ErrContainerLocked
 )
 
-// PlayerContainer 玩家容器集合：一个玩家 3 个容器，每容器一列 JSON。
-type PlayerContainer struct {
-	PlayerID int64      `gorm:"column:player_id;type:bigint;not null;primaryKey;comment:玩家ID" json:"player_id"`
-	Backpack *Container `gorm:"column:backpack;type:json;serializer:json;comment:背包(JSON)" json:"backpack"`
-	Stash    *Container `gorm:"column:stash;type:json;serializer:json;comment:仓库(JSON)" json:"stash"`
-	Secure   *Container `gorm:"column:secure;type:json;serializer:json;comment:保险箱(JSON)" json:"secure"`
-	Version  int64      `gorm:"column:version;type:bigint;not null;default:1;comment:版本号(乐观锁)" json:"version"`
+// ItemContainer 业务层容器便捷别名（= container.BaseContainer[*ItemEntry]）。
+// 调用方用这个类型，不直接写泛型参数。
+type ItemContainer = container.BaseContainer[*ItemEntry]
+
+// ============ Item（实现 container.GridItem） ============
+
+// ItemEntry 业务层具体物品实例。
+// 指针语义：一个 ItemEntry 实例同一时刻只属于一个容器，UID 全局唯一。
+// GridItem 接口方法全指针接收者 → *ItemEntry 满足 container.Grid 约束。
+type ItemEntry struct {
+	ItemID    int64 `json:"itemID"`
+	ItemCfgID int32 `json:"itemCfgID"`
+	Count     int32 `json:"count"`
+	GridX     int32 `json:"gridX"` // 容器内 rel 坐标（左上角）
+	GridY     int32 `json:"equip"`
+	Rotated   bool  `json:"rotated"`
 }
 
-// TableName 指定表名。
-func (PlayerContainer) TableName() string { return enum.TablePlayerContainer.String() }
+// --- container.GridItem 接口实现（全指针接收者） ---
 
-// NewPlayerContainer 构造玩家容器集合（默认网格：backpack=8x12, stash=20x20, secure=4x6）。
-func NewPlayerContainer(playerID int64) *PlayerContainer {
-	return &PlayerContainer{
-		PlayerID: playerID,
-		Backpack: newDefaultContainer(TypeBackpack),
-		Stash:    newDefaultContainer(TypeStash),
-		Secure:   newDefaultContainer(TypeSecure),
-		Version:  1,
-	}
+// UID 返回物品唯一实例 ID。
+func (it *ItemEntry) UID() int64 { return it.ItemID }
+
+// CfgID 返回物品配置 ID。
+func (it *ItemEntry) CfgID() int32 { return it.ItemCfgID }
+
+// Pos 返回容器内 rel 坐标。
+func (it *ItemEntry) Pos() (x, y int32) { return it.GridX, it.GridY }
+
+// IsRotated 是否旋转。
+func (it *ItemEntry) IsRotated() bool { return it.Rotated }
+
+// SetPos 设置容器内坐标与朝向。
+func (it *ItemEntry) SetPos(x, y int32, rotated bool) {
+	it.GridX, it.GridY, it.Rotated = x, y, rotated
 }
 
-// newDefaultContainer 按类型构造默认网格容器。
-func newDefaultContainer(typ int32) *Container {
-	switch typ {
-	case TypeBackpack:
-		return NewContainer(TypeBackpack, 8, 12)
-	case TypeStash:
-		return NewContainer(TypeStash, 20, 20)
-	case TypeSecure:
-		return NewContainer(TypeSecure, 4, 6)
-	default:
-		return NewContainer(typ, 8, 8)
+// --- Item 专有辅助方法 ---
+
+// SizeOf 读取物品在当前朝向下的宽高；配置缺失时 panic。
+func (it *ItemEntry) SizeOf() (w, h int32) {
+	def := GetItemCfgById(it.ItemCfgID)
+	if def == nil {
+		panic(fmt.Sprintf("model: missing ItemCfg for itemCfgID=%d", it.ItemCfgID))
 	}
+	w, h = itemSize(def)
+	if it.Rotated {
+		return h, w
+	}
+	return w, h
 }
 
-// All 返回全部容器（遍历用，如死亡结算）。
-func (p *PlayerContainer) All() []*Container {
-	return []*Container{p.Backpack, p.Stash, p.Secure}
+// RawSize 读取配置的原始（未旋转）占格。
+func (it *ItemEntry) RawSize() (w, h int32) {
+	def := GetItemCfgById(it.ItemCfgID)
+	if def == nil {
+		return 1, 1
+	}
+	return itemSize(def)
 }
 
-// ByType 按枚举取容器；非法类型返回 nil。
-func (p *PlayerContainer) ByType(typ int32) *Container {
-	switch typ {
-	case TypeBackpack:
-		return p.Backpack
-	case TypeStash:
-		return p.Stash
-	case TypeSecure:
-		return p.Secure
-	default:
-		return nil
-	}
-}
-
-// Rebuild 补齐缺失容器并重建各容器 index；从 DB/JSON 加载后必须调用。
-func (p *PlayerContainer) Rebuild() {
-	if p.Backpack == nil {
-		p.Backpack = newDefaultContainer(TypeBackpack)
-	}
-	if p.Stash == nil {
-		p.Stash = newDefaultContainer(TypeStash)
-	}
-	if p.Secure == nil {
-		p.Secure = newDefaultContainer(TypeSecure)
-	}
-	for _, c := range p.All() {
-		c.buildIndex()
-	}
-}
+// ============ 配置辅助（依赖 share/tpl） ============
 
 // GetItemCfgById 按 id 查配置；不存在返回 nil。
 func GetItemCfgById(itemCfgID int32) *tpl.ItemCfg {
@@ -104,7 +114,7 @@ func GetItemCfgById(itemCfgID int32) *tpl.ItemCfg {
 
 // itemSize 读取配置占格（vector2），异常时退回 1x1。
 func itemSize(def *tpl.ItemCfg) (int32, int32) {
-	if def.Size == nil {
+	if def == nil || def.Size == nil {
 		return 1, 1
 	}
 	w := int32(math.Round(float64(def.Size.X)))
@@ -124,53 +134,13 @@ func GetWHByItemCfgId(itemCfgID int32) (int32, int32) {
 	return itemSize(def)
 }
 
-// Item 容器中的物品实例（不含 w/h，查 ItemDef 计算）。
-type Item struct {
-	ItemID    int64 `json:"itemID"`    // 物品唯一实例 ID
-	ItemCfgID int32 `json:"itemCfgID"` // 物品配置 ID
-	Count     int32 `json:"count"`     // 堆叠数量
-	GridX     int32 `json:"gridX"`     // 网格 GridX（左上角）
-	GridY     int32 `json:"gridY"`     // 网格 GridY（左上角）
-	Rotated   bool  `json:"rotated"`   // 是否旋转（w/h 对调）
-}
+// ============ SizeOf 注入（供 NewItemContainer 等构造调用） ============
 
-// Container 网格容器：背包/仓库/保险箱通用结构。
-// Type/GridW/GridH/Version/Items 持久化；mu/index 仅内存。
-type Container struct {
-	mu       sync.Mutex      `json:"-"`
-	Type     int32           `json:"type"`
-	GridW    int32           `json:"gridW"`
-	GridH    int32           `json:"gridH"`
-	Version  int32           `json:"version"` // 每次修改 +1
-	Items    []Item          `json:"items"`
-	indexMap map[int64]*Item `json:"-"` // uid → Item，加载/重排时构建
-}
-
-// NewContainer 构造空容器。
-func NewContainer(typ, gridW, gridH int32) *Container {
-	c := &Container{
-		Type:  typ,
-		GridW: gridW,
-		GridH: gridH,
-		Items: make([]Item, 0),
-	}
-	c.buildIndex()
-	return c
-}
-
-// buildIndex 重建 uid → Item 映射。
-func (c *Container) buildIndex() {
-	c.indexMap = make(map[int64]*Item, len(c.Items))
-	for i := range c.Items {
-		c.indexMap[c.Items[i].ItemID] = &c.Items[i]
-	}
-}
-
-// sizeOf 返回物品当前朝向的尺寸。
-func (c *Container) sizeOf(it *Item) (w, h int32) {
+// defaultItemSizeOf SizeOf 注入的默认实现：读配置 + 应用旋转。
+func defaultItemSizeOf(it *ItemEntry) (w, h int32) {
 	def := GetItemCfgById(it.ItemCfgID)
 	if def == nil {
-		panic(fmt.Sprintf("model: missing ItemDef for defId=%d", it.ItemCfgID))
+		return 1, 1
 	}
 	w, h = itemSize(def)
 	if it.Rotated {
@@ -179,300 +149,102 @@ func (c *Container) sizeOf(it *Item) (w, h int32) {
 	return w, h
 }
 
-// buildOccupied 构建一维占用表：occ[y*GridW+x] = uid，0 为空。临时构建，不落库。
-func (c *Container) buildOccupied() []int64 {
-	occ := make([]int64, c.GridW*c.GridH)
-	for i := range c.Items {
-		it := &c.Items[i]
-		w, h := c.sizeOf(it)
-		for dx := int32(0); dx < w; dx++ {
-			for dy := int32(0); dy < h; dy++ {
-				occ[(it.GridY+dy)*c.GridW+(it.GridX+dx)] = it.ItemID
-			}
-		}
-	}
-	return occ
-}
-
-// canPlace 检查物品能否放在 (x,y)（朝向 rotated）：边界、碰撞（排除自己）。
-func (c *Container) canPlace(occ []int64, it *Item, x, y int32, rotated bool) bool {
+// defaultItemRawSizeOf RawSizeOf 注入的默认实现：读配置原始占格。
+func defaultItemRawSizeOf(it *ItemEntry) (w, h int32) {
 	def := GetItemCfgById(it.ItemCfgID)
 	if def == nil {
-		return false
+		return 1, 1
 	}
-	w, h := itemSize(def)
-	if rotated {
-		w, h = h, w
-	}
-	if x < 0 || y < 0 || x+w > c.GridW || y+h > c.GridH {
-		return false
-	}
-	for dx := int32(0); dx < w; dx++ {
-		for dy := int32(0); dy < h; dy++ {
-			owner := occ[(y+dy)*c.GridW+(x+dx)]
-			if owner != 0 && owner != it.ItemID {
-				return false
-			}
-		}
-	}
-	return true
+	return itemSize(def)
 }
 
-// AddItem 放入物品：校验实例唯一、边界与碰撞后追加。
-func (c *Container) AddItem(it Item) error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+// ============ NewItemContainer 构造包装 ============
 
-	if c.indexMap == nil {
-		c.buildIndex()
-	}
-	if _, ok := c.indexMap[it.ItemID]; ok {
-		return ErrItemExists
-	}
-	occ := c.buildOccupied()
-	if !c.canPlace(occ, &it, it.GridX, it.GridY, it.Rotated) {
-		return ErrPositionConflict
-	}
-
-	c.Items = append(c.Items, it)
-	c.Version++
-	c.buildIndex()
-	return nil
+// NewItemContainer 构造 BaseContainer[*ItemEntry] 的便捷包装。
+// 内部调 container.NewContainer[*ItemEntry]，自动注入 SizeOf/RawSizeOf 依赖 tpl。
+func NewItemContainer(typ, gridW, gridH int32, globalID, ownerID int64, ownerType int32) *ItemContainer {
+	return container.NewContainer[*ItemEntry](typ, gridW, gridH, globalID, ownerID, ownerType,
+		defaultItemSizeOf, defaultItemRawSizeOf)
 }
 
-// moveItemLocked 已持锁版本：把 uid 移到 (toX,toY)，可选旋转。
-func (c *Container) moveItemLocked(uid int64, toX, toY int32, rotated bool) error {
-	it, ok := c.indexMap[uid]
-	if !ok {
-		return ErrItemNotFound
-	}
-	occ := c.buildOccupied()
-	if !c.canPlace(occ, it, toX, toY, rotated) {
-		return ErrPositionConflict
-	}
+// ============ PlayerContainer（玩家三容器聚合，持久化在一张表里） ============
 
-	it.GridX, it.GridY, it.Rotated = toX, toY, rotated
-	c.Version++
-	return nil
+// PlayerContainer 玩家容器集合：一个玩家 3 个容器，每容器一列 JSON。
+// 字段类型为 *ItemContainer（= *container.BaseContainer[*ItemEntry]）。
+type PlayerContainer struct {
+	PlayerID int64          `gorm:"column:player_id;type:bigint;not null;primaryKey;comment:玩家ID" json:"player_id"`
+	Backpack *ItemContainer `gorm:"column:backpack;type:json;serializer:json;comment:背包(JSON)" json:"backpack"`
+	Stash    *ItemContainer `gorm:"column:stash;type:json;serializer:json;comment:仓库(JSON)" json:"stash"`
+	Secure   *ItemContainer `gorm:"column:secure;type:json;serializer:json;comment:保险箱(JSON)" json:"secure"`
+	Version  int64          `gorm:"column:version;type:bigint;not null;default:1;comment:版本号(乐观锁)" json:"version"`
 }
 
-// MoveItem 将物品 uid 移到 (toX,toY)，可选旋转；canPlace 校验通过才改坐标。
-func (c *Container) MoveItem(uid int64, toX, toY int32, rotated bool) error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+// TableName 指定表名。
+func (PlayerContainer) TableName() string { return enum.TablePlayerContainer.String() }
 
-	if c.indexMap == nil {
-		c.buildIndex()
+// NewPlayerContainer 构造玩家容器集合（默认网格：backpack=8x12, stash=20x20, secure=4x6）。
+func NewPlayerContainer(playerID int64) *PlayerContainer {
+	return &PlayerContainer{
+		PlayerID: playerID,
+		Version:  1,
+		Backpack: newPlayerItemContainer(playerID, TypeBackpack, 8, 12),
+		Stash:    newPlayerItemContainer(playerID, TypeStash, 20, 20),
+		Secure:   newPlayerItemContainer(playerID, TypeSecure, 4, 6),
 	}
-	return c.moveItemLocked(uid, toX, toY, rotated)
 }
 
-// RotateItem 原地旋转物品 uid。
-func (c *Container) RotateItem(uid int64) error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	it, ok := c.indexMap[uid]
-	if !ok {
-		return ErrItemNotFound
-	}
-	occ := c.buildOccupied()
-	newRot := !it.Rotated
-	if !c.canPlace(occ, it, it.GridX, it.GridY, newRot) {
-		return ErrPositionConflict
-	}
-
-	it.Rotated = newRot
-	c.Version++
-	return nil
+func newPlayerItemContainer(playerID int64, typ, gridW, gridH int32) *ItemContainer {
+	return NewItemContainer(typ, gridW, gridH,
+		playerID*10+int64(typ), playerID, OwnerPlayer)
 }
 
-// removeItemLocked 已持锁版本：删除物品 uid。
-func (c *Container) removeItemLocked(uid int64) error {
-	if _, ok := c.indexMap[uid]; !ok {
-		return ErrItemNotFound
-	}
-
-	newItems := make([]Item, 0, len(c.Items)-1)
-	for i := range c.Items {
-		if c.Items[i].ItemID != uid {
-			newItems = append(newItems, c.Items[i])
-		}
-	}
-	c.Items = newItems
-	c.Version++
-	c.buildIndex()
-	return nil
+// All 返回全部容器。
+func (p *PlayerContainer) All() []*ItemContainer {
+	return []*ItemContainer{p.Backpack, p.Stash, p.Secure}
 }
 
-// RemoveItem 删除物品 uid。
-func (c *Container) RemoveItem(uid int64) error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	if c.indexMap == nil {
-		c.buildIndex()
+// ByType 按枚举取容器；非法类型返回 nil。
+func (p *PlayerContainer) ByType(typ int32) *ItemContainer {
+	switch typ {
+	case TypeBackpack:
+		return p.Backpack
+	case TypeStash:
+		return p.Stash
+	case TypeSecure:
+		return p.Secure
+	default:
+		return nil
 	}
-	return c.removeItemLocked(uid)
 }
 
-// AutoSort 一键整理：面积降序 → 双朝向扫描放置 → 放不下整体回滚。
-func (c *Container) AutoSort() error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	// 快照用于整体回滚
-	oldItems := make([]Item, len(c.Items))
-	copy(oldItems, c.Items)
-
-	// 面积降序，同面积按 defId/uid 稳定排序
-	sort.SliceStable(c.Items, func(i, j int) bool {
-		di, dj := GetItemCfgById(c.Items[i].ItemCfgID), GetItemCfgById(c.Items[j].ItemCfgID)
-		if di == nil || dj == nil {
-			return false
-		}
-		wi, hi := itemSize(di)
-		wj, hj := itemSize(dj)
-		ai, aj := wi*hi, wj*hj
-		if ai != aj {
-			return ai > aj
-		}
-		if c.Items[i].ItemCfgID != c.Items[j].ItemCfgID {
-			return c.Items[i].ItemCfgID < c.Items[j].ItemCfgID
-		}
-		return c.Items[i].ItemID < c.Items[j].ItemID
-	})
-
-	for i := range c.Items {
-		c.Items[i].GridX, c.Items[i].GridY, c.Items[i].Rotated = 0, 0, false
+// Rebuild 补齐缺失容器并重建各容器 SafeMap；从 DB/JSON 加载后必须调用。
+// UnmarshalJSON 已经把数据灌进 SafeMap 了，但 GlobalID/OwnerID/OwnerType/SizeOf 是运行时字段（不持久化），
+// 所以需要在这里回填。
+func (p *PlayerContainer) Rebuild() {
+	if p.Backpack == nil {
+		p.Backpack = newPlayerItemContainer(p.PlayerID, TypeBackpack, 8, 12)
 	}
-
-	occ := make([]int64, c.GridW*c.GridH)
-
-	for i := range c.Items {
-		it := &c.Items[i]
-		def := GetItemCfgById(it.ItemCfgID)
-		if def == nil {
-			c.Items = oldItems
-			c.buildIndex()
-			return fmt.Errorf("model: missing ItemDef for defId=%d", it.ItemCfgID)
-		}
-		placed := false
-
-		// 双朝向扫描（先原朝向，再旋转）
-		baseW, baseH := itemSize(def)
-		for _, rot := range []bool{false, true} {
-			w, h := baseW, baseH
-			if rot {
-				w, h = baseH, baseW
-			}
-			for y := int32(0); y <= c.GridH-h && !placed; y++ {
-				for x := int32(0); x <= c.GridW-w && !placed; x++ {
-					free := true
-					for dx := int32(0); dx < w && free; dx++ {
-						for dy := int32(0); dy < h && free; dy++ {
-							if occ[(y+dy)*c.GridW+(x+dx)] != 0 {
-								free = false
-							}
-						}
-					}
-					if free {
-						it.GridX, it.GridY, it.Rotated = x, y, rot
-						for dx := int32(0); dx < w; dx++ {
-							for dy := int32(0); dy < h; dy++ {
-								occ[(y+dy)*c.GridW+(x+dx)] = it.ItemID
-							}
-						}
-						placed = true
-					}
-				}
-			}
-			if placed {
-				break
-			}
-		}
-		if !placed {
-			c.Items = oldItems
-			c.buildIndex()
-			return ErrPositionConflict
-		}
+	if p.Stash == nil {
+		p.Stash = newPlayerItemContainer(p.PlayerID, TypeStash, 20, 20)
 	}
-
-	c.Version++
-	c.buildIndex()
-	return nil
+	if p.Secure == nil {
+		p.Secure = newPlayerItemContainer(p.PlayerID, TypeSecure, 4, 6)
+	}
+	for _, c := range p.All() {
+		c.OwnerID = p.PlayerID
+		c.OwnerType = OwnerPlayer
+		c.GlobalID = p.PlayerID*10 + int64(c.Type)
+		c.SizeOf = defaultItemSizeOf
+		c.RawSizeOf = defaultItemRawSizeOf
+		c.EnsureInit()
+	}
 }
 
-// GetItem 按 uid 查物品；不存在返回 nil。
-func (c *Container) GetItem(uid int64) *Item {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	if c.indexMap == nil {
-		c.buildIndex()
-	}
-	return c.indexMap[uid]
-}
+// ============ 未来 WorldContainer 便捷构造 ============
 
-// ItemsCopy 返回物品列表的浅拷贝（供外部遍历）。
-func (c *Container) ItemsCopy() []Item {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	out := make([]Item, len(c.Items))
-	copy(out, c.Items)
-	return out
-}
-
-// OnDeath 死亡结算：保险箱保留，背包清空。
-func (c *Container) OnDeath() {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	if c.Type == TypeSecure {
-		return
-	}
-	c.Items = c.Items[:0]
-	c.Version++
-	c.buildIndex()
-}
-
-// TransferItem 把物品 uid 从 from 容器移到 to 容器的 (toX,toY,rotated) 位置。
-// 两个容器按 Type 升序加锁，避免互搬时的死锁；目标放不下时源容器不做任何修改。
-func (p *PlayerContainer) TransferItem(from, to int32, uid int64, toX, toY int32, rotated bool) error {
-	fromC, toC := p.ByType(from), p.ByType(to)
-	if fromC == toC {
-		return fromC.MoveItem(uid, toX, toY, rotated)
-	}
-
-	first, second := fromC, toC
-	if second.Type < first.Type {
-		first, second = second, first
-	}
-	first.mu.Lock()
-	defer first.mu.Unlock()
-	second.mu.Lock()
-	defer second.mu.Unlock()
-
-	if fromC.indexMap == nil {
-		fromC.buildIndex()
-	}
-	if toC.indexMap == nil {
-		toC.buildIndex()
-	}
-	it, ok := fromC.indexMap[uid]
-	if !ok {
-		return ErrItemNotFound
-	}
-	if _, ok := toC.indexMap[uid]; ok {
-		return ErrItemExists
-	}
-	moved := *it
-	moved.GridX, moved.GridY, moved.Rotated = toX, toY, rotated
-	if !toC.canPlace(toC.buildOccupied(), &moved, toX, toY, rotated) {
-		return ErrPositionConflict
-	}
-
-	fromC.removeItemLocked(uid)
-	toC.Items = append(toC.Items, moved)
-	toC.Version++
-	toC.buildIndex()
-	return nil
+// NewWorldItemContainer 构造一个世界容器（地图掉落箱、柜子、战利品箱等）。
+// entityID 是地图上该容器实体的唯一 ID（如敌人实例 ID、柜子实例 ID）。
+func NewWorldItemContainer(typ, gridW, gridH int32, entityID int64) *ItemContainer {
+	return NewItemContainer(typ, gridW, gridH,
+		entityID, entityID, OwnerWorld)
 }

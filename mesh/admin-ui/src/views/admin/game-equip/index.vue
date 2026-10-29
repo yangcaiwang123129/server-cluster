@@ -3,56 +3,56 @@
     <el-card shadow="never">
       <template #header>
         <div class="card-header">
-          <span>{{ $t('admin.gameGear.title') }}</span>
-          <span class="hint">{{ $t('admin.gameGear.hint') }}</span>
+          <span>{{ $t('admin.gameEquip.title') }}</span>
+          <span class="hint">{{ $t('admin.gameEquip.hint') }}</span>
         </div>
       </template>
 
       <el-form :inline="true" @submit.prevent>
-        <el-form-item :label="$t('admin.gameGear.playerId')">
+        <el-form-item :label="$t('admin.gameEquip.playerId')">
           <el-input
             v-model="playerId"
-            :placeholder="$t('admin.gameGear.playerIdPlaceholder')"
+            :placeholder="$t('admin.gameEquip.playerIdPlaceholder')"
             clearable
             style="width: 200px"
           />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" :loading="loading" @click="loadList">
-            {{ $t('admin.gameGear.list') }}
+            {{ $t('admin.gameEquip.list') }}
           </el-button>
           <el-button
-            v-permisaction="['game:gm:gear:list']"
+            v-permisaction="['game:gm:equip:list']"
             :loading="addDialog.loading"
             @click="openAdd"
-          >{{ $t('admin.gameGear.add') }}</el-button>
+          >{{ $t('admin.gameEquip.add') }}</el-button>
         </el-form-item>
       </el-form>
 
       <el-table v-loading="loading" :data="rows" border>
-        <el-table-column prop="name" :label="$t('admin.gameGear.name')" min-width="180">
+        <el-table-column prop="name" :label="$t('admin.gameEquip.name')" min-width="180">
           <template #default="{ row }">
             <div class="item-cell">
               <GameItemIcon :name="row.name" tone="#f59e0b" :size="28" />
               <span class="item-name">{{ row.name || '-' }}</span>
-              <span class="item-id">#{{ row.gearId }}</span>
+              <span class="item-id">#{{ row.equipId }}</span>
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="level" :label="$t('admin.gameGear.level')" min-width="90" />
+        <el-table-column prop="level" :label="$t('admin.gameEquip.level')" min-width="90" />
         <el-table-column
           prop="desc"
-          :label="$t('admin.gameGear.desc')"
+          :label="$t('admin.gameEquip.desc')"
           min-width="200"
           show-overflow-tooltip
         />
-        <el-table-column :label="$t('admin.gameGear.equipped')" min-width="90">
+        <el-table-column :label="$t('admin.gameEquip.equipped')" min-width="90">
           <template #default="{ row }">{{ row.equipped ? '✓' : '-' }}</template>
         </el-table-column>
         <el-table-column :label="$t('common.actions')" width="100" fixed="right">
           <template #default="{ row }">
             <el-button
-              v-permisaction="['game:gm:gear:list']"
+              v-permisaction="['game:gm:equip:list']"
               link
               type="primary"
               @click="openEdit(row)"
@@ -62,16 +62,16 @@
       </el-table>
     </el-card>
 
-    <el-dialog v-model="addDialog.visible" :title="$t('admin.gameGear.addTitle')" width="420px">
+    <el-dialog v-model="addDialog.visible" :title="$t('admin.gameEquip.addTitle')" width="420px">
       <el-form label-width="100px">
-        <el-form-item :label="$t('admin.gameGear.gearId')">
+        <el-form-item :label="$t('admin.gameEquip.equipId')">
           <el-select
-            v-model="addDialog.gearId"
+            v-model="addDialog.equipId"
             filterable
             remote
             :remote-method="searchCatalog"
             :loading="addDialog.searching"
-            :placeholder="$t('admin.gameGear.pickPlaceholder')"
+            :placeholder="$t('admin.gameEquip.pickPlaceholder')"
             style="width: 100%"
             @focus="searchCatalog('')"
           >
@@ -98,19 +98,19 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="editDialog.visible" :title="$t('admin.gameGear.editTitle')" width="420px">
+    <el-dialog v-model="editDialog.visible" :title="$t('admin.gameEquip.editTitle')" width="420px">
       <el-form label-width="100px">
-        <el-form-item :label="$t('admin.gameGear.gearId')">
+        <el-form-item :label="$t('admin.gameEquip.equipId')">
           <div class="item-cell">
             <GameItemIcon :name="editDialog.name" tone="#f59e0b" :size="22" />
             <span class="item-name">{{ editDialog.name || '-' }}</span>
-            <span class="item-id">#{{ editDialog.gearId }}</span>
+            <span class="item-id">#{{ editDialog.equipId }}</span>
           </div>
         </el-form-item>
-        <el-form-item :label="$t('admin.gameGear.level')">
+        <el-form-item :label="$t('admin.gameEquip.level')">
           <el-input-number v-model="editDialog.level" :min="1" />
         </el-form-item>
-        <el-form-item :label="$t('admin.gameGear.equipped')">
+        <el-form-item :label="$t('admin.gameEquip.equipped')">
           <el-switch v-model="editDialog.equipped" />
         </el-form-item>
       </el-form>
@@ -132,30 +132,30 @@ import PageContainer from '@/components/PageContainer/index.vue'
 import GameItemIcon from '@/components/GameItemIcon/index.vue'
 import { msgInfo, msgSuccess } from '@/utils/message'
 
-import { addGmGear, listGameCatalog, listGmGear, updateGmGear } from '@/api/admin/gm'
-import type { GameCatalogEntry, GmGear } from '@/types/admin'
+import { addGmEquip, listGameCatalog, listGmEquip, updateGmEquip } from '@/api/admin/gm'
+import type { GameCatalogEntry, GmEquip } from '@/types/admin'
 
 // Must match the menu_name the backend serves, or keep-alive silently misses
-defineOptions({ name: 'GameGearManage' })
+defineOptions({ name: 'GameEquipManage' })
 
 const { t } = useI18n()
 
 const playerId = ref('')
 const loading = ref(false)
-const rows = ref<GmGear[]>([])
+const rows = ref<GmEquip[]>([])
 
 const addDialog = reactive({
   visible: false,
   loading: false,
   searching: false,
-  gearId: undefined as number | undefined
+  equipId: undefined as number | undefined
 })
 
 const catalogOptions = ref<GameCatalogEntry[]>([])
 
 const searchCatalog = async(keyword: string) => {
   addDialog.searching = true
-  const res = await listGameCatalog({ type: 'gear', keyword: keyword || undefined }).catch(() => null)
+  const res = await listGameCatalog({ type: 'equip', keyword: keyword || undefined }).catch(() => null)
   addDialog.searching = false
   if (!res) return
   catalogOptions.value = res.data ?? []
@@ -164,7 +164,7 @@ const searchCatalog = async(keyword: string) => {
 const editDialog = reactive({
   visible: false,
   loading: false,
-  gearId: 0,
+  equipId: 0,
   name: '',
   level: 1,
   equipped: false
@@ -178,12 +178,12 @@ const playerIdOrZero = () => {
 const loadList = async() => {
   const id = playerIdOrZero()
   if (!id) {
-    msgInfo(t('admin.gameGear.playerIdInvalid'))
+    msgInfo(t('admin.gameEquip.playerIdInvalid'))
     return
   }
   loading.value = true
   // The interceptor has already reported any failure; null means we stop here.
-  const res = await listGmGear({ playerId: id }).catch(() => null)
+  const res = await listGmEquip({ playerId: id }).catch(() => null)
   loading.value = false
   if (!res) return
   rows.value = res.data ?? []
@@ -191,10 +191,10 @@ const loadList = async() => {
 
 const openAdd = () => {
   if (!playerIdOrZero()) {
-    msgInfo(t('admin.gameGear.playerIdInvalid'))
+    msgInfo(t('admin.gameEquip.playerIdInvalid'))
     return
   }
-  addDialog.gearId = undefined
+  addDialog.equipId = undefined
   addDialog.visible = true
   searchCatalog('')
 }
@@ -202,21 +202,21 @@ const openAdd = () => {
 const submitAdd = async() => {
   const id = playerIdOrZero()
   if (!id) return
-  if (!addDialog.gearId) {
-    msgInfo(t('admin.gameGear.pickPlaceholder'))
+  if (!addDialog.equipId) {
+    msgInfo(t('admin.gameEquip.pickPlaceholder'))
     return
   }
   addDialog.loading = true
-  const res = await addGmGear({ playerId: id, gearId: addDialog.gearId }).catch(() => null)
+  const res = await addGmEquip({ playerId: id, equipId: addDialog.equipId }).catch(() => null)
   addDialog.loading = false
   if (!res) return
-  msgSuccess(t('admin.gameGear.addOk'))
+  msgSuccess(t('admin.gameEquip.addOk'))
   addDialog.visible = false
   await loadList()
 }
 
-const openEdit = (row: GmGear) => {
-  editDialog.gearId = row.gearId ?? 0
+const openEdit = (row: GmEquip) => {
+  editDialog.equipId = row.equipId ?? 0
   editDialog.name = row.name ?? ''
   editDialog.level = row.level ?? 1
   editDialog.equipped = row.equipped ?? false
@@ -227,15 +227,15 @@ const submitEdit = async() => {
   const id = playerIdOrZero()
   if (!id) return
   editDialog.loading = true
-  const res = await updateGmGear({
+  const res = await updateGmEquip({
     playerId: id,
-    gearId: editDialog.gearId,
+    equipId: editDialog.equipId,
     level: editDialog.level,
     equipped: editDialog.equipped
   }).catch(() => null)
   editDialog.loading = false
   if (!res) return
-  msgSuccess(t('admin.gameGear.updateOk'))
+  msgSuccess(t('admin.gameEquip.updateOk'))
   editDialog.visible = false
   await loadList()
 }

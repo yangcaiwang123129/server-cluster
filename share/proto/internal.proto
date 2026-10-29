@@ -1,10 +1,10 @@
-// 内部服务间 RPC：由各节点以 grpc provider 形式提供，后台/网格服务调用。
+﻿// 内部服务间 RPC：由各节点以 grpc provider 形式提供，后台/网格服务调用。
 syntax = "proto3";
 
 package internal;
 
 import "container.proto";
-import "gear.proto";
+import "equip.proto";
 import "hero.proto";
 import "skill.proto";
 import "weapon.proto";
@@ -130,21 +130,21 @@ message GmSkillUpdateReq {
   pb.SkillUpdateReq req = 2; // 业务参数
 }
 
-// GmGearListReq 装备列表请求。
-message GmGearListReq {
+// GmEquipListReq 装备列表请求。
+message GmEquipListReq {
   int64 player_id = 1; // 玩家ID
 }
 
-// GmGearAddReq 新增装备请求。
-message GmGearAddReq {
+// GmEquipAddReq 新增装备请求。
+message GmEquipAddReq {
   int64 player_id = 1; // 玩家ID
-  pb.GearAddReq req = 2; // 业务参数
+  pb.EquipAddReq req = 2; // 业务参数
 }
 
-// GmGearUpdateReq 更新装备请求。
-message GmGearUpdateReq {
+// GmEquipUpdateReq 更新装备请求。
+message GmEquipUpdateReq {
   int64 player_id = 1; // 玩家ID
-  pb.GearUpdateReq req = 2; // 业务参数
+  pb.EquipUpdateReq req = 2; // 业务参数
 }
 
 // GameAdminService 后台 GM 服务（game 服提供，admin 服调用）。
@@ -188,10 +188,11 @@ service GameAdminService {
   // SkillUpdate 更新技能
   rpc SkillUpdate (GmSkillUpdateReq) returns (pb.SkillUpdateResp);
 
-  // GearList 装备列表
-  rpc GearList (GmGearListReq) returns (pb.GearListResp);
-  // GearAdd 新增装备
-  rpc GearAdd (GmGearAddReq) returns (pb.GearAddResp);
-  // GearUpdate 更新装备
-  rpc GearUpdate (GmGearUpdateReq) returns (pb.GearUpdateResp);
+  // EquipList 装备列表
+  rpc EquipList (GmEquipListReq) returns (pb.EquipListResp);
+  // EquipAdd 新增装备
+  rpc EquipAdd (GmEquipAddReq) returns (pb.EquipAddResp);
+  // EquipUpdate 更新装备
+  rpc EquipUpdate (GmEquipUpdateReq) returns (pb.EquipUpdateResp);
 }
+

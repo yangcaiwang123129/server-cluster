@@ -227,7 +227,9 @@ const clearSteps = (keys: StepKey[]) => {
 }
 
 const canRun = (key: StepKey) => {
-  if (runningAll.value || steps[key].status === 'running') return false
+  // 只看步骤自身的前置条件：一键流程执行期间 runningAll 为 true，
+  // 若把它也算进来，流程第一步就会被自己挡住。
+  if (steps[key].status === 'running') return false
   switch (key) {
     case 'login':
       return true
@@ -350,7 +352,8 @@ const runFlow = async (keys: StepKey[], doneMessage: string) => {
   runningAll.value = true
   try {
     for (const key of keys) {
-      if (!canRun(key)) break
+      // 前置条件不满足就停下，不再抛“成功”提示。
+      if (!canRun(key)) return
       const ok = await runStep(key)
       if (!ok) return
     }

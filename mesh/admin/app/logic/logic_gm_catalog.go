@@ -9,7 +9,7 @@ import (
 	"server-cluster/share/tpl"
 )
 
-// GameCatalog 读 Luban 配置生成目录（供 GM 页面选择器与展示；typ: hero|weapon|skill|gear）。
+// GameCatalog 读 Luban 配置生成目录（供 GM 页面选择器与展示；typ: hero|weapon|skill|equip）。
 func GameCatalog(typ, keyword string) ([]dto.GameCatalogEntry, error) {
 	var list []dto.GameCatalogEntry
 	switch typ {
@@ -25,9 +25,9 @@ func GameCatalog(typ, keyword string) ([]dto.GameCatalogEntry, error) {
 		for _, c := range tpl.T().Skill.GetDataList() {
 			list = append(list, dto.GameCatalogEntry{ID: c.Id, Name: c.SkillName, Desc: c.Desc})
 		}
-	case "gear":
-		for _, c := range tpl.T().Gear.GetDataList() {
-			list = append(list, dto.GameCatalogEntry{ID: c.Id, Name: c.GearName, IconKey: c.Icon, Desc: c.Desc})
+	case "equip":
+		for _, c := range tpl.T().Equip.GetDataList() {
+			list = append(list, dto.GameCatalogEntry{ID: c.Id, Name: c.EquipName, IconKey: c.Icon, Desc: c.Desc})
 		}
 	default:
 		return nil, errs.ErrInvalidParams

@@ -2,6 +2,8 @@
 package handler
 
 import (
+	"server-cluster/internal/router"
+
 	"github.com/dobyte/due/v2/cluster/node"
 
 	"server-cluster/internal/svc"
@@ -12,9 +14,9 @@ import (
 
 // init 注册玩家入口路由：仅 VERIFY 无状态，ENTER/LEAVE 为有状态且由节点直接处理。
 func init() {
-	onStateless(pb.RouteCode_ROUTE_CODE_VERIFY, handleVerify)
-	onNode(pb.RouteCode_ROUTE_CODE_ENTER_GAME, handleEnterGame)
-	onNode(pb.RouteCode_ROUTE_CODE_LEAVE_GAME, handleLeaveGame)
+	router.OnStateless(pb.RouteCode_ROUTE_CODE_VERIFY, handleVerify)
+	router.OnNode(pb.RouteCode_ROUTE_CODE_ENTER_GAME, handleEnterGame)
+	router.OnNode(pb.RouteCode_ROUTE_CODE_LEAVE_GAME, handleLeaveGame)
 }
 
 // handleVerify 首包：校验 login 服签发的 JWT，绑定网关与节点（proto 注释明确这是绑定入口）。

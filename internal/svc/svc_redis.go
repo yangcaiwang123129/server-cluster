@@ -62,10 +62,10 @@ func NewRedisManager() (*RedisManager, error) {
 }
 
 // Get 获取指定名称的 Redis 实例。
-func (m *RedisManager) Get(name string) (redis.UniversalClient, error) {
-	m.mu.RLock()
-	defer m.mu.RUnlock()
-	client, ok := m.insts[name]
+func (this *RedisManager) Get(name string) (redis.UniversalClient, error) {
+	this.mu.RLock()
+	defer this.mu.RUnlock()
+	client, ok := this.insts[name]
 	if !ok {
 		return nil, fmt.Errorf("svc: redis instance %q is not configured", name)
 	}
@@ -73,18 +73,18 @@ func (m *RedisManager) Get(name string) (redis.UniversalClient, error) {
 }
 
 // Default 获取默认 Redis 实例。
-func (m *RedisManager) Default() (redis.UniversalClient, error) { return m.Get(DefaultInstance) }
+func (this *RedisManager) Default() (redis.UniversalClient, error) { return this.Get(DefaultInstance) }
 
 // Close 关闭全部客户端。
-func (m *RedisManager) Close() error {
-	m.mu.Lock()
-	defer m.mu.Unlock()
+func (this *RedisManager) Close() error {
+	this.mu.Lock()
+	defer this.mu.Unlock()
 	var err error
-	for name, client := range m.insts {
+	for name, client := range this.insts {
 		if e := client.Close(); e != nil && err == nil {
 			err = fmt.Errorf("svc: close redis instance %q failed: %w", name, e)
 		}
 	}
-	m.insts = make(map[string]redis.UniversalClient)
+	this.insts = make(map[string]redis.UniversalClient)
 	return err
 }

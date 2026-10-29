@@ -8,7 +8,6 @@ import (
 	"gorm.io/gorm"
 
 	"server-cluster/node/game/app/global"
-	"server-cluster/share/consts"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
@@ -71,7 +70,7 @@ func (this *heroLogic) HeroAdd(ctx context.Context, playerID int64, req *pb.Hero
 
 	h := model.HeroInfo{HeroID: req.GetHeroId()}
 	if !row.AddHero(h) {
-		return nil, errs.WithMessage(consts.CodeInvalidParams, "英雄已拥有")
+		return nil, errs.WithMessage(errs.CodeInvalidParams, "英雄已拥有")
 	}
 
 	global.PlayerHeroCache.Set(playerID, row)
@@ -94,7 +93,7 @@ func (this *heroLogic) HeroUpdate(ctx context.Context, playerID int64, req *pb.H
 		Equipped: req.GetEquipped(),
 	}
 	if !row.UpdateHero(h) {
-		return nil, errs.WithMessage(consts.CodeInvalidParams, "英雄未拥有")
+		return nil, errs.WithMessage(errs.CodeInvalidParams, "英雄未拥有")
 	}
 
 	global.PlayerHeroCache.Set(playerID, row)

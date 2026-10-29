@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 import type { ApiResponse, PageQuery, PageResult } from '@/types/api'
-import type { GameCatalogEntry, GmContainer, GmGear, GmHero, GmSkill, GmWeapon, ItemCfg, ItemCfgQuery } from '@/types/admin'
+import type { GameCatalogEntry, GmContainer, GmEquip, GmHero, GmSkill, GmWeapon, ItemCfg, ItemCfgQuery } from '@/types/admin'
 
 /**
  * GM 接口：admin 经 mesh 转发到 game 服，每个方法对应 game 侧 logic 的一个函数。
@@ -16,8 +16,8 @@ export function listItem(query: ItemCfgQuery & Partial<PageQuery>) {
   })
 }
 
-/** Game config catalog for hero/weapon/skill/gear pickers (Luban tables). */
-export function listGameCatalog(params: { type: 'hero' | 'weapon' | 'skill' | 'gear'; keyword?: string }) {
+/** Game config catalog for hero/weapon/skill/equip pickers (Luban tables). */
+export function listGameCatalog(params: { type: 'hero' | 'weapon' | 'skill' | 'equip'; keyword?: string }) {
   return request<ApiResponse<GameCatalogEntry[]>>({
     url: '/api/v1/game/catalog',
     method: 'get',
@@ -198,25 +198,25 @@ export function updateGmSkill(data: { playerId: number; skillId: number; level: 
 
 // ── 装备 ──────────────────────────────────────────────────────────
 
-export function listGmGear(params: { playerId: number }) {
-  return request<ApiResponse<GmGear[]>>({
-    url: '/api/v1/game/gear',
+export function listGmEquip(params: { playerId: number }) {
+  return request<ApiResponse<GmEquip[]>>({
+    url: '/api/v1/game/equip',
     method: 'get',
     params
   })
 }
 
-export function addGmGear(data: { playerId: number; gearId: number }) {
-  return request<ApiResponse<GmGear>>({
-    url: '/api/v1/game/gear',
+export function addGmEquip(data: { playerId: number; equipId: number }) {
+  return request<ApiResponse<GmEquip>>({
+    url: '/api/v1/game/equip',
     method: 'post',
     data
   })
 }
 
-export function updateGmGear(data: { playerId: number; gearId: number; level: number; equipped: boolean }) {
-  return request<ApiResponse<GmGear>>({
-    url: '/api/v1/game/gear',
+export function updateGmEquip(data: { playerId: number; equipId: number; level: number; equipped: boolean }) {
+  return request<ApiResponse<GmEquip>>({
+    url: '/api/v1/game/equip',
     method: 'put',
     data
   })

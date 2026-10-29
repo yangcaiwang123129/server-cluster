@@ -2,6 +2,8 @@
 package handler
 
 import (
+	"server-cluster/internal/router"
+
 	"github.com/dobyte/due/v2/cluster/node"
 
 	"server-cluster/node/game/app/logic"
@@ -10,9 +12,9 @@ import (
 
 // init 注册武器路由（业务在玩家 actor 内串行执行）。
 func init() {
-	onActor(pb.RouteCode_ROUTE_CODE_WEAPON_LIST, handleWeaponList)
-	onActor(pb.RouteCode_ROUTE_CODE_WEAPON_ADD, handleWeaponAdd)
-	onActor(pb.RouteCode_ROUTE_CODE_WEAPON_UPDATE, handleWeaponUpdate)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_WEAPON_LIST, handleWeaponList)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_WEAPON_ADD, handleWeaponAdd)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_WEAPON_UPDATE, handleWeaponUpdate)
 }
 
 // handleWeaponList 武器列表。

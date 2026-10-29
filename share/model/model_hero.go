@@ -20,9 +20,9 @@ type HeroInfo struct {
 // PlayerHero 玩家英雄持有（1:1 行，多英雄以 JSON 对象存储，key=英雄ID），对应 player_hero 表。
 // 注意：Heroes 由 SafeMap 加锁保护，修改请走 Update/UpdateAll，勿直接改 Snapshot 返回值。
 type PlayerHero struct {
-	PlayerID        int64                          `gorm:"column:player_id;type:bigint;not null;primaryKey;comment:玩家ID" json:"player_id"`
-	Heroes          *util.SafeMap[int32, HeroInfo] `gorm:"column:heroes;type:json;comment:英雄列表(JSON对象,key=英雄ID)" json:"heroes"`
-	PlayerTableBase `gorm:"embedded"`
+	PlayerID  int64                          `gorm:"column:player_id;type:bigint;not null;primaryKey;comment:玩家ID" json:"player_id"`
+	Heroes    *util.SafeMap[int32, HeroInfo] `gorm:"column:heroes;type:json;comment:英雄列表(JSON对象,key=英雄ID)" json:"heroes"`
+	TableBase `gorm:"embedded"`
 }
 
 func (this *PlayerHero) Marshal() ([]byte, error)    { return json.Marshal(this) }

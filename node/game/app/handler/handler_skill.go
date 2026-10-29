@@ -2,6 +2,8 @@
 package handler
 
 import (
+	"server-cluster/internal/router"
+
 	"github.com/dobyte/due/v2/cluster/node"
 
 	"server-cluster/node/game/app/logic"
@@ -10,9 +12,9 @@ import (
 
 // init 注册技能路由（业务在玩家 actor 内串行执行）。
 func init() {
-	onActor(pb.RouteCode_ROUTE_CODE_SKILL_LIST, handleSkillList)
-	onActor(pb.RouteCode_ROUTE_CODE_SKILL_ADD, handleSkillAdd)
-	onActor(pb.RouteCode_ROUTE_CODE_SKILL_UPDATE, handleSkillUpdate)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_SKILL_LIST, handleSkillList)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_SKILL_ADD, handleSkillAdd)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_SKILL_UPDATE, handleSkillUpdate)
 }
 
 // handleSkillList 技能列表。

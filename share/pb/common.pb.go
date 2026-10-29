@@ -56,10 +56,10 @@ const (
 	RouteCode_ROUTE_CODE_SKILL_ADD    RouteCode = 10042 // 新增技能
 	RouteCode_ROUTE_CODE_SKILL_UPDATE RouteCode = 10043 // 更新技能
 	// 装备 10050~10059
-	RouteCode_ROUTE_CODE_GEAR_LIST   RouteCode = 10050 // 装备列表
-	RouteCode_ROUTE_CODE_GEAR_NOTIFY RouteCode = 10051 // 装备变化通知
-	RouteCode_ROUTE_CODE_GEAR_ADD    RouteCode = 10052 // 新增装备
-	RouteCode_ROUTE_CODE_GEAR_UPDATE RouteCode = 10053 // 更新装备
+	RouteCode_ROUTE_CODE_EQUIP_LIST   RouteCode = 10050 // 装备列表
+	RouteCode_ROUTE_CODE_EQUIP_NOTIFY RouteCode = 10051 // 装备变化通知
+	RouteCode_ROUTE_CODE_EQUIP_ADD    RouteCode = 10052 // 新增装备
+	RouteCode_ROUTE_CODE_EQUIP_UPDATE RouteCode = 10053 // 更新装备
 )
 
 // Enum value maps for RouteCode.
@@ -88,10 +88,10 @@ var (
 		10041:  "ROUTE_CODE_SKILL_NOTIFY",
 		10042:  "ROUTE_CODE_SKILL_ADD",
 		10043:  "ROUTE_CODE_SKILL_UPDATE",
-		10050:  "ROUTE_CODE_GEAR_LIST",
-		10051:  "ROUTE_CODE_GEAR_NOTIFY",
-		10052:  "ROUTE_CODE_GEAR_ADD",
-		10053:  "ROUTE_CODE_GEAR_UPDATE",
+		10050:  "ROUTE_CODE_EQUIP_LIST",
+		10051:  "ROUTE_CODE_EQUIP_NOTIFY",
+		10052:  "ROUTE_CODE_EQUIP_ADD",
+		10053:  "ROUTE_CODE_EQUIP_UPDATE",
 	}
 	RouteCode_value = map[string]int32{
 		"ROUTE_CODE_UNSPECIFIED":        0,
@@ -117,10 +117,10 @@ var (
 		"ROUTE_CODE_SKILL_NOTIFY":       10041,
 		"ROUTE_CODE_SKILL_ADD":          10042,
 		"ROUTE_CODE_SKILL_UPDATE":       10043,
-		"ROUTE_CODE_GEAR_LIST":          10050,
-		"ROUTE_CODE_GEAR_NOTIFY":        10051,
-		"ROUTE_CODE_GEAR_ADD":           10052,
-		"ROUTE_CODE_GEAR_UPDATE":        10053,
+		"ROUTE_CODE_EQUIP_LIST":         10050,
+		"ROUTE_CODE_EQUIP_NOTIFY":       10051,
+		"ROUTE_CODE_EQUIP_ADD":          10052,
+		"ROUTE_CODE_EQUIP_UPDATE":       10053,
 	}
 )
 
@@ -1052,30 +1052,30 @@ func (x *SkillEntry) GetEquipped() bool {
 	return false
 }
 
-// 装备持有（仅状态，静态属性由 gear_id 关联装备配置表）
-type GearEntry struct {
+// 装备持有（仅状态，静态属性由 equip_id 关联装备配置表）
+type EquipEntry struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	GearId        int32                  `protobuf:"varint,1,opt,name=gear_id,json=gearId,proto3" json:"gear_id,omitempty"` // 装备配置ID
-	Level         int32                  `protobuf:"varint,2,opt,name=level,proto3" json:"level,omitempty"`                 // 等级
-	Equipped      bool                   `protobuf:"varint,3,opt,name=equipped,proto3" json:"equipped,omitempty"`           // 是否穿戴
+	EquipId       int32                  `protobuf:"varint,1,opt,name=equip_id,json=equipId,proto3" json:"equip_id,omitempty"` // 装备配置ID
+	Level         int32                  `protobuf:"varint,2,opt,name=level,proto3" json:"level,omitempty"`                    // 等级
+	Equipped      bool                   `protobuf:"varint,3,opt,name=equipped,proto3" json:"equipped,omitempty"`              // 是否穿戴
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GearEntry) Reset() {
-	*x = GearEntry{}
+func (x *EquipEntry) Reset() {
+	*x = EquipEntry{}
 	mi := &file_common_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GearEntry) String() string {
+func (x *EquipEntry) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GearEntry) ProtoMessage() {}
+func (*EquipEntry) ProtoMessage() {}
 
-func (x *GearEntry) ProtoReflect() protoreflect.Message {
+func (x *EquipEntry) ProtoReflect() protoreflect.Message {
 	mi := &file_common_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1087,26 +1087,26 @@ func (x *GearEntry) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GearEntry.ProtoReflect.Descriptor instead.
-func (*GearEntry) Descriptor() ([]byte, []int) {
+// Deprecated: Use EquipEntry.ProtoReflect.Descriptor instead.
+func (*EquipEntry) Descriptor() ([]byte, []int) {
 	return file_common_proto_rawDescGZIP(), []int{9}
 }
 
-func (x *GearEntry) GetGearId() int32 {
+func (x *EquipEntry) GetEquipId() int32 {
 	if x != nil {
-		return x.GearId
+		return x.EquipId
 	}
 	return 0
 }
 
-func (x *GearEntry) GetLevel() int32 {
+func (x *EquipEntry) GetLevel() int32 {
 	if x != nil {
 		return x.Level
 	}
 	return 0
 }
 
-func (x *GearEntry) GetEquipped() bool {
+func (x *EquipEntry) GetEquipped() bool {
 	if x != nil {
 		return x.Equipped
 	}
@@ -1170,11 +1170,12 @@ const file_common_proto_rawDesc = "" +
 	"SkillEntry\x12\x19\n" +
 	"\bskill_id\x18\x01 \x01(\x05R\askillId\x12\x14\n" +
 	"\x05level\x18\x02 \x01(\x05R\x05level\x12\x1a\n" +
-	"\bequipped\x18\x03 \x01(\bR\bequipped\"V\n" +
-	"\tGearEntry\x12\x17\n" +
-	"\agear_id\x18\x01 \x01(\x05R\x06gearId\x12\x14\n" +
+	"\bequipped\x18\x03 \x01(\bR\bequipped\"Y\n" +
+	"\n" +
+	"EquipEntry\x12\x19\n" +
+	"\bequip_id\x18\x01 \x01(\x05R\aequipId\x12\x14\n" +
 	"\x05level\x18\x02 \x01(\x05R\x05level\x12\x1a\n" +
-	"\bequipped\x18\x03 \x01(\bR\bequipped*\xa6\x06\n" +
+	"\bequipped\x18\x03 \x01(\bR\bequipped*\xaa\x06\n" +
 	"\tRouteCode\x12\x1a\n" +
 	"\x16ROUTE_CODE_UNSPECIFIED\x10\x00\x12\x16\n" +
 	"\x11ROUTE_CODE_VERIFY\x10\x90N\x12\x1a\n" +
@@ -1198,11 +1199,11 @@ const file_common_proto_rawDesc = "" +
 	"\x15ROUTE_CODE_SKILL_LIST\x10\xb8N\x12\x1c\n" +
 	"\x17ROUTE_CODE_SKILL_NOTIFY\x10\xb9N\x12\x19\n" +
 	"\x14ROUTE_CODE_SKILL_ADD\x10\xbaN\x12\x1c\n" +
-	"\x17ROUTE_CODE_SKILL_UPDATE\x10\xbbN\x12\x19\n" +
-	"\x14ROUTE_CODE_GEAR_LIST\x10\xc2N\x12\x1b\n" +
-	"\x16ROUTE_CODE_GEAR_NOTIFY\x10\xc3N\x12\x18\n" +
-	"\x13ROUTE_CODE_GEAR_ADD\x10\xc4N\x12\x1b\n" +
-	"\x16ROUTE_CODE_GEAR_UPDATE\x10\xc5N*\xea\x01\n" +
+	"\x17ROUTE_CODE_SKILL_UPDATE\x10\xbbN\x12\x1a\n" +
+	"\x15ROUTE_CODE_EQUIP_LIST\x10\xc2N\x12\x1c\n" +
+	"\x17ROUTE_CODE_EQUIP_NOTIFY\x10\xc3N\x12\x19\n" +
+	"\x14ROUTE_CODE_EQUIP_ADD\x10\xc4N\x12\x1c\n" +
+	"\x17ROUTE_CODE_EQUIP_UPDATE\x10\xc5N*\xea\x01\n" +
 	"\aErrCode\x12\x0f\n" +
 	"\vERR_CODE_OK\x10\x00\x12\x1c\n" +
 	"\x17ERR_CODE_INTERNAL_ERROR\x10\xe8\a\x12\x1c\n" +
@@ -1260,7 +1261,7 @@ var file_common_proto_goTypes = []any{
 	(*HeroEntry)(nil),      // 11: pb.HeroEntry
 	(*WeaponEntry)(nil),    // 12: pb.WeaponEntry
 	(*SkillEntry)(nil),     // 13: pb.SkillEntry
-	(*GearEntry)(nil),      // 14: pb.GearEntry
+	(*EquipEntry)(nil),     // 14: pb.EquipEntry
 	nil,                    // 15: pb.Object.ValuesEntry
 }
 var file_common_proto_depIdxs = []int32{

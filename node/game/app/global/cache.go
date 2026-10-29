@@ -21,8 +21,8 @@ var (
 	PlayerSkillCache = cache.NewPlayerTableCache[model.PlayerSkill](cache.CacherConfig{Name: "player_skill"})
 	// PlayerWeaponCache 玩家武器持有（player_weapon，一玩家一行，武器 map JSON）
 	PlayerWeaponCache = cache.NewPlayerTableCache[model.PlayerWeapon](cache.CacherConfig{Name: "player_weapon"})
-	// PlayerGearCache 玩家装备持有（player_gear，一玩家一行，装备 map JSON）
-	PlayerGearCache = cache.NewPlayerTableCache[model.PlayerGear](cache.CacherConfig{Name: "player_gear"})
+	// PlayerEquipCache 玩家装备持有（player_equip，一玩家一行，装备 map JSON）
+	PlayerEquipCache = cache.NewPlayerTableCache[model.PlayerEquip](cache.CacherConfig{Name: "player_equip"})
 	// PlayerContainerCache 玩家容器（player_container，一玩家一行）
 	PlayerContainerCache = cache.NewPlayerTableCache[model.PlayerContainer](cache.CacherConfig{Name: "player_container"})
 )
@@ -36,6 +36,6 @@ func CloseCaches() {
 	PlayerHeroCache.Close()
 	PlayerSkillCache.Close()
 	PlayerWeaponCache.Close()
-	PlayerGearCache.Close()
+	PlayerEquipCache.Close()
 	PlayerContainerCache.Close()
 }

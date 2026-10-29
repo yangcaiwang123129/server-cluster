@@ -32,21 +32,21 @@ func newSnowflake(nodeID int64) (*Snowflake, error) {
 }
 
 // Next 生成下一个 ID。
-func (s *Snowflake) Next() int64 {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+func (this *Snowflake) Next() int64 {
+	this.mu.Lock()
+	defer this.mu.Unlock()
 	now := time.Now().UnixMilli() - epochMilli
-	if now == s.last {
-		s.seq = (s.seq + 1) & maxSeq
-		if s.seq == 0 {
+	if now == this.last {
+		this.seq = (this.seq + 1) & maxSeq
+		if this.seq == 0 {
 			// 序列耗尽，自旋到下一毫秒。
-			for now <= s.last {
+			for now <= this.last {
 				now = time.Now().UnixMilli() - epochMilli
 			}
 		}
 	} else {
-		s.seq = 0
+		this.seq = 0
 	}
-	s.last = now
-	return now<<(nodeBits+seqBits) | s.node<<seqBits | s.seq
+	this.last = now
+	return now<<(nodeBits+seqBits) | this.node<<seqBits | this.seq
 }

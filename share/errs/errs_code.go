@@ -1,4 +1,4 @@
-package consts
+package errs
 
 import (
 	"github.com/dobyte/due/v2/codes"

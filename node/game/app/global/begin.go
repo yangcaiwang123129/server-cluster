@@ -30,7 +30,7 @@ func Init() error {
 			&model.PlayerHero{},
 			&model.PlayerSkill{},
 			&model.PlayerWeapon{},
-			&model.PlayerGear{},
+			&model.PlayerEquip{},
 			&model.PlayerContainer{},
 		); err != nil {
 			return err

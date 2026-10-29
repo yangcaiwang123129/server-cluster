@@ -1067,28 +1067,28 @@ func (x *GmSkillUpdateReq) GetReq() *SkillUpdateReq {
 	return nil
 }
 
-// GmGearListReq 装备列表请求。
-type GmGearListReq struct {
+// GmEquipListReq 装备列表请求。
+type GmEquipListReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GmGearListReq) Reset() {
-	*x = GmGearListReq{}
+func (x *GmEquipListReq) Reset() {
+	*x = GmEquipListReq{}
 	mi := &file_internal_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GmGearListReq) String() string {
+func (x *GmEquipListReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GmGearListReq) ProtoMessage() {}
+func (*GmEquipListReq) ProtoMessage() {}
 
-func (x *GmGearListReq) ProtoReflect() protoreflect.Message {
+func (x *GmEquipListReq) ProtoReflect() protoreflect.Message {
 	mi := &file_internal_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1100,41 +1100,41 @@ func (x *GmGearListReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GmGearListReq.ProtoReflect.Descriptor instead.
-func (*GmGearListReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use GmEquipListReq.ProtoReflect.Descriptor instead.
+func (*GmEquipListReq) Descriptor() ([]byte, []int) {
 	return file_internal_proto_rawDescGZIP(), []int{20}
 }
 
-func (x *GmGearListReq) GetPlayerId() int64 {
+func (x *GmEquipListReq) GetPlayerId() int64 {
 	if x != nil {
 		return x.PlayerId
 	}
 	return 0
 }
 
-// GmGearAddReq 新增装备请求。
-type GmGearAddReq struct {
+// GmEquipAddReq 新增装备请求。
+type GmEquipAddReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
-	Req           *GearAddReq            `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数
+	Req           *EquipAddReq           `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GmGearAddReq) Reset() {
-	*x = GmGearAddReq{}
+func (x *GmEquipAddReq) Reset() {
+	*x = GmEquipAddReq{}
 	mi := &file_internal_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GmGearAddReq) String() string {
+func (x *GmEquipAddReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GmGearAddReq) ProtoMessage() {}
+func (*GmEquipAddReq) ProtoMessage() {}
 
-func (x *GmGearAddReq) ProtoReflect() protoreflect.Message {
+func (x *GmEquipAddReq) ProtoReflect() protoreflect.Message {
 	mi := &file_internal_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1146,48 +1146,48 @@ func (x *GmGearAddReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GmGearAddReq.ProtoReflect.Descriptor instead.
-func (*GmGearAddReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use GmEquipAddReq.ProtoReflect.Descriptor instead.
+func (*GmEquipAddReq) Descriptor() ([]byte, []int) {
 	return file_internal_proto_rawDescGZIP(), []int{21}
 }
 
-func (x *GmGearAddReq) GetPlayerId() int64 {
+func (x *GmEquipAddReq) GetPlayerId() int64 {
 	if x != nil {
 		return x.PlayerId
 	}
 	return 0
 }
 
-func (x *GmGearAddReq) GetReq() *GearAddReq {
+func (x *GmEquipAddReq) GetReq() *EquipAddReq {
 	if x != nil {
 		return x.Req
 	}
 	return nil
 }
 
-// GmGearUpdateReq 更新装备请求。
-type GmGearUpdateReq struct {
+// GmEquipUpdateReq 更新装备请求。
+type GmEquipUpdateReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
-	Req           *GearUpdateReq         `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数
+	Req           *EquipUpdateReq        `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GmGearUpdateReq) Reset() {
-	*x = GmGearUpdateReq{}
+func (x *GmEquipUpdateReq) Reset() {
+	*x = GmEquipUpdateReq{}
 	mi := &file_internal_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GmGearUpdateReq) String() string {
+func (x *GmEquipUpdateReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GmGearUpdateReq) ProtoMessage() {}
+func (*GmEquipUpdateReq) ProtoMessage() {}
 
-func (x *GmGearUpdateReq) ProtoReflect() protoreflect.Message {
+func (x *GmEquipUpdateReq) ProtoReflect() protoreflect.Message {
 	mi := &file_internal_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1199,19 +1199,19 @@ func (x *GmGearUpdateReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GmGearUpdateReq.ProtoReflect.Descriptor instead.
-func (*GmGearUpdateReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use GmEquipUpdateReq.ProtoReflect.Descriptor instead.
+func (*GmEquipUpdateReq) Descriptor() ([]byte, []int) {
 	return file_internal_proto_rawDescGZIP(), []int{22}
 }
 
-func (x *GmGearUpdateReq) GetPlayerId() int64 {
+func (x *GmEquipUpdateReq) GetPlayerId() int64 {
 	if x != nil {
 		return x.PlayerId
 	}
 	return 0
 }
 
-func (x *GmGearUpdateReq) GetReq() *GearUpdateReq {
+func (x *GmEquipUpdateReq) GetReq() *EquipUpdateReq {
 	if x != nil {
 		return x.Req
 	}
@@ -1222,8 +1222,7 @@ var File_internal_proto protoreflect.FileDescriptor
 
 const file_internal_proto_rawDesc = "" +
 	"\n" +
-	"\x0einternal.proto\x12\binternal\x1a\x0fcontainer.proto\x1a\n" +
-	"gear.proto\x1a\n" +
+	"\x0einternal.proto\x12\binternal\x1a\x0fcontainer.proto\x1a\vequip.proto\x1a\n" +
 	"hero.proto\x1a\vskill.proto\x1a\fweapon.proto\"c\n" +
 	"\fOnlinePlayer\x12\x1b\n" +
 	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12\x1d\n" +
@@ -1285,15 +1284,15 @@ const file_internal_proto_rawDesc = "" +
 	"\x03req\x18\x02 \x01(\v2\x0f.pb.SkillAddReqR\x03req\"U\n" +
 	"\x10GmSkillUpdateReq\x12\x1b\n" +
 	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12$\n" +
-	"\x03req\x18\x02 \x01(\v2\x12.pb.SkillUpdateReqR\x03req\",\n" +
-	"\rGmGearListReq\x12\x1b\n" +
-	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\"M\n" +
-	"\fGmGearAddReq\x12\x1b\n" +
-	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12 \n" +
-	"\x03req\x18\x02 \x01(\v2\x0e.pb.GearAddReqR\x03req\"S\n" +
-	"\x0fGmGearUpdateReq\x12\x1b\n" +
-	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12#\n" +
-	"\x03req\x18\x02 \x01(\v2\x11.pb.GearUpdateReqR\x03req2\x9d\n" +
+	"\x03req\x18\x02 \x01(\v2\x12.pb.SkillUpdateReqR\x03req\"-\n" +
+	"\x0eGmEquipListReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\"O\n" +
+	"\rGmEquipAddReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12!\n" +
+	"\x03req\x18\x02 \x01(\v2\x0f.pb.EquipAddReqR\x03req\"U\n" +
+	"\x10GmEquipUpdateReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12$\n" +
+	"\x03req\x18\x02 \x01(\v2\x12.pb.EquipUpdateReqR\x03req2\xa6\n" +
 	"\n" +
 	"\x10GameAdminService\x12Q\n" +
 	"\x10GetOnlinePlayers\x12\x1d.internal.GetOnlinePlayersReq\x1a\x1e.internal.GetOnlinePlayersResp\x12?\n" +
@@ -1315,11 +1314,10 @@ const file_internal_proto_rawDesc = "" +
 	"\fWeaponUpdate\x12\x1b.internal.GmWeaponUpdateReq\x1a\x14.pb.WeaponUpdateResp\x128\n" +
 	"\tSkillList\x12\x18.internal.GmSkillListReq\x1a\x11.pb.SkillListResp\x125\n" +
 	"\bSkillAdd\x12\x17.internal.GmSkillAddReq\x1a\x10.pb.SkillAddResp\x12>\n" +
-	"\vSkillUpdate\x12\x1a.internal.GmSkillUpdateReq\x1a\x13.pb.SkillUpdateResp\x125\n" +
-	"\bGearList\x12\x17.internal.GmGearListReq\x1a\x10.pb.GearListResp\x122\n" +
-	"\aGearAdd\x12\x16.internal.GmGearAddReq\x1a\x0f.pb.GearAddResp\x12;\n" +
-	"\n" +
-	"GearUpdate\x12\x19.internal.GmGearUpdateReq\x1a\x12.pb.GearUpdateRespB\x19Z\x17server-cluster/share/pbb\x06proto3"
+	"\vSkillUpdate\x12\x1a.internal.GmSkillUpdateReq\x1a\x13.pb.SkillUpdateResp\x128\n" +
+	"\tEquipList\x12\x18.internal.GmEquipListReq\x1a\x11.pb.EquipListResp\x125\n" +
+	"\bEquipAdd\x12\x17.internal.GmEquipAddReq\x1a\x10.pb.EquipAddResp\x12>\n" +
+	"\vEquipUpdate\x12\x1a.internal.GmEquipUpdateReq\x1a\x13.pb.EquipUpdateRespB\x19Z\x17server-cluster/share/pbb\x06proto3"
 
 var (
 	file_internal_proto_rawDescOnce sync.Once
@@ -1355,9 +1353,9 @@ var file_internal_proto_goTypes = []any{
 	(*GmSkillListReq)(nil),         // 17: internal.GmSkillListReq
 	(*GmSkillAddReq)(nil),          // 18: internal.GmSkillAddReq
 	(*GmSkillUpdateReq)(nil),       // 19: internal.GmSkillUpdateReq
-	(*GmGearListReq)(nil),          // 20: internal.GmGearListReq
-	(*GmGearAddReq)(nil),           // 21: internal.GmGearAddReq
-	(*GmGearUpdateReq)(nil),        // 22: internal.GmGearUpdateReq
+	(*GmEquipListReq)(nil),         // 20: internal.GmEquipListReq
+	(*GmEquipAddReq)(nil),          // 21: internal.GmEquipAddReq
+	(*GmEquipUpdateReq)(nil),       // 22: internal.GmEquipUpdateReq
 	(*ContainerListReq)(nil),       // 23: pb.ContainerListReq
 	(*ContainerMoveReq)(nil),       // 24: pb.ContainerMoveReq
 	(*ContainerRotateReq)(nil),     // 25: pb.ContainerRotateReq
@@ -1369,8 +1367,8 @@ var file_internal_proto_goTypes = []any{
 	(*WeaponUpdateReq)(nil),        // 31: pb.WeaponUpdateReq
 	(*SkillAddReq)(nil),            // 32: pb.SkillAddReq
 	(*SkillUpdateReq)(nil),         // 33: pb.SkillUpdateReq
-	(*GearAddReq)(nil),             // 34: pb.GearAddReq
-	(*GearUpdateReq)(nil),          // 35: pb.GearUpdateReq
+	(*EquipAddReq)(nil),            // 34: pb.EquipAddReq
+	(*EquipUpdateReq)(nil),         // 35: pb.EquipUpdateReq
 	(*ContainerListResp)(nil),      // 36: pb.ContainerListResp
 	(*ContainerMoveResp)(nil),      // 37: pb.ContainerMoveResp
 	(*ContainerRotateResp)(nil),    // 38: pb.ContainerRotateResp
@@ -1385,9 +1383,9 @@ var file_internal_proto_goTypes = []any{
 	(*SkillListResp)(nil),          // 47: pb.SkillListResp
 	(*SkillAddResp)(nil),           // 48: pb.SkillAddResp
 	(*SkillUpdateResp)(nil),        // 49: pb.SkillUpdateResp
-	(*GearListResp)(nil),           // 50: pb.GearListResp
-	(*GearAddResp)(nil),            // 51: pb.GearAddResp
-	(*GearUpdateResp)(nil),         // 52: pb.GearUpdateResp
+	(*EquipListResp)(nil),          // 50: pb.EquipListResp
+	(*EquipAddResp)(nil),           // 51: pb.EquipAddResp
+	(*EquipUpdateResp)(nil),        // 52: pb.EquipUpdateResp
 }
 var file_internal_proto_depIdxs = []int32{
 	0,  // 0: internal.GetOnlinePlayersResp.players:type_name -> internal.OnlinePlayer
@@ -1402,8 +1400,8 @@ var file_internal_proto_depIdxs = []int32{
 	31, // 9: internal.GmWeaponUpdateReq.req:type_name -> pb.WeaponUpdateReq
 	32, // 10: internal.GmSkillAddReq.req:type_name -> pb.SkillAddReq
 	33, // 11: internal.GmSkillUpdateReq.req:type_name -> pb.SkillUpdateReq
-	34, // 12: internal.GmGearAddReq.req:type_name -> pb.GearAddReq
-	35, // 13: internal.GmGearUpdateReq.req:type_name -> pb.GearUpdateReq
+	34, // 12: internal.GmEquipAddReq.req:type_name -> pb.EquipAddReq
+	35, // 13: internal.GmEquipUpdateReq.req:type_name -> pb.EquipUpdateReq
 	1,  // 14: internal.GameAdminService.GetOnlinePlayers:input_type -> internal.GetOnlinePlayersReq
 	3,  // 15: internal.GameAdminService.KickPlayer:input_type -> internal.KickPlayerReq
 	5,  // 16: internal.GameAdminService.ContainerList:input_type -> internal.GmContainerListReq
@@ -1421,9 +1419,9 @@ var file_internal_proto_depIdxs = []int32{
 	17, // 28: internal.GameAdminService.SkillList:input_type -> internal.GmSkillListReq
 	18, // 29: internal.GameAdminService.SkillAdd:input_type -> internal.GmSkillAddReq
 	19, // 30: internal.GameAdminService.SkillUpdate:input_type -> internal.GmSkillUpdateReq
-	20, // 31: internal.GameAdminService.GearList:input_type -> internal.GmGearListReq
-	21, // 32: internal.GameAdminService.GearAdd:input_type -> internal.GmGearAddReq
-	22, // 33: internal.GameAdminService.GearUpdate:input_type -> internal.GmGearUpdateReq
+	20, // 31: internal.GameAdminService.EquipList:input_type -> internal.GmEquipListReq
+	21, // 32: internal.GameAdminService.EquipAdd:input_type -> internal.GmEquipAddReq
+	22, // 33: internal.GameAdminService.EquipUpdate:input_type -> internal.GmEquipUpdateReq
 	2,  // 34: internal.GameAdminService.GetOnlinePlayers:output_type -> internal.GetOnlinePlayersResp
 	4,  // 35: internal.GameAdminService.KickPlayer:output_type -> internal.KickPlayerResp
 	36, // 36: internal.GameAdminService.ContainerList:output_type -> pb.ContainerListResp
@@ -1441,9 +1439,9 @@ var file_internal_proto_depIdxs = []int32{
 	47, // 48: internal.GameAdminService.SkillList:output_type -> pb.SkillListResp
 	48, // 49: internal.GameAdminService.SkillAdd:output_type -> pb.SkillAddResp
 	49, // 50: internal.GameAdminService.SkillUpdate:output_type -> pb.SkillUpdateResp
-	50, // 51: internal.GameAdminService.GearList:output_type -> pb.GearListResp
-	51, // 52: internal.GameAdminService.GearAdd:output_type -> pb.GearAddResp
-	52, // 53: internal.GameAdminService.GearUpdate:output_type -> pb.GearUpdateResp
+	50, // 51: internal.GameAdminService.EquipList:output_type -> pb.EquipListResp
+	51, // 52: internal.GameAdminService.EquipAdd:output_type -> pb.EquipAddResp
+	52, // 53: internal.GameAdminService.EquipUpdate:output_type -> pb.EquipUpdateResp
 	34, // [34:54] is the sub-list for method output_type
 	14, // [14:34] is the sub-list for method input_type
 	14, // [14:14] is the sub-list for extension type_name
@@ -1457,7 +1455,7 @@ func file_internal_proto_init() {
 		return
 	}
 	file_container_proto_init()
-	file_gear_proto_init()
+	file_equip_proto_init()
 	file_hero_proto_init()
 	file_skill_proto_init()
 	file_weapon_proto_init()

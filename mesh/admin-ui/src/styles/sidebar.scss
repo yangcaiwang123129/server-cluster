@@ -66,6 +66,9 @@
 
     .svg-icon {
       margin-right: 16px;
+      width: 18px;
+      height: 18px;
+      transition: color .2s ease, transform .2s ease;
     }
 
     // A row is a flex container. The icon used to shrink with everything else,
@@ -136,6 +139,7 @@
     // them transparent, which shows the scrollbar track through.
     .el-menu-item {
       background-color: var(--rail-bg) !important;
+      position: relative;
 
       &:hover {
         background-color: var(--rail-hover) !important;
@@ -144,6 +148,35 @@
       &.is-active {
         background-color: var(--rail-active-bg) !important;
         color: var(--rail-active-text) !important;
+        // 左侧 3px 主色竖条作为 active 视觉锚点，不影响布局。
+        &::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 10px;
+          bottom: 10px;
+          width: 3px;
+          border-radius: 0 3px 3px 0;
+          background: var(--ga-brand);
+        }
+        // active 时 icon 微放大 + 变主色，强化"这个模块正在工作"的感知。
+        .svg-icon {
+          color: var(--ga-brand);
+          transform: scale(1.08);
+        }
+      }
+
+      // hover 时左边缘一条 2px 半透明主色指示条，跟 active 竖条同位置但更细。
+      &:not(.is-active):hover::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 14px;
+        bottom: 14px;
+        width: 2px;
+        border-radius: 0 2px 2px 0;
+        background: var(--ga-brand);
+        opacity: 0.45;
       }
     }
 
@@ -153,6 +186,7 @@
       background-color: var(--rail-bg-sub) !important;
       color: var(--rail-text) !important;
       min-width: $sideBarWidth !important;
+      position: relative;
 
       &:hover {
         background-color: var(--rail-hover) !important;
@@ -161,6 +195,32 @@
       &.is-active {
         background-color: var(--rail-active-bg) !important;
         color: var(--rail-active-text) !important;
+        &::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 10px;
+          bottom: 10px;
+          width: 3px;
+          border-radius: 0 3px 3px 0;
+          background: var(--ga-brand);
+        }
+        .svg-icon {
+          color: var(--ga-brand);
+          transform: scale(1.08);
+        }
+      }
+
+      &:not(.is-active):hover::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 14px;
+        bottom: 14px;
+        width: 2px;
+        border-radius: 0 2px 2px 0;
+        background: var(--ga-brand);
+        opacity: 0.4;
       }
     }
 
@@ -188,6 +248,9 @@
     .is-active > .el-sub-menu__title,
     .is-active > .el-submenu__title {
       color: var(--rail-active-text) !important;
+      .svg-icon {
+        color: var(--ga-brand);
+      }
     }
   }
 

@@ -2,6 +2,8 @@
 package handler
 
 import (
+	"server-cluster/internal/router"
+
 	"github.com/dobyte/due/v2/cluster/node"
 
 	"server-cluster/node/game/app/logic"
@@ -10,11 +12,11 @@ import (
 
 // init 注册容器路由（业务在玩家 actor 内串行执行）。
 func init() {
-	onActor(pb.RouteCode_ROUTE_CODE_CONTAINER_LIST, handleContainerList)
-	onActor(pb.RouteCode_ROUTE_CODE_CONTAINER_MOVE, handleContainerMove)
-	onActor(pb.RouteCode_ROUTE_CODE_CONTAINER_ROTATE, handleContainerRotate)
-	onActor(pb.RouteCode_ROUTE_CODE_CONTAINER_SORT, handleSortContainer)
-	onActor(pb.RouteCode_ROUTE_CODE_CONTAINER_TRANSFER, handleContainerTransfer)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_CONTAINER_LIST, handleContainerList)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_CONTAINER_MOVE, handleContainerMove)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_CONTAINER_ROTATE, handleContainerRotate)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_CONTAINER_SORT, handleSortContainer)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_CONTAINER_TRANSFER, handleContainerTransfer)
 }
 
 // handleContainerList 容器列表。

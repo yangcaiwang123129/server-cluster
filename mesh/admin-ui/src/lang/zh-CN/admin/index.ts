@@ -11,7 +11,7 @@ import gameContainer from './game-container'
 import gameHero from './game-hero'
 import gameWeapon from './game-weapon'
 import gameSkill from './game-skill'
-import gameGear from './game-gear'
+import gameEquip from './game-equip'
 import simulator from './simulator'
 import clientVersion from './client-version'
 
@@ -39,7 +39,7 @@ export default {
   gameHero,
   gameWeapon,
   gameSkill,
-  gameGear,
+  gameEquip,
   simulator,
   clientVersion
 }

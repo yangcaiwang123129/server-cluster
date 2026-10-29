@@ -1,5 +1,5 @@
 /**
- * GM gear page: list/add/update a player's gear.
+ * GM equip page: list/add/update a player's equip.
  * Menu title comes from the database, not from here.
  */
 export default {
@@ -14,7 +14,7 @@ export default {
   addOk: '已新增',
   editTitle: '更新装备',
   updateOk: '已更新',
-  gearId: '装备ID',
+  equipId: '装备ID',
   name: '装备',
   desc: '描述',
   pickPlaceholder: '按名称或ID搜索',

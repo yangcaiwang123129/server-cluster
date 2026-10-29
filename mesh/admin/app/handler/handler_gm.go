@@ -48,9 +48,9 @@ func RegisterGm(router http.Router) {
 	groupRouter.Put("/game/skill", handleGmSkillUpdate)
 
 	// 装备
-	groupRouter.Get("/game/gear", handleGmGearList)
-	groupRouter.Post("/game/gear", handleGmGearAdd)
-	groupRouter.Put("/game/gear", handleGmGearUpdate)
+	groupRouter.Get("/game/equip", handleGmEquipList)
+	groupRouter.Post("/game/equip", handleGmEquipAdd)
+	groupRouter.Put("/game/equip", handleGmEquipUpdate)
 }
 
 // ══════════════════════════ 配置目录 ══════════════════════════
@@ -59,7 +59,7 @@ func RegisterGm(router http.Router) {
 // @Summary GM 配置目录
 // @Tags gm
 // @Produce json
-// @Param type query string true "类型 hero|weapon|skill|gear"
+// @Param type query string true "类型 hero|weapon|skill|equip"
 // @Param keyword query string false "按名称或ID过滤"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/game/catalog [get]
@@ -372,57 +372,57 @@ func handleGmSkillUpdate(ctx http.Context) error {
 
 // ══════════════════════════ 装备 ══════════════════════════
 
-// handleGmGearList 装备列表。
+// handleGmEquipList 装备列表。
 // @Summary GM 装备列表
 // @Tags gm
 // @Produce json
 // @Param playerId query int true "玩家ID"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
-// @Router /api/v1/game/gear [get]
-func handleGmGearList(ctx http.Context) error {
+// @Router /api/v1/game/equip [get]
+func handleGmEquipList(ctx http.Context) error {
 	req := dto.GmPlayerReq{PlayerID: queryPlayerID(ctx)}
 	if req.PlayerID <= 0 {
 		return errs.Fail(ctx, 400, "请求参数错误")
 	}
-	list, err := logic.GmGear().GearList(req)
+	list, err := logic.GmEquip().EquipList(req)
 	if err != nil {
 		return errs.FailErr(ctx, err)
 	}
 	return errs.OK(ctx, list)
 }
 
-// handleGmGearAdd 新增装备。
+// handleGmEquipAdd 新增装备。
 // @Summary GM 新增装备
 // @Tags gm
 // @Produce json
-// @Param body body dto.GmGearAddReq true "新增参数"
+// @Param body body dto.GmEquipAddReq true "新增参数"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
-// @Router /api/v1/game/gear [post]
-func handleGmGearAdd(ctx http.Context) error {
-	var req dto.GmGearAddReq
-	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.GearID <= 0 {
+// @Router /api/v1/game/equip [post]
+func handleGmEquipAdd(ctx http.Context) error {
+	var req dto.GmEquipAddReq
+	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.EquipID <= 0 {
 		return errs.Fail(ctx, 400, "请求参数错误")
 	}
-	entry, err := logic.GmGear().GearAdd(req)
+	entry, err := logic.GmEquip().EquipAdd(req)
 	if err != nil {
 		return errs.FailErr(ctx, err)
 	}
 	return errs.OK(ctx, entry)
 }
 
-// handleGmGearUpdate 更新装备。
+// handleGmEquipUpdate 更新装备。
 // @Summary GM 更新装备
 // @Tags gm
 // @Produce json
-// @Param body body dto.GmGearUpdateReq true "更新参数"
+// @Param body body dto.GmEquipUpdateReq true "更新参数"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
-// @Router /api/v1/game/gear [put]
-func handleGmGearUpdate(ctx http.Context) error {
-	var req dto.GmGearUpdateReq
-	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.GearID <= 0 {
+// @Router /api/v1/game/equip [put]
+func handleGmEquipUpdate(ctx http.Context) error {
+	var req dto.GmEquipUpdateReq
+	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.EquipID <= 0 {
 		return errs.Fail(ctx, 400, "请求参数错误")
 	}
-	entry, err := logic.GmGear().GearUpdate(req)
+	entry, err := logic.GmEquip().EquipUpdate(req)
 	if err != nil {
 		return errs.FailErr(ctx, err)
 	}

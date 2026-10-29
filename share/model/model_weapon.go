@@ -18,9 +18,9 @@ type WeaponInfo struct {
 // PlayerWeapon 玩家武器持有（1:1 行，多武器以 JSON 对象存储，key=武器ID），对应 player_weapon 表。
 // 注意：Weapons 由 SafeMap 加锁保护，修改请走 Update/UpdateAll，勿直接改 Snapshot 返回值。
 type PlayerWeapon struct {
-	PlayerID        int64                            `gorm:"column:player_id;type:bigint;not null;primaryKey;comment:玩家ID" json:"player_id"`
-	Weapons         *util.SafeMap[int32, WeaponInfo] `gorm:"column:weapons;type:json;comment:武器列表(JSON对象,key=武器ID)" json:"weapons"`
-	PlayerTableBase `gorm:"embedded"`
+	PlayerID  int64                            `gorm:"column:player_id;type:bigint;not null;primaryKey;comment:玩家ID" json:"player_id"`
+	Weapons   *util.SafeMap[int32, WeaponInfo] `gorm:"column:weapons;type:json;comment:武器列表(JSON对象,key=武器ID)" json:"weapons"`
+	TableBase `gorm:"embedded"`
 }
 
 func (this *PlayerWeapon) Marshal() ([]byte, error)    { return json.Marshal(this) }

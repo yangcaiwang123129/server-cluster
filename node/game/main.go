@@ -2,6 +2,7 @@
 package main
 
 import (
+	"server-cluster/internal/router"
 	"server-cluster/node/game/app/service"
 	"server-cluster/share/pb"
 
@@ -15,7 +16,6 @@ import (
 	"server-cluster/internal/singleinstance"
 	"server-cluster/internal/svc"
 	"server-cluster/node/game/app/global"
-	"server-cluster/node/game/app/handler"
 )
 
 func main() {
@@ -42,7 +42,7 @@ func main() {
 	// 注入组件代理（服务间 RPC 用）
 	svc.SetNodeProxy(component.Proxy())
 	// 注册客户端路由（含玩家 actor 业务路由）
-	handler.Register(component.Proxy())
+	router.Register(component.Proxy())
 	// 注册服务间 RPC provider
 	component.Proxy().AddServiceProvider(pb.GameAdminService_ServiceDesc.ServiceName, &pb.GameAdminService_ServiceDesc, &service.GmProvider{})
 	// 添加节点组件

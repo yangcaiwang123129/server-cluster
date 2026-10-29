@@ -8,7 +8,6 @@ import (
 	"gorm.io/gorm"
 
 	"server-cluster/node/game/app/global"
-	"server-cluster/share/consts"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
@@ -69,7 +68,7 @@ func (this *weaponLogic) WeaponAdd(ctx context.Context, playerID int64, req *pb.
 
 	w := model.WeaponInfo{WeaponID: req.GetWeaponId()}
 	if !row.AddWeapon(w) {
-		return nil, errs.WithMessage(consts.CodeInvalidParams, "武器已拥有")
+		return nil, errs.WithMessage(errs.CodeInvalidParams, "武器已拥有")
 	}
 
 	global.PlayerWeaponCache.Set(playerID, row)
@@ -90,7 +89,7 @@ func (this *weaponLogic) WeaponUpdate(ctx context.Context, playerID int64, req *
 		Equipped:   req.GetEquipped(),
 	}
 	if !row.UpdateWeapon(w) {
-		return nil, errs.WithMessage(consts.CodeInvalidParams, "武器未拥有")
+		return nil, errs.WithMessage(errs.CodeInvalidParams, "武器未拥有")
 	}
 
 	global.PlayerWeaponCache.Set(playerID, row)

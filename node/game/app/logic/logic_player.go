@@ -40,7 +40,7 @@ func init() {
 // moduleLogics 持有玩家数据的模块，按进入/离开的统一顺序驱动。
 // 延迟获取单例：各模块的 init 注册顺序不确定，不能在包初始化阶段调用。
 func moduleLogics() []global.ModuleLogic {
-	return []global.ModuleLogic{Container(), Hero(), Skill(), Weapon(), Gear()}
+	return []global.ModuleLogic{Container(), Hero(), Skill(), Weapon(), Equip()}
 }
 
 // PlayerLogic 获取玩家模块业务单例。

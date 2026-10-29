@@ -141,7 +141,7 @@ main ──> app.Init(装配) ──> logic ──> repo ──> svc(DB/Redis �
 ## 协议与模型约定
 
 - **wire 消息**只在 `share/proto` 定义（生成 `share/pb`）：请求 `XxxReq`、响应 `XxxResp`、服务端推送 `XxxNotify`。
-- **路由号段**：1xxx 系统预留（1001 心跳）、2xxx game、3xxx battle、4xxx social；各号段 x9xx 为推送位（1901/3901/4901）。路由号与错误码以 `common.proto` 的枚举（RouteCode/ErrCode）为唯一定义点（客户端同用）；Go 侧直接使用 pb 枚举——handler 注册路由 `int32(pb.RouteCode_...)`，错误码在 `share/consts/consts_code.go` 由 pb 派生。新增时只改 proto 再执行 `deploy\scripts\gen-proto.bat`。
+- **路由号段**：1xxx 系统预留（1001 心跳）、2xxx game、3xxx battle、4xxx social；各号段 x9xx 为推送位（1901/3901/4901）。路由号与错误码以 `common.proto` 的枚举（RouteCode/ErrCode）为唯一定义点（客户端同用）；Go 侧直接使用 pb 枚举——handler 注册路由 `int32(pb.RouteCode_...)`，错误码在 `share/errs/errs_code.go` 由 pb 派生。新增时只改 proto 再执行 `deploy\scripts\gen-proto.bat`。
 - **DTO / 模型分工**：`share/dto` = HTTP 出入参；`share/model` = 表模型与业务模型。
 - **模型规范**：所有模型实现 `model.Serializable`（`Marshal/Unmarshal` + gorm `Scan/Value`，一行调用 `ScanJSON/ValueJSON`）；表模型再带 gorm tag 与 `TableName()`（即 `model.Model`），表名统一引用 `share/enum.TableXxx` 枚举。整包 JSON 落库的模型（如背包）配一个 Row 类型（`BackpackRow`）做 gorm 表行。
 - **自动建表**：服务启动时在 `app.Init` 里对本服务用到的表执行 `db.AutoMigrate`（gorm AutoMigrate 封装，只增不删；默认实例 dsn 留空则跳过）。

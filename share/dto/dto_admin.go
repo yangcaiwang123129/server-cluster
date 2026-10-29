@@ -193,9 +193,9 @@ type GmSkillUpdateReq struct {
 
 // ========== 装备（GM） ==========
 
-// GmGearEntry GM 装备持有状态（含配置展示信息）。
-type GmGearEntry struct {
-	GearID   int32  `json:"gearId"`   // 装备配置ID
+// GmEquipEntry GM 装备持有状态（含配置展示信息）。
+type GmEquipEntry struct {
+	EquipID   int32  `json:"equipId"`   // 装备配置ID
 	Level    int32  `json:"level"`    // 等级
 	Equipped bool   `json:"equipped"` // 是否穿戴
 	Name     string `json:"name"`     // 装备名称
@@ -203,16 +203,16 @@ type GmGearEntry struct {
 	Desc     string `json:"desc"`     // 描述
 }
 
-// GmGearAddReq 新增装备请求。
-type GmGearAddReq struct {
+// GmEquipAddReq 新增装备请求。
+type GmEquipAddReq struct {
 	PlayerID int64 `json:"playerId"` // 玩家ID
-	GearID   int32 `json:"gearId"`   // 装备配置ID
+	EquipID   int32 `json:"equipId"`   // 装备配置ID
 }
 
-// GmGearUpdateReq 更新装备请求。
-type GmGearUpdateReq struct {
+// GmEquipUpdateReq 更新装备请求。
+type GmEquipUpdateReq struct {
 	PlayerID int64 `json:"playerId"` // 玩家ID
-	GearID   int32 `json:"gearId"`   // 装备配置ID
+	EquipID   int32 `json:"equipId"`   // 装备配置ID
 	Level    int32 `json:"level"`    // 等级
 	Equipped bool  `json:"equipped"` // 是否穿戴
 }

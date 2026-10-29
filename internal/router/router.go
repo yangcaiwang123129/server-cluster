@@ -1,4 +1,4 @@
-package handler
+package router
 
 import (
 	"github.com/dobyte/due/v2/cluster"
@@ -19,18 +19,18 @@ type route struct {
 // routes 全部客户端路由表：装配期由各模块的 init 追加，Serve 前由 Register 统一装配。
 var routes []route
 
-// onStateless 注册无状态路由（仅首包 VERIFY 使用）。
-func onStateless(code pb.RouteCode, handler node.RouteHandler) {
+// OnStateless 注册无状态路由（仅首包 VERIFY 使用）。
+func OnStateless(code pb.RouteCode, handler node.RouteHandler) {
 	routes = append(routes, route{code: int32(code), handler: handler, stateless: true})
 }
 
-// onNode 注册有状态、由节点直接处理的路由（ENTER/LEAVE：actor 的创建/销毁不能进 actor）。
-func onNode(code pb.RouteCode, handler node.RouteHandler) {
+// OnNode 注册有状态、由节点直接处理的路由（ENTER/LEAVE：actor 的创建/销毁不能进 actor）。
+func OnNode(code pb.RouteCode, handler node.RouteHandler) {
 	routes = append(routes, route{code: int32(code), handler: handler})
 }
 
-// onActor 注册有状态、由玩家 actor 串行处理的路由：节点侧只做转发。
-func onActor(code pb.RouteCode, handler node.RouteHandler) {
+// OnActor 注册有状态、由玩家 actor 串行处理的路由：节点侧只做转发。
+func OnActor(code pb.RouteCode, handler node.RouteHandler) {
 	routes = append(routes, route{code: int32(code), handler: handler, actor: true})
 }
 
