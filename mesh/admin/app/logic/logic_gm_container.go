@@ -142,14 +142,14 @@ func (this *gmContainerLogic) ContainerAddEntry(req dto.GmContainerAddEntryReq) 
 	callReq := &pb.GmContainerAddEntryReq{
 		PlayerId:      req.PlayerID,
 		ContainerType: req.ContainerType,
-		ItemCfgId:     req.ItemCfgID,
+		CfgId:         req.ItemCfgID,
 		Count:         req.Count,
 		GridX:         req.GridX,
 		GridY:         req.GridY,
 		Rotated:       req.Rotated,
 	}
 	resp := &pb.ContainerListResp{}
-	if err := gmCall(ctx, req.PlayerID, pb.GameAdminService_ContainerAddItem_FullMethodName, callReq, resp); err != nil {
+	if err := gmCall(ctx, req.PlayerID, pb.GameAdminService_ContainerAddEntry_FullMethodName, callReq, resp); err != nil {
 		return nil, err
 	}
 	return toGmContainerResps(req.PlayerID, resp.GetContainerEntries()), nil

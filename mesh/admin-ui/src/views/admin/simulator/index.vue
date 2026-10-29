@@ -56,11 +56,6 @@
                 />
               </el-form-item>
             </el-col>
-            <el-col :xs="24" :sm="24" :md="12">
-              <el-form-item :label="t('admin.simulator.gateAddr')">
-                <el-input v-model="form.gateAddr" :placeholder="t('admin.simulator.gateAddrPlaceholder')" clearable />
-              </el-form-item>
-            </el-col>
           </el-row>
         </el-form>
       </section>
@@ -153,8 +148,7 @@ const form = reactive({
   mode: 'login' as 'login' | 'register',
   username: '',
   password: '',
-  loginAddr: '',
-  gateAddr: ''
+  loginAddr: ''
 })
 
 const session = reactive({
@@ -287,8 +281,7 @@ const runStep = async (key: StepKey): Promise<boolean> => {
         mode: form.mode,
         username: form.username.trim(),
         password: form.password,
-        loginAddr: form.loginAddr.trim(),
-        gateAddr: form.gateAddr.trim()
+        loginAddr: form.loginAddr.trim()
       })
       const data = res.data!
       session.id = data.sessionId
@@ -309,7 +302,7 @@ const runStep = async (key: StepKey): Promise<boolean> => {
       verified.value = false
       entered.value = false
       clearSteps(['verify', 'enter', 'leave'])
-      state.request = { sessionId: session.id, gateAddr: session.gateAddr }
+      state.request = { sessionId: session.id }
       state.response = {
         gateAddr: data.gateAddr,
         remoteAddr: data.remoteAddr,
@@ -371,7 +364,6 @@ const loadOptions = async () => {
   const res = await getSimOptions().catch(() => null)
   if (!res?.data) return
   if (!form.loginAddr) form.loginAddr = res.data.loginAddr || ''
-  if (!form.gateAddr) form.gateAddr = res.data.gateAddr || ''
 }
 
 onMounted(loadOptions)

@@ -9,8 +9,6 @@ export default {
   formTitle: 'Connection',
   loginAddr: 'Login server',
   loginAddrPlaceholder: 'e.g. http://188.18.23.72:8080',
-  gateAddr: 'Gateway override',
-  gateAddrPlaceholder: 'Leave empty to use the address returned by the login server',
   username: 'Account',
   usernamePlaceholder: 'Enter the account',
   password: 'Password',

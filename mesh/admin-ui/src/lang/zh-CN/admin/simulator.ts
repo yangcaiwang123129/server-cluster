@@ -9,8 +9,6 @@ export default {
   formTitle: '连接参数',
   loginAddr: '登录服地址',
   loginAddrPlaceholder: '例如 http://188.18.23.72:8080',
-  gateAddr: '网关地址覆盖',
-  gateAddrPlaceholder: '留空则使用登录服下发的地址',
   username: '账号',
   usernamePlaceholder: '请输入账号',
   password: '密码',

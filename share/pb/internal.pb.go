@@ -309,7 +309,7 @@ func (x *GmContainerListReq) GetReq() *ContainerListReq {
 	return nil
 }
 
-// GmContainerMoveReq 容器内移动物品请求。
+// GmContainerMoveReq 容器内移动对象请求。
 type GmContainerMoveReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
@@ -362,7 +362,7 @@ func (x *GmContainerMoveReq) GetReq() *ContainerMoveReq {
 	return nil
 }
 
-// GmContainerRotateReq 容器内旋转物品请求。
+// GmContainerRotateReq 容器内旋转对象请求。
 type GmContainerRotateReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
@@ -468,7 +468,7 @@ func (x *GmContainerSortReq) GetReq() *SortContainerReq {
 	return nil
 }
 
-// GmContainerTransferReq 容器间移动物品请求。
+// GmContainerTransferReq 容器间移动对象请求。
 type GmContainerTransferReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
@@ -521,12 +521,12 @@ func (x *GmContainerTransferReq) GetReq() *ContainerTransferReq {
 	return nil
 }
 
-// GmContainerAddEntryReq 向容器放入物品请求（坐标为左上角格）。
+// GmContainerAddEntryReq 向容器放入对象请求（坐标为左上角格）。
 type GmContainerAddEntryReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"`                // 玩家ID
 	ContainerType int32                  `protobuf:"varint,2,opt,name=container_type,json=containerType,proto3" json:"container_type,omitempty"` // 容器类型：1 背包 2 仓库 3 保险箱
-	ItemCfgId     int32                  `protobuf:"varint,3,opt,name=item_cfg_id,json=itemCfgId,proto3" json:"item_cfg_id,omitempty"`           // 物品配置ID
+	CfgId         int32                  `protobuf:"varint,3,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"`                         // 对象配置ID
 	Count         int32                  `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`                                      // 堆叠数量
 	GridX         int32                  `protobuf:"varint,5,opt,name=grid_x,json=gridX,proto3" json:"grid_x,omitempty"`                         // 网格X
 	GridY         int32                  `protobuf:"varint,6,opt,name=grid_y,json=gridY,proto3" json:"grid_y,omitempty"`                         // 网格Y
@@ -560,7 +560,7 @@ func (x *GmContainerAddEntryReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GmContainerAddItemReq.ProtoReflect.Descriptor instead.
+// Deprecated: Use GmContainerAddEntryReq.ProtoReflect.Descriptor instead.
 func (*GmContainerAddEntryReq) Descriptor() ([]byte, []int) {
 	return file_internal_proto_rawDescGZIP(), []int{10}
 }
@@ -579,9 +579,9 @@ func (x *GmContainerAddEntryReq) GetContainerType() int32 {
 	return 0
 }
 
-func (x *GmContainerAddEntryReq) GetItemCfgId() int32 {
+func (x *GmContainerAddEntryReq) GetCfgId() int32 {
 	if x != nil {
-		return x.ItemCfgId
+		return x.CfgId
 	}
 	return 0
 }
@@ -1252,11 +1252,11 @@ const file_internal_proto_rawDesc = "" +
 	"\x03req\x18\x02 \x01(\v2\x14.pb.SortContainerReqR\x03req\"a\n" +
 	"\x16GmContainerTransferReq\x12\x1b\n" +
 	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12*\n" +
-	"\x03req\x18\x02 \x01(\v2\x18.pb.ContainerTransferReqR\x03req\"\xd9\x01\n" +
-	"\x15GmContainerAddItemReq\x12\x1b\n" +
+	"\x03req\x18\x02 \x01(\v2\x18.pb.ContainerTransferReqR\x03req\"\xd1\x01\n" +
+	"\x16GmContainerAddEntryReq\x12\x1b\n" +
 	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12%\n" +
-	"\x0econtainer_type\x18\x02 \x01(\x05R\rcontainerType\x12\x1e\n" +
-	"\vitem_cfg_id\x18\x03 \x01(\x05R\titemCfgId\x12\x14\n" +
+	"\x0econtainer_type\x18\x02 \x01(\x05R\rcontainerType\x12\x15\n" +
+	"\x06cfg_id\x18\x03 \x01(\x05R\x05cfgId\x12\x14\n" +
 	"\x05count\x18\x04 \x01(\x05R\x05count\x12\x15\n" +
 	"\x06grid_x\x18\x05 \x01(\x05R\x05gridX\x12\x15\n" +
 	"\x06grid_y\x18\x06 \x01(\x05R\x05gridY\x12\x18\n" +
@@ -1292,7 +1292,7 @@ const file_internal_proto_rawDesc = "" +
 	"\x03req\x18\x02 \x01(\v2\x0f.pb.EquipAddReqR\x03req\"U\n" +
 	"\x10GmEquipUpdateReq\x12\x1b\n" +
 	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12$\n" +
-	"\x03req\x18\x02 \x01(\v2\x12.pb.EquipUpdateReqR\x03req2\xa6\n" +
+	"\x03req\x18\x02 \x01(\v2\x12.pb.EquipUpdateReqR\x03req2\xa8\n" +
 	"\n" +
 	"\x10GameAdminService\x12Q\n" +
 	"\x10GetOnlinePlayers\x12\x1d.internal.GetOnlinePlayersReq\x1a\x1e.internal.GetOnlinePlayersResp\x12?\n" +
@@ -1302,8 +1302,8 @@ const file_internal_proto_rawDesc = "" +
 	"\rContainerMove\x12\x1c.internal.GmContainerMoveReq\x1a\x15.pb.ContainerMoveResp\x12J\n" +
 	"\x0fContainerRotate\x12\x1e.internal.GmContainerRotateReq\x1a\x17.pb.ContainerRotateResp\x12D\n" +
 	"\rContainerSort\x12\x1c.internal.GmContainerSortReq\x1a\x15.pb.SortContainerResp\x12P\n" +
-	"\x11ContainerTransfer\x12 .internal.GmContainerTransferReq\x1a\x19.pb.ContainerTransferResp\x12J\n" +
-	"\x10ContainerAddItem\x12\x1f.internal.GmContainerAddItemReq\x1a\x15.pb.ContainerListResp\x125\n" +
+	"\x11ContainerTransfer\x12 .internal.GmContainerTransferReq\x1a\x19.pb.ContainerTransferResp\x12L\n" +
+	"\x11ContainerAddEntry\x12 .internal.GmContainerAddEntryReq\x1a\x15.pb.ContainerListResp\x125\n" +
 	"\bHeroList\x12\x17.internal.GmHeroListReq\x1a\x10.pb.HeroListResp\x122\n" +
 	"\aHeroAdd\x12\x16.internal.GmHeroAddReq\x1a\x0f.pb.HeroAddResp\x12;\n" +
 	"\n" +
@@ -1343,7 +1343,7 @@ var file_internal_proto_goTypes = []any{
 	(*GmContainerRotateReq)(nil),   // 7: internal.GmContainerRotateReq
 	(*GmContainerSortReq)(nil),     // 8: internal.GmContainerSortReq
 	(*GmContainerTransferReq)(nil), // 9: internal.GmContainerTransferReq
-	(*GmContainerAddEntryReq)(nil), // 10: internal.GmContainerAddItemReq
+	(*GmContainerAddEntryReq)(nil), // 10: internal.GmContainerAddEntryReq
 	(*GmHeroListReq)(nil),          // 11: internal.GmHeroListReq
 	(*GmHeroAddReq)(nil),           // 12: internal.GmHeroAddReq
 	(*GmHeroUpdateReq)(nil),        // 13: internal.GmHeroUpdateReq
@@ -1409,7 +1409,7 @@ var file_internal_proto_depIdxs = []int32{
 	7,  // 18: internal.GameAdminService.ContainerRotate:input_type -> internal.GmContainerRotateReq
 	8,  // 19: internal.GameAdminService.ContainerSort:input_type -> internal.GmContainerSortReq
 	9,  // 20: internal.GameAdminService.ContainerTransfer:input_type -> internal.GmContainerTransferReq
-	10, // 21: internal.GameAdminService.ContainerAddItem:input_type -> internal.GmContainerAddItemReq
+	10, // 21: internal.GameAdminService.ContainerAddEntry:input_type -> internal.GmContainerAddEntryReq
 	11, // 22: internal.GameAdminService.HeroList:input_type -> internal.GmHeroListReq
 	12, // 23: internal.GameAdminService.HeroAdd:input_type -> internal.GmHeroAddReq
 	13, // 24: internal.GameAdminService.HeroUpdate:input_type -> internal.GmHeroUpdateReq
@@ -1429,7 +1429,7 @@ var file_internal_proto_depIdxs = []int32{
 	38, // 38: internal.GameAdminService.ContainerRotate:output_type -> pb.ContainerRotateResp
 	39, // 39: internal.GameAdminService.ContainerSort:output_type -> pb.SortContainerResp
 	40, // 40: internal.GameAdminService.ContainerTransfer:output_type -> pb.ContainerTransferResp
-	36, // 41: internal.GameAdminService.ContainerAddItem:output_type -> pb.ContainerListResp
+	36, // 41: internal.GameAdminService.ContainerAddEntry:output_type -> pb.ContainerListResp
 	41, // 42: internal.GameAdminService.HeroList:output_type -> pb.HeroListResp
 	42, // 43: internal.GameAdminService.HeroAdd:output_type -> pb.HeroAddResp
 	43, // 44: internal.GameAdminService.HeroUpdate:output_type -> pb.HeroUpdateResp

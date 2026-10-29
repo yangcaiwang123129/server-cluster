@@ -220,7 +220,6 @@ func SimOptions() dto.SimOptionsResp {
 	}
 	return dto.SimOptionsResp{
 		LoginAddr: loginAddr,
-		GateAddr:  strings.TrimSpace(etc.Get("etc.sim.gateAddr").String()),
 	}
 }
 
@@ -308,10 +307,7 @@ func SimLogin(req dto.SimLoginReq) (*dto.SimLoginResp, error) {
 		return nil, codes.NewCode(502, "登录服未返回 token 或网关地址").Err()
 	}
 
-	gateAddr := strings.TrimSpace(req.GateAddr)
-	if gateAddr == "" {
-		gateAddr = env.Data.GateAddr
-	}
+	gateAddr := env.Data.GateAddr
 
 	playerID, _ := svc.ParseToken(env.Data.Token)
 

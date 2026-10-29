@@ -12,6 +12,7 @@ import (
 	"github.com/dobyte/due/registry/etcd/v2"
 	"github.com/dobyte/due/transport/grpc/v2"
 	"github.com/dobyte/due/v2"
+	"github.com/dobyte/due/v2/etc"
 	"github.com/dobyte/due/v2/log"
 
 	"server-cluster/internal/singleinstance"
@@ -22,7 +23,8 @@ import (
 
 func main() {
 	// 单实例保护：重复启动会触发 due 日志 rotate 失败 panic，提前拦截
-	singleinstance.Check("admin")
+	// 实例标识读取 etc 中的集群实例 ID，避免写死
+	singleinstance.Check(instanceID())
 	// 创建容器
 	container := due.NewContainer()
 	// 创建服务注册发现（admin 经 etcd 发现 game 节点）
@@ -59,4 +61,12 @@ func main() {
 	container.Serve()
 	// 释放资源
 	global.Destroy()
+}
+
+// instanceID 读取 etc 中配置的集群实例 ID（cluster.mesh.id），未配置时退回服务名。
+func instanceID() string {
+	if id := etc.Get("cluster.mesh.id").String(); id != "" {
+		return id
+	}
+	return "admin"
 }

@@ -38,6 +38,9 @@
       >
         <template #default="{ row }">{{ row.desc || '-' }}</template>
       </el-table-column>
+      <el-table-column v-if="showSize" :label="t('components.gameCatalog.size')" width="100">
+        <template #default="{ row }">{{ (row.width ?? 1) }} × {{ (row.height ?? 1) }}</template>
+      </el-table-column>
       <el-table-column :label="t('common.actions')" width="90" fixed="right">
         <template #default="{ row }">
           <el-button
@@ -71,8 +74,8 @@ import type { GameCatalogEntry } from '@/types/admin'
 defineOptions({ name: 'GameCatalogList' })
 
 const props = withDefaults(defineProps<{
-  /** Luban table to read: hero/weapon/skill/equip. */
-  type: 'hero' | 'weapon' | 'skill' | 'equip'
+  /** Luban table to read: hero/weapon/skill/equip/item. */
+  type: 'hero' | 'weapon' | 'skill' | 'equip' | 'item'
   /** Icon accent for tables without a rarity concept. */
   tone?: string
   /** Permission required to add a row to the player. */
@@ -92,9 +95,10 @@ const total = ref(0)
 const page = ref(1)
 const limit = ref(20)
 
-/** Rarity only exists for heroes; skills and equips are the two with descriptions. */
-const showRarity = computed(() => props.type === 'hero')
+/** Rarity exists for heroes and items; skills/equips carry descriptions; items carry grid size. */
+const showRarity = computed(() => props.type === 'hero' || props.type === 'item')
 const showDesc = computed(() => props.type === 'skill' || props.type === 'equip')
+const showSize = computed(() => props.type === 'item')
 
 const load = async() => {
   loading.value = true

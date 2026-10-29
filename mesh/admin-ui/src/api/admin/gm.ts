@@ -7,18 +7,9 @@ import type { GameCatalogEntry, GmContainer, GmEquip, GmHero, GmSkill, GmWeapon 
  * 请求统一以 playerId 定位玩家，后台自动选择玩家所在实例。
  */
 
-/** Item catalog (Luban itemconfig), paginated — goes through the unified catalog endpoint. */
-export function listItem(query: { keyword?: string; pageIndex: number; pageSize: number }) {
-  return request<ApiResponse<PageResult<GameCatalogEntry>>>({
-    url: '/api/v1/gm/catalog',
-    method: 'get',
-    params: { type: 'item', ...query }
-  })
-}
-
-/** Game config catalog for hero/weapon/skill/equip lists (Luban tables), paginated. */
+/** Game config catalog for hero/weapon/skill/equip/item lists (Luban tables), paginated. */
 export function listGameCatalog(params: {
-  type: 'hero' | 'weapon' | 'skill' | 'equip'
+  type: 'hero' | 'weapon' | 'skill' | 'equip' | 'item'
   keyword?: string
   pageIndex: number
   pageSize: number

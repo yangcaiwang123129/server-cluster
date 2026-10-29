@@ -28,7 +28,7 @@ const (
 	GameAdminService_ContainerRotate_FullMethodName   = "/internal.GameAdminService/ContainerRotate"
 	GameAdminService_ContainerSort_FullMethodName     = "/internal.GameAdminService/ContainerSort"
 	GameAdminService_ContainerTransfer_FullMethodName = "/internal.GameAdminService/ContainerTransfer"
-	GameAdminService_ContainerAddItem_FullMethodName  = "/internal.GameAdminService/ContainerAddItem"
+	GameAdminService_ContainerAddEntry_FullMethodName = "/internal.GameAdminService/ContainerAddEntry"
 	GameAdminService_HeroList_FullMethodName          = "/internal.GameAdminService/HeroList"
 	GameAdminService_HeroAdd_FullMethodName           = "/internal.GameAdminService/HeroAdd"
 	GameAdminService_HeroUpdate_FullMethodName        = "/internal.GameAdminService/HeroUpdate"
@@ -55,16 +55,16 @@ type GameAdminServiceClient interface {
 	KickPlayer(ctx context.Context, in *KickPlayerReq, opts ...grpc.CallOption) (*KickPlayerResp, error)
 	// ContainerList 容器列表
 	ContainerList(ctx context.Context, in *GmContainerListReq, opts ...grpc.CallOption) (*ContainerListResp, error)
-	// ContainerMove 容器内移动物品
+	// ContainerMove 容器内移动对象
 	ContainerMove(ctx context.Context, in *GmContainerMoveReq, opts ...grpc.CallOption) (*ContainerMoveResp, error)
-	// ContainerRotate 容器内旋转物品
+	// ContainerRotate 容器内旋转对象
 	ContainerRotate(ctx context.Context, in *GmContainerRotateReq, opts ...grpc.CallOption) (*ContainerRotateResp, error)
 	// ContainerSort 容器一键整理
 	ContainerSort(ctx context.Context, in *GmContainerSortReq, opts ...grpc.CallOption) (*SortContainerResp, error)
-	// ContainerTransfer 容器间移动物品
+	// ContainerTransfer 容器间移动对象
 	ContainerTransfer(ctx context.Context, in *GmContainerTransferReq, opts ...grpc.CallOption) (*ContainerTransferResp, error)
-	// ContainerAddItem 向容器放入物品（返回变更后的容器）
-	ContainerAddItem(ctx context.Context, in *GmContainerAddEntryReq, opts ...grpc.CallOption) (*ContainerListResp, error)
+	// ContainerAddEntry 向容器放入对象（返回变更后的容器）
+	ContainerAddEntry(ctx context.Context, in *GmContainerAddEntryReq, opts ...grpc.CallOption) (*ContainerListResp, error)
 	// HeroList 英雄列表
 	HeroList(ctx context.Context, in *GmHeroListReq, opts ...grpc.CallOption) (*HeroListResp, error)
 	// HeroAdd 新增英雄
@@ -169,10 +169,10 @@ func (c *gameAdminServiceClient) ContainerTransfer(ctx context.Context, in *GmCo
 	return out, nil
 }
 
-func (c *gameAdminServiceClient) ContainerAddItem(ctx context.Context, in *GmContainerAddEntryReq, opts ...grpc.CallOption) (*ContainerListResp, error) {
+func (c *gameAdminServiceClient) ContainerAddEntry(ctx context.Context, in *GmContainerAddEntryReq, opts ...grpc.CallOption) (*ContainerListResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ContainerListResp)
-	err := c.cc.Invoke(ctx, GameAdminService_ContainerAddItem_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, GameAdminService_ContainerAddEntry_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -311,16 +311,16 @@ type GameAdminServiceServer interface {
 	KickPlayer(context.Context, *KickPlayerReq) (*KickPlayerResp, error)
 	// ContainerList 容器列表
 	ContainerList(context.Context, *GmContainerListReq) (*ContainerListResp, error)
-	// ContainerMove 容器内移动物品
+	// ContainerMove 容器内移动对象
 	ContainerMove(context.Context, *GmContainerMoveReq) (*ContainerMoveResp, error)
-	// ContainerRotate 容器内旋转物品
+	// ContainerRotate 容器内旋转对象
 	ContainerRotate(context.Context, *GmContainerRotateReq) (*ContainerRotateResp, error)
 	// ContainerSort 容器一键整理
 	ContainerSort(context.Context, *GmContainerSortReq) (*SortContainerResp, error)
-	// ContainerTransfer 容器间移动物品
+	// ContainerTransfer 容器间移动对象
 	ContainerTransfer(context.Context, *GmContainerTransferReq) (*ContainerTransferResp, error)
-	// ContainerAddItem 向容器放入物品（返回变更后的容器）
-	ContainerAddItem(context.Context, *GmContainerAddEntryReq) (*ContainerListResp, error)
+	// ContainerAddEntry 向容器放入对象（返回变更后的容器）
+	ContainerAddEntry(context.Context, *GmContainerAddEntryReq) (*ContainerListResp, error)
 	// HeroList 英雄列表
 	HeroList(context.Context, *GmHeroListReq) (*HeroListResp, error)
 	// HeroAdd 新增英雄
@@ -376,8 +376,8 @@ func (UnimplementedGameAdminServiceServer) ContainerSort(context.Context, *GmCon
 func (UnimplementedGameAdminServiceServer) ContainerTransfer(context.Context, *GmContainerTransferReq) (*ContainerTransferResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method ContainerTransfer not implemented")
 }
-func (UnimplementedGameAdminServiceServer) ContainerAddItem(context.Context, *GmContainerAddEntryReq) (*ContainerListResp, error) {
-	return nil, status.Error(codes.Unimplemented, "method ContainerAddItem not implemented")
+func (UnimplementedGameAdminServiceServer) ContainerAddEntry(context.Context, *GmContainerAddEntryReq) (*ContainerListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ContainerAddEntry not implemented")
 }
 func (UnimplementedGameAdminServiceServer) HeroList(context.Context, *GmHeroListReq) (*HeroListResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method HeroList not implemented")
@@ -562,20 +562,20 @@ func _GameAdminService_ContainerTransfer_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
-func _GameAdminService_ContainerAddItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _GameAdminService_ContainerAddEntry_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GmContainerAddEntryReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GameAdminServiceServer).ContainerAddItem(ctx, in)
+		return srv.(GameAdminServiceServer).ContainerAddEntry(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: GameAdminService_ContainerAddItem_FullMethodName,
+		FullMethod: GameAdminService_ContainerAddEntry_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameAdminServiceServer).ContainerAddItem(ctx, req.(*GmContainerAddEntryReq))
+		return srv.(GameAdminServiceServer).ContainerAddEntry(ctx, req.(*GmContainerAddEntryReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -832,8 +832,8 @@ var GameAdminService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _GameAdminService_ContainerTransfer_Handler,
 		},
 		{
-			MethodName: "ContainerAddItem",
-			Handler:    _GameAdminService_ContainerAddItem_Handler,
+			MethodName: "ContainerAddEntry",
+			Handler:    _GameAdminService_ContainerAddEntry_Handler,
 		},
 		{
 			MethodName: "HeroList",

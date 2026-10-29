@@ -38,12 +38,6 @@
             :loading="sorting"
             @click="sortContainer"
           >{{ $t('admin.gameContainer.sort') }}</el-button>
-          <el-button
-            v-permisaction="['game:gm:container:list']"
-            type="primary"
-            :disabled="!container.loaded"
-            @click="openAdd"
-          >{{ $t('admin.gameContainer.add') }}</el-button>
         </el-form-item>
       </el-form>
 
@@ -74,6 +68,14 @@
       </div>
       <el-empty v-else :description="$t('admin.gameContainer.emptyHint')" />
     </el-card>
+
+    <el-divider content-position="left">{{ $t('admin.gameContainer.itemCatalogTitle') }}</el-divider>
+
+    <GameCatalogList
+      type="item"
+      permission="game:gm:container:list"
+      @add="addFromCatalog"
+    />
 
     <el-dialog v-model="actionDialog.visible" :title="actionDialog.name" width="360px">
       <el-descriptions :column="1" border size="small">
@@ -150,29 +152,7 @@
     <el-dialog v-model="addDialog.visible" :title="$t('admin.gameContainer.addTitle')" width="420px">
       <el-form label-width="90px">
         <el-form-item :label="$t('admin.gameContainer.pickItem')">
-          <el-select
-            v-model="addDialog.itemCfgId"
-            filterable
-            remote
-            :remote-method="searchItems"
-            :loading="addDialog.searching"
-            :placeholder="$t('admin.gameContainer.pickItemPlaceholder')"
-            style="width: 100%"
-            @focus="searchItems('')"
-          >
-            <el-option
-              v-for="cfg in itemOptions"
-              :key="cfg.id"
-              :label="`${cfg.name} (#${cfg.id}) ${cfg.width}×${cfg.height}`"
-              :value="cfg.id!"
-            >
-              <div class="option-cell">
-                <GameItemIcon :name="cfg.name" :rarity="cfg.rarity" :size="20" />
-                <span>{{ cfg.name }}</span>
-                <span class="option-id">#{{ cfg.id }} · {{ cfg.width }}×{{ cfg.height }}</span>
-              </div>
-            </el-option>
-          </el-select>
+          <span>{{ addDialog.name }} (#{{ addDialog.itemCfgId }})</span>
         </el-form-item>
         <el-form-item :label="$t('admin.gameContainer.count')">
           <el-input-number v-model="addDialog.count" :min="1" :max="999" />
@@ -203,18 +183,18 @@ import { useI18n } from 'vue-i18n'
 
 import PageContainer from '@/components/PageContainer/index.vue'
 import GameItemIcon from '@/components/GameItemIcon/index.vue'
+import GameCatalogList from '@/components/GameCatalogList/index.vue'
 import { msgInfo, msgSuccess } from '@/utils/message'
 
 import {
   addGmContainerItem,
   listGmContainer,
-  listItem,
   moveGmContainerItem,
   rotateGmContainerItem,
   sortGmContainer,
   transferGmContainerItem
 } from '@/api/admin/gm'
-import type { GmContainer, GmContainerItem, ItemCfg } from '@/types/admin'
+import type { GameCatalogEntry, GmContainer, GmContainerItem } from '@/types/admin'
 
 // Must match the menu_name the backend serves, or keep-alive silently misses
 defineOptions({ name: 'GameContainerManage' })
@@ -284,15 +264,13 @@ const transferDialog = reactive({
 const addDialog = reactive({
   visible: false,
   loading: false,
-  searching: false,
+  name: '',
   itemCfgId: undefined as number | undefined,
   count: 1,
   gridX: 0,
   gridY: 0,
   rotated: false
 })
-
-const itemOptions = ref<ItemCfg[]>([])
 
 const gridStyle = computed(() => ({
   width: `${container.gridW * CELL_SIZE}px`,
@@ -529,22 +507,23 @@ const submitTransfer = async() => {
 
 // ── 添加物品 ─────────────────────────────────────────────────────
 
-const searchItems = async(keyword: string) => {
-  addDialog.searching = true
-  const res = await listItem({ keyword: keyword || undefined, pageIndex: 1, pageSize: 50 }).catch(() => null)
-  addDialog.searching = false
-  if (!res) return
-  itemOptions.value = res.data.list ?? []
-}
-
-const openAdd = () => {
-  addDialog.itemCfgId = undefined
+/** Bottom catalog row clicked: prefill the add dialog, grid position/count stay editable. */
+const addFromCatalog = (entry: GameCatalogEntry) => {
+  if (!playerIdOrZero()) {
+    msgInfo(t('admin.gameContainer.playerIdInvalid'))
+    return
+  }
+  if (!container.loaded) {
+    msgInfo(t('admin.gameContainer.emptyHint'))
+    return
+  }
+  addDialog.name = entry.name ?? ''
+  addDialog.itemCfgId = entry.id
   addDialog.count = 1
   addDialog.gridX = 0
   addDialog.gridY = 0
   addDialog.rotated = false
   addDialog.visible = true
-  searchItems('')
 }
 
 const submitAdd = async() => {
@@ -663,16 +642,5 @@ const submitAdd = async() => {
 .grid-item-count {
   align-self: flex-end;
   color: var(--el-text-color-secondary);
-}
-
-.option-cell {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.option-id {
-  color: var(--el-text-color-secondary);
-  font-size: 12px;
 }
 </style>

@@ -115,10 +115,10 @@ type Tables struct {
 	RoleInfo        *Table[RoleInfoCfg]        //
 	AttributeRole   *Table[AttributeRoleCfg]   //
 	AttributeWeapon *Table[AttributeWeaponCfg] //
-	AttributeEquip   *Table[AttributeEquipCfg]   //
+	AttributeEquip  *Table[AttributeEquipCfg]  //
 	AttributeSkill  *Table[AttributeSkillCfg]  //
 	Weapon          *Table[WeaponCfg]          //
-	Equip            *Table[EquipCfg]            //
+	Equip           *Table[EquipCfg]           //
 	Damage          *Table[DamageCfg]          //
 }
 

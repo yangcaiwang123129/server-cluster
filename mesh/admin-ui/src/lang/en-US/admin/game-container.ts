@@ -34,6 +34,7 @@ export default {
   add: 'Add Item',
   addTitle: 'Add Item',
   addOk: 'Item added',
+  itemCatalogTitle: 'Item catalog',
   pickItem: 'Item',
   pickItemPlaceholder: 'Search by name or ID',
   gridX: 'Grid X',

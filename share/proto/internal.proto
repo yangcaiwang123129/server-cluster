@@ -44,13 +44,13 @@ message GmContainerListReq {
   pb.ContainerListReq req = 2; // 业务参数（容器类型）
 }
 
-// GmContainerMoveReq 容器内移动物品请求。
+// GmContainerMoveReq 容器内移动对象请求。
 message GmContainerMoveReq {
   int64 player_id = 1;   // 玩家ID
   pb.ContainerMoveReq req = 2; // 业务参数
 }
 
-// GmContainerRotateReq 容器内旋转物品请求。
+// GmContainerRotateReq 容器内旋转对象请求。
 message GmContainerRotateReq {
   int64 player_id = 1;     // 玩家ID
   pb.ContainerRotateReq req = 2; // 业务参数
@@ -62,17 +62,17 @@ message GmContainerSortReq {
   pb.SortContainerReq req = 2; // 业务参数
 }
 
-// GmContainerTransferReq 容器间移动物品请求。
+// GmContainerTransferReq 容器间移动对象请求。
 message GmContainerTransferReq {
   int64 player_id = 1;       // 玩家ID
   pb.ContainerTransferReq req = 2; // 业务参数
 }
 
-// GmContainerAddItemReq 向容器放入物品请求（坐标为左上角格）。
-message GmContainerAddItemReq {
+// GmContainerAddEntryReq 向容器放入对象请求（坐标为左上角格）。
+message GmContainerAddEntryReq {
   int64 player_id = 1;      // 玩家ID
   int32 container_type = 2; // 容器类型：1 背包 2 仓库 3 保险箱
-  int32 item_cfg_id = 3;    // 物品配置ID
+  int32 cfg_id = 3;    // 对象配置ID
   int32 count = 4;          // 堆叠数量
   int32 grid_x = 5;         // 网格X
   int32 grid_y = 6;         // 网格Y
@@ -156,16 +156,16 @@ service GameAdminService {
 
   // ContainerList 容器列表
   rpc ContainerList (GmContainerListReq) returns (pb.ContainerListResp);
-  // ContainerMove 容器内移动物品
+  // ContainerMove 容器内移动对象
   rpc ContainerMove (GmContainerMoveReq) returns (pb.ContainerMoveResp);
-  // ContainerRotate 容器内旋转物品
+  // ContainerRotate 容器内旋转对象
   rpc ContainerRotate (GmContainerRotateReq) returns (pb.ContainerRotateResp);
   // ContainerSort 容器一键整理
   rpc ContainerSort (GmContainerSortReq) returns (pb.SortContainerResp);
-  // ContainerTransfer 容器间移动物品
+  // ContainerTransfer 容器间移动对象
   rpc ContainerTransfer (GmContainerTransferReq) returns (pb.ContainerTransferResp);
-  // ContainerAddItem 向容器放入物品（返回变更后的容器）
-  rpc ContainerAddItem (GmContainerAddItemReq) returns (pb.ContainerListResp);
+  // ContainerAddEntry 向容器放入对象（返回变更后的容器）
+  rpc ContainerAddEntry (GmContainerAddEntryReq) returns (pb.ContainerListResp);
 
   // HeroList 英雄列表
   rpc HeroList (GmHeroListReq) returns (pb.HeroListResp);

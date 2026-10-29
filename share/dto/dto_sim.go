@@ -5,7 +5,6 @@ import "encoding/json"
 // SimOptionsResp 客户端模拟器默认参数。
 type SimOptionsResp struct {
 	LoginAddr string `json:"loginAddr"` // 登录服地址
-	GateAddr  string `json:"gateAddr"`  // 网关地址覆盖，空则使用登录服下发的地址
 }
 
 // SimLoginReq 模拟客户端登录/注册请求。
@@ -14,7 +13,6 @@ type SimLoginReq struct {
 	Username  string `json:"username"`  // 账号
 	Password  string `json:"password"`  // 密码
 	LoginAddr string `json:"loginAddr"` // 登录服地址，空则取默认配置
-	GateAddr  string `json:"gateAddr"`  // 网关地址覆盖，空则使用登录服下发地址
 }
 
 // SimLoginResp 登录/注册结果，JSON 中的 request/response 为页面展示用的报文。

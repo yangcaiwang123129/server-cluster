@@ -34,6 +34,7 @@ export default {
   add: '添加物品',
   addTitle: '添加物品',
   addOk: '已添加',
+  itemCatalogTitle: '物品配置',
   pickItem: '选择物品',
   pickItemPlaceholder: '按名称或ID搜索',
   gridX: '网格X',

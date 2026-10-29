@@ -36,6 +36,7 @@ export default {
     name: '名称',
     rarity: '稀有度',
     desc: '描述',
+    size: '尺寸',
     add: '添加'
   },
   rightPanel: {

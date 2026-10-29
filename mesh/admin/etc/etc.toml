@@ -85,5 +85,3 @@ timezone = "Local"
 [sim]
     # 登录服地址
     loginAddr = "http://188.18.23.72:8080"
-    # 网关地址覆盖；留空则使用登录服下发的 gateAddr
-    gateAddr = ""

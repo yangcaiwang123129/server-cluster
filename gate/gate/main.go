@@ -7,13 +7,15 @@ import (
 	"github.com/dobyte/due/registry/etcd/v2"
 	"github.com/dobyte/due/v2"
 	"github.com/dobyte/due/v2/cluster/gate"
+	"github.com/dobyte/due/v2/etc"
 
 	"server-cluster/internal/singleinstance"
 )
 
 func main() {
 	// 单实例保护：重复启动会触发 due 日志 rotate 失败 panic，提前拦截
-	singleinstance.Check("gate-1")
+	// 实例标识读取 etc 中的集群实例 ID，避免写死
+	singleinstance.Check(instanceID())
 	// 创建容器
 	container := due.NewContainer()
 	// 创建网络服务器
@@ -32,4 +34,12 @@ func main() {
 	container.Add(component)
 	// 启动容器
 	container.Serve()
+}
+
+// instanceID 读取 etc 中配置的集群实例 ID（cluster.gate.id），未配置时退回服务名。
+func instanceID() string {
+	if id := etc.Get("cluster.gate.id").String(); id != "" {
+		return id
+	}
+	return "gate"
 }

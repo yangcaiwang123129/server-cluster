@@ -238,7 +238,7 @@ func (this *containerLogic) ContainerTransfer(ctx context.Context, playerID int6
 
 // ContainerAddItem 向容器放入物品（GM）：校验配置与占格后挂缓存待落库。
 func (this *containerLogic) ContainerAddItem(ctx context.Context, playerID int64, req *pb.GmContainerAddEntryReq) (*pb.ContainerListResp, error) {
-	if !tpl.T().Item.Has(req.GetItemCfgId()) {
+	if !tpl.T().Item.Has(req.GetCfgId()) {
 		return nil, errs.CodeInvalidParams.WithMessage("物品配置不存在").Err()
 	}
 
@@ -260,7 +260,7 @@ func (this *containerLogic) ContainerAddItem(ctx context.Context, playerID int64
 	// 新接口 AddItem 接收 *Item（指针化）
 	if err := c.AddEntry(&model.ItemEntry{
 		ItemID:    svc.NextID(),
-		ItemCfgID: req.GetItemCfgId(),
+		ItemCfgID: req.GetCfgId(),
 		Count:     count,
 		GridX:     req.GetGridX(),
 		GridY:     req.GetGridY(),

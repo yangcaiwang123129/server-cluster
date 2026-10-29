@@ -13,6 +13,7 @@ import (
 
 	"github.com/dobyte/due/component/http/v2"
 	"github.com/dobyte/due/v2"
+	"github.com/dobyte/due/v2/etc"
 
 	"server-cluster/mesh/login/app/global"
 
@@ -21,7 +22,8 @@ import (
 
 func main() {
 	// 单实例保护：重复启动会触发 due 日志 rotate 失败 panic，提前拦截
-	singleinstance.Check("login")
+	// 实例标识读取 etc 中的集群实例 ID，避免写死
+	singleinstance.Check(instanceID())
 	// 创建容器
 	container := due.NewContainer()
 	// 创建 HTTP 组件（监听地址、swagger 等由 etc.http.* 配置驱动）
@@ -38,4 +40,12 @@ func main() {
 	container.Serve()
 	// 释放资源
 	global.Destroy()
+}
+
+// instanceID 读取 etc 中配置的集群实例 ID（cluster.mesh.id），未配置时退回服务名。
+func instanceID() string {
+	if id := etc.Get("cluster.mesh.id").String(); id != "" {
+		return id
+	}
+	return "login"
 }

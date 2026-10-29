@@ -22,6 +22,7 @@ export default {
     name: 'Name',
     rarity: 'Rarity',
     desc: 'Description',
+    size: 'Size',
     add: 'Add'
   },
   rightPanel: {

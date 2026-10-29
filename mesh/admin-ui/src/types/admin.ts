@@ -331,12 +331,14 @@ export interface GameCatalogEntry {
   iconKey?: string
   desc?: string
   rarity?: number
+  /** Item grid size (item catalog only). */
+  width?: number
+  height?: number
 }
 
 /** 客户端模拟器默认参数。 */
 export interface SimOptions {
   loginAddr?: string
-  gateAddr?: string
 }
 
 /** 模拟客户端登录/注册参数。 */
@@ -345,7 +347,6 @@ export interface SimLoginPayload {
   username: string
   password: string
   loginAddr?: string
-  gateAddr?: string
 }
 
 /** 登录/注册结果，request/response 为展示用报文。 */

@@ -3601,10 +3601,6 @@ const docTemplate = `{
         "dto.SimLoginReq": {
             "type": "object",
             "properties": {
-                "gateAddr": {
-                    "description": "网关地址覆盖，空则使用登录服下发地址",
-                    "type": "string"
-                },
                 "loginAddr": {
                     "description": "登录服地址，空则取默认配置",
                     "type": "string"
