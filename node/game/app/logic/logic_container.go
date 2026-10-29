@@ -51,7 +51,7 @@ func containerID(playerID int64, typ int32) int64 {
 // c 参数类型 *model.ItemContainer = *model.BaseContainer[*Item]。
 func containerToEntry(playerID int64, c *model.ItemContainer) *pb.ContainerEntry {
 	meta := c.Meta()
-	items := c.Items()
+	items := c.Entries()
 	entries := make([]*pb.ItemEntry, 0, len(items))
 	for _, it := range items {
 		entries = append(entries, &pb.ItemEntry{
@@ -168,7 +168,7 @@ func (this *containerLogic) ContainerMove(ctx context.Context, playerID int64, r
 		return nil, err
 	}
 
-	if err := c.MoveItem(req.GetItemId(), req.GetToX(), req.GetToY(), req.GetRotated()); err != nil {
+	if err := c.MoveEntry(req.GetItemId(), req.GetToX(), req.GetToY(), req.GetRotated()); err != nil {
 		return nil, containerErr(err)
 	}
 
@@ -183,7 +183,7 @@ func (this *containerLogic) ContainerRotate(ctx context.Context, playerID int64,
 		return nil, err
 	}
 
-	if err := c.RotateItem(req.GetItemId()); err != nil {
+	if err := c.RotateEntry(req.GetItemId()); err != nil {
 		return nil, containerErr(err)
 	}
 
@@ -247,7 +247,7 @@ func (this *containerLogic) ContainerAddItem(ctx context.Context, playerID int64
 		return nil, err
 	}
 	// 存量脏数据缺配置时占格计算会 panic，先校验（新接口 Items() 返回 []*Item）
-	for _, it := range c.Items() {
+	for _, it := range c.Entries() {
 		if !tpl.T().Item.Has(it.ItemCfgID) {
 			return nil, errs.CodeInvalidParams.WithMessage(fmt.Sprintf("容器内物品配置缺失，物品配置ID: %d", it.ItemCfgID)).Err()
 		}
@@ -258,7 +258,7 @@ func (this *containerLogic) ContainerAddItem(ctx context.Context, playerID int64
 		count = 1
 	}
 	// 新接口 AddItem 接收 *Item（指针化）
-	if err := c.AddItem(&model.ItemEntry{
+	if err := c.AddEntry(&model.ItemEntry{
 		ItemID:    svc.NextID(),
 		ItemCfgID: req.GetItemCfgId(),
 		Count:     count,

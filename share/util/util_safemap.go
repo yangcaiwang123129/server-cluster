@@ -206,3 +206,25 @@ func (this *SafeMap[K, V]) Scan(src any) error {
 
 // GormDataType 声明 GORM 字段类型为 JSON；列定义仍可用 tag 的 `gorm:"type:json"` 覆盖。
 func (this *SafeMap[K, V]) GormDataType() string { return "json" }
+
+// AddOwned 新增一条持有数据；key 已存在返回 false。
+func AddOwned[V any](m *SafeMap[int32, V], key int32, val V) bool {
+	added := false
+	m.Update(key, func(old V, exists bool) (V, bool) {
+		if exists {
+			return old, true
+		}
+		added = true
+		return val, true
+	})
+	return added
+}
+
+// UpdateOwned 覆盖一条已持有数据；key 不存在返回 false。
+func UpdateOwned[V any](m *SafeMap[int32, V], key int32, val V) bool {
+	if !m.Has(key) {
+		return false
+	}
+	m.Set(key, val)
+	return true
+}

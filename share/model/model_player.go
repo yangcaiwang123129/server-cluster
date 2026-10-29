@@ -3,9 +3,7 @@ package model
 import (
 	"database/sql/driver"
 	"encoding/json"
-
 	"server-cluster/share/enum"
-	"server-cluster/share/util"
 )
 
 // PlayerBase 玩家账号（1:1），对应 player_base 表。
@@ -59,25 +57,3 @@ func (this *PlayerAsset) Unmarshal(data []byte) error { return json.Unmarshal(da
 func (this *PlayerAsset) Scan(src any) error          { return ScanJSON(src, this) }
 func (this PlayerAsset) Value() (driver.Value, error) { return ValueJSON(this) }
 func (PlayerAsset) TableName() string                 { return enum.TablePlayerAsset.String() }
-
-// addOwned 新增一条持有数据；key 已存在返回 false。
-func addOwned[V any](m *util.SafeMap[int32, V], key int32, val V) bool {
-	added := false
-	m.Update(key, func(old V, exists bool) (V, bool) {
-		if exists {
-			return old, true
-		}
-		added = true
-		return val, true
-	})
-	return added
-}
-
-// updateOwned 覆盖一条已持有数据；key 不存在返回 false。
-func updateOwned[V any](m *util.SafeMap[int32, V], key int32, val V) bool {
-	if !m.Has(key) {
-		return false
-	}
-	m.Set(key, val)
-	return true
-}

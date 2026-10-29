@@ -25,7 +25,6 @@ func Init() error {
 		if err = svc.AutoMigrate(inst.Gorm(),
 			&model.PlayerBase{},
 			&model.PlayerExtra{},
-			&model.PlayerProfile{},
 			&model.PlayerAsset{},
 			&model.PlayerHero{},
 			&model.PlayerSkill{},

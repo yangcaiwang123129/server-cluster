@@ -112,10 +112,9 @@ func (this *playerLogic) LeaveGame(ctx context.Context, playerID int64, req *pb.
 		_, err := mod.LeaveGame(ctx, playerID, req)
 		record("module", err)
 	}
-	// 无独立模块的玩家表：账号、核心、资料、资产
+	// 无独立模块的玩家表：账号、核心、资产
 	record("player_base", flushAndEvict(ctx, global.PlayerBaseCache, playerID))
 	record("player_core", flushAndEvict(ctx, global.PlayerCoreCache, playerID))
-	record("player_profile", flushAndEvict(ctx, global.PlayerProfileCache, playerID))
 	record("player_asset", flushAndEvict(ctx, global.PlayerAssetCache, playerID))
 
 	record("player_actor", this.PlayerDestroyActor(ctx, playerID))

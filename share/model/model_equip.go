@@ -25,10 +25,10 @@ type PlayerEquip struct {
 func (PlayerEquip) TableName() string { return enum.TablePlayerEquip.String() }
 
 // AddEquip 新增装备持有；已拥有返回 false。
-func (p *PlayerEquip) AddEquip(g EquipInfo) bool { return addOwned(p.Equips, g.EquipID, g) }
+func (p *PlayerEquip) AddEquip(g EquipInfo) bool { return util.AddOwned(p.Equips, g.EquipID, g) }
 
 // UpdateEquip 覆盖装备持有状态；未拥有返回 false。
-func (p *PlayerEquip) UpdateEquip(g EquipInfo) bool { return updateOwned(p.Equips, g.EquipID, g) }
+func (p *PlayerEquip) UpdateEquip(g EquipInfo) bool { return util.UpdateOwned(p.Equips, g.EquipID, g) }
 
 // LootItem 战斗拾取道具（对局内临时资产，结算时映射为 AssetChange；非表实体）。
 type LootItem struct {

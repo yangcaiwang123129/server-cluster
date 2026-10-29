@@ -65,40 +65,40 @@ type ItemEntry struct {
 // --- container.GridItem 接口实现（全指针接收者） ---
 
 // UID 返回物品唯一实例 ID。
-func (it *ItemEntry) UID() int64 { return it.ItemID }
+func (this *ItemEntry) ID() int64 { return this.ItemID }
 
 // CfgID 返回物品配置 ID。
-func (it *ItemEntry) CfgID() int32 { return it.ItemCfgID }
+func (this *ItemEntry) CfgID() int32 { return this.ItemCfgID }
 
 // Pos 返回容器内 rel 坐标。
-func (it *ItemEntry) Pos() (x, y int32) { return it.GridX, it.GridY }
+func (this *ItemEntry) Pos() (x, y int32) { return this.GridX, this.GridY }
 
 // IsRotated 是否旋转。
-func (it *ItemEntry) IsRotated() bool { return it.Rotated }
+func (this *ItemEntry) IsRotated() bool { return this.Rotated }
 
 // SetPos 设置容器内坐标与朝向。
-func (it *ItemEntry) SetPos(x, y int32, rotated bool) {
-	it.GridX, it.GridY, it.Rotated = x, y, rotated
+func (this *ItemEntry) SetPos(x, y int32, rotated bool) {
+	this.GridX, this.GridY, this.Rotated = x, y, rotated
 }
 
 // --- Item 专有辅助方法 ---
 
 // SizeOf 读取物品在当前朝向下的宽高；配置缺失时 panic。
-func (it *ItemEntry) SizeOf() (w, h int32) {
-	def := GetItemCfgById(it.ItemCfgID)
+func (this *ItemEntry) SizeOf() (w, h int32) {
+	def := GetItemCfgById(this.ItemCfgID)
 	if def == nil {
-		panic(fmt.Sprintf("model: missing ItemCfg for itemCfgID=%d", it.ItemCfgID))
+		panic(fmt.Sprintf("model: missing ItemCfg for itemCfgID=%d", this.ItemCfgID))
 	}
 	w, h = itemSize(def)
-	if it.Rotated {
+	if this.Rotated {
 		return h, w
 	}
 	return w, h
 }
 
 // RawSize 读取配置的原始（未旋转）占格。
-func (it *ItemEntry) RawSize() (w, h int32) {
-	def := GetItemCfgById(it.ItemCfgID)
+func (this *ItemEntry) RawSize() (w, h int32) {
+	def := GetItemCfgById(this.ItemCfgID)
 	if def == nil {
 		return 1, 1
 	}
@@ -172,10 +172,10 @@ func NewItemContainer(typ, gridW, gridH int32, globalID, ownerID int64, ownerTyp
 // PlayerContainer 玩家容器集合：一个玩家 3 个容器，每容器一列 JSON。
 // 字段类型为 *ItemContainer（= *container.BaseContainer[*ItemEntry]）。
 type PlayerContainer struct {
-	PlayerID  int64          `gorm:"column:player_id;type:bigint;not null;primaryKey;comment:玩家ID" json:"player_id"`
-	Backpack  *ItemContainer `gorm:"column:backpack;type:json;serializer:json;comment:背包(JSON)" json:"backpack"`
-	Stash     *ItemContainer `gorm:"column:stash;type:json;serializer:json;comment:仓库(JSON)" json:"stash"`
-	Secure    *ItemContainer `gorm:"column:secure;type:json;serializer:json;comment:保险箱(JSON)" json:"secure"`
+	PlayerID   int64          `gorm:"column:player_id;type:bigint;not null;primaryKey;comment:玩家ID" json:"player_id"`
+	Backpack   *ItemContainer `gorm:"column:backpack;type:json;serializer:json;comment:背包(JSON)" json:"backpack"`
+	Stash      *ItemContainer `gorm:"column:stash;type:json;serializer:json;comment:仓库(JSON)" json:"stash"`
+	Secure     *ItemContainer `gorm:"column:secure;type:json;serializer:json;comment:保险箱(JSON)" json:"secure"`
 	TableModel `gorm:"embedded"`
 }
 

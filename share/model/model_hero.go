@@ -32,7 +32,7 @@ func (this PlayerHero) Value() (driver.Value, error) { return ValueJSON(this) }
 func (PlayerHero) TableName() string                 { return enum.TablePlayerHero.String() }
 
 // AddHero 新增英雄持有；已拥有返回 false。
-func (p *PlayerHero) AddHero(h HeroInfo) bool { return addOwned(p.Heroes, h.HeroID, h) }
+func (p *PlayerHero) AddHero(h HeroInfo) bool { return util.AddOwned(p.Heroes, h.HeroID, h) }
 
 // UpdateHero 覆盖英雄持有状态；未拥有返回 false。
-func (p *PlayerHero) UpdateHero(h HeroInfo) bool { return updateOwned(p.Heroes, h.HeroID, h) }
+func (p *PlayerHero) UpdateHero(h HeroInfo) bool { return util.UpdateOwned(p.Heroes, h.HeroID, h) }

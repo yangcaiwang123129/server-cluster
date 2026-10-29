@@ -11,8 +11,6 @@ var (
 	PlayerBaseCache = cache.NewPlayerTableCache[model.PlayerBase](cache.CacherConfig{Name: "player_base"})
 	// PlayerCoreCache 玩家核心数值（player_core，一玩家一行）
 	PlayerCoreCache = cache.NewPlayerTableCache[model.PlayerExtra](cache.CacherConfig{Name: "player_core"})
-	// PlayerProfileCache 玩家展示资料（player_profile，一玩家一行）
-	PlayerProfileCache = cache.NewPlayerTableCache[model.PlayerProfile](cache.CacherConfig{Name: "player_profile"})
 	// PlayerAssetCache 玩家资产（player_asset，一玩家多行）
 	PlayerAssetCache = cache.NewPlayerRowsCache[model.PlayerAsset](cache.CacherConfig{Name: "player_asset"})
 	// PlayerHeroCache 玩家英雄持有（player_hero，一玩家一行，英雄 map JSON）
@@ -31,7 +29,6 @@ var (
 func CloseCaches() {
 	PlayerBaseCache.Close()
 	PlayerCoreCache.Close()
-	PlayerProfileCache.Close()
 	PlayerAssetCache.Close()
 	PlayerHeroCache.Close()
 	PlayerSkillCache.Close()
