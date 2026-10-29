@@ -1,4 +1,4 @@
-// Package logic 业务实现：实现 global 定义的接口；单例容器在本包，init 自注册（替代 app/wire）。
+﻿// Package logic 业务实现：实现 global 定义的接口；单例容器在本包，init 自注册（替代 app/wire）。
 package logic
 
 import (
@@ -14,7 +14,6 @@ import (
 	"server-cluster/share/singleton"
 
 	"github.com/dobyte/due/v2/etc"
-	"github.com/dobyte/due/v2/utils/xtime"
 	"github.com/dobyte/jwt"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -47,7 +46,7 @@ func (this *playerBaseLogic) PlayerRegister(ctx context.Context, req *dto.Player
 	// 检查用户名是否已存在
 	_, err := repo.Repo().FindByUsername(ctx, req.Username)
 	if err == nil {
-		return nil, errs.ErrPlayerExists
+		return nil, errs.CodePlayerExists.Err()
 	}
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
@@ -58,10 +57,9 @@ func (this *playerBaseLogic) PlayerRegister(ctx context.Context, req *dto.Player
 		return nil, err
 	}
 	m := &model.PlayerBase{
-		PlayerID:  svc.NextID(),
-		Username:  req.Username,
-		Password:  string(hash),
-		CreatedAt: xtime.Now().UnixMilli(),
+		PlayerID: svc.NextID(),
+		Username: req.Username,
+		Password: string(hash),
 	}
 	if err := repo.Repo().Save(ctx, m); err != nil {
 		return nil, err
@@ -83,7 +81,7 @@ func (this *playerBaseLogic) PlayerLogin(ctx context.Context, req *dto.PlayerLog
 	case dto.LoginTypeWechat:
 		return nil, errors.New("该登录方式暂不支持")
 	default:
-		return nil, errs.ErrInvalidParams
+		return nil, errs.CodeInvalidParams.Err()
 	}
 }
 
@@ -92,12 +90,12 @@ func (this *playerBaseLogic) loginByUsername(ctx context.Context, req *dto.Playe
 	m, err := repo.Repo().FindByUsername(ctx, req.Username)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errs.ErrPlayerNotFound
+			return nil, errs.CodePlayerNotFound.Err()
 		}
 		return nil, err
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(m.Password), []byte(req.Password)); err != nil {
-		return nil, errs.ErrPasswordWrong
+		return nil, errs.CodePasswordWrong.Err()
 	}
 	token, err := svc.JWT().GenerateToken(jwt.Payload{svc.PayloadPlayerID: m.PlayerID})
 	if err != nil {

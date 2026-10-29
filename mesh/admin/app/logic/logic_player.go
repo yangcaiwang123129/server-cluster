@@ -1,4 +1,4 @@
-package logic
+﻿package logic
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 	"server-cluster/internal/svc"
 	"server-cluster/mesh/admin/app/repo"
 	"server-cluster/share/dto"
-	"server-cluster/share/errs"
+	"github.com/dobyte/due/v2/codes"
 	"server-cluster/share/pb"
 	"server-cluster/share/singleton"
 )
@@ -123,7 +123,7 @@ func (this *playerLogic) PlayerKick(req dto.PlayerKickReq) error {
 		return err
 	}
 	if len(resp.FailedIds) > 0 {
-		return errs.NewError(int(pb.ErrCode_ERR_CODE_PLAYER_NOT_FOUND), "player is not online")
+		return codes.NewCode(int(pb.ErrCode_ERR_CODE_PLAYER_NOT_FOUND), "player is not online").Err()
 	}
 	return nil
 }

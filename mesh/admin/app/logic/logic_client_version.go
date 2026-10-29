@@ -1,4 +1,4 @@
-package logic
+﻿package logic
 
 import (
 	"strings"
@@ -6,7 +6,7 @@ import (
 	"server-cluster/mesh/admin/app/repo"
 	"server-cluster/share/consts"
 	"server-cluster/share/dto"
-	"server-cluster/share/errs"
+	"github.com/dobyte/due/v2/codes"
 	"server-cluster/share/model"
 )
 
@@ -40,7 +40,7 @@ func ClientVersionCreate(req dto.ClientVersionSaveReq) (*model.ClientVersion, er
 // ClientVersionUpdate 修改客户端版本。
 func ClientVersionUpdate(id int, req dto.ClientVersionSaveReq) (*model.ClientVersion, error) {
 	if id == 0 {
-		return nil, errs.NewError(400, "版本ID不能为空")
+		return nil, codes.NewCode(400, "版本ID不能为空").Err()
 	}
 	m, err := clientVersionModel(req, id)
 	if err != nil {
@@ -60,7 +60,7 @@ func ClientVersionDelete(ids []int) error { return repo.R().DeleteClientVersions
 // ClientVersionUpdateStatus 启用/停用客户端版本。
 func ClientVersionUpdateStatus(req dto.ClientVersionStatusReq) error {
 	if req.VersionId == 0 {
-		return errs.NewError(400, "版本ID不能为空")
+		return codes.NewCode(400, "版本ID不能为空").Err()
 	}
 	return repo.R().UpdateClientVersionStatus(req.VersionId, req.Status)
 }
@@ -70,17 +70,17 @@ func clientVersionModel(req dto.ClientVersionSaveReq, excludeId int) (*model.Cli
 	version := strings.TrimSpace(req.Version)
 	platform := strings.TrimSpace(req.Platform)
 	if version == "" {
-		return nil, errs.NewError(400, "版本号不能为空")
+		return nil, codes.NewCode(400, "版本号不能为空").Err()
 	}
 	if platform == "" {
-		return nil, errs.NewError(400, "平台不能为空")
+		return nil, codes.NewCode(400, "平台不能为空").Err()
 	}
 	exists, err := repo.R().ExistsClientVersion(version, platform, excludeId)
 	if err != nil {
 		return nil, err
 	}
 	if exists {
-		return nil, errs.NewError(400, "该平台下已存在相同版本号")
+		return nil, codes.NewCode(400, "该平台下已存在相同版本号").Err()
 	}
 
 	status := req.Status

@@ -1,4 +1,4 @@
-package logic
+﻿package logic
 
 import (
 	"context"
@@ -57,7 +57,7 @@ func toSkillEntry(s model.SkillInfo) *pb.SkillEntry {
 // SkillAdd 新增技能：配置ID必须存在，已拥有返回错误。
 func (this *skillLogic) SkillAdd(ctx context.Context, playerID int64, req *pb.SkillAddReq) (*pb.SkillAddResp, error) {
 	if !tpl.T().Skill.Has(req.GetSkillId()) {
-		return nil, errs.ErrInvalidParams
+		return nil, errs.CodeInvalidParams.Err()
 	}
 
 	row, err := loadPlayerSkill(ctx, playerID)
@@ -67,7 +67,7 @@ func (this *skillLogic) SkillAdd(ctx context.Context, playerID int64, req *pb.Sk
 
 	s := model.SkillInfo{SkillID: req.GetSkillId()}
 	if !row.AddSkill(s) {
-		return nil, errs.WithMessage(errs.CodeInvalidParams, "技能已拥有")
+		return nil, errs.CodeInvalidParams.WithMessage("技能已拥有").Err()
 	}
 
 	global.PlayerSkillCache.Set(playerID, row)
@@ -87,7 +87,7 @@ func (this *skillLogic) SkillUpdate(ctx context.Context, playerID int64, req *pb
 		Equipped: req.GetEquipped(),
 	}
 	if !row.UpdateSkill(s) {
-		return nil, errs.WithMessage(errs.CodeInvalidParams, "技能未拥有")
+		return nil, errs.CodeInvalidParams.WithMessage("技能未拥有").Err()
 	}
 
 	global.PlayerSkillCache.Set(playerID, row)

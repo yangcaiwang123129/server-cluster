@@ -27,7 +27,7 @@ func RegisterPlayer(router http.Router) {
 func register(ctx http.Context) error {
 	req := &dto.PlayerRegisterReq{}
 	if err := ctx.Bind().Body(req); err != nil {
-		return ctx.Failure(errs.ErrInvalidParams)
+		return ctx.Failure(errs.CodeInvalidParams.Err())
 	}
 	data, err := logic.PlayerBaseLogic().PlayerRegister(ctx.Context(), req)
 	if err != nil {
@@ -47,7 +47,7 @@ func register(ctx http.Context) error {
 func login(ctx http.Context) error {
 	req := &dto.PlayerLoginReq{}
 	if err := ctx.Bind().Body(req); err != nil {
-		return ctx.Failure(errs.ErrInvalidParams)
+		return ctx.Failure(errs.CodeInvalidParams.Err())
 	}
 	data, err := logic.PlayerBaseLogic().PlayerLogin(ctx.Context(), req)
 	if err != nil {

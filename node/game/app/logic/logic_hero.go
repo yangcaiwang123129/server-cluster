@@ -1,4 +1,4 @@
-package logic
+﻿package logic
 
 import (
 	"context"
@@ -60,7 +60,7 @@ func toHeroEntry(h model.HeroInfo) *pb.HeroEntry {
 // HeroAdd 新增英雄：配置ID必须存在，已拥有返回错误。
 func (this *heroLogic) HeroAdd(ctx context.Context, playerID int64, req *pb.HeroAddReq) (*pb.HeroAddResp, error) {
 	if !tpl.T().RoleInfo.Has(req.GetHeroId()) {
-		return nil, errs.ErrInvalidParams
+		return nil, errs.CodeInvalidParams.Err()
 	}
 
 	row, err := loadPlayerHero(ctx, playerID)
@@ -70,7 +70,7 @@ func (this *heroLogic) HeroAdd(ctx context.Context, playerID int64, req *pb.Hero
 
 	h := model.HeroInfo{HeroID: req.GetHeroId()}
 	if !row.AddHero(h) {
-		return nil, errs.WithMessage(errs.CodeInvalidParams, "英雄已拥有")
+		return nil, errs.CodeInvalidParams.WithMessage("英雄已拥有").Err()
 	}
 
 	global.PlayerHeroCache.Set(playerID, row)
@@ -93,7 +93,7 @@ func (this *heroLogic) HeroUpdate(ctx context.Context, playerID int64, req *pb.H
 		Equipped: req.GetEquipped(),
 	}
 	if !row.UpdateHero(h) {
-		return nil, errs.WithMessage(errs.CodeInvalidParams, "英雄未拥有")
+		return nil, errs.CodeInvalidParams.WithMessage("英雄未拥有").Err()
 	}
 
 	global.PlayerHeroCache.Set(playerID, row)

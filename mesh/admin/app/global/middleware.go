@@ -1,4 +1,4 @@
-// Package global 后台全局公共件：初始化装配、鉴权/审计中间件与当前用户上下文读取。
+﻿// Package global 后台全局公共件：初始化装配、鉴权/审计中间件与当前用户上下文读取。
 package global
 
 import (
@@ -15,6 +15,7 @@ import (
 	"server-cluster/internal/svc"
 	"server-cluster/share/consts"
 	"server-cluster/share/errs"
+	"github.com/dobyte/due/v2/codes"
 	"server-cluster/share/model"
 )
 
@@ -138,32 +139,32 @@ func OperaLogMiddleware(c fiber.Ctx) error {
 func Authenticate(token string) (*model.SysUser, *model.SysRole, error) {
 	payload, err := svc.JWT().ExtractPayload(token)
 	if err != nil {
-		return nil, nil, errs.NewError(401, "未登录或登录已过期")
+		return nil, nil, codes.NewCode(401, "未登录或登录已过期").Err()
 	}
 	uid, ok := payload["uid"].(float64)
 	if !ok {
-		return nil, nil, errs.NewError(401, "令牌无效")
+		return nil, nil, codes.NewCode(401, "令牌无效").Err()
 	}
 	d, err := svc.Ctx().DB()
 	if err != nil {
-		return nil, nil, errs.NewError(500, "数据库未配置")
+		return nil, nil, codes.NewCode(500, "数据库未配置").Err()
 	}
 	var user model.SysUser
 	if err := d.First(&user, "user_id = ?", int(uid)).Error; err != nil {
-		return nil, nil, errs.NewError(401, "账号不存在")
+		return nil, nil, codes.NewCode(401, "账号不存在").Err()
 	}
 	if user.Status != consts.StatusEnabled {
-		return nil, nil, errs.NewError(403, "账号已停用")
+		return nil, nil, codes.NewCode(403, "账号已停用").Err()
 	}
 	var role model.SysRole
 	if err := d.First(&role, "role_id = ?", user.RoleId).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil, errs.NewError(403, "账号未绑定角色")
+			return nil, nil, codes.NewCode(403, "账号未绑定角色").Err()
 		}
-		return nil, nil, errs.NewError(500, "查询角色失败")
+		return nil, nil, codes.NewCode(500, "查询角色失败").Err()
 	}
 	if role.Status != consts.StatusEnabled {
-		return nil, nil, errs.NewError(403, "角色已停用")
+		return nil, nil, codes.NewCode(403, "角色已停用").Err()
 	}
 	return &user, &role, nil
 }

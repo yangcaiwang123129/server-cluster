@@ -1,4 +1,4 @@
-package logic
+﻿package logic
 
 import (
 	"strconv"
@@ -30,7 +30,7 @@ func GameCatalog(typ, keyword string) ([]dto.GameCatalogEntry, error) {
 			list = append(list, dto.GameCatalogEntry{ID: c.Id, Name: c.EquipName, IconKey: c.Icon, Desc: c.Desc})
 		}
 	default:
-		return nil, errs.ErrInvalidParams
+		return nil, errs.CodeInvalidParams.Err()
 	}
 	if keyword == "" {
 		return list, nil

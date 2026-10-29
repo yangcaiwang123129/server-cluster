@@ -1,4 +1,4 @@
-// Package logic 客户端模拟器：由 admin 侧代替 U3D 客户端走完「登录 → 连网关 → 首包 → 进游戏 → 退游戏」。
+﻿// Package logic 客户端模拟器：由 admin 侧代替 U3D 客户端走完「登录 → 连网关 → 首包 → 进游戏 → 退游戏」。
 package logic
 
 import (
@@ -23,6 +23,7 @@ import (
 	"server-cluster/internal/svc"
 	"server-cluster/share/dto"
 	"server-cluster/share/errs"
+	"github.com/dobyte/due/v2/codes"
 	"server-cluster/share/pb"
 )
 
@@ -87,7 +88,7 @@ func (st *simStore) get(id string) (*simSession, error) {
 	s, ok := st.sessions[id]
 	st.mu.Unlock()
 	if !ok {
-		return nil, errs.NewError(400, "会话不存在或已结束，请重新登录")
+		return nil, codes.NewCode(400, "会话不存在或已结束，请重新登录").Err()
 	}
 	return s, nil
 }
@@ -139,10 +140,10 @@ func SimLogin(req dto.SimLoginReq) (*dto.SimLoginResp, error) {
 		mode = "login"
 	}
 	if mode != "login" && mode != "register" {
-		return nil, errs.NewError(400, "mode 只能是 login 或 register")
+		return nil, codes.NewCode(400, "mode 只能是 login 或 register").Err()
 	}
 	if strings.TrimSpace(req.Username) == "" || req.Password == "" {
-		return nil, errs.NewError(400, "账号和密码不能为空")
+		return nil, codes.NewCode(400, "账号和密码不能为空").Err()
 	}
 
 	loginAddr := strings.TrimRight(strings.TrimSpace(req.LoginAddr), "/")
@@ -213,7 +214,7 @@ func SimLogin(req dto.SimLoginReq) (*dto.SimLoginResp, error) {
 		return nil, errs.NewError(400, fmt.Sprintf("登录失败(code=%d): %s", env.Code, msg))
 	}
 	if env.Data.Token == "" || env.Data.GateAddr == "" {
-		return nil, errs.NewError(502, "登录服未返回 token 或网关地址")
+		return nil, codes.NewCode(502, "登录服未返回 token 或网关地址").Err()
 	}
 
 	gateAddr := strings.TrimSpace(req.GateAddr)
@@ -273,7 +274,7 @@ func SimConnect(sessionID string) (*dto.SimConnectResp, error) {
 	defer s.mu.Unlock()
 
 	if s.conn != nil {
-		return nil, errs.NewError(400, "网关已连接，无需重复连接")
+		return nil, codes.NewCode(400, "网关已连接，无需重复连接").Err()
 	}
 
 	url := simWSURL(s.gateAddr)
@@ -330,7 +331,7 @@ func SimStep(req dto.SimStepReq) (*dto.SimStepResp, error) {
 	defer s.mu.Unlock()
 
 	if s.conn == nil {
-		return nil, errs.NewError(400, "请先连接网关")
+		return nil, codes.NewCode(400, "请先连接网关").Err()
 	}
 
 	var (
@@ -346,14 +347,14 @@ func SimStep(req dto.SimStepReq) (*dto.SimStepResp, error) {
 		respP = &pb.VerifyResp{}
 	case "enter":
 		if !s.verified {
-			return nil, errs.NewError(400, "请先完成首包验证")
+			return nil, codes.NewCode(400, "请先完成首包验证").Err()
 		}
 		route = int32(pb.RouteCode_ROUTE_CODE_ENTER_GAME)
 		reqP = &pb.EnterGameReq{Token: s.token}
 		respP = &pb.EnterGameResp{}
 	case "leave":
 		if !s.entered {
-			return nil, errs.NewError(400, "请先进入游戏")
+			return nil, codes.NewCode(400, "请先进入游戏").Err()
 		}
 		route = int32(pb.RouteCode_ROUTE_CODE_LEAVE_GAME)
 		reqP = &pb.LeaveGameReq{}

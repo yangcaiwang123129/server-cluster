@@ -4,17 +4,15 @@ import (
 	"context"
 	"errors"
 	"reflect"
-	"server-cluster/internal/svc"
 	"sync"
 	"time"
+
+	"server-cluster/internal/svc"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
 )
-
-// PlayerTableModel 玩家表模型约束：表名自述（gorm TableName），主键含 player_id。
-type PlayerTableModel interface{ TableName() string }
 
 // schemaCache 表结构解析缓存。
 var schemaCache sync.Map
@@ -31,7 +29,7 @@ type tableMeta struct {
 }
 
 // parseTableMeta 解析 T 的主键列与非主键列。
-func parseTableMeta[T PlayerTableModel]() (*tableMeta, error) {
+func parseTableMeta[T any]() (*tableMeta, error) {
 	sch, err := schema.Parse(new(T), &schemaCache, schema.NamingStrategy{})
 	if err != nil {
 		return nil, errors.New("cache: parse table schema failed: " + err.Error())
@@ -116,7 +114,7 @@ func upsertRows[T any](db *gorm.DB, rows []T, meta *tableMeta) error {
 // 读：SELECT * WHERE player_id=?，无行返回 gorm.ErrRecordNotFound。
 // 写：异步批量 upsert（冲突列取主键，更新列取非 PK 列）。
 // 删：DELETE WHERE player_id IN（同步）。
-func NewPlayerTableCache[M PlayerTableModel](cfg CacherConfig) *Cache[int64, *M] {
+func NewPlayerTableCache[M any](cfg CacherConfig) *Cache[int64, *M] {
 	meta, err := parseTableMeta[M]()
 	if err != nil {
 		panic(err)
@@ -156,7 +154,7 @@ func NewPlayerTableCache[M PlayerTableModel](cfg CacherConfig) *Cache[int64, *M]
 // NewPlayerRowsCache 多行表缓存：key=playerID，value=[]*M（一玩家多行，如 PlayerAsset）。
 // 读：SELECT * WHERE player_id=?，无行返回空切片。
 // 写/删：同单行表缓存。
-func NewPlayerRowsCache[M PlayerTableModel](cfg CacherConfig) *Cache[int64, []*M] {
+func NewPlayerRowsCache[M any](cfg CacherConfig) *Cache[int64, []*M] {
 	meta, err := parseTableMeta[M]()
 	if err != nil {
 		panic(err)

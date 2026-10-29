@@ -1,4 +1,4 @@
-package logic
+﻿package logic
 
 import (
 	"crypto/rand"
@@ -16,7 +16,7 @@ import (
 	"server-cluster/mesh/admin/app/repo"
 	"server-cluster/share/consts"
 	"server-cluster/share/dto"
-	"server-cluster/share/errs"
+	"github.com/dobyte/due/v2/codes"
 	"server-cluster/share/model"
 )
 
@@ -37,7 +37,7 @@ func ApiGet(id int) (*model.SysApi, error) { return repo.R().GetApi(id) }
 // ApiCreate 新增接口。
 func ApiCreate(req dto.ApiSaveReq) (*model.SysApi, error) {
 	if req.Path == "" || req.Action == "" {
-		return nil, errs.NewError(400, "接口路径与方法不能为空")
+		return nil, codes.NewCode(400, "接口路径与方法不能为空").Err()
 	}
 	m := apiModel(req)
 	if err := repo.R().CreateApi(m); err != nil {
@@ -49,7 +49,7 @@ func ApiCreate(req dto.ApiSaveReq) (*model.SysApi, error) {
 // ApiUpdate 修改接口。
 func ApiUpdate(id int, req dto.ApiSaveReq) (*model.SysApi, error) {
 	if id == 0 {
-		return nil, errs.NewError(400, "接口ID不能为空")
+		return nil, codes.NewCode(400, "接口ID不能为空").Err()
 	}
 	m := apiModel(req)
 	m.ApiId = id
@@ -177,29 +177,29 @@ func randomInt(n int) int {
 // Login 校验验证码与账号密码，签发令牌。
 func Login(req dto.AdminLoginReq, ip, ua string) (string, error) {
 	if !verifyCaptcha(req.UUID, req.Code) {
-		return "", errs.NewError(400, "验证码错误或已过期")
+		return "", codes.NewCode(400, "验证码错误或已过期").Err()
 	}
 	user, err := repo.R().FindUserByUsername(req.Username)
 	if err != nil || !repo.CheckUserPassword(user.Password, req.Password) {
 		RecordLogin(req.Username, ip, ua, false, "用户名或密码错误")
-		return "", errs.NewError(400, "用户名或密码错误")
+		return "", codes.NewCode(400, "用户名或密码错误").Err()
 	}
 	if user.Status != consts.StatusEnabled {
 		RecordLogin(req.Username, ip, ua, false, "账号已停用")
-		return "", errs.NewError(400, "账号已停用")
+		return "", codes.NewCode(400, "账号已停用").Err()
 	}
 	role, err := repo.R().RoleForUser(user.UserId)
 	if err != nil || role == nil {
 		RecordLogin(req.Username, ip, ua, false, "账号未绑定角色")
-		return "", errs.NewError(400, "账号未绑定角色")
+		return "", codes.NewCode(400, "账号未绑定角色").Err()
 	}
 	if role.Status != consts.StatusEnabled {
 		RecordLogin(req.Username, ip, ua, false, "角色已停用")
-		return "", errs.NewError(400, "角色已停用")
+		return "", codes.NewCode(400, "角色已停用").Err()
 	}
 	token, err := svc.JWT().GenerateToken(jwt.Payload{"uid": user.UserId})
 	if err != nil {
-		return "", errs.NewError(500, "令牌签发失败")
+		return "", codes.NewCode(500, "令牌签发失败").Err()
 	}
 	RecordLogin(req.Username, ip, ua, true, "登录成功")
 	return token.Token, nil
@@ -231,7 +231,7 @@ func GetInfo(user *model.SysUser, role *model.SysRole) dto.GetInfoResp {
 // MenuRole 当前用户的动态路由菜单树。
 func MenuRole(role *model.SysRole) ([]model.SysMenu, error) {
 	if role == nil {
-		return nil, errs.NewError(403, "账号未绑定角色")
+		return nil, codes.NewCode(403, "账号未绑定角色").Err()
 	}
 	return RouteMenus(role)
 }
@@ -264,7 +264,7 @@ func ConfigGetByKey(key string) (*model.SysConfig, error) { return repo.R().GetC
 // ConfigCreate 新增配置。
 func ConfigCreate(req dto.ConfigSaveReq) (*model.SysConfig, error) {
 	if req.ConfigKey == "" {
-		return nil, errs.NewError(400, "配置键不能为空")
+		return nil, codes.NewCode(400, "配置键不能为空").Err()
 	}
 	m := configModel(req)
 	if err := repo.R().CreateConfig(m); err != nil {
@@ -276,7 +276,7 @@ func ConfigCreate(req dto.ConfigSaveReq) (*model.SysConfig, error) {
 // ConfigUpdate 修改配置。
 func ConfigUpdate(id int, req dto.ConfigSaveReq) (*model.SysConfig, error) {
 	if id == 0 {
-		return nil, errs.NewError(400, "配置ID不能为空")
+		return nil, codes.NewCode(400, "配置ID不能为空").Err()
 	}
 	m := configModel(req)
 	m.ConfigId = id
@@ -334,7 +334,7 @@ func DictTypeGet(id int) (*model.SysDictType, error) { return repo.R().GetDictTy
 // DictTypeCreate 新增字典类型。
 func DictTypeCreate(req dto.DictTypeSaveReq) (*model.SysDictType, error) {
 	if req.DictName == "" || req.DictType == "" {
-		return nil, errs.NewError(400, "字典名称与类型不能为空")
+		return nil, codes.NewCode(400, "字典名称与类型不能为空").Err()
 	}
 	m := &model.SysDictType{
 		DictName: req.DictName,
@@ -351,7 +351,7 @@ func DictTypeCreate(req dto.DictTypeSaveReq) (*model.SysDictType, error) {
 // DictTypeUpdate 修改字典类型。
 func DictTypeUpdate(id int, req dto.DictTypeSaveReq) (*model.SysDictType, error) {
 	if id == 0 {
-		return nil, errs.NewError(400, "字典ID不能为空")
+		return nil, codes.NewCode(400, "字典ID不能为空").Err()
 	}
 	m := &model.SysDictType{
 		DictId:   id,
@@ -398,7 +398,7 @@ func DictDataGet(code int) (*model.SysDictData, error) { return repo.R().GetDict
 // DictDataCreate 新增字典项。
 func DictDataCreate(req dto.DictDataSaveReq) (*model.SysDictData, error) {
 	if req.DictType == "" || req.DictLabel == "" {
-		return nil, errs.NewError(400, "字典类型与标签不能为空")
+		return nil, codes.NewCode(400, "字典类型与标签不能为空").Err()
 	}
 	m := dictDataModel(req, 0)
 	if err := repo.R().CreateDictData(m); err != nil {
@@ -410,7 +410,7 @@ func DictDataCreate(req dto.DictDataSaveReq) (*model.SysDictData, error) {
 // DictDataUpdate 修改字典项。
 func DictDataUpdate(code int, req dto.DictDataSaveReq) (*model.SysDictData, error) {
 	if code == 0 {
-		return nil, errs.NewError(400, "字典项ID不能为空")
+		return nil, codes.NewCode(400, "字典项ID不能为空").Err()
 	}
 	m := dictDataModel(req, code)
 	if err := repo.R().UpdateDictData(m); err != nil {
@@ -569,7 +569,7 @@ func MenuCreate(req dto.MenuSaveReq) (*model.SysMenu, error) {
 // MenuUpdate 修改菜单与接口授权关系。
 func MenuUpdate(id int, req dto.MenuSaveReq) (*model.SysMenu, error) {
 	if id == 0 {
-		return nil, errs.NewError(400, "菜单ID不能为空")
+		return nil, codes.NewCode(400, "菜单ID不能为空").Err()
 	}
 	m := menuModel(req)
 	m.MenuId = id
@@ -649,10 +649,10 @@ func RoleGet(id int) (*model.SysRole, error) { return repo.R().GetRole(id) }
 // RoleCreate 新增角色。
 func RoleCreate(req dto.RoleSaveReq) (*model.SysRole, error) {
 	if req.RoleName == "" || req.RoleKey == "" {
-		return nil, errs.NewError(400, "角色名称与角色标识不能为空")
+		return nil, codes.NewCode(400, "角色名称与角色标识不能为空").Err()
 	}
 	if req.RoleKey == consts.AdminRoleKey {
-		return nil, errs.NewError(400, "角色标识 admin 为系统保留")
+		return nil, codes.NewCode(400, "角色标识 admin 为系统保留").Err()
 	}
 	m := roleModel(req)
 	if err := repo.R().CreateRole(m, req.MenuIds); err != nil {
@@ -664,7 +664,7 @@ func RoleCreate(req dto.RoleSaveReq) (*model.SysRole, error) {
 // RoleUpdate 修改角色与菜单授权。
 func RoleUpdate(id int, req dto.RoleSaveReq) (*model.SysRole, error) {
 	if id == 0 {
-		return nil, errs.NewError(400, "角色ID不能为空")
+		return nil, codes.NewCode(400, "角色ID不能为空").Err()
 	}
 	m := roleModel(req)
 	m.RoleId = id
@@ -680,7 +680,7 @@ func RoleDelete(ids []int) error {
 	if err == nil {
 		for _, id := range ids {
 			if id == adminRole.RoleId {
-				return errs.NewError(400, "超级管理员角色不可删除")
+				return codes.NewCode(400, "超级管理员角色不可删除").Err()
 			}
 		}
 	}
@@ -720,7 +720,7 @@ func UserGet(id int) (*model.SysUser, error) { return repo.R().GetUser(id) }
 // UserCreate 新增用户。
 func UserCreate(req dto.UserSaveReq) (*model.SysUser, error) {
 	if req.Username == "" {
-		return nil, errs.NewError(400, "用户名不能为空")
+		return nil, codes.NewCode(400, "用户名不能为空").Err()
 	}
 	m := userModel(req)
 	if err := repo.R().CreateUser(m); err != nil {
@@ -732,7 +732,7 @@ func UserCreate(req dto.UserSaveReq) (*model.SysUser, error) {
 // UserUpdate 修改用户。
 func UserUpdate(id int, req dto.UserSaveReq) (*model.SysUser, error) {
 	if id == 0 {
-		return nil, errs.NewError(400, "用户ID不能为空")
+		return nil, codes.NewCode(400, "用户ID不能为空").Err()
 	}
 	m := userModel(req)
 	m.UserId = id
@@ -753,7 +753,7 @@ func UserUpdateStatus(req dto.UserStatusReq) error {
 // UserResetPassword 管理员重置指定用户密码。
 func UserResetPassword(req dto.UserPasswordResetReq) error {
 	if req.Password == "" {
-		return errs.NewError(400, "密码不能为空")
+		return codes.NewCode(400, "密码不能为空").Err()
 	}
 	return repo.R().ResetUserPassword(req.UserId, req.Password)
 }
@@ -776,10 +776,10 @@ func UserUpdateProfile(userId int, req dto.UserProfileUpdateReq) (*model.SysUser
 // UserSetPassword 当前登录用户修改密码。
 func UserSetPassword(user *model.SysUser, req dto.UserPasswordSetReq) error {
 	if req.NewPassword == "" {
-		return errs.NewError(400, "新密码不能为空")
+		return codes.NewCode(400, "新密码不能为空").Err()
 	}
 	if !repo.CheckUserPassword(user.Password, req.OldPassword) {
-		return errs.NewError(400, "原密码错误")
+		return codes.NewCode(400, "原密码错误").Err()
 	}
 	return repo.R().ResetUserPassword(user.UserId, req.NewPassword)
 }

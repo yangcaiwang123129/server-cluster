@@ -1,4 +1,4 @@
-package logic
+﻿package logic
 
 import (
 	"context"
@@ -58,7 +58,7 @@ func toWeaponEntry(w model.WeaponInfo) *pb.WeaponEntry {
 // WeaponAdd 新增武器：配置ID必须存在，已拥有返回错误。
 func (this *weaponLogic) WeaponAdd(ctx context.Context, playerID int64, req *pb.WeaponAddReq) (*pb.WeaponAddResp, error) {
 	if !tpl.T().Weapon.Has(req.GetWeaponId()) {
-		return nil, errs.ErrInvalidParams
+		return nil, errs.CodeInvalidParams.Err()
 	}
 
 	row, err := loadPlayerWeapon(ctx, playerID)
@@ -68,7 +68,7 @@ func (this *weaponLogic) WeaponAdd(ctx context.Context, playerID int64, req *pb.
 
 	w := model.WeaponInfo{WeaponID: req.GetWeaponId()}
 	if !row.AddWeapon(w) {
-		return nil, errs.WithMessage(errs.CodeInvalidParams, "武器已拥有")
+		return nil, errs.CodeInvalidParams.WithMessage("武器已拥有").Err()
 	}
 
 	global.PlayerWeaponCache.Set(playerID, row)
@@ -89,7 +89,7 @@ func (this *weaponLogic) WeaponUpdate(ctx context.Context, playerID int64, req *
 		Equipped:   req.GetEquipped(),
 	}
 	if !row.UpdateWeapon(w) {
-		return nil, errs.WithMessage(errs.CodeInvalidParams, "武器未拥有")
+		return nil, errs.CodeInvalidParams.WithMessage("武器未拥有").Err()
 	}
 
 	global.PlayerWeaponCache.Set(playerID, row)

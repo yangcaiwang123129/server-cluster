@@ -1,4 +1,4 @@
-package logic
+﻿package logic
 
 import (
 	"context"
@@ -77,11 +77,11 @@ func containerToEntry(playerID int64, c *model.ItemContainer) *pb.ContainerEntry
 func containerErr(err error) error {
 	switch {
 	case errors.Is(err, model.ErrItemNotFound):
-		return errs.WithMessage(errs.CodeInvalidParams, "物品不存在")
+		return errs.CodeInvalidParams.WithMessage("物品不存在").Err()
 	case errors.Is(err, model.ErrItemExists):
-		return errs.WithMessage(errs.CodeInvalidParams, "物品已存在")
+		return errs.CodeInvalidParams.WithMessage("物品已存在").Err()
 	case errors.Is(err, model.ErrPositionConflict):
-		return errs.WithMessage(errs.CodeInvalidParams, "目标位置不可放置")
+		return errs.CodeInvalidParams.WithMessage("目标位置不可放置").Err()
 	default:
 		return fmt.Errorf("logic: container op failed: %w", err)
 	}
@@ -116,11 +116,11 @@ func containerOf(ctx context.Context, playerID int64, t pb.ContainerType) (*mode
 	}
 	typ, ok := containerTypeToModel(t)
 	if !ok {
-		return nil, nil, errs.ErrInvalidParams
+		return nil, nil, errs.CodeInvalidParams.Err()
 	}
 	c := pc.ByType(typ)
 	if c == nil {
-		return nil, nil, errs.ErrInvalidParams
+		return nil, nil, errs.CodeInvalidParams.Err()
 	}
 	return pc, c, nil
 }
@@ -212,7 +212,7 @@ func (this *containerLogic) ContainerTransfer(ctx context.Context, playerID int6
 	fromType, okFrom := containerTypeToModel(req.GetFromType())
 	toType, okTo := containerTypeToModel(req.GetToType())
 	if !okFrom || !okTo || fromType == toType {
-		return nil, errs.ErrInvalidParams
+		return nil, errs.CodeInvalidParams.Err()
 	}
 
 	pc, err := loadContainer(ctx, playerID)
@@ -221,7 +221,7 @@ func (this *containerLogic) ContainerTransfer(ctx context.Context, playerID int6
 	}
 	fromC, toC := pc.ByType(fromType), pc.ByType(toType)
 	if fromC == nil || toC == nil {
-		return nil, errs.ErrInvalidParams
+		return nil, errs.CodeInvalidParams.Err()
 	}
 
 	// 新接口：目标容器调 TransferFrom 把源容器的物品搬过来
@@ -239,7 +239,7 @@ func (this *containerLogic) ContainerTransfer(ctx context.Context, playerID int6
 // ContainerAddItem 向容器放入物品（GM）：校验配置与占格后挂缓存待落库。
 func (this *containerLogic) ContainerAddItem(ctx context.Context, playerID int64, req *pb.GmContainerAddItemReq) (*pb.ContainerListResp, error) {
 	if !tpl.T().Item.Has(req.GetItemCfgId()) {
-		return nil, errs.WithMessage(errs.CodeInvalidParams, "物品配置不存在")
+		return nil, errs.CodeInvalidParams.WithMessage("物品配置不存在").Err()
 	}
 
 	pc, c, err := containerOf(ctx, playerID, pb.ContainerType(req.GetContainerType()))
@@ -249,7 +249,7 @@ func (this *containerLogic) ContainerAddItem(ctx context.Context, playerID int64
 	// 存量脏数据缺配置时占格计算会 panic，先校验（新接口 Items() 返回 []*Item）
 	for _, it := range c.Items() {
 		if !tpl.T().Item.Has(it.ItemCfgID) {
-			return nil, errs.WithMessage(errs.CodeInvalidParams, fmt.Sprintf("容器内物品配置缺失，物品配置ID: %d", it.ItemCfgID))
+			return nil, errs.CodeInvalidParams.WithMessage(fmt.Sprintf("容器内物品配置缺失，物品配置ID: %d", it.ItemCfgID)).Err()
 		}
 	}
 

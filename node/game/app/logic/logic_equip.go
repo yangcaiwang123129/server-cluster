@@ -1,4 +1,4 @@
-package logic
+﻿package logic
 
 import (
 	"context"
@@ -57,7 +57,7 @@ func toEquipEntry(g model.EquipInfo) *pb.EquipEntry {
 // EquipAdd 新增装备：配置ID必须存在，已拥有返回错误。
 func (this *equipLogic) EquipAdd(ctx context.Context, playerID int64, req *pb.EquipAddReq) (*pb.EquipAddResp, error) {
 	if !tpl.T().Equip.Has(req.GetEquipId()) {
-		return nil, errs.ErrInvalidParams
+		return nil, errs.CodeInvalidParams.Err()
 	}
 
 	row, err := loadPlayerEquip(ctx, playerID)
@@ -67,7 +67,7 @@ func (this *equipLogic) EquipAdd(ctx context.Context, playerID int64, req *pb.Eq
 
 	g := model.EquipInfo{EquipID: req.GetEquipId()}
 	if !row.AddEquip(g) {
-		return nil, errs.WithMessage(errs.CodeInvalidParams, "装备已拥有")
+		return nil, errs.CodeInvalidParams.WithMessage("装备已拥有").Err()
 	}
 
 	global.PlayerEquipCache.Set(playerID, row)
@@ -87,7 +87,7 @@ func (this *equipLogic) EquipUpdate(ctx context.Context, playerID int64, req *pb
 		Equipped: req.GetEquipped(),
 	}
 	if !row.UpdateEquip(g) {
-		return nil, errs.WithMessage(errs.CodeInvalidParams, "装备未拥有")
+		return nil, errs.CodeInvalidParams.WithMessage("装备未拥有").Err()
 	}
 
 	global.PlayerEquipCache.Set(playerID, row)

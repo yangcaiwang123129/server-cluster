@@ -172,11 +172,11 @@ func NewItemContainer(typ, gridW, gridH int32, globalID, ownerID int64, ownerTyp
 // PlayerContainer 玩家容器集合：一个玩家 3 个容器，每容器一列 JSON。
 // 字段类型为 *ItemContainer（= *container.BaseContainer[*ItemEntry]）。
 type PlayerContainer struct {
-	PlayerID int64          `gorm:"column:player_id;type:bigint;not null;primaryKey;comment:玩家ID" json:"player_id"`
-	Backpack *ItemContainer `gorm:"column:backpack;type:json;serializer:json;comment:背包(JSON)" json:"backpack"`
-	Stash    *ItemContainer `gorm:"column:stash;type:json;serializer:json;comment:仓库(JSON)" json:"stash"`
-	Secure   *ItemContainer `gorm:"column:secure;type:json;serializer:json;comment:保险箱(JSON)" json:"secure"`
-	Version  int64          `gorm:"column:version;type:bigint;not null;default:1;comment:版本号(乐观锁)" json:"version"`
+	PlayerID  int64          `gorm:"column:player_id;type:bigint;not null;primaryKey;comment:玩家ID" json:"player_id"`
+	Backpack  *ItemContainer `gorm:"column:backpack;type:json;serializer:json;comment:背包(JSON)" json:"backpack"`
+	Stash     *ItemContainer `gorm:"column:stash;type:json;serializer:json;comment:仓库(JSON)" json:"stash"`
+	Secure    *ItemContainer `gorm:"column:secure;type:json;serializer:json;comment:保险箱(JSON)" json:"secure"`
+	TableModel `gorm:"embedded"`
 }
 
 // TableName 指定表名。
@@ -186,7 +186,6 @@ func (PlayerContainer) TableName() string { return enum.TablePlayerContainer.Str
 func NewPlayerContainer(playerID int64) *PlayerContainer {
 	return &PlayerContainer{
 		PlayerID: playerID,
-		Version:  1,
 		Backpack: newPlayerItemContainer(playerID, TypeBackpack, 8, 12),
 		Stash:    newPlayerItemContainer(playerID, TypeStash, 20, 20),
 		Secure:   newPlayerItemContainer(playerID, TypeSecure, 4, 6),

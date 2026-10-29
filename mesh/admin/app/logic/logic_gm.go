@@ -1,4 +1,4 @@
-package logic
+﻿package logic
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"github.com/dobyte/due/v2/transport"
 
 	"server-cluster/internal/rpc"
-	"server-cluster/share/errs"
+	"github.com/dobyte/due/v2/codes"
 	"server-cluster/share/pb"
 )
 
@@ -39,7 +39,7 @@ func gmClient(ctx context.Context, playerID int64) (transport.Client, error) {
 		return nil, err
 	}
 	if len(instances) == 0 {
-		return nil, errs.NewError(500, "game service unavailable")
+		return nil, codes.NewCode(500, "game service unavailable").Err()
 	}
 	if nodeID := onlineNodeID(ctx, playerID); nodeID != "" {
 		return rpc.NewDirectClient(nodeID)

@@ -1,8 +1,6 @@
 package model
 
 import (
-	"database/sql/driver"
-	"encoding/json"
 	"server-cluster/share/enum"
 	"server-cluster/share/util"
 )
@@ -18,16 +16,12 @@ type WeaponInfo struct {
 // PlayerWeapon 玩家武器持有（1:1 行，多武器以 JSON 对象存储，key=武器ID），对应 player_weapon 表。
 // 注意：Weapons 由 SafeMap 加锁保护，修改请走 Update/UpdateAll，勿直接改 Snapshot 返回值。
 type PlayerWeapon struct {
-	PlayerID  int64                            `gorm:"column:player_id;type:bigint;not null;primaryKey;comment:玩家ID" json:"player_id"`
-	Weapons   *util.SafeMap[int32, WeaponInfo] `gorm:"column:weapons;type:json;comment:武器列表(JSON对象,key=武器ID)" json:"weapons"`
-	TableBase `gorm:"embedded"`
+	PlayerID   int64                            `gorm:"column:player_id;type:bigint;not null;primaryKey;comment:玩家ID" json:"player_id"`
+	Weapons    *util.SafeMap[int32, WeaponInfo] `gorm:"column:weapons;type:json;comment:武器列表(JSON对象,key=武器ID)" json:"weapons"`
+	TableModel `gorm:"embedded"`
 }
 
-func (this *PlayerWeapon) Marshal() ([]byte, error)    { return json.Marshal(this) }
-func (this *PlayerWeapon) Unmarshal(data []byte) error { return json.Unmarshal(data, this) }
-func (this *PlayerWeapon) Scan(src any) error          { return ScanJSON(src, this) }
-func (this PlayerWeapon) Value() (driver.Value, error) { return ValueJSON(this) }
-func (PlayerWeapon) TableName() string                 { return enum.TablePlayerWeapon.String() }
+func (PlayerWeapon) TableName() string { return enum.TablePlayerWeapon.String() }
 
 // AddWeapon 新增武器持有；已拥有返回 false。
 func (p *PlayerWeapon) AddWeapon(w WeaponInfo) bool { return addOwned(p.Weapons, w.WeaponID, w) }
