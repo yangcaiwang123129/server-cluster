@@ -7,13 +7,13 @@ import (
 	"server-cluster/share/errs"
 )
 
-// RegisterCatalog 注册游戏配置目录路由（英雄/武器/技能/装备/物品选择器统一入口）。
+// RegisterCatalog 注册游戏配置目录路由（配置列表与选择器的统一数据源）。
 func RegisterCatalog(router http.Router) {
 	g := gmGroup(router)
 	g.Get("/catalog", handleCatalog)
 }
 
-// handleCatalog 游戏配置目录（英雄/武器/技能/装备/物品选择器）。
+// handleCatalog 游戏配置目录（英雄/武器/技能/装备/物品，列表与选择器共用）。
 // @Summary GM 配置目录
 // @Tags gm
 // @Produce json
@@ -29,8 +29,8 @@ func handleCatalog(ctx http.Context) error {
 	if err != nil {
 		return errs.FailErr(ctx, err)
 	}
-	// pageSize<=0 表示调用方不想要分页（hero/weapon/skill/equip 选择器量小），
-	// 为兼容前端，此时直接把 list 当 data 返回，不套 {list,total}。
+	// pageSize<=0 表示调用方只要全量（选择器场景），此时直接把 list 作为 data 返回；
+	// pageSize>0 返回 {list, count, pageIndex, pageSize}，供 GM 页面配置列表分页使用。
 	if pageSize <= 0 {
 		return errs.OK(ctx, list)
 	}
