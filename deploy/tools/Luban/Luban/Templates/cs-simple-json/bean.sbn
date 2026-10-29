@@ -1,4 +1,4 @@
-﻿using Luban;
+using Luban;
 using Luban.SimpleJSON;
 {{
     parent_def_type = __bean.parent_def_type

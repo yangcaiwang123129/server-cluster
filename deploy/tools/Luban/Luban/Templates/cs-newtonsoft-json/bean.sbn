@@ -1,4 +1,4 @@
-﻿using Luban;
+using Luban;
 using Newtonsoft.Json.Linq;
 
 {{

@@ -1,4 +1,4 @@
-﻿// Package global 后台全局公共件：初始化装配、鉴权/审计中间件与当前用户上下文读取。
+// Package global 后台全局公共件：初始化装配、鉴权/审计中间件与当前用户上下文读取。
 package global
 
 import (

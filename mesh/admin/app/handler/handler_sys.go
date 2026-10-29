@@ -10,94 +10,87 @@ import (
 	"server-cluster/share/errs"
 )
 
-// RegisterSys 注册管理后台权限管理路由。
+// RegisterSys 注册系统管理路由（鉴权 + 用户 + 角色 + 菜单 + 字典 + 配置 + 日志 + 接口）。
 func RegisterSys(router http.Router) {
-	groupRouter := router.Group("/api/v1",
-		global.CORSMiddleware(),
-		global.RequireDB,
-		global.OperaLogMiddleware,
-		global.AuthMiddleware,
-		global.PermissionMiddleware,
-	)
+	g := protectedGroup(router)
 
-	groupRouter.Get("/sys-api", handleApiList)
-	groupRouter.Get("/sys-api/:id", handleApiGet)
-	groupRouter.Post("/sys-api", handleApiCreate)
-	groupRouter.Put("/sys-api/:id", handleApiUpdate)
-	groupRouter.Delete("/sys-api", handleApiDelete)
+	// --- 鉴权（captcha / login / app-config 是公开接口，走独立分组） ---
+	pg := publicGroup(router)
+	pg.Get("/captcha", handleCaptcha)
+	pg.Post("/login", handleLogin)
+	pg.Get("/app-config", handleAppConfig)
 
-	// registerAuth 认证模块路由。
-	groupRouter.Get("/captcha", handleCaptcha)
-	groupRouter.Post("/login", handleLogin)
-	groupRouter.Get("/app-config", handleAppConfig)
+	// --- 受保护的系统路由 ---
+	g.Post("/logout", handleLogout)
+	g.Get("/getinfo", handleGetInfo)
+	g.Get("/menurole", handleMenuRole)
 
-	groupRouter.Post("/logout", handleLogout)
-	groupRouter.Get("/getinfo", handleGetInfo)
-	groupRouter.Get("/menurole", handleMenuRole)
+	// 接口管理
+	g.Get("/sys-api", handleApiList)
+	g.Get("/sys-api/:id", handleApiGet)
+	g.Post("/sys-api", handleApiCreate)
+	g.Put("/sys-api/:id", handleApiUpdate)
+	g.Delete("/sys-api", handleApiDelete)
 
-	// registerUser 用户模块路由。
-	groupRouter.Get("/sys-user", handleUserList)
-	groupRouter.Get("/sys-user/:userId", handleUserGet)
-	groupRouter.Post("/sys-user", handleUserCreate)
-	groupRouter.Put("/sys-user", handleUserUpdate)
-	groupRouter.Delete("/sys-user", handleUserDelete)
-	groupRouter.Put("/user/status", handleUserStatus)
-	groupRouter.Put("/user/pwd/reset", handleUserResetPwd)
-	groupRouter.Get("/user/profile", handleUserProfile)
-	groupRouter.Put("/sys-user/profile", handleUserProfileUpdate)
-	groupRouter.Put("/user/pwd/set", handleUserPwdSet)
+	// 用户
+	g.Get("/sys-user", handleUserList)
+	g.Get("/sys-user/:userId", handleUserGet)
+	g.Post("/sys-user", handleUserCreate)
+	g.Put("/sys-user", handleUserUpdate)
+	g.Delete("/sys-user", handleUserDelete)
+	g.Put("/user/status", handleUserStatus)
+	g.Put("/user/pwd/reset", handleUserResetPwd)
+	g.Get("/user/profile", handleUserProfile)
+	g.Put("/sys-user/profile", handleUserProfileUpdate)
+	g.Put("/user/pwd/set", handleUserPwdSet)
 
-	// registerRole 角色模块路由。
-	groupRouter.Get("/role", handleRoleList)
-	groupRouter.Get("/role/:roleId", handleRoleGet)
-	groupRouter.Post("/role", handleRoleCreate)
-	groupRouter.Put("/role/:roleId", handleRoleUpdate)
-	groupRouter.Delete("/role", handleRoleDelete)
-	groupRouter.Put("/role-status", handleRoleStatus)
+	// 角色
+	g.Get("/role", handleRoleList)
+	g.Get("/role/:roleId", handleRoleGet)
+	g.Post("/role", handleRoleCreate)
+	g.Put("/role/:roleId", handleRoleUpdate)
+	g.Delete("/role", handleRoleDelete)
+	g.Put("/role-status", handleRoleStatus)
 
-	// registerMenu 菜单模块路由。
-	groupRouter.Get("/menu", handleMenuList)
-	groupRouter.Get("/menu/:menuId", handleMenuGet)
-	groupRouter.Get("/roleMenuTreeselect/:roleId", handleRoleMenuTreeselect)
-	groupRouter.Post("/menu", handleMenuCreate)
-	groupRouter.Put("/menu/:id", handleMenuUpdate)
-	groupRouter.Delete("/menu", handleMenuDelete)
+	// 菜单
+	g.Get("/menu", handleMenuList)
+	g.Get("/menu/:menuId", handleMenuGet)
+	g.Get("/roleMenuTreeselect/:roleId", handleRoleMenuTreeselect)
+	g.Post("/menu", handleMenuCreate)
+	g.Put("/menu/:id", handleMenuUpdate)
+	g.Delete("/menu", handleMenuDelete)
 
-	// registerDict 字典模块路由。
-	groupRouter.Get("/dict/type", handleDictTypeList)
-	groupRouter.Get("/dict/type/:id", handleDictTypeGet)
-	groupRouter.Post("/dict/type", handleDictTypeCreate)
-	groupRouter.Put("/dict/type/:id", handleDictTypeUpdate)
-	groupRouter.Delete("/dict/type", handleDictTypeDelete)
-	groupRouter.Get("/dict/type-option-select", handleDictTypeOptions)
-	groupRouter.Get("/dict/data", handleDictDataList)
-	groupRouter.Get("/dict/data/:dictCode", handleDictDataGet)
-	groupRouter.Post("/dict/data", handleDictDataCreate)
-	groupRouter.Put("/dict/data/:dictCode", handleDictDataUpdate)
-	groupRouter.Delete("/dict/data", handleDictDataDelete)
-	groupRouter.Get("/dict-data/option-select", handleDictDataOptions)
+	// 字典
+	g.Get("/dict/type", handleDictTypeList)
+	g.Get("/dict/type/:id", handleDictTypeGet)
+	g.Post("/dict/type", handleDictTypeCreate)
+	g.Put("/dict/type/:id", handleDictTypeUpdate)
+	g.Delete("/dict/type", handleDictTypeDelete)
+	g.Get("/dict/type-option-select", handleDictTypeOptions)
+	g.Get("/dict/data", handleDictDataList)
+	g.Get("/dict/data/:dictCode", handleDictDataGet)
+	g.Post("/dict/data", handleDictDataCreate)
+	g.Put("/dict/data/:dictCode", handleDictDataUpdate)
+	g.Delete("/dict/data", handleDictDataDelete)
+	g.Get("/dict-data/option-select", handleDictDataOptions)
 
-	// registerConfig 系统配置模块路由。
-	groupRouter.Get("/config", handleConfigList)
-	groupRouter.Get("/config/:id", handleConfigGet)
-	groupRouter.Get("/configKey/:key", handleConfigKey)
-	groupRouter.Post("/config", handleConfigCreate)
-	groupRouter.Put("/config/:id", handleConfigUpdate)
-	groupRouter.Delete("/config", handleConfigDelete)
-	groupRouter.Get("/set-config", handleGetSetConfig)
-	groupRouter.Put("/set-config", handleUpdateSetConfig)
+	// 系统配置
+	g.Get("/config", handleConfigList)
+	g.Get("/config/:id", handleConfigGet)
+	g.Get("/configKey/:key", handleConfigKey)
+	g.Post("/config", handleConfigCreate)
+	g.Put("/config/:id", handleConfigUpdate)
+	g.Delete("/config", handleConfigDelete)
+	g.Get("/set-config", handleGetSetConfig)
+	g.Put("/set-config", handleUpdateSetConfig)
 
-	// registerLog 审计日志模块路由。
-	groupRouter.Get("/sys-login-log", handleLoginLogList)
-	groupRouter.Get("/sys-login-log/:id", handleLoginLogGet)
-	groupRouter.Delete("/sys-login-log", handleLoginLogDelete)
-	groupRouter.Get("/sys-opera-log", handleOperaLogList)
-	groupRouter.Delete("/sys-opera-log", handleOperaLogDelete)
-	groupRouter.Delete("/operlog/clean", handleOperaLogClean)
-
-	// registerPlayer 玩家管理路由。
-	groupRouter.Get("/player", handlePlayerList)
-	groupRouter.Get("/player/online", handlePlayerOnline)
+	// 日志
+	g.Get("/sys-login-log", handleLoginLogList)
+	g.Get("/sys-login-log/:id", handleLoginLogGet)
+	g.Delete("/sys-login-log", handleLoginLogDelete)
+	g.Get("/sys-opera-log", handleOperaLogList)
+	g.Delete("/sys-opera-log", handleOperaLogDelete)
+	g.Delete("/operlog/clean", handleOperaLogClean)
 }
 
 // handleApiList 接口分页列表。

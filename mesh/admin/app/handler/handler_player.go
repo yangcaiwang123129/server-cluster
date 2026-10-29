@@ -3,26 +3,17 @@ package handler
 import (
 	"github.com/dobyte/due/component/http/v2"
 
-	"server-cluster/mesh/admin/app/global"
 	"server-cluster/mesh/admin/app/logic"
 	"server-cluster/share/dto"
 	"server-cluster/share/errs"
 )
 
-// RegisterSys 注册管理后台玩家相关路由。
+// RegisterPlayer 注册玩家管理路由（列表/在线/踢下线）。
 func RegisterPlayer(router http.Router) {
-	groupRouter := router.Group("/api/v1",
-		global.CORSMiddleware(),
-		global.RequireDB,
-		global.OperaLogMiddleware,
-		global.AuthMiddleware,
-		global.PermissionMiddleware,
-	)
-
-	// registerPlayer 玩家管理路由。
-	groupRouter.Get("/player", handlePlayerList)
-	groupRouter.Get("/player/online", handlePlayerOnline)
-	groupRouter.Post("/player/kick", handlePlayerKick)
+	g := gmGroup(router)
+	g.Get("/player", handlePlayerList)
+	g.Get("/player/online", handlePlayerOnline)
+	g.Post("/player/kick", handlePlayerKick)
 }
 
 // handlePlayerList 玩家分页列表（player_base）。
@@ -33,7 +24,7 @@ func RegisterPlayer(router http.Router) {
 // @Param pageSize query int false "每页条数" default(10)
 // @Param username query string false "账号"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
-// @Router /api/v1/player [get]
+// @Router /api/v1/gm/player [get]
 func handlePlayerList(ctx http.Context) error {
 	var req dto.PlayerListReq
 	req.PageIndex, req.PageSize = pageParams(ctx)
@@ -54,7 +45,7 @@ func handlePlayerList(ctx http.Context) error {
 // @Tags system
 // @Produce json
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
-// @Router /api/v1/player/online [get]
+// @Router /api/v1/gm/player/online [get]
 func handlePlayerOnline(ctx http.Context) error {
 	list, err := logic.Player().PlayerOnline()
 	if err != nil {
@@ -69,7 +60,7 @@ func handlePlayerOnline(ctx http.Context) error {
 // @Produce json
 // @Param body body dto.PlayerKickReq true "踢人参数"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
-// @Router /api/v1/player/kick [post]
+// @Router /api/v1/gm/player/kick [post]
 func handlePlayerKick(ctx http.Context) error {
 	var req dto.PlayerKickReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.NodeID == "" {

@@ -1,4 +1,4 @@
-﻿// Package logic 客户端模拟器：由 admin 侧代替 U3D 客户端走完「登录 → 连网关 → 首包 → 进游戏 → 退游戏」。
+// Package logic 客户端模拟器：由 admin 侧代替 U3D 客户端走完「登录 → 连网关 → 首包 → 进游戏 → 退游戏」。
 package logic
 
 import (

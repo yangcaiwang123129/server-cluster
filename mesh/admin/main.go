@@ -45,11 +45,14 @@ func main() {
 	svc.SetRegistry(registry)
 	// 注册 HTTP 路由
 	handler.RegisterSys(httpComponent.Proxy().Router())
+	handler.RegisterClient(httpComponent.Proxy().Router())
+	handler.RegisterCatalog(httpComponent.Proxy().Router())
 	handler.RegisterPlayer(httpComponent.Proxy().Router())
-	handler.RegisterItem(httpComponent.Proxy().Router())
-	handler.RegisterGm(httpComponent.Proxy().Router())
-	handler.RegisterSim(httpComponent.Proxy().Router())
-	handler.RegisterClientVersion(httpComponent.Proxy().Router())
+	handler.RegisterContainer(httpComponent.Proxy().Router())
+	handler.RegisterEquip(httpComponent.Proxy().Router())
+	handler.RegisterHero(httpComponent.Proxy().Router())
+	handler.RegisterSkill(httpComponent.Proxy().Router())
+	handler.RegisterWeapon(httpComponent.Proxy().Router())
 	// 添加组件到容器
 	container.Add(httpComponent)
 	// 启动容器
