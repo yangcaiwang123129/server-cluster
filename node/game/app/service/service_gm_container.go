@@ -65,7 +65,7 @@ func (p *GmProvider) ContainerAddEntry(ctx context.Context, req *pb.GmContainerA
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
 	}
-	resp, err := logic.Container().ContainerAddItem(ctx, req.GetPlayerId(), req)
+	resp, err := logic.Container().ContainerAddEntry(ctx, req.GetPlayerId(), req)
 	if err != nil {
 		return nil, err
 	}

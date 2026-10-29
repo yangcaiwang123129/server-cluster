@@ -1,0 +1,56 @@
+# 网关服（test / gate-1）。部署包目录即工作目录，pid/log 均相对当前目录。
+
+pid = "./pid/gate-1.pid"
+mode = "debug"
+timezone = "Asia/Shanghai"
+
+[cluster.gate]
+    id = "gate-1"
+    name = "gate"
+    addr = "127.0.0.1:"
+    [cluster.gate.linker]
+        callTimeout = "3s"
+
+[log]
+    level = "info"
+    timeFormat = "2006/01/02 15:04:05.000000"
+    stackLevel = "error"
+    callFullPath = true
+    [log.file]
+        path = "./log/gate-1.log"
+        format = "text"
+        maxAge = "7d"
+        maxSize = 100
+        rotate = "day"
+
+[packet]
+    byteOrder = "big"
+    routeBytes = 4
+    seqBytes = 4
+    bufferBytes = 5000
+    heartbeatTime = true
+
+[locate.redis]
+    addrs = ["10.10.2.10:6379"]
+    db = 2
+    username = ""
+    password = "game123"
+    maxRetries = 3
+    prefix = "cluster:locate"
+
+[registry.etcd]
+    addrs = ["10.10.2.10:2379"]
+    namespace = "services"
+
+[transport.grpc.client]
+    caFile = ""
+    serverName = ""
+
+# 客户端接入地址：对外域名/IP 按实际网络映射填写
+[network.ws.server]
+    addr = "0.0.0.0:9000"
+    path = "/"
+    maxConnNum = 5000
+    origins = ["*"]
+    heartbeatInterval = "10s"
+    heartbeatMechanism = "resp"

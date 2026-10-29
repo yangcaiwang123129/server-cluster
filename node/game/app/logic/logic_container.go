@@ -191,7 +191,7 @@ func (this *containerLogic) ContainerRotate(ctx context.Context, playerID int64,
 	return &pb.ContainerRotateResp{}, nil
 }
 
-// SortContainer 容器一键整理。
+// ContainerSort 容器一键整理。
 func (this *containerLogic) ContainerSort(ctx context.Context, playerID int64, req *pb.SortContainerReq) (*pb.SortContainerResp, error) {
 	pc, c, err := containerOf(ctx, playerID, req.GetContainerType())
 	if err != nil {
@@ -236,8 +236,8 @@ func (this *containerLogic) ContainerTransfer(ctx context.Context, playerID int6
 	}, nil
 }
 
-// ContainerAddItem 向容器放入物品（GM）：校验配置与占格后挂缓存待落库。
-func (this *containerLogic) ContainerAddItem(ctx context.Context, playerID int64, req *pb.GmContainerAddEntryReq) (*pb.ContainerListResp, error) {
+// ContainerAddEntry 向容器放入对象（GM）：校验配置与占格后挂缓存待落库。
+func (this *containerLogic) ContainerAddEntry(ctx context.Context, playerID int64, req *pb.GmContainerAddEntryReq) (*pb.ContainerListResp, error) {
 	if !tpl.T().Item.Has(req.GetCfgId()) {
 		return nil, errs.CodeInvalidParams.WithMessage("物品配置不存在").Err()
 	}

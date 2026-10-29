@@ -305,21 +305,44 @@ const dropPreviewStyle = computed(() => {
   }
 })
 
-/** Client-side pre-check: inside bounds and not overlapping another item. */
+/** 物品 other 是否能整体放到 (x,y)（ignoreIds 中的物品视为不占用）。 */
+const canPlaceAt = (other: GmContainerItem, x: number, y: number, ignoreIds: string[]) => {
+  const w = itemW(other)
+  const h = itemH(other)
+  if (x < 0 || y < 0 || x + w > container.gridW || y + h > container.gridH) return false
+  return !container.items.some(o => {
+    if (ignoreIds.includes(o.itemId ?? '')) return false
+    return (
+      x < (o.gridX ?? 0) + itemW(o) && x + w > (o.gridX ?? 0) &&
+      y < (o.gridY ?? 0) + itemH(o) && y + h > (o.gridY ?? 0)
+    )
+  })
+}
+
+/** 客户端预检：目标区域必须为空，或仅被一件能与之换位的物品占据。 */
 const dropValid = computed(() => {
   const item = drag.item
   if (!item) return false
   const x1 = drag.hoverX
   const y1 = drag.hoverY
-  const x2 = x1 + itemW(item) - 1
-  const y2 = y1 + itemH(item) - 1
-  if (x1 < 0 || y1 < 0 || x2 >= container.gridW || y2 >= container.gridH) return false
-  return !container.items.some(other => {
+  const w = itemW(item)
+  const h = itemH(item)
+  if (x1 < 0 || y1 < 0 || x1 + w > container.gridW || y1 + h > container.gridH) return false
+  const hits = container.items.filter(other => {
     if (other.itemId === item.itemId) return false
-    const ox2 = (other.gridX ?? 0) + itemW(other) - 1
-    const oy2 = (other.gridY ?? 0) + itemH(other) - 1
-    return x1 <= ox2 && x2 >= (other.gridX ?? 0) && y1 <= oy2 && y2 >= (other.gridY ?? 0)
+    return (
+      x1 < (other.gridX ?? 0) + itemW(other) && x1 + w > (other.gridX ?? 0) &&
+      y1 < (other.gridY ?? 0) + itemH(other) && y1 + h > (other.gridY ?? 0)
+    )
   })
+  if (hits.length === 0) return true
+  if (hits.length > 1) return false
+  const other = hits[0]
+  const ox = other.gridX ?? 0
+  const oy = other.gridY ?? 0
+  // 拖拽区域必须整块落在对方物品上，且对方要能整体放回原位置，才允许交换
+  const covered = x1 >= ox && x1 + w <= ox + itemW(other) && y1 >= oy && y1 + h <= oy + itemH(other)
+  return covered && canPlaceAt(other, item.gridX ?? 0, item.gridY ?? 0, [item.itemId ?? '', other.itemId ?? ''])
 })
 
 const itemTitle = (item: GmContainerItem) =>

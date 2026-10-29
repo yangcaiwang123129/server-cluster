@@ -267,6 +267,11 @@ func (c *BaseContainer[T]) invokeRawSizeOf(it T) (w, h int32) {
 
 // canPlace 检查对象能否放在 (x,y)（朝向 rotated）：边界 + 碰撞（排除自身）。
 func (c *BaseContainer[T]) canPlace(occ []int64, it T, x, y int32, rotated bool) bool {
+	return c.canPlaceExcept(occ, it, x, y, rotated, 0)
+}
+
+// canPlaceExcept 与 canPlace 相同，但把 exceptID 的占用单元格视为空（用于交换/腾挪校验）。
+func (c *BaseContainer[T]) canPlaceExcept(occ []int64, it T, x, y int32, rotated bool, exceptID int64) bool {
 	w, h := c.invokeRawSizeOf(it)
 	if rotated {
 		w, h = h, w
@@ -278,12 +283,39 @@ func (c *BaseContainer[T]) canPlace(occ []int64, it T, x, y int32, rotated bool)
 	for dx := int32(0); dx < w; dx++ {
 		for dy := int32(0); dy < h; dy++ {
 			owner := occ[(y+dy)*c.GridW+(x+dx)]
-			if owner != 0 && owner != selfID {
+			if owner != 0 && owner != selfID && owner != exceptID {
 				return false
 			}
 		}
 	}
 	return true
+}
+
+// swapTarget 判断目标区域是否整块被同一件物品占据（满足时才允许两件物品交换）。
+// 返回占据者 id；目标区域有空格、越界或被多件物品占据时返回 false。
+func (c *BaseContainer[T]) swapTarget(occ []int64, it T, x, y int32, rotated bool) (int64, bool) {
+	w, h := c.invokeRawSizeOf(it)
+	if rotated {
+		w, h = h, w
+	}
+	if x < 0 || y < 0 || x+w > c.GridW || y+h > c.GridH {
+		return 0, false
+	}
+	selfID := it.ID()
+	var blocker int64
+	for dx := int32(0); dx < w; dx++ {
+		for dy := int32(0); dy < h; dy++ {
+			owner := occ[(y+dy)*c.GridW+(x+dx)]
+			if owner == 0 || owner == selfID {
+				return 0, false
+			}
+			if blocker != 0 && owner != blocker {
+				return 0, false
+			}
+			blocker = owner
+		}
+	}
+	return blocker, blocker != 0
 }
 
 // AddEntry 放入对象：校验 id 唯一、边界与碰撞后存入。
@@ -315,15 +347,34 @@ func (c *BaseContainer[T]) RemoveEntry(id int64) (T, error) {
 }
 
 // MoveEntry 将对象 id 移到 (toX,toY)，可选旋转。
+// 若目标区域整块被另一件物品占据、且该物品能放回 id 的原位置，则两件物品交换位置；
+// 其余情况（越界、含空格、被多件物品占据、对方放不回原位置）返回 ErrPositionConflict。
 func (c *BaseContainer[T]) MoveEntry(id int64, toX, toY int32, rotated bool) error {
 	it, ok := c.EntryMap.Get(id)
 	if !ok {
 		return ErrItemNotFound
 	}
 	occ := c.BuildOccupied()
-	if !c.canPlace(occ, it, toX, toY, rotated) {
+	if c.canPlace(occ, it, toX, toY, rotated) {
+		it.SetPos(toX, toY, rotated)
+		c.BumpVersion()
+		return nil
+	}
+	blocker, ok := c.swapTarget(occ, it, toX, toY, rotated)
+	if !ok {
 		return ErrPositionConflict
 	}
+	other, ok := c.EntryMap.Get(blocker)
+	if !ok {
+		return ErrPositionConflict
+	}
+	// 被挡住的物品放回 id 的原位置（保持自身朝向），两件物品一次性交换
+	px, py := it.Pos()
+	orot := other.IsRotated()
+	if !c.canPlaceExcept(occ, other, px, py, orot, id) {
+		return ErrPositionConflict
+	}
+	other.SetPos(px, py, orot)
 	it.SetPos(toX, toY, rotated)
 	c.BumpVersion()
 	return nil

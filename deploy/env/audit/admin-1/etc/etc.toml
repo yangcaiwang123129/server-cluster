@@ -1,0 +1,73 @@
+# 管理后台服（audit / admin-1）。
+
+pid = "./pid/admin-1.pid"
+mode = "debug"
+timezone = "Asia/Shanghai"
+
+[cluster.mesh]
+    id = "admin-1"
+    name = "admin"
+    codec = "json"
+    [cluster.mesh.linker]
+        callTimeout = "3s"
+
+[http]
+    addr = "0.0.0.0:8081"
+
+[http.swagger]
+    enable = true
+    title = "管理后台 API"
+    filePath = "docs/swagger.json"
+    basePath = "/swagger"
+
+[log]
+    level = "debug"
+    timeFormat = "2006/01/02 15:04:05.000000"
+    stackLevel = "error"
+    callFullPath = true
+    [log.file]
+        path = "./log/admin-1.log"
+        format = "text"
+        maxAge = "7d"
+        maxSize = 100
+        rotate = "day"
+
+[packet]
+    byteOrder = "big"
+    routeBytes = 4
+    seqBytes = 4
+    bufferBytes = 5000
+    heartbeatTime = true
+
+[task]
+    size = 1000
+    nonblocking = true
+    disablePurge = true
+
+[registry.etcd]
+    addrs = ["10.10.1.10:2379"]
+    namespace = "services"
+
+[transport.grpc.client]
+    caFile = ""
+    serverName = ""
+
+[[db.mysql.instances]]
+    name = "default"
+    dsn = "game:game123@tcp(10.10.1.10:3306)/game_audit?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s&readTimeout=10s&writeTimeout=10s"
+    max_open_conns = 50
+    max_idle_conns = 20
+
+[[redis.instances]]
+    name = "default"
+    addrs = ["10.10.1.10:6379"]
+    username = ""
+    password = "game123"
+    db = 1
+
+[jwt]
+    secret = "audit-cluster-secret"
+    valid_duration = 7200
+
+[sim]
+    loginAddr = "http://10.10.1.15:8080"

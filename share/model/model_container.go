@@ -186,9 +186,9 @@ func (PlayerContainer) TableName() string { return enum.TablePlayerContainer.Str
 func NewPlayerContainer(playerID int64) *PlayerContainer {
 	return &PlayerContainer{
 		PlayerID: playerID,
-		Backpack: newPlayerItemContainer(playerID, TypeBackpack, 8, 12),
-		Stash:    newPlayerItemContainer(playerID, TypeStash, 20, 20),
-		Secure:   newPlayerItemContainer(playerID, TypeSecure, 4, 6),
+		Backpack: newPlayerItemContainer(playerID, TypeBackpack, 6, 6),
+		Stash:    newPlayerItemContainer(playerID, TypeStash, 6, 6),
+		Secure:   newPlayerItemContainer(playerID, TypeSecure, 3, 3),
 	}
 }
 

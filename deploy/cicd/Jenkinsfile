@@ -1,0 +1,52 @@
+// CI/CD 流水线：参数选择环境/版本/服务器 → 拉代码 → 构建打包 → scp 分发重启。
+// 依赖插件：Git、Extended Choice Parameter（复选框服务器列表）。
+pipeline {
+    agent any
+
+    parameters {
+        choice(name: 'ENV', choices: ['audit', 'test', 'release', 'prod'], description: '环境')
+        string(name: 'VERSION', defaultValue: '', description: '版本号，如 v1.2.3')
+        string(name: 'BRANCH', defaultValue: 'main', description: '分支（TAG 为空时生效）')
+        string(name: 'TAG', defaultValue: '', description: 'Tag（非空时优先，按 tag 检出）')
+        extendedChoice(name: 'SERVERS', type: 'PT_CHECKBOX', multiSelectDelimiter: ' ',
+            value: 'gate-1,game-1,battle-1,social-1,login-1,admin-1',
+            description: '服务器（复选框，可多选）')
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    if (env.TAG?.trim()) {
+                        // 按 tag 拉取本次发布版本代码
+                        checkout([$class: 'GitSCM',
+                                  branches: [[name: "refs/tags/${env.TAG}"]],
+                                  userRemoteConfigs: scm.userRemoteConfigs])
+                    } else {
+                        checkout scm
+                    }
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // 配置随代码版本化：deploy/env/<ENV>/<服务器id>/etc，按所选服务器 id 打进包内
+                sh 'bash deploy/scripts/build.sh --env "$ENV" --version "$VERSION" --servers "$SERVERS"'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                // 主机清单：deploy/cicd/<ENV>/servers.conf；scp 后远端 stop → 解包 → start
+                sh 'bash deploy/cicd/deploy.sh --env "$ENV" --version "$VERSION" --servers "$SERVERS"'
+            }
+        }
+    }
+
+    post {
+        success {
+            archiveArtifacts artifacts: "dist/${params.ENV}/${params.VERSION}/*.tar.gz", fingerprint: true
+        }
+    }
+}

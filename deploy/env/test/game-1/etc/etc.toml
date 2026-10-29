@@ -1,0 +1,72 @@
+# 玩家逻辑服（test / game-1）。
+
+pid = "./pid/game-1.pid"
+mode = "debug"
+timezone = "Asia/Shanghai"
+
+[cluster.node]
+    id = "game-1"
+    name = "game"
+    addr = "127.0.0.1:"
+    codec = "proto"
+    [cluster.node.linker]
+        callTimeout = "3s"
+
+[log]
+    level = "info"
+    timeFormat = "2006/01/02 15:04:05.000000"
+    stackLevel = "error"
+    callFullPath = true
+    [log.file]
+        path = "./log/game-1.log"
+        format = "text"
+        maxAge = "7d"
+        maxSize = 100
+        rotate = "day"
+
+[packet]
+    byteOrder = "big"
+    routeBytes = 4
+    seqBytes = 4
+    bufferBytes = 5000
+
+[registry.etcd]
+    addrs = ["10.10.2.10:2379"]
+    namespace = "services"
+
+[locate.redis]
+    addrs = ["10.10.2.10:6379"]
+    db = 2
+    username = ""
+    password = "game123"
+    maxRetries = 3
+    prefix = "cluster:locate"
+
+[task]
+    size = 1000
+    nonblocking = true
+    disablePurge = true
+
+[transport.grpc.server]
+    addr = "127.0.0.1:"
+
+[transport.grpc.client]
+    caFile = ""
+    serverName = ""
+
+[[db.mysql.instances]]
+    name = "default"
+    dsn = "game:game123@tcp(10.10.2.10:3306)/game_test?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s&readTimeout=10s&writeTimeout=10s"
+    max_open_conns = 50
+    max_idle_conns = 20
+
+[[redis.instances]]
+    name = "default"
+    addrs = ["10.10.2.10:6379"]
+    username = ""
+    password = "game123"
+    db = 2
+
+[jwt]
+    secret = "test-cluster-secret"
+    valid_duration = 7200
