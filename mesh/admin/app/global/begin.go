@@ -33,6 +33,7 @@ func Init() error {
 			&model.SysLoginLog{},
 			&model.SysOperaLog{},
 			&model.SysCasbinRule{},
+			&model.ClientVersion{},
 		); err != nil {
 			return err
 		}

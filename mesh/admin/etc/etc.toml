@@ -80,3 +80,10 @@ timezone = "Local"
 [jwt]
     secret = "cluster-secret"
     valid_duration = 7200 # 秒
+
+# 客户端模拟器默认参数（页面可覆盖）
+[sim]
+    # 登录服地址
+    loginAddr = "http://188.18.23.72:8080"
+    # 网关地址覆盖；留空则使用登录服下发的 gateAddr
+    gateAddr = ""

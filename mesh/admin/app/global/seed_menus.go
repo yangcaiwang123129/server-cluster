@@ -179,4 +179,30 @@ var defaultMenus = []seedMenu{
 			},
 		},
 	},
+	{
+		Menu: model.SysMenu{MenuName: "Client", Title: "客户端管理", Path: "/client", MenuType: "M", Component: "Layout", Icon: "app-group-fill", Sort: 4, Visible: "0", IsFrame: "1"},
+		Children: []seedMenu{
+			{
+				Menu: model.SysMenu{MenuName: "ClientSimulator", Title: "模拟器", Path: "/client/simulator/index", Component: "/admin/simulator/index", Icon: "scene", MenuType: "C", Permission: "game:sim:list", Sort: 1, Visible: "0", IsFrame: "1"},
+				Apis: []seedAPI{
+					{"模拟器默认参数", "/api/v1/sim/options", "GET"},
+					{"模拟器登录", "/api/v1/sim/login", "POST"},
+					{"模拟器连接网关", "/api/v1/sim/connect", "POST"},
+					{"模拟器流程步骤", "/api/v1/sim/step", "POST"},
+					{"模拟器关闭会话", "/api/v1/sim/close", "POST"},
+				},
+			},
+			{
+				Menu: model.SysMenu{MenuName: "ClientVersionManage", Title: "版本管理", Path: "/client/version/index", Component: "/admin/client-version/index", Icon: "build", MenuType: "C", Permission: "client:version:list", Sort: 2, Visible: "0", IsFrame: "1"},
+				Apis: []seedAPI{
+					{"客户端版本列表", "/api/v1/client-version", "GET"},
+					{"客户端版本详情", "/api/v1/client-version/:id", "GET"},
+					{"新增客户端版本", "/api/v1/client-version", "POST"},
+					{"修改客户端版本", "/api/v1/client-version/:id", "PUT"},
+					{"删除客户端版本", "/api/v1/client-version", "DELETE"},
+					{"客户端版本启停", "/api/v1/client-version-status", "PUT"},
+				},
+			},
+		},
+	},
 }

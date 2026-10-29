@@ -332,3 +332,68 @@ export interface GameCatalogEntry {
   desc?: string
   rarity?: number
 }
+
+/** 客户端模拟器默认参数。 */
+export interface SimOptions {
+  loginAddr?: string
+  gateAddr?: string
+}
+
+/** 模拟客户端登录/注册参数。 */
+export interface SimLoginPayload {
+  mode: 'login' | 'register'
+  username: string
+  password: string
+  loginAddr?: string
+  gateAddr?: string
+}
+
+/** 登录/注册结果，request/response 为展示用报文。 */
+export interface SimLoginResult {
+  sessionId: string
+  playerId: number
+  token: string
+  gateAddr: string
+  takenMs: number
+  request?: unknown
+  response?: unknown
+}
+
+/** 连接网关结果。 */
+export interface SimConnectResult {
+  gateAddr: string
+  remoteAddr?: string
+  localAddr?: string
+  takenMs: number
+}
+
+/** 首包验证/进入/退出游戏结果。 */
+export interface SimStepResult {
+  step: string
+  route: number
+  seq: number
+  request?: unknown
+  response?: unknown
+  takenMs: number
+}
+
+/** 客户端版本（安装包清单）。 */
+export interface ClientVersion {
+  versionId?: number
+  version?: string
+  /** android / ios / windows */
+  platform?: string
+  downloadUrl?: string
+  forceUpdate?: boolean
+  /** '1' disabled, '2' normal. */
+  status?: string
+  releaseNote?: string
+  createdAt?: string
+  updatedAt?: string
+}
+
+export interface ClientVersionQuery {
+  version?: string
+  platform?: string
+  status?: string
+}

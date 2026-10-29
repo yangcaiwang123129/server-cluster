@@ -146,7 +146,7 @@ func syncMenus(gdb *gorm.DB) error {
 	})
 }
 
-// syncMenuNodes 递归补齐菜单节点：已存在的菜单沿用原配置与 ID，只补缺失的接口关系。
+// syncMenuNodes 递归补齐菜单节点：已存在的菜单沿用原 ID 与接口关系，归属/路由/标题以种子为准。
 func syncMenuNodes(tx *gorm.DB, items []seedMenu, parentId int) error {
 	for i := range items {
 		var menu model.SysMenu
@@ -159,6 +159,31 @@ func syncMenuNodes(tx *gorm.DB, items []seedMenu, parentId int) error {
 			}
 		} else if err != nil {
 			return err
+		} else {
+			// 内置模块被移动到别的目录或改名时，把既有菜单一并调整过来；
+			// 排序同样以种子为准，保证同一目录下方的内置页面顺序稳定。
+			updates := map[string]any{}
+			if menu.ParentId != parentId {
+				updates["parent_id"] = parentId
+			}
+			if menu.Path != items[i].Menu.Path {
+				updates["path"] = items[i].Menu.Path
+			}
+			if menu.Title != items[i].Menu.Title {
+				updates["title"] = items[i].Menu.Title
+			}
+			if menu.Sort != items[i].Menu.Sort {
+				updates["sort"] = items[i].Menu.Sort
+			}
+			if items[i].Menu.Icon != "" && menu.Icon == "" {
+				updates["icon"] = items[i].Menu.Icon
+			}
+			if len(updates) > 0 {
+				if err := tx.Model(&model.SysMenu{}).Where("menu_id = ?", menu.MenuId).
+					Updates(updates).Error; err != nil {
+					return err
+				}
+			}
 		}
 
 		for _, api := range items[i].Apis {

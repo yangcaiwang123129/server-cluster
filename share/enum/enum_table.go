@@ -28,6 +28,7 @@ const (
 	TableSysLoginLog   Table = "sys_login_log"   // 登录审计
 	TableSysOperaLog   Table = "sys_opera_log"   // 操作审计
 	TableSysCasbinRule Table = "sys_casbin_rule" // 接口放行规则
+	TableClientVersion Table = "client_version"  // 客户端版本
 )
 
 // String 返回表名字符串。
