@@ -61,7 +61,7 @@ func (this *gmHeroLogic) HeroAdd(req dto.GmHeroAddReq) (*dto.GmHeroEntry, error)
 	resp := &pb.HeroAddResp{}
 	callReq := &pb.GmHeroAddReq{
 		PlayerId: req.PlayerID,
-		Req:      &pb.HeroAddReq{HeroId: req.HeroID},
+		Req:      &pb.HeroAddReq{CfgId: req.HeroID},
 	}
 	if err := gmCall(ctx, req.PlayerID, pb.GameAdminService_HeroAdd_FullMethodName, callReq, resp); err != nil {
 		return nil, err
@@ -79,7 +79,7 @@ func (this *gmHeroLogic) HeroUpdate(req dto.GmHeroUpdateReq) (*dto.GmHeroEntry, 
 	callReq := &pb.GmHeroUpdateReq{
 		PlayerId: req.PlayerID,
 		Req: &pb.HeroUpdateReq{
-			HeroId:   req.HeroID,
+			CfgId:    req.HeroID,
 			Level:    req.Level,
 			Exp:      req.Exp,
 			Star:     req.Star,
@@ -97,14 +97,14 @@ func (this *gmHeroLogic) HeroUpdate(req dto.GmHeroUpdateReq) (*dto.GmHeroEntry, 
 // toGmHeroEntry 英雄条目转响应（补齐名称/稀有度等展示信息）。
 func toGmHeroEntry(e *pb.HeroEntry) dto.GmHeroEntry {
 	row := dto.GmHeroEntry{
-		HeroID:   e.GetHeroId(),
+		HeroID:   e.GetCfgId(),
 		Level:    e.GetLevel(),
 		Exp:      e.GetExp(),
 		Star:     e.GetStar(),
 		SkinID:   e.GetSkinId(),
 		Equipped: e.GetEquipped(),
 	}
-	if cfg := tpl.T().RoleInfo.Get(e.GetHeroId()); cfg != nil {
+	if cfg := tpl.T().RoleInfo.Get(e.GetCfgId()); cfg != nil {
 		row.Name = cfg.Name
 		row.Rarity = cfg.Rarity
 	}

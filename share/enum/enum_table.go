@@ -15,6 +15,15 @@ const (
 	TablePlayerContainer Table = "player_container" // 玩家容器（1:1）
 )
 
+// 游戏打点记录表（game_record 库，game 写入、admin 只读）。
+const (
+	TableItemRecord   Table = "item_record"   // 物品打点
+	TableEquipRecord  Table = "equip_record"  // 装备打点
+	TableWeaponRecord Table = "weapon_record" // 武器打点
+	TableSkillRecord  Table = "skill_record"  // 技能打点
+	TableHeroRecord   Table = "hero_record"   // 英雄打点
+)
+
 // 管理后台表（mesh/admin）。
 const (
 	TableSysUser       Table = "sys_user"        // 后台账号

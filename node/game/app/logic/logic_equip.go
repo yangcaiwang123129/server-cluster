@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 	"errors"
+	"server-cluster/internal/record"
 	"sort"
 
 	"gorm.io/gorm"
@@ -41,14 +42,14 @@ func (this *equipLogic) EquipList(ctx context.Context, playerID int64) (*pb.Equi
 		return true
 	})
 	// map 遍历无序，按配置ID排序保证客户端展示稳定
-	sort.Slice(entries, func(i, j int) bool { return entries[i].EquipId < entries[j].EquipId })
+	sort.Slice(entries, func(i, j int) bool { return entries[i].CfgId < entries[j].CfgId })
 	return &pb.EquipListResp{EquipEntries: entries}, nil
 }
 
 // toEquipEntry 持有数据 → wire 条目（仅状态）。
 func toEquipEntry(g model.EquipInfo) *pb.EquipEntry {
 	return &pb.EquipEntry{
-		EquipId:  g.EquipID,
+		CfgId:    g.EquipID,
 		Level:    g.Level,
 		Equipped: g.Equipped,
 	}
@@ -56,7 +57,7 @@ func toEquipEntry(g model.EquipInfo) *pb.EquipEntry {
 
 // EquipAdd 新增装备：配置ID必须存在，已拥有返回错误。
 func (this *equipLogic) EquipAdd(ctx context.Context, playerID int64, req *pb.EquipAddReq) (*pb.EquipAddResp, error) {
-	if !tpl.T().Equip.Has(req.GetEquipId()) {
+	if !tpl.T().Equip.Has(req.GetCfgId()) {
 		return nil, errs.CodeInvalidParams.Err()
 	}
 
@@ -65,12 +66,13 @@ func (this *equipLogic) EquipAdd(ctx context.Context, playerID int64, req *pb.Eq
 		return nil, err
 	}
 
-	g := model.EquipInfo{EquipID: req.GetEquipId()}
+	g := model.EquipInfo{EquipID: req.GetCfgId()}
 	if !row.AddEquip(g) {
 		return nil, errs.CodeInvalidParams.WithMessage("装备已拥有").Err()
 	}
 
 	global.PlayerEquipCache.Set(playerID, row)
+	record.Record(ctx, model.RecordModuleEquip, playerID, model.RecordActionGain, req.GetCfgId(), 1)
 	return &pb.EquipAddResp{EquipEntry: toEquipEntry(g)}, nil
 }
 
@@ -82,7 +84,7 @@ func (this *equipLogic) EquipUpdate(ctx context.Context, playerID int64, req *pb
 	}
 
 	g := model.EquipInfo{
-		EquipID:  req.GetEquipId(),
+		EquipID:  req.GetCfgId(),
 		Level:    req.GetLevel(),
 		Equipped: req.GetEquipped(),
 	}

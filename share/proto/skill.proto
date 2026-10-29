@@ -17,13 +17,13 @@ message SkillListResp {
 }
 
 // 技能变化通知（路由 10041）
-message SkillChangeNotify {
+message SkillNotify {
   SkillEntry skill_entry = 1;
 }
 
 // 新增技能请求（路由 10042）
 message SkillAddReq {
-  int32 skill_id = 1; // 技能配置ID
+  int32 cfg_id = 1; // 技能配置ID
 }
 
 // 新增技能响应
@@ -34,7 +34,7 @@ message SkillAddResp {
 
 // 更新技能请求（路由 10043）
 message SkillUpdateReq {
-  int32 skill_id = 1; // 技能配置ID
+  int32 cfg_id = 1; // 技能配置ID
   int32 level = 2;    // 等级
   bool equipped = 3;  // 是否装备
 }

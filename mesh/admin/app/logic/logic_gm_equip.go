@@ -61,7 +61,7 @@ func (this *gmEquipLogic) EquipAdd(req dto.GmEquipAddReq) (*dto.GmEquipEntry, er
 	resp := &pb.EquipAddResp{}
 	callReq := &pb.GmEquipAddReq{
 		PlayerId: req.PlayerID,
-		Req:      &pb.EquipAddReq{EquipId: req.EquipID},
+		Req:      &pb.EquipAddReq{CfgId: req.EquipID},
 	}
 	if err := gmCall(ctx, req.PlayerID, pb.GameAdminService_EquipAdd_FullMethodName, callReq, resp); err != nil {
 		return nil, err
@@ -79,7 +79,7 @@ func (this *gmEquipLogic) EquipUpdate(req dto.GmEquipUpdateReq) (*dto.GmEquipEnt
 	callReq := &pb.GmEquipUpdateReq{
 		PlayerId: req.PlayerID,
 		Req: &pb.EquipUpdateReq{
-			EquipId:   req.EquipID,
+			CfgId:    req.EquipID,
 			Level:    req.Level,
 			Equipped: req.Equipped,
 		},
@@ -94,11 +94,11 @@ func (this *gmEquipLogic) EquipUpdate(req dto.GmEquipUpdateReq) (*dto.GmEquipEnt
 // toGmEquipEntry 装备条目转响应。
 func toGmEquipEntry(e *pb.EquipEntry) dto.GmEquipEntry {
 	row := dto.GmEquipEntry{
-		EquipID:   e.GetEquipId(),
+		EquipID:  e.GetCfgId(),
 		Level:    e.GetLevel(),
 		Equipped: e.GetEquipped(),
 	}
-	if cfg := tpl.T().Equip.Get(e.GetEquipId()); cfg != nil {
+	if cfg := tpl.T().Equip.Get(e.GetCfgId()); cfg != nil {
 		row.Name = cfg.EquipName
 		row.IconKey = cfg.Icon
 		row.Desc = cfg.Desc

@@ -75,6 +75,13 @@ timezone = "Local"
     max_open_conns = 50
     max_idle_conns = 20
 
+# 打点记录库（game_record）：物品/装备/武器/技能/英雄 获得与消耗记录
+[[db.mysql.instances]]
+    name = "record"
+    dsn = "root:root123@tcp(127.0.0.1:3306)/game_record?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s&readTimeout=10s&writeTimeout=10s"
+    max_open_conns = 50
+    max_idle_conns = 20
+
 # Redis 命名实例（不同业务可按 name 使用不同 db 号）
 [[redis.instances]]
     name = "default"

@@ -119,7 +119,7 @@ var defaultMenus = []seedMenu{
 		},
 	},
 	{
-		Menu: model.SysMenu{MenuName: "Game", Title: "游戏管理", Path: "/game", MenuType: "M", Component: "Layout", Icon: "star", Sort: 3, Visible: "0", IsFrame: "1"},
+		Menu: model.SysMenu{MenuName: "Game", Title: "游戏管理", Path: "/game", MenuType: "M", Component: "Layout", Icon: "star", Sort: 4, Visible: "0", IsFrame: "1"},
 		Children: []seedMenu{
 			{
 				Menu: model.SysMenu{MenuName: "PlayerManage", Title: "玩家列表", Path: "/game/player/index", Component: "/admin/player/index", MenuType: "C", Icon: "user-info", Permission: "game:player:list", Sort: 1, Visible: "0", IsFrame: "1"},
@@ -180,7 +180,7 @@ var defaultMenus = []seedMenu{
 		},
 	},
 	{
-		Menu: model.SysMenu{MenuName: "Client", Title: "客户端管理", Path: "/client", MenuType: "M", Component: "Layout", Icon: "app-group-fill", Sort: 4, Visible: "0", IsFrame: "1"},
+		Menu: model.SysMenu{MenuName: "Client", Title: "客户端管理", Path: "/client", MenuType: "M", Component: "Layout", Icon: "app-group-fill", Sort: 3, Visible: "0", IsFrame: "1"},
 		Children: []seedMenu{
 			{
 				Menu: model.SysMenu{MenuName: "ClientSimulator", Title: "模拟器", Path: "/client/simulator/index", Component: "/admin/simulator/index", Icon: "scene", MenuType: "C", Permission: "game:sim:list", Sort: 1, Visible: "0", IsFrame: "1"},
@@ -201,6 +201,23 @@ var defaultMenus = []seedMenu{
 					{"修改客户端版本", "/api/v1/gm/client/version/:id", "PUT"},
 					{"删除客户端版本", "/api/v1/gm/client/version", "DELETE"},
 					{"客户端版本启停", "/api/v1/gm/client/version-status", "PUT"},
+				},
+			},
+		},
+	},
+	{
+		Menu: model.SysMenu{MenuName: "GameRecord", Title: "游戏记录", Path: "/record", MenuType: "M", Component: "Layout", Icon: "form", Sort: 5, Visible: "0", IsFrame: "1"},
+		Children: []seedMenu{
+			{
+				Menu: model.SysMenu{MenuName: "GameRecordGain", Title: "获得记录", Path: "/record/gain", Component: "/admin/game-record/gain", MenuType: "C", Icon: "list", Permission: "game:gm:record:gain", Sort: 1, Visible: "0", IsFrame: "1"},
+				Apis: []seedAPI{
+					{"获得记录列表", "/api/v1/gm/record", "GET"},
+				},
+			},
+			{
+				Menu: model.SysMenu{MenuName: "GameRecordConsume", Title: "消耗记录", Path: "/record/consume", Component: "/admin/game-record/consume", MenuType: "C", Icon: "err-list", Permission: "game:gm:record:consume", Sort: 2, Visible: "0", IsFrame: "1"},
+				Apis: []seedAPI{
+					{"消耗记录列表", "/api/v1/gm/record", "GET"},
 				},
 			},
 		},

@@ -34,64 +34,66 @@ const (
 	RouteCode_ROUTE_CODE_LEAVE_GAME   RouteCode = 10002 // 离开游戏
 	RouteCode_ROUTE_CODE_SEVER_NOTIFY RouteCode = 10003 // 服务器通知
 	// 玩家容器 10010~10019
-	RouteCode_ROUTE_CODE_CONTAINER_LIST     RouteCode = 10010  // 容器列表
-	RouteCode_ROUTE_CODE_CONTAINER_NOTIFY   RouteCode = 10011  // 容器内变化通知
-	RouteCode_ROUTE_CODE_CONTAINER_MOVE     RouteCode = 100112 // 容器内物品移动
-	RouteCode_ROUTE_CODE_CONTAINER_ROTATE   RouteCode = 10013  // 容器内物品旋转
-	RouteCode_ROUTE_CODE_CONTAINER_SORT     RouteCode = 10014  // 容器一键整理物品
-	RouteCode_ROUTE_CODE_CONTAINER_TRANSFER RouteCode = 10015  // 容器间物品移动
+	RouteCode_ROUTE_CODE_CONTAINER_LIST     RouteCode = 10010 // 容器列表
+	RouteCode_ROUTE_CODE_CONTAINER_NOTIFY   RouteCode = 10011 // 容器内变化通知
+	RouteCode_ROUTE_CODE_CONTAINER_ADD      RouteCode = 10012 // 容器内对象添加(预发布和生成环境不开放)
+	RouteCode_ROUTE_CODE_CONTAINER_MOVE     RouteCode = 10013 // 容器内对象移动
+	RouteCode_ROUTE_CODE_CONTAINER_ROTATE   RouteCode = 10014 // 容器内对象旋转
+	RouteCode_ROUTE_CODE_CONTAINER_SORT     RouteCode = 10015 // 容器一键整理对象
+	RouteCode_ROUTE_CODE_CONTAINER_TRANSFER RouteCode = 10016 // 容器间对象移动
 	// 英雄 10020~10029
 	RouteCode_ROUTE_CODE_HERO_LIST   RouteCode = 10020 // 英雄列表
 	RouteCode_ROUTE_CODE_HERO_NOTIFY RouteCode = 10021 // 英雄变化通知
-	RouteCode_ROUTE_CODE_HERO_ADD    RouteCode = 10022 // 新增英雄
-	RouteCode_ROUTE_CODE_HERO_UPDATE RouteCode = 10023 // 更新英雄
+	RouteCode_ROUTE_CODE_HERO_ADD    RouteCode = 10022 // 新增英雄(预发布和生成环境不开放)
+	RouteCode_ROUTE_CODE_HERO_UPDATE RouteCode = 10023 // 更新英雄(预发布和生成环境不开放)
 	// 武器 10030~10039
 	RouteCode_ROUTE_CODE_WEAPON_LIST   RouteCode = 10030 // 武器列表
 	RouteCode_ROUTE_CODE_WEAPON_NOTIFY RouteCode = 10031 // 武器变化通知
-	RouteCode_ROUTE_CODE_WEAPON_ADD    RouteCode = 10032 // 新增武器
-	RouteCode_ROUTE_CODE_WEAPON_UPDATE RouteCode = 10033 // 更新武器
+	RouteCode_ROUTE_CODE_WEAPON_ADD    RouteCode = 10032 // 新增武器(预发布和生成环境不开放)
+	RouteCode_ROUTE_CODE_WEAPON_UPDATE RouteCode = 10033 // 更新武器(预发布和生成环境不开放)
 	// 技能 10040~10049
 	RouteCode_ROUTE_CODE_SKILL_LIST   RouteCode = 10040 // 技能列表
 	RouteCode_ROUTE_CODE_SKILL_NOTIFY RouteCode = 10041 // 技能变化通知
-	RouteCode_ROUTE_CODE_SKILL_ADD    RouteCode = 10042 // 新增技能
-	RouteCode_ROUTE_CODE_SKILL_UPDATE RouteCode = 10043 // 更新技能
+	RouteCode_ROUTE_CODE_SKILL_ADD    RouteCode = 10042 // 新增技能(预发布和生成环境不开放)
+	RouteCode_ROUTE_CODE_SKILL_UPDATE RouteCode = 10043 // 更新技能(预发布和生成环境不开放)
 	// 装备 10050~10059
 	RouteCode_ROUTE_CODE_EQUIP_LIST   RouteCode = 10050 // 装备列表
 	RouteCode_ROUTE_CODE_EQUIP_NOTIFY RouteCode = 10051 // 装备变化通知
-	RouteCode_ROUTE_CODE_EQUIP_ADD    RouteCode = 10052 // 新增装备
-	RouteCode_ROUTE_CODE_EQUIP_UPDATE RouteCode = 10053 // 更新装备
+	RouteCode_ROUTE_CODE_EQUIP_ADD    RouteCode = 10052 // 新增装备(预发布和生成环境不开放)
+	RouteCode_ROUTE_CODE_EQUIP_UPDATE RouteCode = 10053 // 更新装备(预发布和生成环境不开放)
 )
 
 // Enum value maps for RouteCode.
 var (
 	RouteCode_name = map[int32]string{
-		0:      "ROUTE_CODE_UNSPECIFIED",
-		10000:  "ROUTE_CODE_VERIFY",
-		10001:  "ROUTE_CODE_ENTER_GAME",
-		10002:  "ROUTE_CODE_LEAVE_GAME",
-		10003:  "ROUTE_CODE_SEVER_NOTIFY",
-		10010:  "ROUTE_CODE_CONTAINER_LIST",
-		10011:  "ROUTE_CODE_CONTAINER_NOTIFY",
-		100112: "ROUTE_CODE_CONTAINER_MOVE",
-		10013:  "ROUTE_CODE_CONTAINER_ROTATE",
-		10014:  "ROUTE_CODE_CONTAINER_SORT",
-		10015:  "ROUTE_CODE_CONTAINER_TRANSFER",
-		10020:  "ROUTE_CODE_HERO_LIST",
-		10021:  "ROUTE_CODE_HERO_NOTIFY",
-		10022:  "ROUTE_CODE_HERO_ADD",
-		10023:  "ROUTE_CODE_HERO_UPDATE",
-		10030:  "ROUTE_CODE_WEAPON_LIST",
-		10031:  "ROUTE_CODE_WEAPON_NOTIFY",
-		10032:  "ROUTE_CODE_WEAPON_ADD",
-		10033:  "ROUTE_CODE_WEAPON_UPDATE",
-		10040:  "ROUTE_CODE_SKILL_LIST",
-		10041:  "ROUTE_CODE_SKILL_NOTIFY",
-		10042:  "ROUTE_CODE_SKILL_ADD",
-		10043:  "ROUTE_CODE_SKILL_UPDATE",
-		10050:  "ROUTE_CODE_EQUIP_LIST",
-		10051:  "ROUTE_CODE_EQUIP_NOTIFY",
-		10052:  "ROUTE_CODE_EQUIP_ADD",
-		10053:  "ROUTE_CODE_EQUIP_UPDATE",
+		0:     "ROUTE_CODE_UNSPECIFIED",
+		10000: "ROUTE_CODE_VERIFY",
+		10001: "ROUTE_CODE_ENTER_GAME",
+		10002: "ROUTE_CODE_LEAVE_GAME",
+		10003: "ROUTE_CODE_SEVER_NOTIFY",
+		10010: "ROUTE_CODE_CONTAINER_LIST",
+		10011: "ROUTE_CODE_CONTAINER_NOTIFY",
+		10012: "ROUTE_CODE_CONTAINER_ADD",
+		10013: "ROUTE_CODE_CONTAINER_MOVE",
+		10014: "ROUTE_CODE_CONTAINER_ROTATE",
+		10015: "ROUTE_CODE_CONTAINER_SORT",
+		10016: "ROUTE_CODE_CONTAINER_TRANSFER",
+		10020: "ROUTE_CODE_HERO_LIST",
+		10021: "ROUTE_CODE_HERO_NOTIFY",
+		10022: "ROUTE_CODE_HERO_ADD",
+		10023: "ROUTE_CODE_HERO_UPDATE",
+		10030: "ROUTE_CODE_WEAPON_LIST",
+		10031: "ROUTE_CODE_WEAPON_NOTIFY",
+		10032: "ROUTE_CODE_WEAPON_ADD",
+		10033: "ROUTE_CODE_WEAPON_UPDATE",
+		10040: "ROUTE_CODE_SKILL_LIST",
+		10041: "ROUTE_CODE_SKILL_NOTIFY",
+		10042: "ROUTE_CODE_SKILL_ADD",
+		10043: "ROUTE_CODE_SKILL_UPDATE",
+		10050: "ROUTE_CODE_EQUIP_LIST",
+		10051: "ROUTE_CODE_EQUIP_NOTIFY",
+		10052: "ROUTE_CODE_EQUIP_ADD",
+		10053: "ROUTE_CODE_EQUIP_UPDATE",
 	}
 	RouteCode_value = map[string]int32{
 		"ROUTE_CODE_UNSPECIFIED":        0,
@@ -101,10 +103,11 @@ var (
 		"ROUTE_CODE_SEVER_NOTIFY":       10003,
 		"ROUTE_CODE_CONTAINER_LIST":     10010,
 		"ROUTE_CODE_CONTAINER_NOTIFY":   10011,
-		"ROUTE_CODE_CONTAINER_MOVE":     100112,
-		"ROUTE_CODE_CONTAINER_ROTATE":   10013,
-		"ROUTE_CODE_CONTAINER_SORT":     10014,
-		"ROUTE_CODE_CONTAINER_TRANSFER": 10015,
+		"ROUTE_CODE_CONTAINER_ADD":      10012,
+		"ROUTE_CODE_CONTAINER_MOVE":     10013,
+		"ROUTE_CODE_CONTAINER_ROTATE":   10014,
+		"ROUTE_CODE_CONTAINER_SORT":     10015,
+		"ROUTE_CODE_CONTAINER_TRANSFER": 10016,
 		"ROUTE_CODE_HERO_LIST":          10020,
 		"ROUTE_CODE_HERO_NOTIFY":        10021,
 		"ROUTE_CODE_HERO_ADD":           10022,
@@ -670,12 +673,12 @@ func (*ObjectValue_StringValue) isObjectValue_Kind() {}
 // 容器中的物品
 type ItemEntry struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ItemId        int64                  `protobuf:"varint,1,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"`            // 物品唯一实例ID
-	ItemCfgId     int32                  `protobuf:"varint,2,opt,name=item_cfg_id,json=itemCfgId,proto3" json:"item_cfg_id,omitempty"` // 物品配置ID
-	Count         int32                  `protobuf:"varint,3,opt,name=count,proto3" json:"count,omitempty"`                            // 堆叠数量
-	GridX         int32                  `protobuf:"varint,4,opt,name=grid_x,json=gridX,proto3" json:"grid_x,omitempty"`               // 网格 X
-	GridY         int32                  `protobuf:"varint,5,opt,name=grid_y,json=gridY,proto3" json:"grid_y,omitempty"`               // 网格 Y
-	Rotated       bool                   `protobuf:"varint,6,opt,name=rotated,proto3" json:"rotated,omitempty"`                        // 是否旋转
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                    // 实例ID
+	CfgId         int32                  `protobuf:"varint,2,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 配置ID
+	Count         int32                  `protobuf:"varint,3,opt,name=count,proto3" json:"count,omitempty"`              // 堆叠数量
+	GridX         int32                  `protobuf:"varint,4,opt,name=grid_x,json=gridX,proto3" json:"grid_x,omitempty"` // 网格 X
+	GridY         int32                  `protobuf:"varint,5,opt,name=grid_y,json=gridY,proto3" json:"grid_y,omitempty"` // 网格 Y
+	Rotated       bool                   `protobuf:"varint,6,opt,name=rotated,proto3" json:"rotated,omitempty"`          // 是否旋转
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -710,16 +713,16 @@ func (*ItemEntry) Descriptor() ([]byte, []int) {
 	return file_common_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *ItemEntry) GetItemId() int64 {
+func (x *ItemEntry) GetId() int64 {
 	if x != nil {
-		return x.ItemId
+		return x.Id
 	}
 	return 0
 }
 
-func (x *ItemEntry) GetItemCfgId() int32 {
+func (x *ItemEntry) GetCfgId() int32 {
 	if x != nil {
-		return x.ItemCfgId
+		return x.CfgId
 	}
 	return 0
 }
@@ -755,12 +758,12 @@ func (x *ItemEntry) GetRotated() bool {
 // 容器条目
 type ContainerEntry struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ContainerId   int64                  `protobuf:"varint,1,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"` // 容器实例ID（=playerID + type 编码）
-	Type          ContainerType          `protobuf:"varint,2,opt,name=type,proto3,enum=pb.ContainerType" json:"type,omitempty"`            // 容器类型
-	GridW         int32                  `protobuf:"varint,3,opt,name=grid_w,json=gridW,proto3" json:"grid_w,omitempty"`                   // 网格宽度
-	GridH         int32                  `protobuf:"varint,4,opt,name=grid_h,json=gridH,proto3" json:"grid_h,omitempty"`                   // 网格高度
-	Version       int32                  `protobuf:"varint,5,opt,name=version,proto3" json:"version,omitempty"`                            // 操作版本号（每次修改+1）
-	ItemEntries   []*ItemEntry           `protobuf:"bytes,6,rep,name=item_entries,json=itemEntries,proto3" json:"item_entries,omitempty"`  // 物品列表
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                     // 容器实例ID（=playerID + type 编码）
+	Type          ContainerType          `protobuf:"varint,2,opt,name=type,proto3,enum=pb.ContainerType" json:"type,omitempty"`           // 容器类型
+	GridW         int32                  `protobuf:"varint,3,opt,name=grid_w,json=gridW,proto3" json:"grid_w,omitempty"`                  // 网格宽度
+	GridH         int32                  `protobuf:"varint,4,opt,name=grid_h,json=gridH,proto3" json:"grid_h,omitempty"`                  // 网格高度
+	Version       int32                  `protobuf:"varint,5,opt,name=version,proto3" json:"version,omitempty"`                           // 操作版本号（每次修改+1）
+	ItemEntries   []*ItemEntry           `protobuf:"bytes,6,rep,name=item_entries,json=itemEntries,proto3" json:"item_entries,omitempty"` // 物品列表
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -795,9 +798,9 @@ func (*ContainerEntry) Descriptor() ([]byte, []int) {
 	return file_common_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *ContainerEntry) GetContainerId() int64 {
+func (x *ContainerEntry) GetId() int64 {
 	if x != nil {
-		return x.ContainerId
+		return x.Id
 	}
 	return 0
 }
@@ -840,12 +843,13 @@ func (x *ContainerEntry) GetItemEntries() []*ItemEntry {
 // 英雄持有（仅状态，静态属性由 hero_id 关联英雄配置表）
 type HeroEntry struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	HeroId        int32                  `protobuf:"varint,1,opt,name=hero_id,json=heroId,proto3" json:"hero_id,omitempty"` // 英雄配置ID
-	Level         int32                  `protobuf:"varint,2,opt,name=level,proto3" json:"level,omitempty"`                 // 等级
-	Exp           int64                  `protobuf:"varint,3,opt,name=exp,proto3" json:"exp,omitempty"`                     // 经验
-	Star          int32                  `protobuf:"varint,4,opt,name=star,proto3" json:"star,omitempty"`                   // 星级
-	SkinId        int32                  `protobuf:"varint,5,opt,name=skin_id,json=skinId,proto3" json:"skin_id,omitempty"` // 皮肤ID
-	Equipped      bool                   `protobuf:"varint,6,opt,name=equipped,proto3" json:"equipped,omitempty"`           // 是否出战
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                       // 实例ID
+	CfgId         int32                  `protobuf:"varint,2,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"`    // 配置ID
+	Level         int32                  `protobuf:"varint,3,opt,name=level,proto3" json:"level,omitempty"`                 // 等级
+	Exp           int64                  `protobuf:"varint,4,opt,name=exp,proto3" json:"exp,omitempty"`                     // 经验
+	Star          int32                  `protobuf:"varint,5,opt,name=star,proto3" json:"star,omitempty"`                   // 星级
+	SkinId        int32                  `protobuf:"varint,6,opt,name=skin_id,json=skinId,proto3" json:"skin_id,omitempty"` // 皮肤ID
+	Equipped      bool                   `protobuf:"varint,7,opt,name=equipped,proto3" json:"equipped,omitempty"`           // 是否出战
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -880,9 +884,16 @@ func (*HeroEntry) Descriptor() ([]byte, []int) {
 	return file_common_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *HeroEntry) GetHeroId() int32 {
+func (x *HeroEntry) GetId() int64 {
 	if x != nil {
-		return x.HeroId
+		return x.Id
+	}
+	return 0
+}
+
+func (x *HeroEntry) GetCfgId() int32 {
+	if x != nil {
+		return x.CfgId
 	}
 	return 0
 }
@@ -925,10 +936,11 @@ func (x *HeroEntry) GetEquipped() bool {
 // 武器持有（仅状态，静态属性由 weapon_id 关联武器配置表）
 type WeaponEntry struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	WeaponId      int32                  `protobuf:"varint,1,opt,name=weapon_id,json=weaponId,proto3" json:"weapon_id,omitempty"` // 武器配置ID
-	Level         int32                  `protobuf:"varint,2,opt,name=level,proto3" json:"level,omitempty"`                       // 等级
-	Durability    int32                  `protobuf:"varint,3,opt,name=durability,proto3" json:"durability,omitempty"`             // 耐久度
-	Equipped      bool                   `protobuf:"varint,4,opt,name=equipped,proto3" json:"equipped,omitempty"`                 // 是否装备
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                    // 实例ID
+	CfgId         int32                  `protobuf:"varint,2,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 配置ID
+	Level         int32                  `protobuf:"varint,3,opt,name=level,proto3" json:"level,omitempty"`              // 等级
+	Durability    int32                  `protobuf:"varint,4,opt,name=durability,proto3" json:"durability,omitempty"`    // 耐久度
+	Equipped      bool                   `protobuf:"varint,5,opt,name=equipped,proto3" json:"equipped,omitempty"`        // 是否装备
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -963,9 +975,16 @@ func (*WeaponEntry) Descriptor() ([]byte, []int) {
 	return file_common_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *WeaponEntry) GetWeaponId() int32 {
+func (x *WeaponEntry) GetId() int64 {
 	if x != nil {
-		return x.WeaponId
+		return x.Id
+	}
+	return 0
+}
+
+func (x *WeaponEntry) GetCfgId() int32 {
+	if x != nil {
+		return x.CfgId
 	}
 	return 0
 }
@@ -994,9 +1013,10 @@ func (x *WeaponEntry) GetEquipped() bool {
 // 技能持有（仅状态，静态属性由 skill_id 关联技能配置表）
 type SkillEntry struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	SkillId       int32                  `protobuf:"varint,1,opt,name=skill_id,json=skillId,proto3" json:"skill_id,omitempty"` // 技能配置ID
-	Level         int32                  `protobuf:"varint,2,opt,name=level,proto3" json:"level,omitempty"`                    // 等级
-	Equipped      bool                   `protobuf:"varint,3,opt,name=equipped,proto3" json:"equipped,omitempty"`              // 是否装备
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                    // 实例ID
+	CfgId         int32                  `protobuf:"varint,2,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 配置ID
+	Level         int32                  `protobuf:"varint,3,opt,name=level,proto3" json:"level,omitempty"`              // 等级
+	Equipped      bool                   `protobuf:"varint,4,opt,name=equipped,proto3" json:"equipped,omitempty"`        // 是否装备
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1031,9 +1051,16 @@ func (*SkillEntry) Descriptor() ([]byte, []int) {
 	return file_common_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *SkillEntry) GetSkillId() int32 {
+func (x *SkillEntry) GetId() int64 {
 	if x != nil {
-		return x.SkillId
+		return x.Id
+	}
+	return 0
+}
+
+func (x *SkillEntry) GetCfgId() int32 {
+	if x != nil {
+		return x.CfgId
 	}
 	return 0
 }
@@ -1055,9 +1082,10 @@ func (x *SkillEntry) GetEquipped() bool {
 // 装备持有（仅状态，静态属性由 equip_id 关联装备配置表）
 type EquipEntry struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	EquipId       int32                  `protobuf:"varint,1,opt,name=equip_id,json=equipId,proto3" json:"equip_id,omitempty"` // 装备配置ID
-	Level         int32                  `protobuf:"varint,2,opt,name=level,proto3" json:"level,omitempty"`                    // 等级
-	Equipped      bool                   `protobuf:"varint,3,opt,name=equipped,proto3" json:"equipped,omitempty"`              // 是否穿戴
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                    // 实例ID
+	CfgId         int32                  `protobuf:"varint,2,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 配置ID
+	Level         int32                  `protobuf:"varint,3,opt,name=level,proto3" json:"level,omitempty"`              // 等级
+	Equipped      bool                   `protobuf:"varint,4,opt,name=equipped,proto3" json:"equipped,omitempty"`        // 是否穿戴
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1092,9 +1120,16 @@ func (*EquipEntry) Descriptor() ([]byte, []int) {
 	return file_common_proto_rawDescGZIP(), []int{9}
 }
 
-func (x *EquipEntry) GetEquipId() int32 {
+func (x *EquipEntry) GetId() int64 {
 	if x != nil {
-		return x.EquipId
+		return x.Id
+	}
+	return 0
+}
+
+func (x *EquipEntry) GetCfgId() int32 {
+	if x != nil {
+		return x.CfgId
 	}
 	return 0
 }
@@ -1137,45 +1172,49 @@ const file_common_proto_rawDesc = "" +
 	"\fBigint_value\x18\x03 \x01(\x03H\x00R\vBigintValue\x12#\n" +
 	"\fdouble_value\x18\x04 \x01(\x01H\x00R\vdoubleValue\x12#\n" +
 	"\fstring_value\x18\x05 \x01(\tH\x00R\vstringValueB\x06\n" +
-	"\x04kind\"\xa2\x01\n" +
-	"\tItemEntry\x12\x17\n" +
-	"\aitem_id\x18\x01 \x01(\x03R\x06itemId\x12\x1e\n" +
-	"\vitem_cfg_id\x18\x02 \x01(\x05R\titemCfgId\x12\x14\n" +
+	"\x04kind\"\x90\x01\n" +
+	"\tItemEntry\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x15\n" +
+	"\x06cfg_id\x18\x02 \x01(\x05R\x05cfgId\x12\x14\n" +
 	"\x05count\x18\x03 \x01(\x05R\x05count\x12\x15\n" +
 	"\x06grid_x\x18\x04 \x01(\x05R\x05gridX\x12\x15\n" +
 	"\x06grid_y\x18\x05 \x01(\x05R\x05gridY\x12\x18\n" +
-	"\arotated\x18\x06 \x01(\bR\arotated\"\xd4\x01\n" +
-	"\x0eContainerEntry\x12!\n" +
-	"\fcontainer_id\x18\x01 \x01(\x03R\vcontainerId\x12%\n" +
+	"\arotated\x18\x06 \x01(\bR\arotated\"\xc1\x01\n" +
+	"\x0eContainerEntry\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12%\n" +
 	"\x04type\x18\x02 \x01(\x0e2\x11.pb.ContainerTypeR\x04type\x12\x15\n" +
 	"\x06grid_w\x18\x03 \x01(\x05R\x05gridW\x12\x15\n" +
 	"\x06grid_h\x18\x04 \x01(\x05R\x05gridH\x12\x18\n" +
 	"\aversion\x18\x05 \x01(\x05R\aversion\x120\n" +
-	"\fitem_entries\x18\x06 \x03(\v2\r.pb.ItemEntryR\vitemEntries\"\x95\x01\n" +
-	"\tHeroEntry\x12\x17\n" +
-	"\ahero_id\x18\x01 \x01(\x05R\x06heroId\x12\x14\n" +
-	"\x05level\x18\x02 \x01(\x05R\x05level\x12\x10\n" +
-	"\x03exp\x18\x03 \x01(\x03R\x03exp\x12\x12\n" +
-	"\x04star\x18\x04 \x01(\x05R\x04star\x12\x17\n" +
-	"\askin_id\x18\x05 \x01(\x05R\x06skinId\x12\x1a\n" +
-	"\bequipped\x18\x06 \x01(\bR\bequipped\"|\n" +
-	"\vWeaponEntry\x12\x1b\n" +
-	"\tweapon_id\x18\x01 \x01(\x05R\bweaponId\x12\x14\n" +
-	"\x05level\x18\x02 \x01(\x05R\x05level\x12\x1e\n" +
+	"\fitem_entries\x18\x06 \x03(\v2\r.pb.ItemEntryR\vitemEntries\"\xa3\x01\n" +
+	"\tHeroEntry\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x15\n" +
+	"\x06cfg_id\x18\x02 \x01(\x05R\x05cfgId\x12\x14\n" +
+	"\x05level\x18\x03 \x01(\x05R\x05level\x12\x10\n" +
+	"\x03exp\x18\x04 \x01(\x03R\x03exp\x12\x12\n" +
+	"\x04star\x18\x05 \x01(\x05R\x04star\x12\x17\n" +
+	"\askin_id\x18\x06 \x01(\x05R\x06skinId\x12\x1a\n" +
+	"\bequipped\x18\a \x01(\bR\bequipped\"\x86\x01\n" +
+	"\vWeaponEntry\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x15\n" +
+	"\x06cfg_id\x18\x02 \x01(\x05R\x05cfgId\x12\x14\n" +
+	"\x05level\x18\x03 \x01(\x05R\x05level\x12\x1e\n" +
 	"\n" +
-	"durability\x18\x03 \x01(\x05R\n" +
+	"durability\x18\x04 \x01(\x05R\n" +
 	"durability\x12\x1a\n" +
-	"\bequipped\x18\x04 \x01(\bR\bequipped\"Y\n" +
+	"\bequipped\x18\x05 \x01(\bR\bequipped\"e\n" +
 	"\n" +
-	"SkillEntry\x12\x19\n" +
-	"\bskill_id\x18\x01 \x01(\x05R\askillId\x12\x14\n" +
-	"\x05level\x18\x02 \x01(\x05R\x05level\x12\x1a\n" +
-	"\bequipped\x18\x03 \x01(\bR\bequipped\"Y\n" +
+	"SkillEntry\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x15\n" +
+	"\x06cfg_id\x18\x02 \x01(\x05R\x05cfgId\x12\x14\n" +
+	"\x05level\x18\x03 \x01(\x05R\x05level\x12\x1a\n" +
+	"\bequipped\x18\x04 \x01(\bR\bequipped\"e\n" +
 	"\n" +
-	"EquipEntry\x12\x19\n" +
-	"\bequip_id\x18\x01 \x01(\x05R\aequipId\x12\x14\n" +
-	"\x05level\x18\x02 \x01(\x05R\x05level\x12\x1a\n" +
-	"\bequipped\x18\x03 \x01(\bR\bequipped*\xaa\x06\n" +
+	"EquipEntry\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x15\n" +
+	"\x06cfg_id\x18\x02 \x01(\x05R\x05cfgId\x12\x14\n" +
+	"\x05level\x18\x03 \x01(\x05R\x05level\x12\x1a\n" +
+	"\bequipped\x18\x04 \x01(\bR\bequipped*\xc8\x06\n" +
 	"\tRouteCode\x12\x1a\n" +
 	"\x16ROUTE_CODE_UNSPECIFIED\x10\x00\x12\x16\n" +
 	"\x11ROUTE_CODE_VERIFY\x10\x90N\x12\x1a\n" +
@@ -1183,11 +1222,12 @@ const file_common_proto_rawDesc = "" +
 	"\x15ROUTE_CODE_LEAVE_GAME\x10\x92N\x12\x1c\n" +
 	"\x17ROUTE_CODE_SEVER_NOTIFY\x10\x93N\x12\x1e\n" +
 	"\x19ROUTE_CODE_CONTAINER_LIST\x10\x9aN\x12 \n" +
-	"\x1bROUTE_CODE_CONTAINER_NOTIFY\x10\x9bN\x12\x1f\n" +
-	"\x19ROUTE_CODE_CONTAINER_MOVE\x10\x90\x8e\x06\x12 \n" +
-	"\x1bROUTE_CODE_CONTAINER_ROTATE\x10\x9dN\x12\x1e\n" +
-	"\x19ROUTE_CODE_CONTAINER_SORT\x10\x9eN\x12\"\n" +
-	"\x1dROUTE_CODE_CONTAINER_TRANSFER\x10\x9fN\x12\x19\n" +
+	"\x1bROUTE_CODE_CONTAINER_NOTIFY\x10\x9bN\x12\x1d\n" +
+	"\x18ROUTE_CODE_CONTAINER_ADD\x10\x9cN\x12\x1e\n" +
+	"\x19ROUTE_CODE_CONTAINER_MOVE\x10\x9dN\x12 \n" +
+	"\x1bROUTE_CODE_CONTAINER_ROTATE\x10\x9eN\x12\x1e\n" +
+	"\x19ROUTE_CODE_CONTAINER_SORT\x10\x9fN\x12\"\n" +
+	"\x1dROUTE_CODE_CONTAINER_TRANSFER\x10\xa0N\x12\x19\n" +
 	"\x14ROUTE_CODE_HERO_LIST\x10\xa4N\x12\x1b\n" +
 	"\x16ROUTE_CODE_HERO_NOTIFY\x10\xa5N\x12\x18\n" +
 	"\x13ROUTE_CODE_HERO_ADD\x10\xa6N\x12\x1b\n" +

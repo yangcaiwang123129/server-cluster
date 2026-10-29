@@ -112,27 +112,27 @@ func (x *HeroListResp) GetHeroEntries() []*HeroEntry {
 }
 
 // 英雄变化通知（路由 10021）
-type HeroChangeNotify struct {
+type HeroNotify struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	HeroEntry     *HeroEntry             `protobuf:"bytes,1,opt,name=hero_entry,json=heroEntry,proto3" json:"hero_entry,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *HeroChangeNotify) Reset() {
-	*x = HeroChangeNotify{}
+func (x *HeroNotify) Reset() {
+	*x = HeroNotify{}
 	mi := &file_hero_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *HeroChangeNotify) String() string {
+func (x *HeroNotify) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*HeroChangeNotify) ProtoMessage() {}
+func (*HeroNotify) ProtoMessage() {}
 
-func (x *HeroChangeNotify) ProtoReflect() protoreflect.Message {
+func (x *HeroNotify) ProtoReflect() protoreflect.Message {
 	mi := &file_hero_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -144,12 +144,12 @@ func (x *HeroChangeNotify) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use HeroChangeNotify.ProtoReflect.Descriptor instead.
-func (*HeroChangeNotify) Descriptor() ([]byte, []int) {
+// Deprecated: Use HeroNotify.ProtoReflect.Descriptor instead.
+func (*HeroNotify) Descriptor() ([]byte, []int) {
 	return file_hero_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *HeroChangeNotify) GetHeroEntry() *HeroEntry {
+func (x *HeroNotify) GetHeroEntry() *HeroEntry {
 	if x != nil {
 		return x.HeroEntry
 	}
@@ -159,7 +159,7 @@ func (x *HeroChangeNotify) GetHeroEntry() *HeroEntry {
 // 新增英雄请求（路由 10022）
 type HeroAddReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	HeroId        int32                  `protobuf:"varint,1,opt,name=hero_id,json=heroId,proto3" json:"hero_id,omitempty"` // 英雄配置ID
+	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 英雄配置ID
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -194,9 +194,9 @@ func (*HeroAddReq) Descriptor() ([]byte, []int) {
 	return file_hero_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *HeroAddReq) GetHeroId() int32 {
+func (x *HeroAddReq) GetCfgId() int32 {
 	if x != nil {
-		return x.HeroId
+		return x.CfgId
 	}
 	return 0
 }
@@ -257,7 +257,7 @@ func (x *HeroAddResp) GetHeroEntry() *HeroEntry {
 // 更新英雄请求（路由 10023）
 type HeroUpdateReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	HeroId        int32                  `protobuf:"varint,1,opt,name=hero_id,json=heroId,proto3" json:"hero_id,omitempty"` // 英雄配置ID
+	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"`    // 英雄配置ID
 	Level         int32                  `protobuf:"varint,2,opt,name=level,proto3" json:"level,omitempty"`                 // 等级
 	Exp           int64                  `protobuf:"varint,3,opt,name=exp,proto3" json:"exp,omitempty"`                     // 经验
 	Star          int32                  `protobuf:"varint,4,opt,name=star,proto3" json:"star,omitempty"`                   // 星级
@@ -297,9 +297,9 @@ func (*HeroUpdateReq) Descriptor() ([]byte, []int) {
 	return file_hero_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *HeroUpdateReq) GetHeroId() int32 {
+func (x *HeroUpdateReq) GetCfgId() int32 {
 	if x != nil {
-		return x.HeroId
+		return x.CfgId
 	}
 	return 0
 }
@@ -402,20 +402,21 @@ const file_hero_proto_rawDesc = "" +
 	"\fHeroListResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\x120\n" +
-	"\fhero_entries\x18\x02 \x03(\v2\r.pb.HeroEntryR\vheroEntries\"@\n" +
-	"\x10HeroChangeNotify\x12,\n" +
+	"\fhero_entries\x18\x02 \x03(\v2\r.pb.HeroEntryR\vheroEntries\":\n" +
 	"\n" +
-	"hero_entry\x18\x01 \x01(\v2\r.pb.HeroEntryR\theroEntry\"%\n" +
+	"HeroNotify\x12,\n" +
 	"\n" +
-	"HeroAddReq\x12\x17\n" +
-	"\ahero_id\x18\x01 \x01(\x05R\x06heroId\"_\n" +
+	"hero_entry\x18\x01 \x01(\v2\r.pb.HeroEntryR\theroEntry\"#\n" +
+	"\n" +
+	"HeroAddReq\x12\x15\n" +
+	"\x06cfg_id\x18\x01 \x01(\x05R\x05cfgId\"_\n" +
 	"\vHeroAddResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\x12,\n" +
 	"\n" +
-	"hero_entry\x18\x02 \x01(\v2\r.pb.HeroEntryR\theroEntry\"\x99\x01\n" +
-	"\rHeroUpdateReq\x12\x17\n" +
-	"\ahero_id\x18\x01 \x01(\x05R\x06heroId\x12\x14\n" +
+	"hero_entry\x18\x02 \x01(\v2\r.pb.HeroEntryR\theroEntry\"\x97\x01\n" +
+	"\rHeroUpdateReq\x12\x15\n" +
+	"\x06cfg_id\x18\x01 \x01(\x05R\x05cfgId\x12\x14\n" +
 	"\x05level\x18\x02 \x01(\x05R\x05level\x12\x10\n" +
 	"\x03exp\x18\x03 \x01(\x03R\x03exp\x12\x12\n" +
 	"\x04star\x18\x04 \x01(\x05R\x04star\x12\x17\n" +
@@ -441,20 +442,20 @@ func file_hero_proto_rawDescGZIP() []byte {
 
 var file_hero_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_hero_proto_goTypes = []any{
-	(*HeroListReq)(nil),      // 0: pb.HeroListReq
-	(*HeroListResp)(nil),     // 1: pb.HeroListResp
-	(*HeroChangeNotify)(nil), // 2: pb.HeroChangeNotify
-	(*HeroAddReq)(nil),       // 3: pb.HeroAddReq
-	(*HeroAddResp)(nil),      // 4: pb.HeroAddResp
-	(*HeroUpdateReq)(nil),    // 5: pb.HeroUpdateReq
-	(*HeroUpdateResp)(nil),   // 6: pb.HeroUpdateResp
-	(*Result)(nil),           // 7: pb.Result
-	(*HeroEntry)(nil),        // 8: pb.HeroEntry
+	(*HeroListReq)(nil),    // 0: pb.HeroListReq
+	(*HeroListResp)(nil),   // 1: pb.HeroListResp
+	(*HeroNotify)(nil),     // 2: pb.HeroNotify
+	(*HeroAddReq)(nil),     // 3: pb.HeroAddReq
+	(*HeroAddResp)(nil),    // 4: pb.HeroAddResp
+	(*HeroUpdateReq)(nil),  // 5: pb.HeroUpdateReq
+	(*HeroUpdateResp)(nil), // 6: pb.HeroUpdateResp
+	(*Result)(nil),         // 7: pb.Result
+	(*HeroEntry)(nil),      // 8: pb.HeroEntry
 }
 var file_hero_proto_depIdxs = []int32{
 	7, // 0: pb.HeroListResp.result:type_name -> pb.Result
 	8, // 1: pb.HeroListResp.hero_entries:type_name -> pb.HeroEntry
-	8, // 2: pb.HeroChangeNotify.hero_entry:type_name -> pb.HeroEntry
+	8, // 2: pb.HeroNotify.hero_entry:type_name -> pb.HeroEntry
 	7, // 3: pb.HeroAddResp.result:type_name -> pb.Result
 	8, // 4: pb.HeroAddResp.hero_entry:type_name -> pb.HeroEntry
 	7, // 5: pb.HeroUpdateResp.result:type_name -> pb.Result

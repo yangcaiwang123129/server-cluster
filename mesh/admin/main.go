@@ -55,6 +55,7 @@ func main() {
 	handler.RegisterHero(httpComponent.Proxy().Router())
 	handler.RegisterSkill(httpComponent.Proxy().Router())
 	handler.RegisterWeapon(httpComponent.Proxy().Router())
+	handler.RegisterRecord(httpComponent.Proxy().Router())
 	// 添加组件到容器
 	container.Add(httpComponent)
 	// 启动容器

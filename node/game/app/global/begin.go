@@ -35,6 +35,20 @@ func Init() error {
 			return err
 		}
 	}
+	// 打点记录表（独立库 game_record，access 走 "record" 实例；未配置则跳过，不阻断启动）
+	if inst, err := svc.Ctx().MySQL.Get("record"); err == nil {
+		if err = svc.AutoMigrate(inst.Gorm(),
+			&model.ItemRecord{},
+			&model.EquipRecord{},
+			&model.WeaponRecord{},
+			&model.SkillRecord{},
+			&model.HeroRecord{},
+		); err != nil {
+			return err
+		}
+	} else {
+		log.Warnf("game: record mysql not configured, telemetry disabled: %v", err)
+	}
 	return nil
 }
 

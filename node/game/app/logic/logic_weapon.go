@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 	"errors"
+	"server-cluster/internal/record"
 	"sort"
 
 	"gorm.io/gorm"
@@ -41,14 +42,14 @@ func (this *weaponLogic) WeaponList(ctx context.Context, playerID int64) (*pb.We
 		return true
 	})
 	// map 遍历无序，按配置ID排序保证客户端展示稳定
-	sort.Slice(entries, func(i, j int) bool { return entries[i].WeaponId < entries[j].WeaponId })
+	sort.Slice(entries, func(i, j int) bool { return entries[i].CfgId < entries[j].CfgId })
 	return &pb.WeaponListResp{WeaponEntries: entries}, nil
 }
 
 // toWeaponEntry 持有数据 → wire 条目（仅状态）。
 func toWeaponEntry(w model.WeaponInfo) *pb.WeaponEntry {
 	return &pb.WeaponEntry{
-		WeaponId:   w.WeaponID,
+		CfgId:      w.WeaponID,
 		Level:      w.Level,
 		Durability: w.Durability,
 		Equipped:   w.Equipped,
@@ -57,7 +58,7 @@ func toWeaponEntry(w model.WeaponInfo) *pb.WeaponEntry {
 
 // WeaponAdd 新增武器：配置ID必须存在，已拥有返回错误。
 func (this *weaponLogic) WeaponAdd(ctx context.Context, playerID int64, req *pb.WeaponAddReq) (*pb.WeaponAddResp, error) {
-	if !tpl.T().Weapon.Has(req.GetWeaponId()) {
+	if !tpl.T().Weapon.Has(req.GetCfgId()) {
 		return nil, errs.CodeInvalidParams.Err()
 	}
 
@@ -66,12 +67,13 @@ func (this *weaponLogic) WeaponAdd(ctx context.Context, playerID int64, req *pb.
 		return nil, err
 	}
 
-	w := model.WeaponInfo{WeaponID: req.GetWeaponId()}
+	w := model.WeaponInfo{WeaponID: req.GetCfgId()}
 	if !row.AddWeapon(w) {
 		return nil, errs.CodeInvalidParams.WithMessage("武器已拥有").Err()
 	}
 
 	global.PlayerWeaponCache.Set(playerID, row)
+	record.Record(ctx, model.RecordModuleWeapon, playerID, model.RecordActionGain, req.GetCfgId(), 1)
 	return &pb.WeaponAddResp{WeaponEntry: toWeaponEntry(w)}, nil
 }
 
@@ -83,7 +85,7 @@ func (this *weaponLogic) WeaponUpdate(ctx context.Context, playerID int64, req *
 	}
 
 	w := model.WeaponInfo{
-		WeaponID:   req.GetWeaponId(),
+		WeaponID:   req.GetCfgId(),
 		Level:      req.GetLevel(),
 		Durability: req.GetDurability(),
 		Equipped:   req.GetEquipped(),
@@ -117,7 +119,7 @@ func equippedWeaponEntry(row *model.PlayerWeapon) *pb.WeaponEntry {
 			return true
 		}
 		entry = &pb.WeaponEntry{
-			WeaponId:   w.WeaponID,
+			CfgId:      w.WeaponID,
 			Level:      w.Level,
 			Durability: w.Durability,
 			Equipped:   true,

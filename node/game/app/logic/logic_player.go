@@ -55,6 +55,8 @@ func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.
 			PlayerID: playerID,
 			Nickname: "player_" + strconv.FormatInt(playerID, 10),
 			Level:    1,
+			// settings_json 是 MySQL json 列，空字符串不是合法 JSON，必须显式给空对象
+			SettingsJSON: "{}",
 		})
 	} else if err != nil {
 		return nil, err

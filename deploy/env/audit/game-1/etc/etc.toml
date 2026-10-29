@@ -60,6 +60,13 @@ timezone = "Asia/Shanghai"
     max_open_conns = 50
     max_idle_conns = 20
 
+# 打点记录库（game_record）：物品/装备/武器/技能/英雄 获得与消耗记录
+[[db.mysql.instances]]
+    name = "record"
+    dsn = "game:game123@tcp(10.10.1.10:3306)/game_record?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s&readTimeout=10s&writeTimeout=10s"
+    max_open_conns = 50
+    max_idle_conns = 20
+
 [[redis.instances]]
     name = "default"
     addrs = ["10.10.1.10:6379"]

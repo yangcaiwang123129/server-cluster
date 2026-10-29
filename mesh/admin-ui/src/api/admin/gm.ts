@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 import type { ApiResponse, PageResult } from '@/types/api'
-import type { GameCatalogEntry, GmContainer, GmEquip, GmHero, GmSkill, GmWeapon } from '@/types/admin'
+import type { GameCatalogEntry, GmContainer, GmEquip, GmHero, GmRecord, GmSkill, GmWeapon } from '@/types/admin'
 
 /**
  * GM 接口：admin 经 mesh 转发到 game 服，每个方法对应 game 侧 logic 的一个函数。
@@ -215,5 +215,25 @@ export function updateGmEquip(data: { playerId: number; equipId: number; level: 
     url: '/api/v1/gm/equip',
     method: 'put',
     data
+  })
+}
+
+// ── 打点记录 ──────────────────────────────────────────────────────
+
+/** 获得/消耗记录分页列表（读 game_record 库）。 */
+export function listGmRecord(params: {
+  action: number
+  module: 'item' | 'equip' | 'weapon' | 'skill' | 'hero'
+  playerId?: number
+  cfgId?: number
+  begin?: number
+  end?: number
+  pageIndex: number
+  pageSize: number
+}) {
+  return request<ApiResponse<PageResult<GmRecord>>>({
+    url: '/api/v1/gm/record',
+    method: 'get',
+    params
   })
 }

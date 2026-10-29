@@ -17,13 +17,13 @@ message EquipListResp {
 }
 
 // 装备变化通知（路由 10051）
-message EquipChangeNotify {
+message EquipNotify {
   EquipEntry equip_entry = 1;
 }
 
 // 新增装备请求（路由 10052）
 message EquipAddReq {
-  int32 equip_id = 1; // 装备配置ID
+  int32 cfg_id = 1; // 装备配置ID
 }
 
 // 新增装备响应
@@ -34,7 +34,7 @@ message EquipAddResp {
 
 // 更新装备请求（路由 10053）
 message EquipUpdateReq {
-  int32 equip_id = 1;  // 装备配置ID
+  int32 cfg_id = 1;  // 装备配置ID
   int32 level = 2;    // 等级
   bool equipped = 3;  // 是否穿戴
 }

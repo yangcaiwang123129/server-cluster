@@ -68,7 +68,7 @@ func (this *gmContainerLogic) ContainerMove(req dto.GmContainerMoveReq) error {
 		PlayerId: req.PlayerID,
 		Req: &pb.ContainerMoveReq{
 			Type:    pb.ContainerType(req.ContainerType),
-			ItemId:  req.ItemID,
+			Id:      req.ItemID,
 			ToX:     req.ToX,
 			ToY:     req.ToY,
 			Rotated: req.Rotated,
@@ -85,8 +85,8 @@ func (this *gmContainerLogic) ContainerRotate(req dto.GmContainerRotateReq) erro
 	callReq := &pb.GmContainerRotateReq{
 		PlayerId: req.PlayerID,
 		Req: &pb.ContainerRotateReq{
-			Type:   pb.ContainerType(req.ContainerType),
-			ItemId: req.ItemID,
+			Type: pb.ContainerType(req.ContainerType),
+			Id:   req.ItemID,
 		},
 	}
 	return gmCall(ctx, req.PlayerID, pb.GameAdminService_ContainerRotate_FullMethodName, callReq, &pb.ContainerRotateResp{})
@@ -114,7 +114,7 @@ func (this *gmContainerLogic) ContainerTransfer(req dto.GmContainerTransferReq) 
 		Req: &pb.ContainerTransferReq{
 			FromType: pb.ContainerType(req.FromType),
 			ToType:   pb.ContainerType(req.ToType),
-			ItemId:   req.ItemID,
+			Id:       req.ItemID,
 			ToX:      req.ToX,
 			ToY:      req.ToY,
 			Rotated:  req.Rotated,
@@ -168,13 +168,13 @@ func toGmContainerResps(playerID int64, entries []*pb.ContainerEntry) []dto.GmCo
 func toGmContainerResp(playerID int64, e *pb.ContainerEntry) dto.GmContainerResp {
 	items := make([]dto.GmContainerItem, 0, len(e.GetItemEntries()))
 	for _, it := range e.GetItemEntries() {
-		w, h := model.GetWHByItemCfgId(it.GetItemCfgId())
+		w, h := model.GetWHByItemCfgId(it.GetCfgId())
 		if it.GetRotated() {
 			w, h = h, w
 		}
 		row := dto.GmContainerItem{
-			ItemID:    it.GetItemId(),
-			ItemCfgID: it.GetItemCfgId(),
+			ItemID:    it.GetId(),
+			ItemCfgID: it.GetCfgId(),
 			Count:     it.GetCount(),
 			GridX:     it.GetGridX(),
 			GridY:     it.GetGridY(),
@@ -182,7 +182,7 @@ func toGmContainerResp(playerID int64, e *pb.ContainerEntry) dto.GmContainerResp
 			Width:     w,
 			Height:    h,
 		}
-		if cfg := tpl.T().Item.Get(it.GetItemCfgId()); cfg != nil {
+		if cfg := tpl.T().Item.Get(it.GetCfgId()); cfg != nil {
 			row.Name = cfg.Name
 			row.IconKey = cfg.IconKey
 			row.Rarity = cfg.Rarity

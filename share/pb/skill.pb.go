@@ -112,27 +112,27 @@ func (x *SkillListResp) GetSkillEntries() []*SkillEntry {
 }
 
 // 技能变化通知（路由 10041）
-type SkillChangeNotify struct {
+type SkillNotify struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	SkillEntry    *SkillEntry            `protobuf:"bytes,1,opt,name=skill_entry,json=skillEntry,proto3" json:"skill_entry,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SkillChangeNotify) Reset() {
-	*x = SkillChangeNotify{}
+func (x *SkillNotify) Reset() {
+	*x = SkillNotify{}
 	mi := &file_skill_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *SkillChangeNotify) String() string {
+func (x *SkillNotify) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SkillChangeNotify) ProtoMessage() {}
+func (*SkillNotify) ProtoMessage() {}
 
-func (x *SkillChangeNotify) ProtoReflect() protoreflect.Message {
+func (x *SkillNotify) ProtoReflect() protoreflect.Message {
 	mi := &file_skill_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -144,12 +144,12 @@ func (x *SkillChangeNotify) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SkillChangeNotify.ProtoReflect.Descriptor instead.
-func (*SkillChangeNotify) Descriptor() ([]byte, []int) {
+// Deprecated: Use SkillNotify.ProtoReflect.Descriptor instead.
+func (*SkillNotify) Descriptor() ([]byte, []int) {
 	return file_skill_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *SkillChangeNotify) GetSkillEntry() *SkillEntry {
+func (x *SkillNotify) GetSkillEntry() *SkillEntry {
 	if x != nil {
 		return x.SkillEntry
 	}
@@ -159,7 +159,7 @@ func (x *SkillChangeNotify) GetSkillEntry() *SkillEntry {
 // 新增技能请求（路由 10042）
 type SkillAddReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	SkillId       int32                  `protobuf:"varint,1,opt,name=skill_id,json=skillId,proto3" json:"skill_id,omitempty"` // 技能配置ID
+	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 技能配置ID
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -194,9 +194,9 @@ func (*SkillAddReq) Descriptor() ([]byte, []int) {
 	return file_skill_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *SkillAddReq) GetSkillId() int32 {
+func (x *SkillAddReq) GetCfgId() int32 {
 	if x != nil {
-		return x.SkillId
+		return x.CfgId
 	}
 	return 0
 }
@@ -257,9 +257,9 @@ func (x *SkillAddResp) GetSkillEntry() *SkillEntry {
 // 更新技能请求（路由 10043）
 type SkillUpdateReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	SkillId       int32                  `protobuf:"varint,1,opt,name=skill_id,json=skillId,proto3" json:"skill_id,omitempty"` // 技能配置ID
-	Level         int32                  `protobuf:"varint,2,opt,name=level,proto3" json:"level,omitempty"`                    // 等级
-	Equipped      bool                   `protobuf:"varint,3,opt,name=equipped,proto3" json:"equipped,omitempty"`              // 是否装备
+	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 技能配置ID
+	Level         int32                  `protobuf:"varint,2,opt,name=level,proto3" json:"level,omitempty"`              // 等级
+	Equipped      bool                   `protobuf:"varint,3,opt,name=equipped,proto3" json:"equipped,omitempty"`        // 是否装备
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -294,9 +294,9 @@ func (*SkillUpdateReq) Descriptor() ([]byte, []int) {
 	return file_skill_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *SkillUpdateReq) GetSkillId() int32 {
+func (x *SkillUpdateReq) GetCfgId() int32 {
 	if x != nil {
-		return x.SkillId
+		return x.CfgId
 	}
 	return 0
 }
@@ -377,19 +377,19 @@ const file_skill_proto_rawDesc = "" +
 	"\rSkillListResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\x123\n" +
-	"\rskill_entries\x18\x02 \x03(\v2\x0e.pb.SkillEntryR\fskillEntries\"D\n" +
-	"\x11SkillChangeNotify\x12/\n" +
+	"\rskill_entries\x18\x02 \x03(\v2\x0e.pb.SkillEntryR\fskillEntries\">\n" +
+	"\vSkillNotify\x12/\n" +
 	"\vskill_entry\x18\x01 \x01(\v2\x0e.pb.SkillEntryR\n" +
-	"skillEntry\"(\n" +
-	"\vSkillAddReq\x12\x19\n" +
-	"\bskill_id\x18\x01 \x01(\x05R\askillId\"c\n" +
+	"skillEntry\"$\n" +
+	"\vSkillAddReq\x12\x15\n" +
+	"\x06cfg_id\x18\x01 \x01(\x05R\x05cfgId\"c\n" +
 	"\fSkillAddResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\x12/\n" +
 	"\vskill_entry\x18\x02 \x01(\v2\x0e.pb.SkillEntryR\n" +
-	"skillEntry\"]\n" +
-	"\x0eSkillUpdateReq\x12\x19\n" +
-	"\bskill_id\x18\x01 \x01(\x05R\askillId\x12\x14\n" +
+	"skillEntry\"Y\n" +
+	"\x0eSkillUpdateReq\x12\x15\n" +
+	"\x06cfg_id\x18\x01 \x01(\x05R\x05cfgId\x12\x14\n" +
 	"\x05level\x18\x02 \x01(\x05R\x05level\x12\x1a\n" +
 	"\bequipped\x18\x03 \x01(\bR\bequipped\"f\n" +
 	"\x0fSkillUpdateResp\x12\"\n" +
@@ -412,20 +412,20 @@ func file_skill_proto_rawDescGZIP() []byte {
 
 var file_skill_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_skill_proto_goTypes = []any{
-	(*SkillListReq)(nil),      // 0: pb.SkillListReq
-	(*SkillListResp)(nil),     // 1: pb.SkillListResp
-	(*SkillChangeNotify)(nil), // 2: pb.SkillChangeNotify
-	(*SkillAddReq)(nil),       // 3: pb.SkillAddReq
-	(*SkillAddResp)(nil),      // 4: pb.SkillAddResp
-	(*SkillUpdateReq)(nil),    // 5: pb.SkillUpdateReq
-	(*SkillUpdateResp)(nil),   // 6: pb.SkillUpdateResp
-	(*Result)(nil),            // 7: pb.Result
-	(*SkillEntry)(nil),        // 8: pb.SkillEntry
+	(*SkillListReq)(nil),    // 0: pb.SkillListReq
+	(*SkillListResp)(nil),   // 1: pb.SkillListResp
+	(*SkillNotify)(nil),     // 2: pb.SkillNotify
+	(*SkillAddReq)(nil),     // 3: pb.SkillAddReq
+	(*SkillAddResp)(nil),    // 4: pb.SkillAddResp
+	(*SkillUpdateReq)(nil),  // 5: pb.SkillUpdateReq
+	(*SkillUpdateResp)(nil), // 6: pb.SkillUpdateResp
+	(*Result)(nil),          // 7: pb.Result
+	(*SkillEntry)(nil),      // 8: pb.SkillEntry
 }
 var file_skill_proto_depIdxs = []int32{
 	7, // 0: pb.SkillListResp.result:type_name -> pb.Result
 	8, // 1: pb.SkillListResp.skill_entries:type_name -> pb.SkillEntry
-	8, // 2: pb.SkillChangeNotify.skill_entry:type_name -> pb.SkillEntry
+	8, // 2: pb.SkillNotify.skill_entry:type_name -> pb.SkillEntry
 	7, // 3: pb.SkillAddResp.result:type_name -> pb.Result
 	8, // 4: pb.SkillAddResp.skill_entry:type_name -> pb.SkillEntry
 	7, // 5: pb.SkillUpdateResp.result:type_name -> pb.Result

@@ -229,3 +229,29 @@ type GameCatalogEntry struct {
 	Width   int32  `json:"width"`   // 占格宽（仅 item 有意义）
 	Height  int32  `json:"height"`  // 占格高（仅 item 有意义）
 }
+
+// ========== 打点记录（GM，读 game_record 库） ==========
+
+// GmRecordQuery 打点记录查询条件。
+type GmRecordQuery struct {
+	Module    string `json:"module"`    // 模块：item|equip|weapon|skill|hero
+	Action    int8   `json:"action"`    // 动作：1 获得 2 消耗
+	PlayerID  int64  `json:"playerId"`  // 玩家ID（可选）
+	CfgID     int32  `json:"cfgId"`     // 配置ID（可选）
+	Begin     int64  `json:"begin"`     // created_at 起（毫秒，可选）
+	End       int64  `json:"end"`       // created_at 止（毫秒，可选）
+	Order     string `json:"order"`     // 排序（白名单列）
+	PageIndex int    `json:"pageIndex"` // 页码
+	PageSize  int    `json:"pageSize"`  // 每页条数
+}
+
+// GmRecordEntry 打点记录行（含配置展示信息）。
+type GmRecordEntry struct {
+	PlayerID  int64  `json:"playerId"`          // 玩家ID
+	Action    int8   `json:"action"`            // 1 获得 2 消耗
+	CfgID     int32  `json:"cfgId"`             // 配置ID
+	Count     int32  `json:"count"`             // 数量
+	Name      string `json:"name"`              // 配置名称
+	IconKey   string `json:"iconKey,omitempty"` // 图标
+	CreatedAt int64  `json:"createdAt"`         // 记录时间（毫秒）
+}

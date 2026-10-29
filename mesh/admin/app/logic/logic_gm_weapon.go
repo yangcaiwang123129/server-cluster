@@ -61,7 +61,7 @@ func (this *gmWeaponLogic) WeaponAdd(req dto.GmWeaponAddReq) (*dto.GmWeaponEntry
 	resp := &pb.WeaponAddResp{}
 	callReq := &pb.GmWeaponAddReq{
 		PlayerId: req.PlayerID,
-		Req:      &pb.WeaponAddReq{WeaponId: req.WeaponID},
+		Req:      &pb.WeaponAddReq{CfgId: req.WeaponID},
 	}
 	if err := gmCall(ctx, req.PlayerID, pb.GameAdminService_WeaponAdd_FullMethodName, callReq, resp); err != nil {
 		return nil, err
@@ -79,7 +79,7 @@ func (this *gmWeaponLogic) WeaponUpdate(req dto.GmWeaponUpdateReq) (*dto.GmWeapo
 	callReq := &pb.GmWeaponUpdateReq{
 		PlayerId: req.PlayerID,
 		Req: &pb.WeaponUpdateReq{
-			WeaponId:   req.WeaponID,
+			CfgId:      req.WeaponID,
 			Level:      req.Level,
 			Durability: req.Durability,
 			Equipped:   req.Equipped,
@@ -95,12 +95,12 @@ func (this *gmWeaponLogic) WeaponUpdate(req dto.GmWeaponUpdateReq) (*dto.GmWeapo
 // toGmWeaponEntry 武器条目转响应。
 func toGmWeaponEntry(e *pb.WeaponEntry) dto.GmWeaponEntry {
 	row := dto.GmWeaponEntry{
-		WeaponID:   e.GetWeaponId(),
+		WeaponID:   e.GetCfgId(),
 		Level:      e.GetLevel(),
 		Durability: e.GetDurability(),
 		Equipped:   e.GetEquipped(),
 	}
-	if cfg := tpl.T().Weapon.Get(e.GetWeaponId()); cfg != nil {
+	if cfg := tpl.T().Weapon.Get(e.GetCfgId()); cfg != nil {
 		row.Name = cfg.WeaponName
 		row.IconKey = cfg.Icon
 	}

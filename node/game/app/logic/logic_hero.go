@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 	"errors"
+	"server-cluster/internal/record"
 	"sort"
 
 	"gorm.io/gorm"
@@ -41,14 +42,14 @@ func (this *heroLogic) HeroList(ctx context.Context, playerID int64) (*pb.HeroLi
 		return true
 	})
 	// map 遍历无序，按配置ID排序保证客户端展示稳定
-	sort.Slice(entries, func(i, j int) bool { return entries[i].HeroId < entries[j].HeroId })
+	sort.Slice(entries, func(i, j int) bool { return entries[i].CfgId < entries[j].CfgId })
 	return &pb.HeroListResp{HeroEntries: entries}, nil
 }
 
 // toHeroEntry 持有数据 → wire 条目（仅状态）。
 func toHeroEntry(h model.HeroInfo) *pb.HeroEntry {
 	return &pb.HeroEntry{
-		HeroId:   h.HeroID,
+		CfgId:    h.HeroID,
 		Level:    h.Level,
 		Exp:      h.Exp,
 		Star:     h.Star,
@@ -59,7 +60,7 @@ func toHeroEntry(h model.HeroInfo) *pb.HeroEntry {
 
 // HeroAdd 新增英雄：配置ID必须存在，已拥有返回错误。
 func (this *heroLogic) HeroAdd(ctx context.Context, playerID int64, req *pb.HeroAddReq) (*pb.HeroAddResp, error) {
-	if !tpl.T().RoleInfo.Has(req.GetHeroId()) {
+	if !tpl.T().RoleInfo.Has(req.GetCfgId()) {
 		return nil, errs.CodeInvalidParams.Err()
 	}
 
@@ -68,12 +69,13 @@ func (this *heroLogic) HeroAdd(ctx context.Context, playerID int64, req *pb.Hero
 		return nil, err
 	}
 
-	h := model.HeroInfo{HeroID: req.GetHeroId()}
+	h := model.HeroInfo{HeroID: req.GetCfgId()}
 	if !row.AddHero(h) {
 		return nil, errs.CodeInvalidParams.WithMessage("英雄已拥有").Err()
 	}
 
 	global.PlayerHeroCache.Set(playerID, row)
+	record.Record(ctx, model.RecordModuleHero, playerID, model.RecordActionGain, req.GetCfgId(), 1)
 	return &pb.HeroAddResp{HeroEntry: toHeroEntry(h)}, nil
 }
 
@@ -85,7 +87,7 @@ func (this *heroLogic) HeroUpdate(ctx context.Context, playerID int64, req *pb.H
 	}
 
 	h := model.HeroInfo{
-		HeroID:   req.GetHeroId(),
+		HeroID:   req.GetCfgId(),
 		Level:    req.GetLevel(),
 		Exp:      req.GetExp(),
 		Star:     req.GetStar(),
@@ -121,7 +123,7 @@ func equippedHeroEntry(row *model.PlayerHero) *pb.HeroEntry {
 			return true
 		}
 		entry = &pb.HeroEntry{
-			HeroId:   h.HeroID,
+			CfgId:    h.HeroID,
 			Level:    h.Level,
 			Exp:      h.Exp,
 			Star:     h.Star,

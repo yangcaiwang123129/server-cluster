@@ -112,27 +112,27 @@ func (x *EquipListResp) GetEquipEntries() []*EquipEntry {
 }
 
 // 装备变化通知（路由 10051）
-type EquipChangeNotify struct {
+type EquipNotify struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	EquipEntry    *EquipEntry            `protobuf:"bytes,1,opt,name=equip_entry,json=equipEntry,proto3" json:"equip_entry,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *EquipChangeNotify) Reset() {
-	*x = EquipChangeNotify{}
+func (x *EquipNotify) Reset() {
+	*x = EquipNotify{}
 	mi := &file_equip_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *EquipChangeNotify) String() string {
+func (x *EquipNotify) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*EquipChangeNotify) ProtoMessage() {}
+func (*EquipNotify) ProtoMessage() {}
 
-func (x *EquipChangeNotify) ProtoReflect() protoreflect.Message {
+func (x *EquipNotify) ProtoReflect() protoreflect.Message {
 	mi := &file_equip_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -144,12 +144,12 @@ func (x *EquipChangeNotify) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use EquipChangeNotify.ProtoReflect.Descriptor instead.
-func (*EquipChangeNotify) Descriptor() ([]byte, []int) {
+// Deprecated: Use EquipNotify.ProtoReflect.Descriptor instead.
+func (*EquipNotify) Descriptor() ([]byte, []int) {
 	return file_equip_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *EquipChangeNotify) GetEquipEntry() *EquipEntry {
+func (x *EquipNotify) GetEquipEntry() *EquipEntry {
 	if x != nil {
 		return x.EquipEntry
 	}
@@ -159,7 +159,7 @@ func (x *EquipChangeNotify) GetEquipEntry() *EquipEntry {
 // 新增装备请求（路由 10052）
 type EquipAddReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	EquipId       int32                  `protobuf:"varint,1,opt,name=equip_id,json=equipId,proto3" json:"equip_id,omitempty"` // 装备配置ID
+	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 装备配置ID
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -194,9 +194,9 @@ func (*EquipAddReq) Descriptor() ([]byte, []int) {
 	return file_equip_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *EquipAddReq) GetEquipId() int32 {
+func (x *EquipAddReq) GetCfgId() int32 {
 	if x != nil {
-		return x.EquipId
+		return x.CfgId
 	}
 	return 0
 }
@@ -257,9 +257,9 @@ func (x *EquipAddResp) GetEquipEntry() *EquipEntry {
 // 更新装备请求（路由 10053）
 type EquipUpdateReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	EquipId       int32                  `protobuf:"varint,1,opt,name=equip_id,json=equipId,proto3" json:"equip_id,omitempty"` // 装备配置ID
-	Level         int32                  `protobuf:"varint,2,opt,name=level,proto3" json:"level,omitempty"`                    // 等级
-	Equipped      bool                   `protobuf:"varint,3,opt,name=equipped,proto3" json:"equipped,omitempty"`              // 是否穿戴
+	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 装备配置ID
+	Level         int32                  `protobuf:"varint,2,opt,name=level,proto3" json:"level,omitempty"`              // 等级
+	Equipped      bool                   `protobuf:"varint,3,opt,name=equipped,proto3" json:"equipped,omitempty"`        // 是否穿戴
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -294,9 +294,9 @@ func (*EquipUpdateReq) Descriptor() ([]byte, []int) {
 	return file_equip_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *EquipUpdateReq) GetEquipId() int32 {
+func (x *EquipUpdateReq) GetCfgId() int32 {
 	if x != nil {
-		return x.EquipId
+		return x.CfgId
 	}
 	return 0
 }
@@ -377,19 +377,19 @@ const file_equip_proto_rawDesc = "" +
 	"\rEquipListResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\x123\n" +
-	"\requip_entries\x18\x02 \x03(\v2\x0e.pb.EquipEntryR\fequipEntries\"D\n" +
-	"\x11EquipChangeNotify\x12/\n" +
+	"\requip_entries\x18\x02 \x03(\v2\x0e.pb.EquipEntryR\fequipEntries\">\n" +
+	"\vEquipNotify\x12/\n" +
 	"\vequip_entry\x18\x01 \x01(\v2\x0e.pb.EquipEntryR\n" +
-	"equipEntry\"(\n" +
-	"\vEquipAddReq\x12\x19\n" +
-	"\bequip_id\x18\x01 \x01(\x05R\aequipId\"c\n" +
+	"equipEntry\"$\n" +
+	"\vEquipAddReq\x12\x15\n" +
+	"\x06cfg_id\x18\x01 \x01(\x05R\x05cfgId\"c\n" +
 	"\fEquipAddResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\x12/\n" +
 	"\vequip_entry\x18\x02 \x01(\v2\x0e.pb.EquipEntryR\n" +
-	"equipEntry\"]\n" +
-	"\x0eEquipUpdateReq\x12\x19\n" +
-	"\bequip_id\x18\x01 \x01(\x05R\aequipId\x12\x14\n" +
+	"equipEntry\"Y\n" +
+	"\x0eEquipUpdateReq\x12\x15\n" +
+	"\x06cfg_id\x18\x01 \x01(\x05R\x05cfgId\x12\x14\n" +
 	"\x05level\x18\x02 \x01(\x05R\x05level\x12\x1a\n" +
 	"\bequipped\x18\x03 \x01(\bR\bequipped\"f\n" +
 	"\x0fEquipUpdateResp\x12\"\n" +
@@ -412,20 +412,20 @@ func file_equip_proto_rawDescGZIP() []byte {
 
 var file_equip_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_equip_proto_goTypes = []any{
-	(*EquipListReq)(nil),      // 0: pb.EquipListReq
-	(*EquipListResp)(nil),     // 1: pb.EquipListResp
-	(*EquipChangeNotify)(nil), // 2: pb.EquipChangeNotify
-	(*EquipAddReq)(nil),       // 3: pb.EquipAddReq
-	(*EquipAddResp)(nil),      // 4: pb.EquipAddResp
-	(*EquipUpdateReq)(nil),    // 5: pb.EquipUpdateReq
-	(*EquipUpdateResp)(nil),   // 6: pb.EquipUpdateResp
-	(*Result)(nil),            // 7: pb.Result
-	(*EquipEntry)(nil),        // 8: pb.EquipEntry
+	(*EquipListReq)(nil),    // 0: pb.EquipListReq
+	(*EquipListResp)(nil),   // 1: pb.EquipListResp
+	(*EquipNotify)(nil),     // 2: pb.EquipNotify
+	(*EquipAddReq)(nil),     // 3: pb.EquipAddReq
+	(*EquipAddResp)(nil),    // 4: pb.EquipAddResp
+	(*EquipUpdateReq)(nil),  // 5: pb.EquipUpdateReq
+	(*EquipUpdateResp)(nil), // 6: pb.EquipUpdateResp
+	(*Result)(nil),          // 7: pb.Result
+	(*EquipEntry)(nil),      // 8: pb.EquipEntry
 }
 var file_equip_proto_depIdxs = []int32{
 	7, // 0: pb.EquipListResp.result:type_name -> pb.Result
 	8, // 1: pb.EquipListResp.equip_entries:type_name -> pb.EquipEntry
-	8, // 2: pb.EquipChangeNotify.equip_entry:type_name -> pb.EquipEntry
+	8, // 2: pb.EquipNotify.equip_entry:type_name -> pb.EquipEntry
 	7, // 3: pb.EquipAddResp.result:type_name -> pb.Result
 	8, // 4: pb.EquipAddResp.equip_entry:type_name -> pb.EquipEntry
 	7, // 5: pb.EquipUpdateResp.result:type_name -> pb.Result

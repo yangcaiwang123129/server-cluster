@@ -61,7 +61,7 @@ func (this *gmSkillLogic) SkillAdd(req dto.GmSkillAddReq) (*dto.GmSkillEntry, er
 	resp := &pb.SkillAddResp{}
 	callReq := &pb.GmSkillAddReq{
 		PlayerId: req.PlayerID,
-		Req:      &pb.SkillAddReq{SkillId: req.SkillID},
+		Req:      &pb.SkillAddReq{CfgId: req.SkillID},
 	}
 	if err := gmCall(ctx, req.PlayerID, pb.GameAdminService_SkillAdd_FullMethodName, callReq, resp); err != nil {
 		return nil, err
@@ -79,7 +79,7 @@ func (this *gmSkillLogic) SkillUpdate(req dto.GmSkillUpdateReq) (*dto.GmSkillEnt
 	callReq := &pb.GmSkillUpdateReq{
 		PlayerId: req.PlayerID,
 		Req: &pb.SkillUpdateReq{
-			SkillId:  req.SkillID,
+			CfgId:    req.SkillID,
 			Level:    req.Level,
 			Equipped: req.Equipped,
 		},
@@ -94,11 +94,11 @@ func (this *gmSkillLogic) SkillUpdate(req dto.GmSkillUpdateReq) (*dto.GmSkillEnt
 // toGmSkillEntry 技能条目转响应。
 func toGmSkillEntry(e *pb.SkillEntry) dto.GmSkillEntry {
 	row := dto.GmSkillEntry{
-		SkillID:  e.GetSkillId(),
+		SkillID:  e.GetCfgId(),
 		Level:    e.GetLevel(),
 		Equipped: e.GetEquipped(),
 	}
-	if cfg := tpl.T().Skill.Get(e.GetSkillId()); cfg != nil {
+	if cfg := tpl.T().Skill.Get(e.GetCfgId()); cfg != nil {
 		row.Name = cfg.SkillName
 		row.Desc = cfg.Desc
 	}

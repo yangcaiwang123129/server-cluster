@@ -324,6 +324,20 @@ export interface GmEquip {
   desc?: string
 }
 
+/** A record row from game_record (item/equip/weapon/skill/hero gain or consume). */
+export interface GmRecord {
+  playerId?: number
+  /** 1 gain, 2 consume. */
+  action?: number
+  cfgId?: number
+  count?: number
+  /** config-derived display info */
+  name?: string
+  iconKey?: string
+  /** Millisecond timestamp. */
+  createdAt?: number
+}
+
 /** A row from the game config catalog (hero/weapon/skill/equip), for pickers. */
 export interface GameCatalogEntry {
   id?: number

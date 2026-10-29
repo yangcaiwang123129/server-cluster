@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 	"errors"
+	"server-cluster/internal/record"
 	"sort"
 
 	"gorm.io/gorm"
@@ -41,14 +42,14 @@ func (this *skillLogic) SkillList(ctx context.Context, playerID int64) (*pb.Skil
 		return true
 	})
 	// map 遍历无序，按配置ID排序保证客户端展示稳定
-	sort.Slice(entries, func(i, j int) bool { return entries[i].SkillId < entries[j].SkillId })
+	sort.Slice(entries, func(i, j int) bool { return entries[i].CfgId < entries[j].CfgId })
 	return &pb.SkillListResp{SkillEntries: entries}, nil
 }
 
 // toSkillEntry 持有数据 → wire 条目（仅状态）。
 func toSkillEntry(s model.SkillInfo) *pb.SkillEntry {
 	return &pb.SkillEntry{
-		SkillId:  s.SkillID,
+		CfgId:    s.SkillID,
 		Level:    s.Level,
 		Equipped: s.Equipped,
 	}
@@ -56,7 +57,7 @@ func toSkillEntry(s model.SkillInfo) *pb.SkillEntry {
 
 // SkillAdd 新增技能：配置ID必须存在，已拥有返回错误。
 func (this *skillLogic) SkillAdd(ctx context.Context, playerID int64, req *pb.SkillAddReq) (*pb.SkillAddResp, error) {
-	if !tpl.T().Skill.Has(req.GetSkillId()) {
+	if !tpl.T().Skill.Has(req.GetCfgId()) {
 		return nil, errs.CodeInvalidParams.Err()
 	}
 
@@ -65,12 +66,13 @@ func (this *skillLogic) SkillAdd(ctx context.Context, playerID int64, req *pb.Sk
 		return nil, err
 	}
 
-	s := model.SkillInfo{SkillID: req.GetSkillId()}
+	s := model.SkillInfo{SkillID: req.GetCfgId()}
 	if !row.AddSkill(s) {
 		return nil, errs.CodeInvalidParams.WithMessage("技能已拥有").Err()
 	}
 
 	global.PlayerSkillCache.Set(playerID, row)
+	record.Record(ctx, model.RecordModuleSkill, playerID, model.RecordActionGain, req.GetCfgId(), 1)
 	return &pb.SkillAddResp{SkillEntry: toSkillEntry(s)}, nil
 }
 
@@ -82,7 +84,7 @@ func (this *skillLogic) SkillUpdate(ctx context.Context, playerID int64, req *pb
 	}
 
 	s := model.SkillInfo{
-		SkillID:  req.GetSkillId(),
+		SkillID:  req.GetCfgId(),
 		Level:    req.GetLevel(),
 		Equipped: req.GetEquipped(),
 	}

@@ -17,38 +17,49 @@ message ContainerListResp {
   repeated ContainerEntry container_entries = 2; // 容器列表
 }
 
-// 容器内物品变化（路由 10011）
+// 容器内对象变化（路由 10011）
 message ContainerNotify {
   ContainerType container_type = 1; // 容器类型
-  ItemEntry item_entry = 2;         // 容器内物品
+  ItemEntry item_entry = 2;         // 容器内对象
 }
 
-// 容器内移动物品请求（路由 10012）
+// 容器内移动对象请求（路由 10013）
+message ContainerAddReq {
+  ContainerType type = 1; // 容器类型
+  ItemEntry item_entry = 2;  // 对象实例ID
+}
+
+// 容器内移动对象响应
+message ContainerAddResp {
+  Result result = 1;
+}
+
+// 容器内移动对象请求（路由 10013）
 message ContainerMoveReq {
   ContainerType type = 1; // 容器类型
-  int64 item_id = 2;      // 物品实例ID
+  int64 id = 2;      // 对象实例ID
   int32 to_x = 3;         // 目标 X
   int32 to_y = 4;         // 目标 Y
   bool rotated = 5;       // 是否旋转放置
 }
 
-// 容器内移动物品响应
+// 容器内移动对象响应
 message ContainerMoveResp {
   Result result = 1;
 }
 
-// 容器内旋转物品请求（路由 10013）
+// 容器内旋转对象请求（路由 10014）
 message ContainerRotateReq {
   ContainerType type = 1; // 容器类型
-  int64 item_id = 2;      // 物品实例ID
+  int64 id = 2;      // 对象实例ID
 }
 
-// 容器内旋转物品响应
+// 容器内旋转对象响应
 message ContainerRotateResp {
   Result result = 1;
 }
 
-// 容器一键整理请求（路由 10014）
+// 容器一键整理请求（路由 10015）
 message SortContainerReq {
   ContainerType container_type = 1; // 容器类型
 }
@@ -58,17 +69,17 @@ message SortContainerResp {
   Result result = 1;
 }
 
-// 容器间移动物品请求（路由 10015）
+// 容器间移动对象请求（路由 10016）
 message ContainerTransferReq {
   ContainerType from_type = 1; // 源容器类型
   ContainerType to_type = 2;   // 目标容器类型
-  int64 item_id = 3;           // 物品实例ID
+  int64 id = 3;           // 对象实例ID
   int32 to_x = 4;              // 目标 X
   int32 to_y = 5;              // 目标 Y
   bool rotated = 6;            // 是否旋转放置
 }
 
-// 容器间移动物品响应
+// 容器间移动对象响应
 message ContainerTransferResp {
   Result result = 1;
   ContainerEntry from_entry = 2; // 源容器（变更后）

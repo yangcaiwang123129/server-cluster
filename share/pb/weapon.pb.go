@@ -112,27 +112,27 @@ func (x *WeaponListResp) GetWeaponEntries() []*WeaponEntry {
 }
 
 // 武器变化通知（路由 10031）
-type WeaponChangeNotify struct {
+type WeaponNotify struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	WeaponEntry   *WeaponEntry           `protobuf:"bytes,1,opt,name=weapon_entry,json=weaponEntry,proto3" json:"weapon_entry,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *WeaponChangeNotify) Reset() {
-	*x = WeaponChangeNotify{}
+func (x *WeaponNotify) Reset() {
+	*x = WeaponNotify{}
 	mi := &file_weapon_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *WeaponChangeNotify) String() string {
+func (x *WeaponNotify) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*WeaponChangeNotify) ProtoMessage() {}
+func (*WeaponNotify) ProtoMessage() {}
 
-func (x *WeaponChangeNotify) ProtoReflect() protoreflect.Message {
+func (x *WeaponNotify) ProtoReflect() protoreflect.Message {
 	mi := &file_weapon_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -144,12 +144,12 @@ func (x *WeaponChangeNotify) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use WeaponChangeNotify.ProtoReflect.Descriptor instead.
-func (*WeaponChangeNotify) Descriptor() ([]byte, []int) {
+// Deprecated: Use WeaponNotify.ProtoReflect.Descriptor instead.
+func (*WeaponNotify) Descriptor() ([]byte, []int) {
 	return file_weapon_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *WeaponChangeNotify) GetWeaponEntry() *WeaponEntry {
+func (x *WeaponNotify) GetWeaponEntry() *WeaponEntry {
 	if x != nil {
 		return x.WeaponEntry
 	}
@@ -159,7 +159,7 @@ func (x *WeaponChangeNotify) GetWeaponEntry() *WeaponEntry {
 // 新增武器请求（路由 10032）
 type WeaponAddReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	WeaponId      int32                  `protobuf:"varint,1,opt,name=weapon_id,json=weaponId,proto3" json:"weapon_id,omitempty"` // 武器配置ID
+	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 武器配置ID
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -194,9 +194,9 @@ func (*WeaponAddReq) Descriptor() ([]byte, []int) {
 	return file_weapon_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *WeaponAddReq) GetWeaponId() int32 {
+func (x *WeaponAddReq) GetCfgId() int32 {
 	if x != nil {
-		return x.WeaponId
+		return x.CfgId
 	}
 	return 0
 }
@@ -257,10 +257,10 @@ func (x *WeaponAddResp) GetWeaponEntry() *WeaponEntry {
 // 更新武器请求（路由 10033）
 type WeaponUpdateReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	WeaponId      int32                  `protobuf:"varint,1,opt,name=weapon_id,json=weaponId,proto3" json:"weapon_id,omitempty"` // 武器配置ID
-	Level         int32                  `protobuf:"varint,2,opt,name=level,proto3" json:"level,omitempty"`                       // 等级
-	Durability    int32                  `protobuf:"varint,3,opt,name=durability,proto3" json:"durability,omitempty"`             // 耐久度
-	Equipped      bool                   `protobuf:"varint,4,opt,name=equipped,proto3" json:"equipped,omitempty"`                 // 是否装备
+	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 武器配置ID
+	Level         int32                  `protobuf:"varint,2,opt,name=level,proto3" json:"level,omitempty"`              // 等级
+	Durability    int32                  `protobuf:"varint,3,opt,name=durability,proto3" json:"durability,omitempty"`    // 耐久度
+	Equipped      bool                   `protobuf:"varint,4,opt,name=equipped,proto3" json:"equipped,omitempty"`        // 是否装备
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -295,9 +295,9 @@ func (*WeaponUpdateReq) Descriptor() ([]byte, []int) {
 	return file_weapon_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *WeaponUpdateReq) GetWeaponId() int32 {
+func (x *WeaponUpdateReq) GetCfgId() int32 {
 	if x != nil {
-		return x.WeaponId
+		return x.CfgId
 	}
 	return 0
 }
@@ -385,17 +385,17 @@ const file_weapon_proto_rawDesc = "" +
 	"\x0eWeaponListResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\x126\n" +
-	"\x0eweapon_entries\x18\x02 \x03(\v2\x0f.pb.WeaponEntryR\rweaponEntries\"H\n" +
-	"\x12WeaponChangeNotify\x122\n" +
-	"\fweapon_entry\x18\x01 \x01(\v2\x0f.pb.WeaponEntryR\vweaponEntry\"+\n" +
-	"\fWeaponAddReq\x12\x1b\n" +
-	"\tweapon_id\x18\x01 \x01(\x05R\bweaponId\"g\n" +
+	"\x0eweapon_entries\x18\x02 \x03(\v2\x0f.pb.WeaponEntryR\rweaponEntries\"B\n" +
+	"\fWeaponNotify\x122\n" +
+	"\fweapon_entry\x18\x01 \x01(\v2\x0f.pb.WeaponEntryR\vweaponEntry\"%\n" +
+	"\fWeaponAddReq\x12\x15\n" +
+	"\x06cfg_id\x18\x01 \x01(\x05R\x05cfgId\"g\n" +
 	"\rWeaponAddResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\x122\n" +
-	"\fweapon_entry\x18\x02 \x01(\v2\x0f.pb.WeaponEntryR\vweaponEntry\"\x80\x01\n" +
-	"\x0fWeaponUpdateReq\x12\x1b\n" +
-	"\tweapon_id\x18\x01 \x01(\x05R\bweaponId\x12\x14\n" +
+	"\fweapon_entry\x18\x02 \x01(\v2\x0f.pb.WeaponEntryR\vweaponEntry\"z\n" +
+	"\x0fWeaponUpdateReq\x12\x15\n" +
+	"\x06cfg_id\x18\x01 \x01(\x05R\x05cfgId\x12\x14\n" +
 	"\x05level\x18\x02 \x01(\x05R\x05level\x12\x1e\n" +
 	"\n" +
 	"durability\x18\x03 \x01(\x05R\n" +
@@ -420,20 +420,20 @@ func file_weapon_proto_rawDescGZIP() []byte {
 
 var file_weapon_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_weapon_proto_goTypes = []any{
-	(*WeaponListReq)(nil),      // 0: pb.WeaponListReq
-	(*WeaponListResp)(nil),     // 1: pb.WeaponListResp
-	(*WeaponChangeNotify)(nil), // 2: pb.WeaponChangeNotify
-	(*WeaponAddReq)(nil),       // 3: pb.WeaponAddReq
-	(*WeaponAddResp)(nil),      // 4: pb.WeaponAddResp
-	(*WeaponUpdateReq)(nil),    // 5: pb.WeaponUpdateReq
-	(*WeaponUpdateResp)(nil),   // 6: pb.WeaponUpdateResp
-	(*Result)(nil),             // 7: pb.Result
-	(*WeaponEntry)(nil),        // 8: pb.WeaponEntry
+	(*WeaponListReq)(nil),    // 0: pb.WeaponListReq
+	(*WeaponListResp)(nil),   // 1: pb.WeaponListResp
+	(*WeaponNotify)(nil),     // 2: pb.WeaponNotify
+	(*WeaponAddReq)(nil),     // 3: pb.WeaponAddReq
+	(*WeaponAddResp)(nil),    // 4: pb.WeaponAddResp
+	(*WeaponUpdateReq)(nil),  // 5: pb.WeaponUpdateReq
+	(*WeaponUpdateResp)(nil), // 6: pb.WeaponUpdateResp
+	(*Result)(nil),           // 7: pb.Result
+	(*WeaponEntry)(nil),      // 8: pb.WeaponEntry
 }
 var file_weapon_proto_depIdxs = []int32{
 	7, // 0: pb.WeaponListResp.result:type_name -> pb.Result
 	8, // 1: pb.WeaponListResp.weapon_entries:type_name -> pb.WeaponEntry
-	8, // 2: pb.WeaponChangeNotify.weapon_entry:type_name -> pb.WeaponEntry
+	8, // 2: pb.WeaponNotify.weapon_entry:type_name -> pb.WeaponEntry
 	7, // 3: pb.WeaponAddResp.result:type_name -> pb.Result
 	8, // 4: pb.WeaponAddResp.weapon_entry:type_name -> pb.WeaponEntry
 	7, // 5: pb.WeaponUpdateResp.result:type_name -> pb.Result

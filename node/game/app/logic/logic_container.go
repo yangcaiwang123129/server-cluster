@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"server-cluster/internal/record"
 
 	"gorm.io/gorm"
 
@@ -55,16 +56,16 @@ func containerToEntry(playerID int64, c *model.ItemContainer) *pb.ContainerEntry
 	entries := make([]*pb.ItemEntry, 0, len(items))
 	for _, it := range items {
 		entries = append(entries, &pb.ItemEntry{
-			ItemId:    it.ItemID,
-			ItemCfgId: it.ItemCfgID,
-			Count:     it.Count,
-			GridX:     it.GridX,
-			GridY:     it.GridY,
-			Rotated:   it.Rotated,
+			Id:      it.ItemID,
+			CfgId:   it.ItemCfgID,
+			Count:   it.Count,
+			GridX:   it.GridX,
+			GridY:   it.GridY,
+			Rotated: it.Rotated,
 		})
 	}
 	return &pb.ContainerEntry{
-		ContainerId: containerID(playerID, meta.Type),
+		Id:          containerID(playerID, meta.Type),
 		Type:        pb.ContainerType(meta.Type),
 		GridW:       meta.GridW,
 		GridH:       meta.GridH,
@@ -168,7 +169,7 @@ func (this *containerLogic) ContainerMove(ctx context.Context, playerID int64, r
 		return nil, err
 	}
 
-	if err := c.MoveEntry(req.GetItemId(), req.GetToX(), req.GetToY(), req.GetRotated()); err != nil {
+	if err := c.MoveEntry(req.GetId(), req.GetToX(), req.GetToY(), req.GetRotated()); err != nil {
 		return nil, containerErr(err)
 	}
 
@@ -183,7 +184,7 @@ func (this *containerLogic) ContainerRotate(ctx context.Context, playerID int64,
 		return nil, err
 	}
 
-	if err := c.RotateEntry(req.GetItemId()); err != nil {
+	if err := c.RotateEntry(req.GetId()); err != nil {
 		return nil, containerErr(err)
 	}
 
@@ -225,7 +226,7 @@ func (this *containerLogic) ContainerTransfer(ctx context.Context, playerID int6
 	}
 
 	// 新接口：目标容器调 TransferFrom 把源容器的物品搬过来
-	if err := toC.TransferFrom(fromC, req.GetItemId(), req.GetToX(), req.GetToY(), req.GetRotated()); err != nil {
+	if err := toC.TransferFrom(fromC, req.GetId(), req.GetToX(), req.GetToY(), req.GetRotated()); err != nil {
 		return nil, containerErr(err)
 	}
 
@@ -270,5 +271,6 @@ func (this *containerLogic) ContainerAddEntry(ctx context.Context, playerID int6
 	}
 
 	saveContainer(playerID, pc)
+	record.Record(ctx, model.RecordModuleItem, playerID, model.RecordActionGain, req.GetCfgId(), count)
 	return &pb.ContainerListResp{ContainerEntries: []*pb.ContainerEntry{containerToEntry(playerID, c)}}, nil
 }
