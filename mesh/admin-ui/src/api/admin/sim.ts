@@ -9,14 +9,14 @@ import type { SimConnectResult, SimLoginPayload, SimLoginResult, SimOptions, Sim
 
 export function getSimOptions() {
   return request<ApiResponse<SimOptions>>({
-    url: '/api/v1/sim/options',
+    url: '/api/v1/gm/client/sim/options',
     method: 'get'
   })
 }
 
 export function simLogin(data: SimLoginPayload) {
   return request<ApiResponse<SimLoginResult>>({
-    url: '/api/v1/sim/login',
+    url: '/api/v1/gm/client/sim/login',
     method: 'post',
     data
   })
@@ -24,7 +24,7 @@ export function simLogin(data: SimLoginPayload) {
 
 export function simConnect(sessionId: string) {
   return request<ApiResponse<SimConnectResult>>({
-    url: '/api/v1/sim/connect',
+    url: '/api/v1/gm/client/sim/connect',
     method: 'post',
     data: { sessionId }
   })
@@ -32,7 +32,7 @@ export function simConnect(sessionId: string) {
 
 export function simStep(sessionId: string, step: 'verify' | 'enter' | 'leave') {
   return request<ApiResponse<SimStepResult>>({
-    url: '/api/v1/sim/step',
+    url: '/api/v1/gm/client/sim/step',
     method: 'post',
     data: { sessionId, step }
   })
@@ -40,7 +40,7 @@ export function simStep(sessionId: string, step: 'verify' | 'enter' | 'leave') {
 
 export function simClose(sessionId: string) {
   return request<ApiResponse<null>>({
-    url: '/api/v1/sim/close',
+    url: '/api/v1/gm/client/sim/close',
     method: 'post',
     data: { sessionId }
   })

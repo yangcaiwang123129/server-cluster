@@ -684,6 +684,1027 @@
                 }
             }
         },
+        "/api/v1/gm/catalog": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 配置目录",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "类型 hero|weapon|skill|equip|item",
+                        "name": "type",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "按名称或ID过滤",
+                        "name": "keyword",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码（仅 item 需要；不传返回全量）",
+                        "name": "pageIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页条数（仅 item 需要；不传返回全量）",
+                        "name": "pageSize",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/client/sim/close": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sim"
+                ],
+                "summary": "客户端模拟器关闭会话",
+                "parameters": [
+                    {
+                        "description": "会话参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SimSessionReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/client/sim/connect": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sim"
+                ],
+                "summary": "客户端模拟器连接网关",
+                "parameters": [
+                    {
+                        "description": "会话参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SimSessionReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/client/sim/login": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sim"
+                ],
+                "summary": "客户端模拟器登录",
+                "parameters": [
+                    {
+                        "description": "登录参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SimLoginReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/client/sim/options": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sim"
+                ],
+                "summary": "客户端模拟器默认参数",
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/client/sim/step": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sim"
+                ],
+                "summary": "客户端模拟器流程步骤",
+                "parameters": [
+                    {
+                        "description": "步骤参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SimStepReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/client/version": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "client"
+                ],
+                "summary": "客户端版本列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "页码",
+                        "name": "pageIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "每页条数",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "版本号",
+                        "name": "version",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "平台",
+                        "name": "platform",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "状态",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "client"
+                ],
+                "summary": "新增客户端版本",
+                "parameters": [
+                    {
+                        "description": "请求体",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ClientVersionSaveReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "client"
+                ],
+                "summary": "批量删除客户端版本",
+                "parameters": [
+                    {
+                        "description": "批量删除ID",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.IdsReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/client/version-status": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "client"
+                ],
+                "summary": "客户端版本启停",
+                "parameters": [
+                    {
+                        "description": "请求体",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ClientVersionStatusReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/client/version/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "client"
+                ],
+                "summary": "客户端版本详情",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "版本ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "client"
+                ],
+                "summary": "修改客户端版本",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "版本ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "请求体",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ClientVersionSaveReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/container": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 容器列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "玩家ID",
+                        "name": "playerId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "容器类型 0全部 1背包 2仓库 3保险箱",
+                        "name": "containerType",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/container/item": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 添加物品",
+                "parameters": [
+                    {
+                        "description": "添加参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmContainerAddEntryReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/container/move": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 移动物品",
+                "parameters": [
+                    {
+                        "description": "移动参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmContainerMoveReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/container/rotate": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 旋转物品",
+                "parameters": [
+                    {
+                        "description": "旋转参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmContainerRotateReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/container/sort": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 整理容器",
+                "parameters": [
+                    {
+                        "description": "整理参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmContainerSortReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/container/transfer": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 容器间移动物品",
+                "parameters": [
+                    {
+                        "description": "转移参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmContainerTransferReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/equip": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 装备列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "玩家ID",
+                        "name": "playerId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 更新装备",
+                "parameters": [
+                    {
+                        "description": "更新参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmEquipUpdateReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 新增装备",
+                "parameters": [
+                    {
+                        "description": "新增参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmEquipAddReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/hero": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 英雄列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "玩家ID",
+                        "name": "playerId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 更新英雄",
+                "parameters": [
+                    {
+                        "description": "更新参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmHeroUpdateReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 新增英雄",
+                "parameters": [
+                    {
+                        "description": "新增参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmHeroAddReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/player": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "玩家列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "页码",
+                        "name": "pageIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "每页条数",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "账号",
+                        "name": "username",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/player/kick": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "踢玩家下线",
+                "parameters": [
+                    {
+                        "description": "踢人参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PlayerKickReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/player/online": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "在线玩家",
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/skill": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 技能列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "玩家ID",
+                        "name": "playerId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 更新技能",
+                "parameters": [
+                    {
+                        "description": "更新参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmSkillUpdateReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 新增技能",
+                "parameters": [
+                    {
+                        "description": "新增参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmSkillAddReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/weapon": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 武器列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "玩家ID",
+                        "name": "playerId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 更新武器",
+                "parameters": [
+                    {
+                        "description": "更新参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmWeaponUpdateReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 新增武器",
+                "parameters": [
+                    {
+                        "description": "新增参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmWeaponAddReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/login": {
             "post": {
                 "consumes": [
@@ -933,66 +1954,6 @@
                     "system"
                 ],
                 "summary": "清空操作日志",
-                "responses": {
-                    "200": {
-                        "description": "响应包在 {code, message, data} 中",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Resp"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/player": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "system"
-                ],
-                "summary": "玩家列表",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "页码",
-                        "name": "pageIndex",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 10,
-                        "description": "每页条数",
-                        "name": "pageSize",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "账号",
-                        "name": "username",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "响应包在 {code, message, data} 中",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Resp"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/player/online": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "system"
-                ],
-                "summary": "在线玩家",
                 "responses": {
                     "200": {
                         "description": "响应包在 {code, message, data} 中",
@@ -2089,6 +3050,43 @@
                 }
             }
         },
+        "dto.ClientVersionSaveReq": {
+            "type": "object",
+            "properties": {
+                "downloadUrl": {
+                    "type": "string"
+                },
+                "forceUpdate": {
+                    "type": "boolean"
+                },
+                "platform": {
+                    "type": "string"
+                },
+                "releaseNote": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                },
+                "versionId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ClientVersionStatusReq": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                },
+                "versionId": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.ConfigSaveReq": {
             "type": "object",
             "properties": {
@@ -2170,6 +3168,286 @@
                 }
             }
         },
+        "dto.GmContainerAddEntryReq": {
+            "type": "object",
+            "properties": {
+                "containerType": {
+                    "description": "容器类型：1 背包 2 仓库 3 保险箱",
+                    "type": "integer"
+                },
+                "count": {
+                    "description": "堆叠数量",
+                    "type": "integer"
+                },
+                "gridX": {
+                    "description": "网格X",
+                    "type": "integer"
+                },
+                "gridY": {
+                    "description": "网格Y",
+                    "type": "integer"
+                },
+                "itemCfgId": {
+                    "description": "物品配置ID",
+                    "type": "integer"
+                },
+                "playerId": {
+                    "description": "玩家ID",
+                    "type": "integer"
+                },
+                "rotated": {
+                    "description": "是否旋转放置",
+                    "type": "boolean"
+                }
+            }
+        },
+        "dto.GmContainerMoveReq": {
+            "type": "object",
+            "properties": {
+                "containerType": {
+                    "description": "容器类型",
+                    "type": "integer"
+                },
+                "itemId": {
+                    "description": "物品实例ID（雪花，按字符串接收）",
+                    "type": "string",
+                    "example": "0"
+                },
+                "playerId": {
+                    "description": "玩家ID",
+                    "type": "integer"
+                },
+                "rotated": {
+                    "description": "是否旋转放置",
+                    "type": "boolean"
+                },
+                "toX": {
+                    "description": "目标X",
+                    "type": "integer"
+                },
+                "toY": {
+                    "description": "目标Y",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GmContainerRotateReq": {
+            "type": "object",
+            "properties": {
+                "containerType": {
+                    "description": "容器类型",
+                    "type": "integer"
+                },
+                "itemId": {
+                    "description": "物品实例ID（雪花，按字符串接收）",
+                    "type": "string",
+                    "example": "0"
+                },
+                "playerId": {
+                    "description": "玩家ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GmContainerSortReq": {
+            "type": "object",
+            "properties": {
+                "containerType": {
+                    "description": "容器类型",
+                    "type": "integer"
+                },
+                "playerId": {
+                    "description": "玩家ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GmContainerTransferReq": {
+            "type": "object",
+            "properties": {
+                "fromType": {
+                    "description": "源容器类型",
+                    "type": "integer"
+                },
+                "itemId": {
+                    "description": "物品实例ID（雪花，按字符串接收）",
+                    "type": "string",
+                    "example": "0"
+                },
+                "playerId": {
+                    "description": "玩家ID",
+                    "type": "integer"
+                },
+                "rotated": {
+                    "description": "是否旋转放置",
+                    "type": "boolean"
+                },
+                "toType": {
+                    "description": "目标容器类型",
+                    "type": "integer"
+                },
+                "toX": {
+                    "description": "目标X",
+                    "type": "integer"
+                },
+                "toY": {
+                    "description": "目标Y",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GmEquipAddReq": {
+            "type": "object",
+            "properties": {
+                "equipId": {
+                    "description": "装备配置ID",
+                    "type": "integer"
+                },
+                "playerId": {
+                    "description": "玩家ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GmEquipUpdateReq": {
+            "type": "object",
+            "properties": {
+                "equipId": {
+                    "description": "装备配置ID",
+                    "type": "integer"
+                },
+                "equipped": {
+                    "description": "是否穿戴",
+                    "type": "boolean"
+                },
+                "level": {
+                    "description": "等级",
+                    "type": "integer"
+                },
+                "playerId": {
+                    "description": "玩家ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GmHeroAddReq": {
+            "type": "object",
+            "properties": {
+                "heroId": {
+                    "description": "英雄配置ID",
+                    "type": "integer"
+                },
+                "playerId": {
+                    "description": "玩家ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GmHeroUpdateReq": {
+            "type": "object",
+            "properties": {
+                "equipped": {
+                    "description": "是否出战",
+                    "type": "boolean"
+                },
+                "exp": {
+                    "description": "经验",
+                    "type": "integer"
+                },
+                "heroId": {
+                    "description": "英雄配置ID",
+                    "type": "integer"
+                },
+                "level": {
+                    "description": "等级",
+                    "type": "integer"
+                },
+                "playerId": {
+                    "description": "玩家ID",
+                    "type": "integer"
+                },
+                "skinId": {
+                    "description": "皮肤ID",
+                    "type": "integer"
+                },
+                "star": {
+                    "description": "星级",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GmSkillAddReq": {
+            "type": "object",
+            "properties": {
+                "playerId": {
+                    "description": "玩家ID",
+                    "type": "integer"
+                },
+                "skillId": {
+                    "description": "技能配置ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GmSkillUpdateReq": {
+            "type": "object",
+            "properties": {
+                "equipped": {
+                    "description": "是否装备",
+                    "type": "boolean"
+                },
+                "level": {
+                    "description": "等级",
+                    "type": "integer"
+                },
+                "playerId": {
+                    "description": "玩家ID",
+                    "type": "integer"
+                },
+                "skillId": {
+                    "description": "技能配置ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GmWeaponAddReq": {
+            "type": "object",
+            "properties": {
+                "playerId": {
+                    "description": "玩家ID",
+                    "type": "integer"
+                },
+                "weaponId": {
+                    "description": "武器配置ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GmWeaponUpdateReq": {
+            "type": "object",
+            "properties": {
+                "durability": {
+                    "description": "耐久度",
+                    "type": "integer"
+                },
+                "equipped": {
+                    "description": "是否装备",
+                    "type": "boolean"
+                },
+                "level": {
+                    "description": "等级",
+                    "type": "integer"
+                },
+                "playerId": {
+                    "description": "玩家ID",
+                    "type": "integer"
+                },
+                "weaponId": {
+                    "description": "武器配置ID",
+                    "type": "integer"
+                }
+            }
+        },
         "dto.IdsReq": {
             "type": "object",
             "properties": {
@@ -2234,6 +3512,23 @@
                 }
             }
         },
+        "dto.PlayerKickReq": {
+            "type": "object",
+            "properties": {
+                "kickType": {
+                    "description": "踢下线类型：1 主动踢 2 封号踢",
+                    "type": "integer"
+                },
+                "nodeId": {
+                    "description": "玩家所在 game 服实例 ID（定向调用）",
+                    "type": "string"
+                },
+                "playerId": {
+                    "description": "玩家ID",
+                    "type": "integer"
+                }
+            }
+        },
         "dto.Resp": {
             "type": "object",
             "properties": {
@@ -2293,6 +3588,50 @@
                     "type": "string"
                 },
                 "configValue": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SimLoginReq": {
+            "type": "object",
+            "properties": {
+                "gateAddr": {
+                    "description": "网关地址覆盖，空则使用登录服下发地址",
+                    "type": "string"
+                },
+                "loginAddr": {
+                    "description": "登录服地址，空则取默认配置",
+                    "type": "string"
+                },
+                "mode": {
+                    "description": "login | register",
+                    "type": "string"
+                },
+                "password": {
+                    "description": "密码",
+                    "type": "string"
+                },
+                "username": {
+                    "description": "账号",
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SimSessionReq": {
+            "type": "object",
+            "properties": {
+                "sessionId": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SimStepReq": {
+            "type": "object",
+            "properties": {
+                "sessionId": {
+                    "type": "string"
+                },
+                "step": {
                     "type": "string"
                 }
             }

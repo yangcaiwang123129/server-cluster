@@ -97,8 +97,8 @@ type GmContainerTransferReq struct {
 	Rotated  bool  `json:"rotated"`       // 是否旋转放置
 }
 
-// GmContainerAddItemReq 向容器放入物品请求（坐标为左上角格）。
-type GmContainerAddItemReq struct {
+// GmContainerAddEntryReq 向容器放入物品请求（坐标为左上角格）。
+type GmContainerAddEntryReq struct {
 	PlayerID      int64 `json:"playerId"`      // 玩家ID
 	ContainerType int32 `json:"containerType"` // 容器类型：1 背包 2 仓库 3 保险箱
 	ItemCfgID     int32 `json:"itemCfgId"`     // 物品配置ID
@@ -195,7 +195,7 @@ type GmSkillUpdateReq struct {
 
 // GmEquipEntry GM 装备持有状态（含配置展示信息）。
 type GmEquipEntry struct {
-	EquipID   int32  `json:"equipId"`   // 装备配置ID
+	EquipID  int32  `json:"equipId"`  // 装备配置ID
 	Level    int32  `json:"level"`    // 等级
 	Equipped bool   `json:"equipped"` // 是否穿戴
 	Name     string `json:"name"`     // 装备名称
@@ -206,24 +206,26 @@ type GmEquipEntry struct {
 // GmEquipAddReq 新增装备请求。
 type GmEquipAddReq struct {
 	PlayerID int64 `json:"playerId"` // 玩家ID
-	EquipID   int32 `json:"equipId"`   // 装备配置ID
+	EquipID  int32 `json:"equipId"`  // 装备配置ID
 }
 
 // GmEquipUpdateReq 更新装备请求。
 type GmEquipUpdateReq struct {
 	PlayerID int64 `json:"playerId"` // 玩家ID
-	EquipID   int32 `json:"equipId"`   // 装备配置ID
+	EquipID  int32 `json:"equipId"`  // 装备配置ID
 	Level    int32 `json:"level"`    // 等级
 	Equipped bool  `json:"equipped"` // 是否穿戴
 }
 
 // ========== 配置目录（GM，读 Luban 配置） ==========
 
-// GameCatalogEntry 游戏配置目录行（英雄/武器/技能/装备通用，供 GM 页面选择器与展示）。
+// GameCatalogEntry 游戏配置目录行（英雄/武器/技能/装备/物品通用，供 GM 页面选择器与展示）。
 type GameCatalogEntry struct {
 	ID      int32  `json:"id"`      // 配置ID
 	Name    string `json:"name"`    // 名称
 	IconKey string `json:"iconKey"` // 图标
 	Desc    string `json:"desc"`    // 描述
 	Rarity  int32  `json:"rarity"`  // 稀有度（无该概念的配置为 0）
+	Width   int32  `json:"width"`   // 占格宽（仅 item 有意义）
+	Height  int32  `json:"height"`  // 占格高（仅 item 有意义）
 }

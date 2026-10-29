@@ -126,15 +126,15 @@ func handleGmContainerTransfer(ctx http.Context) error {
 // @Summary GM 添加物品
 // @Tags gm
 // @Produce json
-// @Param body body dto.GmContainerAddItemReq true "添加参数"
+// @Param body body dto.GmContainerAddEntryReq true "添加参数"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/container/item [post]
 func handleGmContainerAddItem(ctx http.Context) error {
-	var req dto.GmContainerAddItemReq
+	var req dto.GmContainerAddEntryReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.ContainerType <= 0 || req.ItemCfgID <= 0 {
 		return errs.Fail(ctx, 400, "请求参数错误")
 	}
-	list, err := logic.GmContainer().ContainerAddItem(req)
+	list, err := logic.GmContainer().ContainerAddEntry(req)
 	if err != nil {
 		return errs.FailErr(ctx, err)
 	}

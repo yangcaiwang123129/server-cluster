@@ -22,8 +22,8 @@ type GmContainerLogic interface {
 	ContainerSort(req dto.GmContainerSortReq) error
 	// ContainerTransfer 容器间移动物品（返回变更后的源/目标容器）
 	ContainerTransfer(req dto.GmContainerTransferReq) ([]dto.GmContainerResp, error)
-	// ContainerAddItem 向容器放入物品（返回变更后的容器）
-	ContainerAddItem(req dto.GmContainerAddItemReq) ([]dto.GmContainerResp, error)
+	// ContainerAddItem 向容器放入对象（返回变更后的容器）
+	ContainerAddEntry(req dto.GmContainerAddEntryReq) ([]dto.GmContainerResp, error)
 }
 
 // gmContainerLogicInst 容器 GM 业务单例容器。
@@ -134,12 +134,12 @@ func (this *gmContainerLogic) ContainerTransfer(req dto.GmContainerTransferReq) 
 	return toGmContainerResps(req.PlayerID, entries), nil
 }
 
-// ContainerAddItem 向容器放入物品。
-func (this *gmContainerLogic) ContainerAddItem(req dto.GmContainerAddItemReq) ([]dto.GmContainerResp, error) {
+// ContainerAddEntry 向容器放入对象。
+func (this *gmContainerLogic) ContainerAddEntry(req dto.GmContainerAddEntryReq) ([]dto.GmContainerResp, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), rpcTimeout)
 	defer cancel()
 
-	callReq := &pb.GmContainerAddItemReq{
+	callReq := &pb.GmContainerAddEntryReq{
 		PlayerId:      req.PlayerID,
 		ContainerType: req.ContainerType,
 		ItemCfgId:     req.ItemCfgID,

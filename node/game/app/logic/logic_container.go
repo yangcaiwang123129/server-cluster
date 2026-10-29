@@ -237,7 +237,7 @@ func (this *containerLogic) ContainerTransfer(ctx context.Context, playerID int6
 }
 
 // ContainerAddItem 向容器放入物品（GM）：校验配置与占格后挂缓存待落库。
-func (this *containerLogic) ContainerAddItem(ctx context.Context, playerID int64, req *pb.GmContainerAddItemReq) (*pb.ContainerListResp, error) {
+func (this *containerLogic) ContainerAddItem(ctx context.Context, playerID int64, req *pb.GmContainerAddEntryReq) (*pb.ContainerListResp, error) {
 	if !tpl.T().Item.Has(req.GetItemCfgId()) {
 		return nil, errs.CodeInvalidParams.WithMessage("物品配置不存在").Err()
 	}

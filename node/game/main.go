@@ -3,7 +3,7 @@ package main
 
 import (
 	"server-cluster/internal/router"
-	_ "server-cluster/node/game/app/handler" // 触发 handler_player.go 的 init() 注册路由到 routes 切片
+	_ "server-cluster/node/game/app/handler" // 触发 handler_gm_player.go 的 init() 注册路由到 routes 切片
 	"server-cluster/node/game/app/service"
 	"server-cluster/share/pb"
 

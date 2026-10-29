@@ -6,7 +6,7 @@ import type { ClientVersion, ClientVersionQuery } from '@/types/admin'
 
 export function listClientVersion(query: ClientVersionQuery & Partial<PageQuery>) {
   return request<ApiResponse<PageResult<ClientVersion>>>({
-    url: '/api/v1/client-version',
+    url: '/api/v1/gm/client/version',
     method: 'get',
     params: query
   })
@@ -14,14 +14,14 @@ export function listClientVersion(query: ClientVersionQuery & Partial<PageQuery>
 
 export function getClientVersion(versionId: number) {
   return request<ApiResponse<ClientVersion>>({
-    url: '/api/v1/client-version/' + versionId,
+    url: '/api/v1/gm/client/version/' + versionId,
     method: 'get'
   })
 }
 
 export function addClientVersion(data: ClientVersion) {
   return request<ApiResponse<ClientVersion>>({
-    url: '/api/v1/client-version',
+    url: '/api/v1/gm/client/version',
     method: 'post',
     data
   })
@@ -29,7 +29,7 @@ export function addClientVersion(data: ClientVersion) {
 
 export function updateClientVersion(data: ClientVersion & { versionId?: number }) {
   return request<ApiResponse<ClientVersion>>({
-    url: '/api/v1/client-version/' + data.versionId,
+    url: '/api/v1/gm/client/version/' + data.versionId,
     method: 'put',
     data
   })
@@ -37,7 +37,7 @@ export function updateClientVersion(data: ClientVersion & { versionId?: number }
 
 export function delClientVersion(ids: Id[]) {
   return request<ApiResponse<null>>({
-    url: '/api/v1/client-version',
+    url: '/api/v1/gm/client/version',
     method: 'delete',
     data: { ids: ids.map(Number) }
   })
@@ -45,7 +45,7 @@ export function delClientVersion(ids: Id[]) {
 
 export function updateClientVersionStatus(data: { versionId: number; status: string }) {
   return request<ApiResponse<null>>({
-    url: '/api/v1/client-version-status',
+    url: '/api/v1/gm/client/version-status',
     method: 'put',
     data
   })

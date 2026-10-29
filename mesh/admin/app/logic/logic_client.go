@@ -1,4 +1,4 @@
-// Package logic 客户端模拟器：由 admin 侧代替 U3D 客户端走完「登录 → 连网关 → 首包 → 进游戏 → 退游戏」。
+// Package logic 客户端相关业务逻辑：客户端版本管理、客户端模拟器。
 package logic
 
 import (
@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/dobyte/due/network/ws/v2"
+	"github.com/dobyte/due/v2/codes"
 	"github.com/dobyte/due/v2/core/buffer"
 	"github.com/dobyte/due/v2/etc"
 	"github.com/dobyte/due/v2/network"
@@ -21,11 +22,101 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"server-cluster/internal/svc"
+	"server-cluster/mesh/admin/app/repo"
+	"server-cluster/share/consts"
 	"server-cluster/share/dto"
 	"server-cluster/share/errs"
-	"github.com/dobyte/due/v2/codes"
+	"server-cluster/share/model"
 	"server-cluster/share/pb"
 )
+
+// ClientVersionList 客户端版本分页列表。
+func ClientVersionList(req dto.ClientVersionListReq) ([]model.ClientVersion, int64, error) {
+	return repo.R().ListClientVersions(repo.ClientVersionQuery{
+		Version:  req.Version,
+		Platform: req.Platform,
+		Status:   req.Status,
+		Order:    req.Order,
+	}, req.PageIndex, req.PageSize)
+}
+
+// ClientVersionGet 客户端版本详情。
+func ClientVersionGet(id int) (*model.ClientVersion, error) {
+	return repo.R().GetClientVersion(id)
+}
+
+// ClientVersionCreate 新增客户端版本。
+func ClientVersionCreate(req dto.ClientVersionSaveReq) (*model.ClientVersion, error) {
+	m, err := clientVersionModel(req, 0)
+	if err != nil {
+		return nil, err
+	}
+	if err := repo.R().CreateClientVersion(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// ClientVersionUpdate 修改客户端版本。
+func ClientVersionUpdate(id int, req dto.ClientVersionSaveReq) (*model.ClientVersion, error) {
+	if id == 0 {
+		return nil, codes.NewCode(400, "版本ID不能为空").Err()
+	}
+	m, err := clientVersionModel(req, id)
+	if err != nil {
+		return nil, err
+	}
+	m.VersionId = id
+	if err := repo.R().UpdateClientVersion(m); err != nil {
+		return nil, err
+	}
+	// 重新读一次，返回带创建/更新时间的完整记录。
+	return repo.R().GetClientVersion(id)
+}
+
+// ClientVersionDelete 批量删除客户端版本。
+func ClientVersionDelete(ids []int) error { return repo.R().DeleteClientVersions(ids) }
+
+// ClientVersionUpdateStatus 启用/停用客户端版本。
+func ClientVersionUpdateStatus(req dto.ClientVersionStatusReq) error {
+	if req.VersionId == 0 {
+		return codes.NewCode(400, "版本ID不能为空").Err()
+	}
+	return repo.R().UpdateClientVersionStatus(req.VersionId, req.Status)
+}
+
+// clientVersionModel 校验请求并转模型；excludeId 用于修改时排除自身的重号检查。
+func clientVersionModel(req dto.ClientVersionSaveReq, excludeId int) (*model.ClientVersion, error) {
+	version := strings.TrimSpace(req.Version)
+	platform := strings.TrimSpace(req.Platform)
+	if version == "" {
+		return nil, codes.NewCode(400, "版本号不能为空").Err()
+	}
+	if platform == "" {
+		return nil, codes.NewCode(400, "平台不能为空").Err()
+	}
+	exists, err := repo.R().ExistsClientVersion(version, platform, excludeId)
+	if err != nil {
+		return nil, err
+	}
+	if exists {
+		return nil, codes.NewCode(400, "该平台下已存在相同版本号").Err()
+	}
+
+	status := req.Status
+	if status == "" {
+		status = consts.StatusEnabled
+	}
+
+	return &model.ClientVersion{
+		Version:     version,
+		Platform:    platform,
+		DownloadURL: strings.TrimSpace(req.DownloadURL),
+		ForceUpdate: req.ForceUpdate,
+		Status:      status,
+		ReleaseNote: req.ReleaseNote,
+	}, nil
+}
 
 const (
 	simDefaultLoginAddr = "http://188.18.23.72:8080"
@@ -470,7 +561,7 @@ func simProtoJSON(message proto.Message) json.RawMessage {
 	return data
 }
 
-// simWSURL 把登录服下发的网关地址补全成 WebSocket URL。
+// simWSURL 把登录服下发的网关地址补全成 WebSocket 地址。
 func simWSURL(addr string) string {
 	addr = strings.TrimSpace(addr)
 	switch {

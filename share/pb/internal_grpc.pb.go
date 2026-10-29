@@ -64,7 +64,7 @@ type GameAdminServiceClient interface {
 	// ContainerTransfer 容器间移动物品
 	ContainerTransfer(ctx context.Context, in *GmContainerTransferReq, opts ...grpc.CallOption) (*ContainerTransferResp, error)
 	// ContainerAddItem 向容器放入物品（返回变更后的容器）
-	ContainerAddItem(ctx context.Context, in *GmContainerAddItemReq, opts ...grpc.CallOption) (*ContainerListResp, error)
+	ContainerAddItem(ctx context.Context, in *GmContainerAddEntryReq, opts ...grpc.CallOption) (*ContainerListResp, error)
 	// HeroList 英雄列表
 	HeroList(ctx context.Context, in *GmHeroListReq, opts ...grpc.CallOption) (*HeroListResp, error)
 	// HeroAdd 新增英雄
@@ -169,7 +169,7 @@ func (c *gameAdminServiceClient) ContainerTransfer(ctx context.Context, in *GmCo
 	return out, nil
 }
 
-func (c *gameAdminServiceClient) ContainerAddItem(ctx context.Context, in *GmContainerAddItemReq, opts ...grpc.CallOption) (*ContainerListResp, error) {
+func (c *gameAdminServiceClient) ContainerAddItem(ctx context.Context, in *GmContainerAddEntryReq, opts ...grpc.CallOption) (*ContainerListResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ContainerListResp)
 	err := c.cc.Invoke(ctx, GameAdminService_ContainerAddItem_FullMethodName, in, out, cOpts...)
@@ -320,7 +320,7 @@ type GameAdminServiceServer interface {
 	// ContainerTransfer 容器间移动物品
 	ContainerTransfer(context.Context, *GmContainerTransferReq) (*ContainerTransferResp, error)
 	// ContainerAddItem 向容器放入物品（返回变更后的容器）
-	ContainerAddItem(context.Context, *GmContainerAddItemReq) (*ContainerListResp, error)
+	ContainerAddItem(context.Context, *GmContainerAddEntryReq) (*ContainerListResp, error)
 	// HeroList 英雄列表
 	HeroList(context.Context, *GmHeroListReq) (*HeroListResp, error)
 	// HeroAdd 新增英雄
@@ -376,7 +376,7 @@ func (UnimplementedGameAdminServiceServer) ContainerSort(context.Context, *GmCon
 func (UnimplementedGameAdminServiceServer) ContainerTransfer(context.Context, *GmContainerTransferReq) (*ContainerTransferResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method ContainerTransfer not implemented")
 }
-func (UnimplementedGameAdminServiceServer) ContainerAddItem(context.Context, *GmContainerAddItemReq) (*ContainerListResp, error) {
+func (UnimplementedGameAdminServiceServer) ContainerAddItem(context.Context, *GmContainerAddEntryReq) (*ContainerListResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method ContainerAddItem not implemented")
 }
 func (UnimplementedGameAdminServiceServer) HeroList(context.Context, *GmHeroListReq) (*HeroListResp, error) {
@@ -563,7 +563,7 @@ func _GameAdminService_ContainerTransfer_Handler(srv interface{}, ctx context.Co
 }
 
 func _GameAdminService_ContainerAddItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GmContainerAddItemReq)
+	in := new(GmContainerAddEntryReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -575,7 +575,7 @@ func _GameAdminService_ContainerAddItem_Handler(srv interface{}, ctx context.Con
 		FullMethod: GameAdminService_ContainerAddItem_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameAdminServiceServer).ContainerAddItem(ctx, req.(*GmContainerAddItemReq))
+		return srv.(GameAdminServiceServer).ContainerAddItem(ctx, req.(*GmContainerAddEntryReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }

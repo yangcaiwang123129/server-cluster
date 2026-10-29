@@ -1,25 +1,25 @@
 import request from '@/utils/request'
-import type { ApiResponse, PageQuery, PageResult } from '@/types/api'
-import type { GameCatalogEntry, GmContainer, GmEquip, GmHero, GmSkill, GmWeapon, ItemCfg, ItemCfgQuery } from '@/types/admin'
+import type { ApiResponse, PageResult } from '@/types/api'
+import type { GameCatalogEntry, GmContainer, GmEquip, GmHero, GmSkill, GmWeapon } from '@/types/admin'
 
 /**
  * GM 接口：admin 经 mesh 转发到 game 服，每个方法对应 game 侧 logic 的一个函数。
  * 请求统一以 playerId 定位玩家，后台自动选择玩家所在实例。
  */
 
-/** Item catalog (Luban itemconfig), paginated by the admin server. */
-export function listItem(query: ItemCfgQuery & Partial<PageQuery>) {
-  return request<ApiResponse<PageResult<ItemCfg>>>({
-    url: '/api/v1/item',
+/** Item catalog (Luban itemconfig), paginated — goes through the unified catalog endpoint. */
+export function listItem(query: { keyword?: string; pageIndex: number; pageSize: number }) {
+  return request<ApiResponse<PageResult<GameCatalogEntry>>>({
+    url: '/api/v1/gm/catalog',
     method: 'get',
-    params: query
+    params: { type: 'item', ...query }
   })
 }
 
-/** Game config catalog for hero/weapon/skill/equip pickers (Luban tables). */
+/** Game config catalog for hero/weapon/skill/equip pickers (Luban tables); item uses listItem above. */
 export function listGameCatalog(params: { type: 'hero' | 'weapon' | 'skill' | 'equip'; keyword?: string }) {
   return request<ApiResponse<GameCatalogEntry[]>>({
-    url: '/api/v1/game/catalog',
+    url: '/api/v1/gm/catalog',
     method: 'get',
     params
   })
@@ -30,7 +30,7 @@ export function listGameCatalog(params: { type: 'hero' | 'weapon' | 'skill' | 'e
 /** 容器列表，containerType 为 0 时返回全部容器。 */
 export function listGmContainer(params: { playerId: number; containerType?: number }) {
   return request<ApiResponse<GmContainer[]>>({
-    url: '/api/v1/game/container',
+    url: '/api/v1/gm/container',
     method: 'get',
     params
   })
@@ -46,7 +46,7 @@ export function moveGmContainerItem(data: {
   rotated: boolean
 }) {
   return request<ApiResponse<null>>({
-    url: '/api/v1/game/container/move',
+    url: '/api/v1/gm/container/move',
     method: 'post',
     data
   })
@@ -55,7 +55,7 @@ export function moveGmContainerItem(data: {
 /** 容器内旋转物品。 */
 export function rotateGmContainerItem(data: { playerId: number; containerType: number; itemId: string }) {
   return request<ApiResponse<null>>({
-    url: '/api/v1/game/container/rotate',
+    url: '/api/v1/gm/container/rotate',
     method: 'post',
     data
   })
@@ -64,7 +64,7 @@ export function rotateGmContainerItem(data: { playerId: number; containerType: n
 /** 容器一键整理。 */
 export function sortGmContainer(data: { playerId: number; containerType: number }) {
   return request<ApiResponse<null>>({
-    url: '/api/v1/game/container/sort',
+    url: '/api/v1/gm/container/sort',
     method: 'post',
     data
   })
@@ -81,7 +81,7 @@ export function transferGmContainerItem(data: {
   rotated: boolean
 }) {
   return request<ApiResponse<GmContainer[]>>({
-    url: '/api/v1/game/container/transfer',
+    url: '/api/v1/gm/container/transfer',
     method: 'post',
     data
   })
@@ -98,7 +98,7 @@ export function addGmContainerItem(data: {
   rotated: boolean
 }) {
   return request<ApiResponse<GmContainer[]>>({
-    url: '/api/v1/game/container/item',
+    url: '/api/v1/gm/container/item',
     method: 'post',
     data
   })
@@ -108,7 +108,7 @@ export function addGmContainerItem(data: {
 
 export function listGmHero(params: { playerId: number }) {
   return request<ApiResponse<GmHero[]>>({
-    url: '/api/v1/game/hero',
+    url: '/api/v1/gm/hero',
     method: 'get',
     params
   })
@@ -116,7 +116,7 @@ export function listGmHero(params: { playerId: number }) {
 
 export function addGmHero(data: { playerId: number; heroId: number }) {
   return request<ApiResponse<GmHero>>({
-    url: '/api/v1/game/hero',
+    url: '/api/v1/gm/hero',
     method: 'post',
     data
   })
@@ -132,7 +132,7 @@ export function updateGmHero(data: {
   equipped: boolean
 }) {
   return request<ApiResponse<GmHero>>({
-    url: '/api/v1/game/hero',
+    url: '/api/v1/gm/hero',
     method: 'put',
     data
   })
@@ -142,7 +142,7 @@ export function updateGmHero(data: {
 
 export function listGmWeapon(params: { playerId: number }) {
   return request<ApiResponse<GmWeapon[]>>({
-    url: '/api/v1/game/weapon',
+    url: '/api/v1/gm/weapon',
     method: 'get',
     params
   })
@@ -150,7 +150,7 @@ export function listGmWeapon(params: { playerId: number }) {
 
 export function addGmWeapon(data: { playerId: number; weaponId: number }) {
   return request<ApiResponse<GmWeapon>>({
-    url: '/api/v1/game/weapon',
+    url: '/api/v1/gm/weapon',
     method: 'post',
     data
   })
@@ -164,7 +164,7 @@ export function updateGmWeapon(data: {
   equipped: boolean
 }) {
   return request<ApiResponse<GmWeapon>>({
-    url: '/api/v1/game/weapon',
+    url: '/api/v1/gm/weapon',
     method: 'put',
     data
   })
@@ -174,7 +174,7 @@ export function updateGmWeapon(data: {
 
 export function listGmSkill(params: { playerId: number }) {
   return request<ApiResponse<GmSkill[]>>({
-    url: '/api/v1/game/skill',
+    url: '/api/v1/gm/skill',
     method: 'get',
     params
   })
@@ -182,7 +182,7 @@ export function listGmSkill(params: { playerId: number }) {
 
 export function addGmSkill(data: { playerId: number; skillId: number }) {
   return request<ApiResponse<GmSkill>>({
-    url: '/api/v1/game/skill',
+    url: '/api/v1/gm/skill',
     method: 'post',
     data
   })
@@ -190,7 +190,7 @@ export function addGmSkill(data: { playerId: number; skillId: number }) {
 
 export function updateGmSkill(data: { playerId: number; skillId: number; level: number; equipped: boolean }) {
   return request<ApiResponse<GmSkill>>({
-    url: '/api/v1/game/skill',
+    url: '/api/v1/gm/skill',
     method: 'put',
     data
   })
@@ -200,7 +200,7 @@ export function updateGmSkill(data: { playerId: number; skillId: number; level: 
 
 export function listGmEquip(params: { playerId: number }) {
   return request<ApiResponse<GmEquip[]>>({
-    url: '/api/v1/game/equip',
+    url: '/api/v1/gm/equip',
     method: 'get',
     params
   })
@@ -208,7 +208,7 @@ export function listGmEquip(params: { playerId: number }) {
 
 export function addGmEquip(data: { playerId: number; equipId: number }) {
   return request<ApiResponse<GmEquip>>({
-    url: '/api/v1/game/equip',
+    url: '/api/v1/gm/equip',
     method: 'post',
     data
   })
@@ -216,7 +216,7 @@ export function addGmEquip(data: { playerId: number; equipId: number }) {
 
 export function updateGmEquip(data: { playerId: number; equipId: number; level: number; equipped: boolean }) {
   return request<ApiResponse<GmEquip>>({
-    url: '/api/v1/game/equip',
+    url: '/api/v1/gm/equip',
     method: 'put',
     data
   })

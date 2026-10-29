@@ -61,7 +61,7 @@ func (p *GmProvider) ContainerSort(ctx context.Context, req *pb.GmContainerSortR
 }
 
 // ContainerAddItem 向容器放入物品（返回变更后的容器）。
-func (p *GmProvider) ContainerAddItem(ctx context.Context, req *pb.GmContainerAddItemReq) (*pb.ContainerListResp, error) {
+func (p *GmProvider) ContainerAddItem(ctx context.Context, req *pb.GmContainerAddEntryReq) (*pb.ContainerListResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
 	}

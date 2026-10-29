@@ -6,7 +6,7 @@ import type { Player, PlayerQuery, OnlinePlayer } from '@/types/admin'
 
 export function listPlayer(query: PlayerQuery & Partial<PageQuery>) {
   return request<ApiResponse<PageResult<Player>>>({
-    url: '/api/v1/player',
+    url: '/api/v1/gm/player',
     method: 'get',
     params: query
   })
@@ -15,7 +15,7 @@ export function listPlayer(query: PlayerQuery & Partial<PageQuery>) {
 /** One-shot list, not paginated: the game node returns everyone online. */
 export function listOnlinePlayer() {
   return request<ApiResponse<OnlinePlayer[]>>({
-    url: '/api/v1/player/online',
+    url: '/api/v1/gm/player/online',
     method: 'get'
   })
 }
@@ -23,7 +23,7 @@ export function listOnlinePlayer() {
 /** Kick a player offline on its game node. kickType mirrors pb.KickType: 1 active, 2 ban. */
 export function kickPlayer(data: { playerId: number; nodeId: string; kickType: number }) {
   return request<ApiResponse<null>>({
-    url: '/api/v1/player/kick',
+    url: '/api/v1/gm/player/kick',
     method: 'post',
     data
   })

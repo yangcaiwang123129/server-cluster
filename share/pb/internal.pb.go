@@ -521,8 +521,8 @@ func (x *GmContainerTransferReq) GetReq() *ContainerTransferReq {
 	return nil
 }
 
-// GmContainerAddItemReq 向容器放入物品请求（坐标为左上角格）。
-type GmContainerAddItemReq struct {
+// GmContainerAddEntryReq 向容器放入物品请求（坐标为左上角格）。
+type GmContainerAddEntryReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"`                // 玩家ID
 	ContainerType int32                  `protobuf:"varint,2,opt,name=container_type,json=containerType,proto3" json:"container_type,omitempty"` // 容器类型：1 背包 2 仓库 3 保险箱
@@ -535,20 +535,20 @@ type GmContainerAddItemReq struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GmContainerAddItemReq) Reset() {
-	*x = GmContainerAddItemReq{}
+func (x *GmContainerAddEntryReq) Reset() {
+	*x = GmContainerAddEntryReq{}
 	mi := &file_internal_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GmContainerAddItemReq) String() string {
+func (x *GmContainerAddEntryReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GmContainerAddItemReq) ProtoMessage() {}
+func (*GmContainerAddEntryReq) ProtoMessage() {}
 
-func (x *GmContainerAddItemReq) ProtoReflect() protoreflect.Message {
+func (x *GmContainerAddEntryReq) ProtoReflect() protoreflect.Message {
 	mi := &file_internal_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -561,53 +561,53 @@ func (x *GmContainerAddItemReq) ProtoReflect() protoreflect.Message {
 }
 
 // Deprecated: Use GmContainerAddItemReq.ProtoReflect.Descriptor instead.
-func (*GmContainerAddItemReq) Descriptor() ([]byte, []int) {
+func (*GmContainerAddEntryReq) Descriptor() ([]byte, []int) {
 	return file_internal_proto_rawDescGZIP(), []int{10}
 }
 
-func (x *GmContainerAddItemReq) GetPlayerId() int64 {
+func (x *GmContainerAddEntryReq) GetPlayerId() int64 {
 	if x != nil {
 		return x.PlayerId
 	}
 	return 0
 }
 
-func (x *GmContainerAddItemReq) GetContainerType() int32 {
+func (x *GmContainerAddEntryReq) GetContainerType() int32 {
 	if x != nil {
 		return x.ContainerType
 	}
 	return 0
 }
 
-func (x *GmContainerAddItemReq) GetItemCfgId() int32 {
+func (x *GmContainerAddEntryReq) GetItemCfgId() int32 {
 	if x != nil {
 		return x.ItemCfgId
 	}
 	return 0
 }
 
-func (x *GmContainerAddItemReq) GetCount() int32 {
+func (x *GmContainerAddEntryReq) GetCount() int32 {
 	if x != nil {
 		return x.Count
 	}
 	return 0
 }
 
-func (x *GmContainerAddItemReq) GetGridX() int32 {
+func (x *GmContainerAddEntryReq) GetGridX() int32 {
 	if x != nil {
 		return x.GridX
 	}
 	return 0
 }
 
-func (x *GmContainerAddItemReq) GetGridY() int32 {
+func (x *GmContainerAddEntryReq) GetGridY() int32 {
 	if x != nil {
 		return x.GridY
 	}
 	return 0
 }
 
-func (x *GmContainerAddItemReq) GetRotated() bool {
+func (x *GmContainerAddEntryReq) GetRotated() bool {
 	if x != nil {
 		return x.Rotated
 	}
@@ -1343,7 +1343,7 @@ var file_internal_proto_goTypes = []any{
 	(*GmContainerRotateReq)(nil),   // 7: internal.GmContainerRotateReq
 	(*GmContainerSortReq)(nil),     // 8: internal.GmContainerSortReq
 	(*GmContainerTransferReq)(nil), // 9: internal.GmContainerTransferReq
-	(*GmContainerAddItemReq)(nil),  // 10: internal.GmContainerAddItemReq
+	(*GmContainerAddEntryReq)(nil), // 10: internal.GmContainerAddItemReq
 	(*GmHeroListReq)(nil),          // 11: internal.GmHeroListReq
 	(*GmHeroAddReq)(nil),           // 12: internal.GmHeroAddReq
 	(*GmHeroUpdateReq)(nil),        // 13: internal.GmHeroUpdateReq
