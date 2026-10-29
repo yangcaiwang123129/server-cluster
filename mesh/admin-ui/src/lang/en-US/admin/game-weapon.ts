@@ -12,6 +12,7 @@ export default {
   add: 'Add weapon',
   addTitle: 'Add weapon',
   addOk: 'Weapon added',
+  catalogTitle: 'Weapon catalog',
   editTitle: 'Update weapon',
   updateOk: 'Weapon updated',
   weaponId: 'Weapon ID',

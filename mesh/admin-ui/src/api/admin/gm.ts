@@ -16,9 +16,14 @@ export function listItem(query: { keyword?: string; pageIndex: number; pageSize:
   })
 }
 
-/** Game config catalog for hero/weapon/skill/equip pickers (Luban tables); item uses listItem above. */
-export function listGameCatalog(params: { type: 'hero' | 'weapon' | 'skill' | 'equip'; keyword?: string }) {
-  return request<ApiResponse<GameCatalogEntry[]>>({
+/** Game config catalog for hero/weapon/skill/equip lists (Luban tables), paginated. */
+export function listGameCatalog(params: {
+  type: 'hero' | 'weapon' | 'skill' | 'equip'
+  keyword?: string
+  pageIndex: number
+  pageSize: number
+}) {
+  return request<ApiResponse<PageResult<GameCatalogEntry>>>({
     url: '/api/v1/gm/catalog',
     method: 'get',
     params

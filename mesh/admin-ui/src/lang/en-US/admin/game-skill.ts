@@ -12,6 +12,7 @@ export default {
   add: 'Add skill',
   addTitle: 'Add skill',
   addOk: 'Skill added',
+  catalogTitle: 'Skill catalog',
   editTitle: 'Update skill',
   updateOk: 'Skill updated',
   skillId: 'Skill ID',

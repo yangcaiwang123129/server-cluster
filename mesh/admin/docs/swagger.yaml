@@ -963,11 +963,11 @@ paths:
         in: query
         name: keyword
         type: string
-      - description: 页码（仅 item 需要；不传返回全量）
+      - description: 页码（所有类型通用；不传返回全量）
         in: query
         name: pageIndex
         type: integer
-      - description: 每页条数（仅 item 需要；不传返回全量）
+      - description: 每页条数（所有类型通用；不传返回全量）
         in: query
         name: pageSize
         type: integer

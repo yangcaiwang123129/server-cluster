@@ -12,6 +12,7 @@ export default {
   add: '新增装备',
   addTitle: '新增装备',
   addOk: '已新增',
+  catalogTitle: '装备配置',
   editTitle: '更新装备',
   updateOk: '已更新',
   equipId: '装备ID',

@@ -21,11 +21,6 @@
           <el-button type="primary" :loading="loading" @click="loadList">
             {{ $t('admin.gameWeapon.list') }}
           </el-button>
-          <el-button
-            v-permisaction="['game:gm:weapon:list']"
-            :loading="addDialog.loading"
-            @click="openAdd"
-          >{{ $t('admin.gameWeapon.add') }}</el-button>
         </el-form-item>
       </el-form>
 
@@ -57,41 +52,14 @@
       </el-table>
     </el-card>
 
-    <el-dialog v-model="addDialog.visible" :title="$t('admin.gameWeapon.addTitle')" width="420px">
-      <el-form label-width="100px">
-        <el-form-item :label="$t('admin.gameWeapon.weaponId')">
-          <el-select
-            v-model="addDialog.weaponId"
-            filterable
-            remote
-            :remote-method="searchCatalog"
-            :loading="addDialog.searching"
-            :placeholder="$t('admin.gameWeapon.pickPlaceholder')"
-            style="width: 100%"
-            @focus="searchCatalog('')"
-          >
-            <el-option
-              v-for="entry in catalogOptions"
-              :key="entry.id"
-              :label="`${entry.name} (#${entry.id})`"
-              :value="entry.id!"
-            >
-              <div class="option-cell">
-                <GameItemIcon :name="entry.name" tone="#0ea5e9" :size="22" />
-                <span>{{ entry.name }}</span>
-                <span class="option-id">#{{ entry.id }}</span>
-              </div>
-            </el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="addDialog.visible = false">{{ $t('common.dialogCancel') }}</el-button>
-        <el-button type="primary" :loading="addDialog.loading" @click="submitAdd">
-          {{ $t('common.dialogConfirm') }}
-        </el-button>
-      </template>
-    </el-dialog>
+    <el-divider content-position="left">{{ $t('admin.gameWeapon.catalogTitle') }}</el-divider>
+
+    <GameCatalogList
+      type="weapon"
+      tone="#0ea5e9"
+      permission="game:gm:weapon:list"
+      @add="addFromCatalog"
+    />
 
     <el-dialog v-model="editDialog.visible" :title="$t('admin.gameWeapon.editTitle')" width="420px">
       <el-form label-width="100px">
@@ -128,9 +96,10 @@ import { useI18n } from 'vue-i18n'
 
 import PageContainer from '@/components/PageContainer/index.vue'
 import GameItemIcon from '@/components/GameItemIcon/index.vue'
+import GameCatalogList from '@/components/GameCatalogList/index.vue'
 import { msgInfo, msgSuccess } from '@/utils/message'
 
-import { addGmWeapon, listGameCatalog, listGmWeapon, updateGmWeapon } from '@/api/admin/gm'
+import { addGmWeapon, listGmWeapon, updateGmWeapon } from '@/api/admin/gm'
 import type { GameCatalogEntry, GmWeapon } from '@/types/admin'
 
 // Must match the menu_name the backend serves, or keep-alive silently misses
@@ -141,23 +110,6 @@ const { t } = useI18n()
 const playerId = ref('')
 const loading = ref(false)
 const rows = ref<GmWeapon[]>([])
-
-const addDialog = reactive({
-  visible: false,
-  loading: false,
-  searching: false,
-  weaponId: undefined as number | undefined
-})
-
-const catalogOptions = ref<GameCatalogEntry[]>([])
-
-const searchCatalog = async(keyword: string) => {
-  addDialog.searching = true
-  const res = await listGameCatalog({ type: 'weapon', keyword: keyword || undefined }).catch(() => null)
-  addDialog.searching = false
-  if (!res) return
-  catalogOptions.value = res.data ?? []
-}
 
 const editDialog = reactive({
   visible: false,
@@ -188,29 +140,15 @@ const loadList = async() => {
   rows.value = res.data ?? []
 }
 
-const openAdd = () => {
-  if (!playerIdOrZero()) {
+const addFromCatalog = async(entry: GameCatalogEntry) => {
+  const id = playerIdOrZero()
+  if (!id) {
     msgInfo(t('admin.gameWeapon.playerIdInvalid'))
     return
   }
-  addDialog.weaponId = undefined
-  addDialog.visible = true
-  searchCatalog('')
-}
-
-const submitAdd = async() => {
-  const id = playerIdOrZero()
-  if (!id) return
-  if (!addDialog.weaponId) {
-    msgInfo(t('admin.gameWeapon.pickPlaceholder'))
-    return
-  }
-  addDialog.loading = true
-  const res = await addGmWeapon({ playerId: id, weaponId: addDialog.weaponId }).catch(() => null)
-  addDialog.loading = false
+  const res = await addGmWeapon({ playerId: id, weaponId: entry.id! }).catch(() => null)
   if (!res) return
   msgSuccess(t('admin.gameWeapon.addOk'))
-  addDialog.visible = false
   await loadList()
 }
 
@@ -267,16 +205,9 @@ const submitEdit = async() => {
   white-space: nowrap;
 }
 
-.item-id,
-.option-id {
+.item-id {
   flex: none;
   color: var(--el-text-color-secondary);
   font-size: 12px;
-}
-
-.option-cell {
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 </style>

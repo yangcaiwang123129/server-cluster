@@ -12,6 +12,7 @@ export default {
   add: 'Add equip',
   addTitle: 'Add equip',
   addOk: 'Equip added',
+  catalogTitle: 'Equip catalog',
   editTitle: 'Update equip',
   updateOk: 'Equip updated',
   equipId: 'Equip ID',

@@ -19,8 +19,8 @@ func RegisterCatalog(router http.Router) {
 // @Produce json
 // @Param type query string true "类型 hero|weapon|skill|equip|item"
 // @Param keyword query string false "按名称或ID过滤"
-// @Param pageIndex query int false "页码（仅 item 需要；不传返回全量）"
-// @Param pageSize query int false "每页条数（仅 item 需要；不传返回全量）"
+// @Param pageIndex query int false "页码（所有类型通用；不传返回全量）"
+// @Param pageSize query int false "每页条数（所有类型通用；不传返回全量）"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/catalog [get]
 func handleCatalog(ctx http.Context) error {

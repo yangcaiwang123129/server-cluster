@@ -12,6 +12,7 @@ export default {
   add: 'Add hero',
   addTitle: 'Add hero',
   addOk: 'Hero added',
+  catalogTitle: 'Hero catalog',
   editTitle: 'Update hero',
   updateOk: 'Hero updated',
   heroId: 'Hero ID',

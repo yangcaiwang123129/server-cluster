@@ -16,6 +16,14 @@ export default {
   iconSelect: {
     placeholder: 'Enter icon name'
   },
+  gameCatalog: {
+    searchPlaceholder: 'Search by name or ID',
+    hint: 'Click Add to grant the config to the current player',
+    name: 'Name',
+    rarity: 'Rarity',
+    desc: 'Description',
+    add: 'Add'
+  },
   rightPanel: {
     // Kept distinct from layout.settings.title ('页面设置' / 'Page Settings'):
     // the two headings are different strings in Chinese and translating them

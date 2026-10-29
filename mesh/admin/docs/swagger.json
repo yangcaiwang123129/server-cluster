@@ -709,13 +709,13 @@
                     },
                     {
                         "type": "integer",
-                        "description": "页码（仅 item 需要；不传返回全量）",
+                        "description": "页码（所有类型通用；不传返回全量）",
                         "name": "pageIndex",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "每页条数（仅 item 需要；不传返回全量）",
+                        "description": "每页条数（所有类型通用；不传返回全量）",
                         "name": "pageSize",
                         "in": "query"
                     }

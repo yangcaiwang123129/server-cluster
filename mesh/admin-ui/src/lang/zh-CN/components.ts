@@ -30,6 +30,14 @@ export default {
   iconSelect: {
     placeholder: '请输入图标名称'
   },
+  gameCatalog: {
+    searchPlaceholder: '按名称或ID搜索',
+    hint: '点击「添加」把配置发放给当前玩家',
+    name: '名称',
+    rarity: '稀有度',
+    desc: '描述',
+    add: '添加'
+  },
   rightPanel: {
     title: '系统布局配置'
   }

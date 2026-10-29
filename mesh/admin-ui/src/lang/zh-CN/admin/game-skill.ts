@@ -12,6 +12,7 @@ export default {
   add: '新增技能',
   addTitle: '新增技能',
   addOk: '已新增',
+  catalogTitle: '技能配置',
   editTitle: '更新技能',
   updateOk: '已更新',
   skillId: '技能ID',

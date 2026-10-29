@@ -12,6 +12,7 @@ export default {
   add: '新增武器',
   addTitle: '新增武器',
   addOk: '已新增',
+  catalogTitle: '武器配置',
   editTitle: '更新武器',
   updateOk: '已更新',
   weaponId: '武器ID',

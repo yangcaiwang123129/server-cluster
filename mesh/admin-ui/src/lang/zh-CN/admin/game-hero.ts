@@ -12,6 +12,7 @@ export default {
   add: '新增英雄',
   addTitle: '新增英雄',
   addOk: '已新增',
+  catalogTitle: '英雄配置',
   editTitle: '更新英雄',
   updateOk: '已更新',
   heroId: '英雄ID',
