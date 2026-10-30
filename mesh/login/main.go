@@ -26,7 +26,7 @@ func main() {
 	// 创建容器
 	container := due.NewContainer()
 	// 创建 HTTP 组件（监听地址、swagger 等由 etc.http.* 配置驱动）
-	httpComponent := http.NewServer(http.WithName(consts.MeshAlias()))
+	httpComponent := http.NewServer(http.WithName(consts.MeshName()))
 	// 初始化应用（基础设施 + 依赖装配）
 	if err := global.Init(); err != nil {
 		log.Fatalf("login init failed: %v", err)

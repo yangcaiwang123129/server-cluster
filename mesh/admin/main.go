@@ -33,7 +33,7 @@ func main() {
 	transporter := grpc.NewTransporter()
 	// 创建 HTTP 组件（监听地址由 etc.http.addr 配置驱动）
 	httpComponent := http.NewServer(
-		http.WithName(consts.MeshAlias()),
+		http.WithName(consts.MeshName()),
 		http.WithRegistry(registry),
 		http.WithTransporter(transporter),
 	)
