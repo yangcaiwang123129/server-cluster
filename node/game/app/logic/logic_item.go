@@ -31,23 +31,23 @@ func init() {
 // Item 获取玩家物品容器业务单例。
 func Item() global.ItemLogic { return itemLogicInst.MustGet() }
 
-// itemTypeToModel pb 物品容器类型 → 领域物品容器类型；UNSPECIFIED 等非法值返回 false。
-func itemTypeToModel(t pb.ItemType) (int32, bool) {
+// containerTypeToModel pb 物品容器类型 → 领域物品容器类型；UNSPECIFIED 等非法值返回 false。
+func containerTypeToModel(t pb.ContainerType) (int32, bool) {
 	switch t {
-	case pb.ItemType_ITEM_TYPE_BACKPACK:
+	case pb.ContainerType_CONTAINER_TYPE_BACKPACK:
 		return model.TypeBackpack, true
-	case pb.ItemType_ITEM_TYPE_STASH:
+	case pb.ContainerType_CONTAINER_TYPE_STASH:
 		return model.TypeStash, true
-	case pb.ItemType_ITEM_TYPE_SECURE:
+	case pb.ContainerType_CONTAINER_TYPE_SECURE:
 		return model.TypeSecure, true
 	default:
 		return 0, false
 	}
 }
 
-// itemContainerID 物品容器实例 ID：playerID 与物品容器类型编码（playerID*ItemTypeStride + type）。
+// itemContainerID 物品容器实例 ID：playerID 与物品容器类型编码（playerID*ContainerTypeStride + type）。
 func itemContainerID(playerID int64, typ int32) int64 {
-	return playerID*consts.ItemTypeStride + int64(typ)
+	return playerID*consts.ContainerTypeStride + int64(typ)
 }
 
 // itemToContainer 物品容器 → wire 物品容器条目。
@@ -68,7 +68,7 @@ func itemToContainer(playerID int64, c *model.ItemContainer) *pb.ItemContainer {
 	}
 	return &pb.ItemContainer{
 		Id:          itemContainerID(playerID, meta.Type),
-		Type:        pb.ItemType(meta.Type),
+		Type:        pb.ContainerType(meta.Type),
 		GridW:       meta.GridW,
 		GridH:       meta.GridH,
 		Version:     meta.Ver,
@@ -112,12 +112,12 @@ func saveItem(playerID int64, pc *model.PlayerItem) {
 }
 
 // itemContainerOf 加载玩家物品容器集合并取出指定类型的容器（返回 *ItemContainer）。
-func itemContainerOf(ctx context.Context, playerID int64, t pb.ItemType) (*model.PlayerItem, *model.ItemContainer, error) {
+func itemContainerOf(ctx context.Context, playerID int64, t pb.ContainerType) (*model.PlayerItem, *model.ItemContainer, error) {
 	pc, err := loadItem(ctx, playerID)
 	if err != nil {
 		return nil, nil, err
 	}
-	typ, ok := itemTypeToModel(t)
+	typ, ok := containerTypeToModel(t)
 	if !ok {
 		return nil, nil, errs.CodeInvalidParams.Err()
 	}
@@ -153,7 +153,7 @@ func (this *itemLogic) ItemContainerList(ctx context.Context, playerID int64, re
 	}
 
 	types := []int32{model.TypeBackpack, model.TypeStash, model.TypeSecure}
-	if typ, ok := itemTypeToModel(req.GetItemType()); ok {
+	if typ, ok := containerTypeToModel(req.GetContainerType()); ok {
 		types = []int32{typ}
 	}
 
@@ -166,7 +166,7 @@ func (this *itemLogic) ItemContainerList(ctx context.Context, playerID int64, re
 
 // ItemMove 物品容器内移动物品。
 func (this *itemLogic) ItemMove(ctx context.Context, playerID int64, req *pb.ItemMoveReq) (*pb.ItemMoveResp, error) {
-	pc, c, err := itemContainerOf(ctx, playerID, req.GetItemType())
+	pc, c, err := itemContainerOf(ctx, playerID, req.GetContainerType())
 	if err != nil {
 		return nil, err
 	}
@@ -181,7 +181,7 @@ func (this *itemLogic) ItemMove(ctx context.Context, playerID int64, req *pb.Ite
 
 // ItemRotate 物品容器内旋转物品。
 func (this *itemLogic) ItemRotate(ctx context.Context, playerID int64, req *pb.ItemRotateReq) (*pb.ItemRotateResp, error) {
-	pc, c, err := itemContainerOf(ctx, playerID, req.GetItemType())
+	pc, c, err := itemContainerOf(ctx, playerID, req.GetContainerType())
 	if err != nil {
 		return nil, err
 	}
@@ -196,7 +196,7 @@ func (this *itemLogic) ItemRotate(ctx context.Context, playerID int64, req *pb.I
 
 // ItemSort 物品容器一键整理。
 func (this *itemLogic) ItemSort(ctx context.Context, playerID int64, req *pb.ItemSortReq) (*pb.ItemSortResp, error) {
-	pc, c, err := itemContainerOf(ctx, playerID, req.GetItemType())
+	pc, c, err := itemContainerOf(ctx, playerID, req.GetContainerType())
 	if err != nil {
 		return nil, err
 	}
@@ -212,8 +212,8 @@ func (this *itemLogic) ItemSort(ctx context.Context, playerID int64, req *pb.Ite
 // ItemTransfer 物品容器间移动物品：目标容器放不下时源容器不变。
 // 新实现：调用目标容器的 TransferFrom 方法（跨容器按 GlobalID 升序加锁）。
 func (this *itemLogic) ItemTransfer(ctx context.Context, playerID int64, req *pb.ItemTransferReq) (*pb.ItemTransferResp, error) {
-	fromType, okFrom := itemTypeToModel(req.GetFromType())
-	toType, okTo := itemTypeToModel(req.GetToType())
+	fromType, okFrom := containerTypeToModel(req.GetFromType())
+	toType, okTo := containerTypeToModel(req.GetToType())
 	if !okFrom || !okTo || fromType == toType {
 		return nil, errs.CodeInvalidParams.Err()
 	}
@@ -245,7 +245,7 @@ func (this *itemLogic) ItemAddEntry(ctx context.Context, playerID int64, req *pb
 		return nil, errs.CodeInvalidParams.WithMessage("物品配置不存在").Err()
 	}
 
-	pc, c, err := itemContainerOf(ctx, playerID, pb.ItemType(req.GetItemType()))
+	pc, c, err := itemContainerOf(ctx, playerID, pb.ContainerType(req.GetContainerType()))
 	if err != nil {
 		return nil, err
 	}

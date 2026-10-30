@@ -24,7 +24,7 @@ const (
 // 物品容器列表（路由 10010）
 type ItemContainerListReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ItemType      ItemType               `protobuf:"varint,1,opt,name=item_type,json=itemType,proto3,enum=pb.ItemType" json:"item_type,omitempty"` // 物品容器类型（UNSPECIFIED 表示全部容器）
+	ContainerType ContainerType          `protobuf:"varint,1,opt,name=container_type,json=containerType,proto3,enum=pb.ContainerType" json:"container_type,omitempty"` // 物品容器类型（UNSPECIFIED 表示全部容器）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -59,11 +59,11 @@ func (*ItemContainerListReq) Descriptor() ([]byte, []int) {
 	return file_item_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *ItemContainerListReq) GetItemType() ItemType {
+func (x *ItemContainerListReq) GetContainerType() ContainerType {
 	if x != nil {
-		return x.ItemType
+		return x.ContainerType
 	}
-	return ItemType_ITEM_TYPE_UNSPECIFIED
+	return ContainerType_CONTAINER_TYPE_UNSPECIFIED
 }
 
 // 物品容器列表响应
@@ -122,8 +122,8 @@ func (x *ItemContainerListResp) GetItemContainers() []*ItemContainer {
 // 物品容器内对象变化（路由 10011）
 type ItemContainerNotify struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ItemType      ItemType               `protobuf:"varint,1,opt,name=item_type,json=itemType,proto3,enum=pb.ItemType" json:"item_type,omitempty"` // 物品容器类型
-	ItemEntry     *ItemEntry             `protobuf:"bytes,2,opt,name=item_entry,json=itemEntry,proto3" json:"item_entry,omitempty"`                // 物品容器内对象
+	ContainerType ContainerType          `protobuf:"varint,1,opt,name=container_type,json=containerType,proto3,enum=pb.ContainerType" json:"container_type,omitempty"` // 物品容器类型
+	ItemEntry     *ItemEntry             `protobuf:"bytes,2,opt,name=item_entry,json=itemEntry,proto3" json:"item_entry,omitempty"`                                    // 物品容器内对象
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -158,11 +158,11 @@ func (*ItemContainerNotify) Descriptor() ([]byte, []int) {
 	return file_item_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *ItemContainerNotify) GetItemType() ItemType {
+func (x *ItemContainerNotify) GetContainerType() ContainerType {
 	if x != nil {
-		return x.ItemType
+		return x.ContainerType
 	}
-	return ItemType_ITEM_TYPE_UNSPECIFIED
+	return ContainerType_CONTAINER_TYPE_UNSPECIFIED
 }
 
 func (x *ItemContainerNotify) GetItemEntry() *ItemEntry {
@@ -175,8 +175,8 @@ func (x *ItemContainerNotify) GetItemEntry() *ItemEntry {
 // 物品容器内添加对象请求（路由 10012）
 type ItemAddReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ItemType      ItemType               `protobuf:"varint,1,opt,name=item_type,json=itemType,proto3,enum=pb.ItemType" json:"item_type,omitempty"` // 物品容器类型
-	ItemEntry     *ItemEntry             `protobuf:"bytes,2,opt,name=item_entry,json=itemEntry,proto3" json:"item_entry,omitempty"`                // 对象实例
+	ContainerType ContainerType          `protobuf:"varint,1,opt,name=container_type,json=containerType,proto3,enum=pb.ContainerType" json:"container_type,omitempty"` // 物品容器类型
+	ItemEntry     *ItemEntry             `protobuf:"bytes,2,opt,name=item_entry,json=itemEntry,proto3" json:"item_entry,omitempty"`                                    // 对象实例
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -211,11 +211,11 @@ func (*ItemAddReq) Descriptor() ([]byte, []int) {
 	return file_item_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *ItemAddReq) GetItemType() ItemType {
+func (x *ItemAddReq) GetContainerType() ContainerType {
 	if x != nil {
-		return x.ItemType
+		return x.ContainerType
 	}
-	return ItemType_ITEM_TYPE_UNSPECIFIED
+	return ContainerType_CONTAINER_TYPE_UNSPECIFIED
 }
 
 func (x *ItemAddReq) GetItemEntry() *ItemEntry {
@@ -273,11 +273,11 @@ func (x *ItemAddResp) GetResult() *Result {
 // 物品容器内移动对象请求（路由 10013）
 type ItemMoveReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ItemType      ItemType               `protobuf:"varint,1,opt,name=item_type,json=itemType,proto3,enum=pb.ItemType" json:"item_type,omitempty"` // 物品容器类型
-	Id            int64                  `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`                                              // 对象实例ID
-	ToX           int32                  `protobuf:"varint,3,opt,name=to_x,json=toX,proto3" json:"to_x,omitempty"`                                 // 目标 X
-	ToY           int32                  `protobuf:"varint,4,opt,name=to_y,json=toY,proto3" json:"to_y,omitempty"`                                 // 目标 Y
-	Rotated       bool                   `protobuf:"varint,5,opt,name=rotated,proto3" json:"rotated,omitempty"`                                    // 是否旋转放置
+	ContainerType ContainerType          `protobuf:"varint,1,opt,name=container_type,json=containerType,proto3,enum=pb.ContainerType" json:"container_type,omitempty"` // 物品容器类型
+	Id            int64                  `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`                                                                  // 对象实例ID
+	ToX           int32                  `protobuf:"varint,3,opt,name=to_x,json=toX,proto3" json:"to_x,omitempty"`                                                     // 目标 X
+	ToY           int32                  `protobuf:"varint,4,opt,name=to_y,json=toY,proto3" json:"to_y,omitempty"`                                                     // 目标 Y
+	Rotated       bool                   `protobuf:"varint,5,opt,name=rotated,proto3" json:"rotated,omitempty"`                                                        // 是否旋转放置
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -312,11 +312,11 @@ func (*ItemMoveReq) Descriptor() ([]byte, []int) {
 	return file_item_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *ItemMoveReq) GetItemType() ItemType {
+func (x *ItemMoveReq) GetContainerType() ContainerType {
 	if x != nil {
-		return x.ItemType
+		return x.ContainerType
 	}
-	return ItemType_ITEM_TYPE_UNSPECIFIED
+	return ContainerType_CONTAINER_TYPE_UNSPECIFIED
 }
 
 func (x *ItemMoveReq) GetId() int64 {
@@ -395,8 +395,8 @@ func (x *ItemMoveResp) GetResult() *Result {
 // 物品容器内旋转对象请求（路由 10014）
 type ItemRotateReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ItemType      ItemType               `protobuf:"varint,1,opt,name=item_type,json=itemType,proto3,enum=pb.ItemType" json:"item_type,omitempty"` // 物品容器类型
-	Id            int64                  `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`                                              // 对象实例ID
+	ContainerType ContainerType          `protobuf:"varint,1,opt,name=container_type,json=containerType,proto3,enum=pb.ContainerType" json:"container_type,omitempty"` // 物品容器类型
+	Id            int64                  `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`                                                                  // 对象实例ID
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -431,11 +431,11 @@ func (*ItemRotateReq) Descriptor() ([]byte, []int) {
 	return file_item_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *ItemRotateReq) GetItemType() ItemType {
+func (x *ItemRotateReq) GetContainerType() ContainerType {
 	if x != nil {
-		return x.ItemType
+		return x.ContainerType
 	}
-	return ItemType_ITEM_TYPE_UNSPECIFIED
+	return ContainerType_CONTAINER_TYPE_UNSPECIFIED
 }
 
 func (x *ItemRotateReq) GetId() int64 {
@@ -493,7 +493,7 @@ func (x *ItemRotateResp) GetResult() *Result {
 // 物品容器一键整理请求（路由 10015）
 type ItemSortReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ItemType      ItemType               `protobuf:"varint,1,opt,name=item_type,json=itemType,proto3,enum=pb.ItemType" json:"item_type,omitempty"` // 物品容器类型
+	ContainerType ContainerType          `protobuf:"varint,1,opt,name=container_type,json=containerType,proto3,enum=pb.ContainerType" json:"container_type,omitempty"` // 物品容器类型
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -528,11 +528,11 @@ func (*ItemSortReq) Descriptor() ([]byte, []int) {
 	return file_item_proto_rawDescGZIP(), []int{9}
 }
 
-func (x *ItemSortReq) GetItemType() ItemType {
+func (x *ItemSortReq) GetContainerType() ContainerType {
 	if x != nil {
-		return x.ItemType
+		return x.ContainerType
 	}
-	return ItemType_ITEM_TYPE_UNSPECIFIED
+	return ContainerType_CONTAINER_TYPE_UNSPECIFIED
 }
 
 // 物品容器一键整理响应
@@ -583,12 +583,12 @@ func (x *ItemSortResp) GetResult() *Result {
 // 物品容器间移动对象请求（路由 10016）
 type ItemTransferReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	FromType      ItemType               `protobuf:"varint,1,opt,name=from_type,json=fromType,proto3,enum=pb.ItemType" json:"from_type,omitempty"` // 源物品容器类型
-	ToType        ItemType               `protobuf:"varint,2,opt,name=to_type,json=toType,proto3,enum=pb.ItemType" json:"to_type,omitempty"`       // 目标物品容器类型
-	Id            int64                  `protobuf:"varint,3,opt,name=id,proto3" json:"id,omitempty"`                                              // 对象实例ID
-	ToX           int32                  `protobuf:"varint,4,opt,name=to_x,json=toX,proto3" json:"to_x,omitempty"`                                 // 目标 X
-	ToY           int32                  `protobuf:"varint,5,opt,name=to_y,json=toY,proto3" json:"to_y,omitempty"`                                 // 目标 Y
-	Rotated       bool                   `protobuf:"varint,6,opt,name=rotated,proto3" json:"rotated,omitempty"`                                    // 是否旋转放置
+	FromType      ContainerType          `protobuf:"varint,1,opt,name=from_type,json=fromType,proto3,enum=pb.ContainerType" json:"from_type,omitempty"` // 源物品容器类型
+	ToType        ContainerType          `protobuf:"varint,2,opt,name=to_type,json=toType,proto3,enum=pb.ContainerType" json:"to_type,omitempty"`       // 目标物品容器类型
+	Id            int64                  `protobuf:"varint,3,opt,name=id,proto3" json:"id,omitempty"`                                                   // 对象实例ID
+	ToX           int32                  `protobuf:"varint,4,opt,name=to_x,json=toX,proto3" json:"to_x,omitempty"`                                      // 目标 X
+	ToY           int32                  `protobuf:"varint,5,opt,name=to_y,json=toY,proto3" json:"to_y,omitempty"`                                      // 目标 Y
+	Rotated       bool                   `protobuf:"varint,6,opt,name=rotated,proto3" json:"rotated,omitempty"`                                         // 是否旋转放置
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -623,18 +623,18 @@ func (*ItemTransferReq) Descriptor() ([]byte, []int) {
 	return file_item_proto_rawDescGZIP(), []int{11}
 }
 
-func (x *ItemTransferReq) GetFromType() ItemType {
+func (x *ItemTransferReq) GetFromType() ContainerType {
 	if x != nil {
 		return x.FromType
 	}
-	return ItemType_ITEM_TYPE_UNSPECIFIED
+	return ContainerType_CONTAINER_TYPE_UNSPECIFIED
 }
 
-func (x *ItemTransferReq) GetToType() ItemType {
+func (x *ItemTransferReq) GetToType() ContainerType {
 	if x != nil {
 		return x.ToType
 	}
-	return ItemType_ITEM_TYPE_UNSPECIFIED
+	return ContainerType_CONTAINER_TYPE_UNSPECIFIED
 }
 
 func (x *ItemTransferReq) GetId() int64 {
@@ -731,48 +731,48 @@ var File_item_proto protoreflect.FileDescriptor
 const file_item_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"item.proto\x12\x02pb\x1a\fcommon.proto\"A\n" +
-	"\x14ItemContainerListReq\x12)\n" +
-	"\titem_type\x18\x01 \x01(\x0e2\f.pb.ItemTypeR\bitemType\"w\n" +
+	"item.proto\x12\x02pb\x1a\fcommon.proto\"P\n" +
+	"\x14ItemContainerListReq\x128\n" +
+	"\x0econtainer_type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\rcontainerType\"w\n" +
 	"\x15ItemContainerListResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\x12:\n" +
-	"\x0fitem_containers\x18\x02 \x03(\v2\x11.pb.ItemContainerR\x0eitemContainers\"n\n" +
-	"\x13ItemContainerNotify\x12)\n" +
-	"\titem_type\x18\x01 \x01(\x0e2\f.pb.ItemTypeR\bitemType\x12,\n" +
+	"\x0fitem_containers\x18\x02 \x03(\v2\x11.pb.ItemContainerR\x0eitemContainers\"}\n" +
+	"\x13ItemContainerNotify\x128\n" +
+	"\x0econtainer_type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\rcontainerType\x12,\n" +
 	"\n" +
-	"item_entry\x18\x02 \x01(\v2\r.pb.ItemEntryR\titemEntry\"e\n" +
+	"item_entry\x18\x02 \x01(\v2\r.pb.ItemEntryR\titemEntry\"t\n" +
 	"\n" +
-	"ItemAddReq\x12)\n" +
-	"\titem_type\x18\x01 \x01(\x0e2\f.pb.ItemTypeR\bitemType\x12,\n" +
+	"ItemAddReq\x128\n" +
+	"\x0econtainer_type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\rcontainerType\x12,\n" +
 	"\n" +
 	"item_entry\x18\x02 \x01(\v2\r.pb.ItemEntryR\titemEntry\"1\n" +
 	"\vItemAddResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
-	".pb.ResultR\x06result\"\x88\x01\n" +
-	"\vItemMoveReq\x12)\n" +
-	"\titem_type\x18\x01 \x01(\x0e2\f.pb.ItemTypeR\bitemType\x12\x0e\n" +
+	".pb.ResultR\x06result\"\x97\x01\n" +
+	"\vItemMoveReq\x128\n" +
+	"\x0econtainer_type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\rcontainerType\x12\x0e\n" +
 	"\x02id\x18\x02 \x01(\x03R\x02id\x12\x11\n" +
 	"\x04to_x\x18\x03 \x01(\x05R\x03toX\x12\x11\n" +
 	"\x04to_y\x18\x04 \x01(\x05R\x03toY\x12\x18\n" +
 	"\arotated\x18\x05 \x01(\bR\arotated\"2\n" +
 	"\fItemMoveResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
-	".pb.ResultR\x06result\"J\n" +
-	"\rItemRotateReq\x12)\n" +
-	"\titem_type\x18\x01 \x01(\x0e2\f.pb.ItemTypeR\bitemType\x12\x0e\n" +
+	".pb.ResultR\x06result\"Y\n" +
+	"\rItemRotateReq\x128\n" +
+	"\x0econtainer_type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\rcontainerType\x12\x0e\n" +
 	"\x02id\x18\x02 \x01(\x03R\x02id\"4\n" +
 	"\x0eItemRotateResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
-	".pb.ResultR\x06result\"8\n" +
-	"\vItemSortReq\x12)\n" +
-	"\titem_type\x18\x01 \x01(\x0e2\f.pb.ItemTypeR\bitemType\"2\n" +
+	".pb.ResultR\x06result\"G\n" +
+	"\vItemSortReq\x128\n" +
+	"\x0econtainer_type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\rcontainerType\"2\n" +
 	"\fItemSortResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
-	".pb.ResultR\x06result\"\xb3\x01\n" +
-	"\x0fItemTransferReq\x12)\n" +
-	"\tfrom_type\x18\x01 \x01(\x0e2\f.pb.ItemTypeR\bfromType\x12%\n" +
-	"\ato_type\x18\x02 \x01(\x0e2\f.pb.ItemTypeR\x06toType\x12\x0e\n" +
+	".pb.ResultR\x06result\"\xbd\x01\n" +
+	"\x0fItemTransferReq\x12.\n" +
+	"\tfrom_type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\bfromType\x12*\n" +
+	"\ato_type\x18\x02 \x01(\x0e2\x11.pb.ContainerTypeR\x06toType\x12\x0e\n" +
 	"\x02id\x18\x03 \x01(\x03R\x02id\x12\x11\n" +
 	"\x04to_x\x18\x04 \x01(\x05R\x03toX\x12\x11\n" +
 	"\x04to_y\x18\x05 \x01(\x05R\x03toY\x12\x18\n" +
@@ -810,28 +810,28 @@ var file_item_proto_goTypes = []any{
 	(*ItemSortResp)(nil),          // 10: pb.ItemSortResp
 	(*ItemTransferReq)(nil),       // 11: pb.ItemTransferReq
 	(*ItemTransferResp)(nil),      // 12: pb.ItemTransferResp
-	(ItemType)(0),                 // 13: pb.ItemType
+	(ContainerType)(0),            // 13: pb.ContainerType
 	(*Result)(nil),                // 14: pb.Result
 	(*ItemContainer)(nil),         // 15: pb.ItemContainer
 	(*ItemEntry)(nil),             // 16: pb.ItemEntry
 }
 var file_item_proto_depIdxs = []int32{
-	13, // 0: pb.ItemContainerListReq.item_type:type_name -> pb.ItemType
+	13, // 0: pb.ItemContainerListReq.container_type:type_name -> pb.ContainerType
 	14, // 1: pb.ItemContainerListResp.result:type_name -> pb.Result
 	15, // 2: pb.ItemContainerListResp.item_containers:type_name -> pb.ItemContainer
-	13, // 3: pb.ItemContainerNotify.item_type:type_name -> pb.ItemType
+	13, // 3: pb.ItemContainerNotify.container_type:type_name -> pb.ContainerType
 	16, // 4: pb.ItemContainerNotify.item_entry:type_name -> pb.ItemEntry
-	13, // 5: pb.ItemAddReq.item_type:type_name -> pb.ItemType
+	13, // 5: pb.ItemAddReq.container_type:type_name -> pb.ContainerType
 	16, // 6: pb.ItemAddReq.item_entry:type_name -> pb.ItemEntry
 	14, // 7: pb.ItemAddResp.result:type_name -> pb.Result
-	13, // 8: pb.ItemMoveReq.item_type:type_name -> pb.ItemType
+	13, // 8: pb.ItemMoveReq.container_type:type_name -> pb.ContainerType
 	14, // 9: pb.ItemMoveResp.result:type_name -> pb.Result
-	13, // 10: pb.ItemRotateReq.item_type:type_name -> pb.ItemType
+	13, // 10: pb.ItemRotateReq.container_type:type_name -> pb.ContainerType
 	14, // 11: pb.ItemRotateResp.result:type_name -> pb.Result
-	13, // 12: pb.ItemSortReq.item_type:type_name -> pb.ItemType
+	13, // 12: pb.ItemSortReq.container_type:type_name -> pb.ContainerType
 	14, // 13: pb.ItemSortResp.result:type_name -> pb.Result
-	13, // 14: pb.ItemTransferReq.from_type:type_name -> pb.ItemType
-	13, // 15: pb.ItemTransferReq.to_type:type_name -> pb.ItemType
+	13, // 14: pb.ItemTransferReq.from_type:type_name -> pb.ContainerType
+	13, // 15: pb.ItemTransferReq.to_type:type_name -> pb.ContainerType
 	14, // 16: pb.ItemTransferResp.result:type_name -> pb.Result
 	15, // 17: pb.ItemTransferResp.from_container:type_name -> pb.ItemContainer
 	15, // 18: pb.ItemTransferResp.to_container:type_name -> pb.ItemContainer

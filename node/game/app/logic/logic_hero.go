@@ -102,6 +102,63 @@ func (this *heroLogic) HeroUpdate(ctx context.Context, playerID int64, req *pb.H
 	return &pb.HeroUpdateResp{HeroEntry: toHeroEntry(h)}, nil
 }
 
+// HeroAttribute 查看英雄累计属性；cfg_id 为 0 时取当前出战英雄。
+func (this *heroLogic) HeroAttribute(ctx context.Context, playerID int64, req *pb.HeroAttributeReq) (*pb.HeroAttributeResp, error) {
+	hero, attr, err := computeHeroAttribute(ctx, playerID, req.GetCfgId())
+	if err != nil {
+		return nil, err
+	}
+	return &pb.HeroAttributeResp{HeroEntry: toHeroEntry(*hero), Attribute: attr}, nil
+}
+
+// HeroUpgrade 英雄升级：消耗配置表升级素材，等级 +1，最多到等级区间上限。
+func (this *heroLogic) HeroUpgrade(ctx context.Context, playerID int64, req *pb.HeroUpgradeReq) (*pb.HeroUpgradeResp, error) {
+	row, err := loadPlayerHero(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+	hero, ok := row.Heroes.Get(req.GetCfgId())
+	if !ok {
+		return nil, errs.CodeInvalidParams.WithMessage("英雄未拥有").Err()
+	}
+
+	cfg := tpl.T().AttributeRole.Get(hero.HeroID + clampTier(hero.Star))
+	if cfg == nil {
+		return nil, errs.CodeInvalidParams.WithMessage("英雄属性配置不存在").Err()
+	}
+	lo, hi := levelBounds(0, 0, false)
+	if cfg.Level != nil {
+		lo, hi = levelBounds(cfg.Level.X, cfg.Level.Y, true)
+	}
+	lvl := clampLevel(hero.Level, lo, hi)
+	if lvl >= hi {
+		return nil, errs.CodeInvalidParams.WithMessage("英雄已满级").Err()
+	}
+
+	cost := costAt(cfg.UpgradeUse, cfg.GrowUGMaterial, lvl, lo)
+	if cost > 0 {
+		if err := Asset().AssetRemove(ctx, playerID, &tpl.Asset{
+			Type:  tpl.AssetType_Item,
+			Id:    cfg.UpgradeMaterial,
+			Count: cost,
+		}); err != nil {
+			return nil, err
+		}
+	}
+
+	hero.Level = lvl + 1
+	if !row.UpdateHero(hero) {
+		return nil, errs.CodeInvalidParams.WithMessage("英雄未拥有").Err()
+	}
+	global.PlayerHeroCache.Set(playerID, row)
+
+	_, attr, err := computeHeroAttribute(ctx, playerID, hero.HeroID)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.HeroUpgradeResp{HeroEntry: toHeroEntry(hero), Attribute: attr}, nil
+}
+
 // EnterGame 进入游戏：加载玩家英雄持有，未建档则初始化空集合。
 func (this *heroLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq) (*pb.EnterGameResp, error) {
 	row, err := loadPlayerHero(ctx, playerID)

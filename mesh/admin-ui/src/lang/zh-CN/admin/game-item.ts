@@ -9,7 +9,7 @@ export default {
   playerId: '玩家ID',
   playerIdPlaceholder: '请输入玩家ID',
   playerIdInvalid: '请输入有效的玩家ID',
-  itemType: '物品容器',
+  containerType: '物品容器',
   backpack: '背包',
   stash: '仓库',
   secure: '保险箱',

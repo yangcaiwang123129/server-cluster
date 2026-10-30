@@ -71,7 +71,7 @@ message GmItemTransferReq {
 // GmItemAddEntryReq 向物品容器放入对象请求（坐标为左上角格）。
 message GmItemAddEntryReq {
   int64 player_id = 1;  // 玩家ID
-  int32 item_type = 2;  // 物品容器类型：1 背包 2 仓库 3 保险箱
+  int32 container_type = 2;  // 物品容器类型：1 背包 2 仓库 3 保险箱
   int32 cfg_id = 3;     // 对象配置ID
   int32 count = 4;      // 堆叠数量
   int32 grid_x = 5;     // 网格X
@@ -96,6 +96,18 @@ message GmHeroUpdateReq {
   pb.HeroUpdateReq req = 2; // 业务参数
 }
 
+// GmHeroAttributeReq 查看英雄累计属性请求。
+message GmHeroAttributeReq {
+  int64 player_id = 1; // 玩家ID
+  int32 hero_id = 2;   // 英雄配置ID（0 表示出战英雄）
+}
+
+// GmHeroUpgradeReq 英雄升级请求。
+message GmHeroUpgradeReq {
+  int64 player_id = 1; // 玩家ID
+  int32 hero_id = 2;   // 英雄配置ID
+}
+
 // GmWeaponListReq 武器列表请求。
 message GmWeaponListReq {
   int64 player_id = 1; // 玩家ID
@@ -111,6 +123,12 @@ message GmWeaponAddReq {
 message GmWeaponUpdateReq {
   int64 player_id = 1; // 玩家ID
   pb.WeaponUpdateReq req = 2; // 业务参数
+}
+
+// GmWeaponUpgradeReq 武器升级请求。
+message GmWeaponUpgradeReq {
+  int64 player_id = 1; // 玩家ID
+  int32 weapon_id = 2; // 武器配置ID
 }
 
 // GmSkillListReq 技能列表请求。
@@ -130,6 +148,12 @@ message GmSkillUpdateReq {
   pb.SkillUpdateReq req = 2; // 业务参数
 }
 
+// GmSkillUpgradeReq 技能升级请求。
+message GmSkillUpgradeReq {
+  int64 player_id = 1; // 玩家ID
+  int32 skill_id = 2;  // 技能配置ID
+}
+
 // GmEquipListReq 装备列表请求。
 message GmEquipListReq {
   int64 player_id = 1; // 玩家ID
@@ -145,6 +169,12 @@ message GmEquipAddReq {
 message GmEquipUpdateReq {
   int64 player_id = 1; // 玩家ID
   pb.EquipUpdateReq req = 2; // 业务参数
+}
+
+// GmEquipUpgradeReq 装备升级请求。
+message GmEquipUpgradeReq {
+  int64 player_id = 1; // 玩家ID
+  int32 equip_id = 2;  // 装备配置ID
 }
 
 // GameAdminService 后台 GM 服务（game 服提供，admin 服调用）。
@@ -173,6 +203,10 @@ service GameAdminService {
   rpc HeroAdd (GmHeroAddReq) returns (pb.HeroAddResp);
   // HeroUpdate 更新英雄
   rpc HeroUpdate (GmHeroUpdateReq) returns (pb.HeroUpdateResp);
+  // HeroAttribute 查看英雄累计属性
+  rpc HeroAttribute (GmHeroAttributeReq) returns (pb.HeroAttributeResp);
+  // HeroUpgrade 英雄升级（消耗物品）
+  rpc HeroUpgrade (GmHeroUpgradeReq) returns (pb.HeroUpgradeResp);
 
   // WeaponList 武器列表
   rpc WeaponList (GmWeaponListReq) returns (pb.WeaponListResp);
@@ -180,6 +214,8 @@ service GameAdminService {
   rpc WeaponAdd (GmWeaponAddReq) returns (pb.WeaponAddResp);
   // WeaponUpdate 更新武器
   rpc WeaponUpdate (GmWeaponUpdateReq) returns (pb.WeaponUpdateResp);
+  // WeaponUpgrade 武器升级（消耗物品）
+  rpc WeaponUpgrade (GmWeaponUpgradeReq) returns (pb.WeaponUpgradeResp);
 
   // SkillList 技能列表
   rpc SkillList (GmSkillListReq) returns (pb.SkillListResp);
@@ -187,6 +223,8 @@ service GameAdminService {
   rpc SkillAdd (GmSkillAddReq) returns (pb.SkillAddResp);
   // SkillUpdate 更新技能
   rpc SkillUpdate (GmSkillUpdateReq) returns (pb.SkillUpdateResp);
+  // SkillUpgrade 技能升级（消耗物品）
+  rpc SkillUpgrade (GmSkillUpgradeReq) returns (pb.SkillUpgradeResp);
 
   // EquipList 装备列表
   rpc EquipList (GmEquipListReq) returns (pb.EquipListResp);
@@ -194,4 +232,6 @@ service GameAdminService {
   rpc EquipAdd (GmEquipAddReq) returns (pb.EquipAddResp);
   // EquipUpdate 更新装备
   rpc EquipUpdate (GmEquipUpdateReq) returns (pb.EquipUpdateResp);
+  // EquipUpgrade 装备升级（消耗物品）
+  rpc EquipUpgrade (GmEquipUpgradeReq) returns (pb.EquipUpgradeResp);
 }

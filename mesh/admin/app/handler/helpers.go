@@ -64,6 +64,12 @@ func queryPlayerID(ctx http.Context) int64 {
 	return playerID
 }
 
+// queryInt 读取查询串中的 int32 参数；非法或缺省返回 0。
+func queryInt(ctx http.Context, name string) int32 {
+	v, _ := strconv.ParseInt(ctx.Query(name), 10, 32)
+	return int32(v)
+}
+
 // orderBy 解析 <prop>Order 排序参数，只接受白名单列。
 func orderBy(ctx http.Context, columns map[string]string) string {
 	for prop, column := range columns {

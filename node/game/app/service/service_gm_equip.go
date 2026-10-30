@@ -46,3 +46,17 @@ func (p *GmProvider) EquipUpdate(ctx context.Context, req *pb.GmEquipUpdateReq) 
 	flushPlayer(ctx, req.GetPlayerId(), global.PlayerEquipCache)
 	return resp, nil
 }
+
+// EquipUpgrade 装备升级（消耗物品）。
+func (p *GmProvider) EquipUpgrade(ctx context.Context, req *pb.GmEquipUpgradeReq) (*pb.EquipUpgradeResp, error) {
+	if err := checkPlayerID(req.GetPlayerId()); err != nil {
+		return nil, err
+	}
+	resp, err := logic.Equip().EquipUpgrade(ctx, req.GetPlayerId(), &pb.EquipUpgradeReq{CfgId: req.GetEquipId()})
+	if err != nil {
+		return nil, err
+	}
+	flushPlayer(ctx, req.GetPlayerId(), global.PlayerEquipCache)
+	flushPlayer(ctx, req.GetPlayerId(), global.PlayerItemCache)
+	return resp, nil
+}

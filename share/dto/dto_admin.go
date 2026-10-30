@@ -33,8 +33,8 @@ type GmPlayerReq struct {
 
 // GmItemListReq 物品容器列表请求。
 type GmItemListReq struct {
-	PlayerID int64 `json:"playerId"` // 玩家ID
-	ItemType int32 `json:"itemType"` // 物品容器类型：0 全部 1 背包 2 仓库 3 保险箱
+	PlayerID      int64 `json:"playerId"`      // 玩家ID
+	ContainerType int32 `json:"containerType"` // 物品容器类型：0 全部 1 背包 2 仓库 3 保险箱
 }
 
 // GmItemEntry GM 物品容器内物品（含配置展示信息）。ItemID 为雪花 int64，JSON 按字符串收发避免前端精度丢失。
@@ -55,35 +55,35 @@ type GmItemEntry struct {
 
 // GmItemResp GM 物品容器详情。
 type GmItemResp struct {
-	PlayerID int64         `json:"playerId"` // 玩家ID
-	ItemType int32         `json:"itemType"` // 物品容器类型
-	GridW    int32         `json:"gridW"`    // 网格宽
-	GridH    int32         `json:"gridH"`    // 网格高
-	Version  int32         `json:"version"`  // 版本号
-	Items    []GmItemEntry `json:"items"`    // 物品列表
+	PlayerID      int64         `json:"playerId"`      // 玩家ID
+	ContainerType int32         `json:"containerType"` // 物品容器类型
+	GridW         int32         `json:"gridW"`         // 网格宽
+	GridH         int32         `json:"gridH"`         // 网格高
+	Version       int32         `json:"version"`       // 版本号
+	Items         []GmItemEntry `json:"items"`         // 物品列表
 }
 
 // GmItemMoveReq 物品容器内移动物品请求。
 type GmItemMoveReq struct {
-	PlayerID int64 `json:"playerId"`      // 玩家ID
-	ItemType int32 `json:"itemType"`      // 物品容器类型
-	ItemID   int64 `json:"itemId,string"` // 物品实例ID（雪花，按字符串接收）
-	ToX      int32 `json:"toX"`           // 目标X
-	ToY      int32 `json:"toY"`           // 目标Y
-	Rotated  bool  `json:"rotated"`       // 是否旋转放置
+	PlayerID      int64 `json:"playerId"`      // 玩家ID
+	ContainerType int32 `json:"containerType"` // 物品容器类型
+	ItemID        int64 `json:"itemId,string"` // 物品实例ID（雪花，按字符串接收）
+	ToX           int32 `json:"toX"`           // 目标X
+	ToY           int32 `json:"toY"`           // 目标Y
+	Rotated       bool  `json:"rotated"`       // 是否旋转放置
 }
 
 // GmItemRotateReq 物品容器内旋转物品请求。
 type GmItemRotateReq struct {
-	PlayerID int64 `json:"playerId"`      // 玩家ID
-	ItemType int32 `json:"itemType"`      // 物品容器类型
-	ItemID   int64 `json:"itemId,string"` // 物品实例ID（雪花，按字符串接收）
+	PlayerID      int64 `json:"playerId"`      // 玩家ID
+	ContainerType int32 `json:"containerType"` // 物品容器类型
+	ItemID        int64 `json:"itemId,string"` // 物品实例ID（雪花，按字符串接收）
 }
 
 // GmItemSortReq 物品容器一键整理请求。
 type GmItemSortReq struct {
-	PlayerID int64 `json:"playerId"` // 玩家ID
-	ItemType int32 `json:"itemType"` // 物品容器类型
+	PlayerID      int64 `json:"playerId"`      // 玩家ID
+	ContainerType int32 `json:"containerType"` // 物品容器类型
 }
 
 // GmItemTransferReq 物品容器间移动物品请求。
@@ -99,13 +99,13 @@ type GmItemTransferReq struct {
 
 // GmItemAddEntryReq 向物品容器放入物品请求（坐标为左上角格）。
 type GmItemAddEntryReq struct {
-	PlayerID  int64 `json:"playerId"`  // 玩家ID
-	ItemType  int32 `json:"itemType"`  // 物品容器类型：1 背包 2 仓库 3 保险箱
-	ItemCfgID int32 `json:"itemCfgId"` // 物品配置ID
-	Count     int32 `json:"count"`     // 堆叠数量
-	GridX     int32 `json:"gridX"`     // 网格X
-	GridY     int32 `json:"gridY"`     // 网格Y
-	Rotated   bool  `json:"rotated"`   // 是否旋转放置
+	PlayerID      int64 `json:"playerId"`      // 玩家ID
+	ContainerType int32 `json:"containerType"` // 物品容器类型：1 背包 2 仓库 3 保险箱
+	ItemCfgID     int32 `json:"itemCfgId"`     // 物品配置ID
+	Count         int32 `json:"count"`         // 堆叠数量
+	GridX         int32 `json:"gridX"`         // 网格X
+	GridY         int32 `json:"gridY"`         // 网格Y
+	Rotated       bool  `json:"rotated"`       // 是否旋转放置
 }
 
 // ========== 英雄（GM） ==========
@@ -215,6 +215,41 @@ type GmEquipUpdateReq struct {
 	EquipID  int32 `json:"equipId"`  // 装备配置ID
 	Level    int32 `json:"level"`    // 等级
 	Equipped bool  `json:"equipped"` // 是否穿戴
+}
+
+// ========== 英雄累计属性 / 升级（GM） ==========
+
+// GmHeroAttributeReq 查看英雄累计属性请求。
+type GmHeroAttributeReq struct {
+	PlayerID int64 `json:"playerId"` // 玩家ID
+	HeroID   int32 `json:"heroId"`   // 英雄配置ID（0 表示出战英雄）
+}
+
+// GmHeroAttribute 英雄累计属性（基础属性 + 已装备武器/装备加成）。
+type GmHeroAttribute struct {
+	HeroID  int32 `json:"heroId"`  // 英雄配置ID
+	Level   int32 `json:"level"`   // 等级
+	Star    int32 `json:"star"`    // 星级
+	Power   int32 `json:"power"`   // 战力（= 伤害 + 护甲 + 生命）
+	Hp      int32 `json:"hp"`      // 生命值
+	Armor   int32 `json:"armor"`   // 护甲
+	Damage  int32 `json:"damage"`  // 伤害
+}
+
+// GmUpgradeReq 升级请求（英雄/武器/技能/装备通用）。
+type GmUpgradeReq struct {
+	PlayerID int64 `json:"playerId"` // 玩家ID
+	CfgID    int32 `json:"cfgId"`    // 配置ID
+}
+
+// GmUpgradeResp 升级结果（含升级后的英雄累计属性）。
+type GmUpgradeResp struct {
+	CfgID  int32 `json:"cfgId"`  // 配置ID
+	Level  int32 `json:"level"`  // 升级后等级
+	Power  int32 `json:"power"`  // 战力
+	Hp     int32 `json:"hp"`     // 生命值
+	Armor  int32 `json:"armor"`  // 护甲
+	Damage int32 `json:"damage"` // 伤害
 }
 
 // ========== 配置目录（GM，读 Luban 配置） ==========

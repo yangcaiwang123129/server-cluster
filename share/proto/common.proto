@@ -30,24 +30,38 @@ enum RouteCode {
   ROUTE_CODE_HERO_NOTIFY = 10021; // 英雄变化通知
   ROUTE_CODE_HERO_ADD = 10022; // 新增英雄(预发布和生成环境不开放)
   ROUTE_CODE_HERO_UPDATE = 10023; // 更新英雄(预发布和生成环境不开放)
+  ROUTE_CODE_HERO_ATTRIBUTE = 10024; // 查看英雄累计属性
+  ROUTE_CODE_HERO_UPGRADE = 10025; // 英雄升级（消耗物品）
 
   // 武器 10030~10039
   ROUTE_CODE_WEAPON_LIST = 10030; // 武器列表
   ROUTE_CODE_WEAPON_NOTIFY = 10031; // 武器变化通知
   ROUTE_CODE_WEAPON_ADD = 10032; // 新增武器(预发布和生成环境不开放)
   ROUTE_CODE_WEAPON_UPDATE = 10033; // 更新武器(预发布和生成环境不开放)
+  ROUTE_CODE_WEAPON_UPGRADE = 10034; // 武器升级（消耗物品）
 
   // 技能 10040~10049
   ROUTE_CODE_SKILL_LIST = 10040; // 技能列表
   ROUTE_CODE_SKILL_NOTIFY = 10041; // 技能变化通知
   ROUTE_CODE_SKILL_ADD = 10042; // 新增技能(预发布和生成环境不开放)
   ROUTE_CODE_SKILL_UPDATE = 10043; // 更新技能(预发布和生成环境不开放)
+  ROUTE_CODE_SKILL_UPGRADE = 10044; // 技能升级（消耗物品）
 
   // 装备 10050~10059
   ROUTE_CODE_EQUIP_LIST = 10050; // 装备列表
   ROUTE_CODE_EQUIP_NOTIFY = 10051; // 装备变化通知
   ROUTE_CODE_EQUIP_ADD = 10052; // 新增装备(预发布和生成环境不开放)
   ROUTE_CODE_EQUIP_UPDATE = 10053; // 更新装备(预发布和生成环境不开放)
+  ROUTE_CODE_EQUIP_UPGRADE = 10054; // 装备升级（消耗物品）
+
+  // 礼包购买 10060~10069
+  ROUTE_CODE_GIFT_BUY = 10060; // 购买礼包（消耗资产并发放奖励）
+
+  // 兑换 10070~10079
+  ROUTE_CODE_EXCHANGE = 10070; // 兑换（消耗资产并发放奖励）
+
+  // 充值 10080~10089
+  ROUTE_CODE_RECHARGE = 10080; // 充值（当前为假充值，直接发放奖励）
 
   // 战斗服 50000~59999
 
@@ -75,16 +89,16 @@ enum NOTIFY_TYPE {
 
 // ========== 物品容器类型枚举 ==========
 
-enum ItemType {
-  ITEM_TYPE_UNSPECIFIED = 0;
-  ITEM_TYPE_BACKPACK = 1; // 背包（局内随身，死亡掉落）
-  ITEM_TYPE_STASH = 2;    // 仓库（局外固定，不掉落）
-  ITEM_TYPE_SECURE = 3;   // 保险箱（局内随身，不掉落）
+enum ContainerType {
+  CONTAINER_TYPE_UNSPECIFIED = 0;
+  CONTAINER_TYPE_BACKPACK = 1; // 背包（局内随身，死亡掉落）
+  CONTAINER_TYPE_STASH = 2;    // 仓库（局外固定，不掉落）
+  CONTAINER_TYPE_SECURE = 3;   // 保险箱（局内随身，不掉落）
 }
 
 //  ========== 属性枚举 ==========
 enum MagicAttr {
-  // 0~10000 玩家相关属性
+  // 1~1000 玩家相关属性
   PLAYER_ATTR_UNSPECIFIED = 0;
   PLAYER_ATTR_NAME = 1; // 昵称
   PLAYER_ATTR_LEVEL = 2; // 等级
@@ -93,11 +107,17 @@ enum MagicAttr {
   PLAYER_ATTR_VIP_EXP = 5; // vip经验
   PLAYER_ATTR_COIN = 6; // 币
   PLAYER_ATTR_GOLD = 7; // 金
+
+  // 10001~2000 英雄相关属性
+  HERO_POWER = 1000 ;// 战力（= 伤害 + 护甲 + 生命）
+  HERO_HP = 1001 ; // 生命值
+  HERO_ARMOR = 1002 ; // 护甲
+  HERO_DAMAGE = 1003 ;// 伤害
+
   // 10001~20000 红点相关属性
 }
 
 // 属性表：键为 MagicAttr 枚举值，值为动态类型（字符串/整数/长整数）。
-// 例如 {1:"昵称", 2:等级, 3:经验, 4:vip等级, 5:vip经验, 6:币, 7:金}
 message MagicAttrMap {
   map<int32, ObjectValue> values = 1;
 }
@@ -131,6 +151,13 @@ message ObjectValue {
   }
 }
 
+// 资产条目：类型 + 配置ID + 数量（奖励/消耗应答用）
+message AssetEntry {
+  int32 type = 1;   // 资产类型（对应 tpl.AssetType）
+  int32 cfg_id = 2; // 配置ID
+  int32 count = 3;  // 数量
+}
+
 // 物品容器中的物品
 message ItemEntry {
   int64 id = 1;     // 实例ID
@@ -144,7 +171,7 @@ message ItemEntry {
 // 物品容器条目
 message ItemContainer {
   int64 id = 1;                        // 物品容器实例ID（=playerID + type 编码）
-  ItemType type = 2;                   // 物品容器类型
+  ContainerType type = 2;              // 物品容器类型
   int32 grid_w = 3;                    // 网格宽度
   int32 grid_h = 4;                    // 网格高度
   int32 version = 5;                   // 操作版本号（每次修改+1）
@@ -160,6 +187,14 @@ message HeroEntry {
   int32 star = 5;      // 星级
   int32 skin_id = 6;   // 皮肤ID
   bool equipped = 7;   // 是否出战
+}
+
+// 英雄累计属性：英雄基础属性 + 已穿戴武器/装备/技能加成后的最终值。
+message HeroAttribute {
+  int32 power = 1;  // 战力（= 伤害 + 护甲 + 生命）
+  int32 hp = 2;     // 生命值
+  int32 armor = 3;  // 护甲
+  int32 damage = 4; // 伤害
 }
 
 // 武器持有（仅状态，静态属性由 weapon_id 关联武器配置表）

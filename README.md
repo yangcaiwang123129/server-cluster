@@ -132,3 +132,10 @@ dist/<env>/<version>/
 ## 依赖版本
 
 due v2.6.4；卫星模块 `network/ws`、`registry/etcd`、`locate/redis`、`transport/grpc`、`component/http` 统一 `v2.0.0-20261022054807-a7ed9b4593a2`；gorm + MySQL、go-redis、tidwall/wal、theine-go、dobyte/jwt。
+
+
+// 10001~2000 英雄相关属性
+HERO_POWER = 1000 ;// 战力（= 伤害 + 护甲 + 生命）
+HERO_HP = 1001 ; // 生命值
+HERO_ARMOR = 1002 ; // 护甲
+HERO_DAMAGE = 1003 ;// 伤害

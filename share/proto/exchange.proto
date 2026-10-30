@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package pb;
+
+import "common.proto";
+
+option go_package = "server-cluster/share/pb";
+
+// 兑换请求（路由 10070）
+message ExchangeReq {
+  int32 cfg_id = 1; // 兑换配置ID（ExchangeCfg.Id）
+}
+
+// 兑换响应
+message ExchangeResp {
+  Result result = 1;
+  repeated AssetEntry costs = 2;    // 实际消耗的资产
+  repeated AssetEntry rewards = 3;  // 实际发放的奖励
+}

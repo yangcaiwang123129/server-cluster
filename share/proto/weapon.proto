@@ -45,3 +45,15 @@ message WeaponUpdateResp {
   Result result = 1;
   WeaponEntry weapon_entry = 2; // 更新后的持有状态
 }
+
+// 武器升级请求（路由 10034，消耗升级素材）
+message WeaponUpgradeReq {
+  int32 cfg_id = 1; // 武器配置ID
+}
+
+// 武器升级响应
+message WeaponUpgradeResp {
+  Result result = 1;
+  WeaponEntry weapon_entry = 2; // 升级后的持有状态
+  HeroAttribute attribute = 3;  // 升级后的英雄累计属性
+}

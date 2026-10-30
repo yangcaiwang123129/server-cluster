@@ -44,7 +44,7 @@
         <el-table-column :label="$t('admin.gameEquip.equipped')" min-width="90">
           <template #default="{ row }">{{ row.equipped ? '✓' : '-' }}</template>
         </el-table-column>
-        <el-table-column :label="$t('common.actions')" width="100" fixed="right">
+        <el-table-column :label="$t('common.actions')" width="150" fixed="right">
           <template #default="{ row }">
             <el-button
               v-permisaction="['game:gm:equip:list']"
@@ -52,6 +52,12 @@
               type="primary"
               @click="openEdit(row)"
             >{{ $t('common.edit') }}</el-button>
+            <el-button
+              v-permisaction="['game:gm:equip:list']"
+              link
+              type="warning"
+              @click="upgrade(row)"
+            >{{ $t('admin.gameEquip.upgrade') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -101,7 +107,7 @@ import GameItemIcon from '@/components/GameItemIcon/index.vue'
 import GameCatalogList from '@/components/GameCatalogList/index.vue'
 import { msgInfo, msgSuccess } from '@/utils/message'
 
-import { addGmEquip, listGmEquip, updateGmEquip } from '@/api/admin/gm'
+import { addGmEquip, listGmEquip, updateGmEquip, upgradeGmEquip } from '@/api/admin/gm'
 import type { GameCatalogEntry, GmEquip } from '@/types/admin'
 
 // Must match the menu_name the backend serves, or keep-alive silently misses
@@ -175,6 +181,16 @@ const submitEdit = async() => {
   if (!res) return
   msgSuccess(t('admin.gameEquip.updateOk'))
   editDialog.visible = false
+  await loadList()
+}
+
+// Upgrade consumes upgrade materials from the backpack; the interceptor reports failures.
+const upgrade = async(row: GmEquip) => {
+  const id = playerIdOrZero()
+  if (!id) return
+  const res = await upgradeGmEquip({ playerId: id, cfgId: row.equipId ?? 0 }).catch(() => null)
+  if (!res) return
+  msgSuccess(t('admin.gameEquip.upgradeOk'))
   await loadList()
 }
 </script>

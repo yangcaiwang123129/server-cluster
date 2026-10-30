@@ -14,6 +14,7 @@ func RegisterWeapon(router http.Router) {
 	g.Get("/weapon", handleGmWeaponList)
 	g.Post("/weapon", handleGmWeaponAdd)
 	g.Put("/weapon", handleGmWeaponUpdate)
+	g.Post("/weapon/upgrade", handleGmWeaponUpgrade)
 }
 
 // handleGmWeaponList 武器列表。
@@ -71,4 +72,23 @@ func handleGmWeaponUpdate(ctx http.Context) error {
 		return errs.FailErr(ctx, err)
 	}
 	return errs.OK(ctx, entry)
+}
+
+// handleGmWeaponUpgrade 武器升级（消耗物品）。
+// @Summary GM 武器升级
+// @Tags gm
+// @Produce json
+// @Param body body dto.GmUpgradeReq true "升级参数"
+// @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
+// @Router /api/v1/gm/weapon/upgrade [post]
+func handleGmWeaponUpgrade(ctx http.Context) error {
+	var req dto.GmUpgradeReq
+	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.CfgID <= 0 {
+		return errs.Fail(ctx, 400, "请求参数错误")
+	}
+	resp, err := logic.GmWeapon().WeaponUpgrade(req)
+	if err != nil {
+		return errs.FailErr(ctx, err)
+	}
+	return errs.OK(ctx, resp)
 }

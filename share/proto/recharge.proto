@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package pb;
+
+import "common.proto";
+
+option go_package = "server-cluster/share/pb";
+
+// 充值请求（路由 10080）
+// 当前为假充值：服务端不做订单校验，直接按配置发放奖励。
+message RechargeReq {
+  int32 cfg_id = 1; // 充值配置ID（RechargeCfg.Id）
+}
+
+// 充值响应
+message RechargeResp {
+  Result result = 1;
+  repeated AssetEntry rewards = 2; // 实际发放的奖励
+}

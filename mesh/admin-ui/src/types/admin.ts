@@ -282,7 +282,7 @@ export interface GmItemEntry {
 
 export interface GmItem {
   playerId?: number
-  itemType?: number
+  containerType?: number
   gridW?: number
   gridH?: number
   version?: number
@@ -328,6 +328,27 @@ export interface GmEquip {
   name?: string
   iconKey?: string
   desc?: string
+}
+
+/** 英雄累计属性（基础属性 + 已装备武器/装备加成，战力 = 伤害 + 护甲 + 生命）。 */
+export interface GmHeroAttribute {
+  heroId?: number
+  level?: number
+  star?: number
+  power?: number
+  hp?: number
+  armor?: number
+  damage?: number
+}
+
+/** 升级结果（英雄/武器/技能/装备通用，含升级后的英雄累计属性）。 */
+export interface GmUpgradeResult {
+  cfgId?: number
+  level?: number
+  power?: number
+  hp?: number
+  armor?: number
+  damage?: number
 }
 
 /** A record row from game_record (item/equip/weapon/skill/hero gain or consume). */

@@ -17,6 +17,10 @@ type GmHeroLogic interface {
 	HeroAdd(req dto.GmHeroAddReq) (*dto.GmHeroEntry, error)
 	// HeroUpdate 更新英雄
 	HeroUpdate(req dto.GmHeroUpdateReq) (*dto.GmHeroEntry, error)
+	// HeroAttribute 查看英雄累计属性
+	HeroAttribute(req dto.GmHeroAttributeReq) (*dto.GmHeroAttribute, error)
+	// HeroUpgrade 英雄升级（消耗物品）
+	HeroUpgrade(req dto.GmUpgradeReq) (*dto.GmUpgradeResp, error)
 }
 
 // gmHeroLogicInst 英雄 GM 业务单例容器。
@@ -91,6 +95,54 @@ func (this *gmHeroLogic) HeroUpdate(req dto.GmHeroUpdateReq) (*dto.GmHeroEntry, 
 	}
 	entry := toGmHeroEntry(resp.GetHeroEntry())
 	return &entry, nil
+}
+
+// HeroAttribute 查看英雄累计属性。
+func (this *gmHeroLogic) HeroAttribute(req dto.GmHeroAttributeReq) (*dto.GmHeroAttribute, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), rpcTimeout)
+	defer cancel()
+
+	resp := &pb.HeroAttributeResp{}
+	callReq := &pb.GmHeroAttributeReq{PlayerId: req.PlayerID, HeroId: req.HeroID}
+	if err := gmCall(ctx, req.PlayerID, pb.GameAdminService_HeroAttribute_FullMethodName, callReq, resp); err != nil {
+		return nil, err
+	}
+	entry := resp.GetHeroEntry()
+	attr := dto.GmHeroAttribute{
+		HeroID: entry.GetCfgId(),
+		Level:  entry.GetLevel(),
+		Star:   entry.GetStar(),
+		Power:  resp.GetAttribute().GetPower(),
+		Hp:     resp.GetAttribute().GetHp(),
+		Armor:  resp.GetAttribute().GetArmor(),
+		Damage: resp.GetAttribute().GetDamage(),
+	}
+	return &attr, nil
+}
+
+// HeroUpgrade 英雄升级（消耗物品）。
+func (this *gmHeroLogic) HeroUpgrade(req dto.GmUpgradeReq) (*dto.GmUpgradeResp, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), rpcTimeout)
+	defer cancel()
+
+	resp := &pb.HeroUpgradeResp{}
+	callReq := &pb.GmHeroUpgradeReq{PlayerId: req.PlayerID, HeroId: req.CfgID}
+	if err := gmCall(ctx, req.PlayerID, pb.GameAdminService_HeroUpgrade_FullMethodName, callReq, resp); err != nil {
+		return nil, err
+	}
+	return toGmUpgradeResp(resp.GetHeroEntry().GetCfgId(), resp.GetHeroEntry().GetLevel(), resp.GetAttribute()), nil
+}
+
+// toGmUpgradeResp 升级结果转响应。
+func toGmUpgradeResp(cfgID, level int32, attr *pb.HeroAttribute) *dto.GmUpgradeResp {
+	return &dto.GmUpgradeResp{
+		CfgID:  cfgID,
+		Level:  level,
+		Power:  attr.GetPower(),
+		Hp:     attr.GetHp(),
+		Armor:  attr.GetArmor(),
+		Damage: attr.GetDamage(),
+	}
 }
 
 // toGmHeroEntry 英雄条目转响应（补齐名称/稀有度等展示信息）。

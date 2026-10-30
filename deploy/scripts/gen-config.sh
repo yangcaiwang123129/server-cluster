@@ -72,7 +72,7 @@ fi
 # --- 4. go build sanity check ---
 if command -v go >/dev/null 2>&1; then
     echo "[gen-config] go build..."
-    go build ./share/tpl/...
+    go build -buildvcs=false ./share/tpl/...
 else
     echo "[gen-config] go not found, skip build check"
 fi

@@ -392,6 +392,218 @@ func (x *HeroUpdateResp) GetHeroEntry() *HeroEntry {
 	return nil
 }
 
+// 查看英雄累计属性请求（路由 10024）
+type HeroAttributeReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 英雄配置ID（0 表示当前出战英雄）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HeroAttributeReq) Reset() {
+	*x = HeroAttributeReq{}
+	mi := &file_hero_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HeroAttributeReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HeroAttributeReq) ProtoMessage() {}
+
+func (x *HeroAttributeReq) ProtoReflect() protoreflect.Message {
+	mi := &file_hero_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HeroAttributeReq.ProtoReflect.Descriptor instead.
+func (*HeroAttributeReq) Descriptor() ([]byte, []int) {
+	return file_hero_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *HeroAttributeReq) GetCfgId() int32 {
+	if x != nil {
+		return x.CfgId
+	}
+	return 0
+}
+
+// 查看英雄累计属性响应
+type HeroAttributeResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	HeroEntry     *HeroEntry             `protobuf:"bytes,2,opt,name=hero_entry,json=heroEntry,proto3" json:"hero_entry,omitempty"` // 英雄持有状态
+	Attribute     *HeroAttribute         `protobuf:"bytes,3,opt,name=attribute,proto3" json:"attribute,omitempty"`                  // 累计属性
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HeroAttributeResp) Reset() {
+	*x = HeroAttributeResp{}
+	mi := &file_hero_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HeroAttributeResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HeroAttributeResp) ProtoMessage() {}
+
+func (x *HeroAttributeResp) ProtoReflect() protoreflect.Message {
+	mi := &file_hero_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HeroAttributeResp.ProtoReflect.Descriptor instead.
+func (*HeroAttributeResp) Descriptor() ([]byte, []int) {
+	return file_hero_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *HeroAttributeResp) GetResult() *Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
+func (x *HeroAttributeResp) GetHeroEntry() *HeroEntry {
+	if x != nil {
+		return x.HeroEntry
+	}
+	return nil
+}
+
+func (x *HeroAttributeResp) GetAttribute() *HeroAttribute {
+	if x != nil {
+		return x.Attribute
+	}
+	return nil
+}
+
+// 英雄升级请求（路由 10025，消耗升级素材）
+type HeroUpgradeReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 英雄配置ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HeroUpgradeReq) Reset() {
+	*x = HeroUpgradeReq{}
+	mi := &file_hero_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HeroUpgradeReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HeroUpgradeReq) ProtoMessage() {}
+
+func (x *HeroUpgradeReq) ProtoReflect() protoreflect.Message {
+	mi := &file_hero_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HeroUpgradeReq.ProtoReflect.Descriptor instead.
+func (*HeroUpgradeReq) Descriptor() ([]byte, []int) {
+	return file_hero_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *HeroUpgradeReq) GetCfgId() int32 {
+	if x != nil {
+		return x.CfgId
+	}
+	return 0
+}
+
+// 英雄升级响应
+type HeroUpgradeResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	HeroEntry     *HeroEntry             `protobuf:"bytes,2,opt,name=hero_entry,json=heroEntry,proto3" json:"hero_entry,omitempty"` // 升级后的持有状态
+	Attribute     *HeroAttribute         `protobuf:"bytes,3,opt,name=attribute,proto3" json:"attribute,omitempty"`                  // 升级后的累计属性
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HeroUpgradeResp) Reset() {
+	*x = HeroUpgradeResp{}
+	mi := &file_hero_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HeroUpgradeResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HeroUpgradeResp) ProtoMessage() {}
+
+func (x *HeroUpgradeResp) ProtoReflect() protoreflect.Message {
+	mi := &file_hero_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HeroUpgradeResp.ProtoReflect.Descriptor instead.
+func (*HeroUpgradeResp) Descriptor() ([]byte, []int) {
+	return file_hero_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *HeroUpgradeResp) GetResult() *Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
+func (x *HeroUpgradeResp) GetHeroEntry() *HeroEntry {
+	if x != nil {
+		return x.HeroEntry
+	}
+	return nil
+}
+
+func (x *HeroUpgradeResp) GetAttribute() *HeroAttribute {
+	if x != nil {
+		return x.Attribute
+	}
+	return nil
+}
+
 var File_hero_proto protoreflect.FileDescriptor
 
 const file_hero_proto_rawDesc = "" +
@@ -426,7 +638,23 @@ const file_hero_proto_rawDesc = "" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\x12,\n" +
 	"\n" +
-	"hero_entry\x18\x02 \x01(\v2\r.pb.HeroEntryR\theroEntryB\x19Z\x17server-cluster/share/pbb\x06proto3"
+	"hero_entry\x18\x02 \x01(\v2\r.pb.HeroEntryR\theroEntry\")\n" +
+	"\x10HeroAttributeReq\x12\x15\n" +
+	"\x06cfg_id\x18\x01 \x01(\x05R\x05cfgId\"\x96\x01\n" +
+	"\x11HeroAttributeResp\x12\"\n" +
+	"\x06result\x18\x01 \x01(\v2\n" +
+	".pb.ResultR\x06result\x12,\n" +
+	"\n" +
+	"hero_entry\x18\x02 \x01(\v2\r.pb.HeroEntryR\theroEntry\x12/\n" +
+	"\tattribute\x18\x03 \x01(\v2\x11.pb.HeroAttributeR\tattribute\"'\n" +
+	"\x0eHeroUpgradeReq\x12\x15\n" +
+	"\x06cfg_id\x18\x01 \x01(\x05R\x05cfgId\"\x94\x01\n" +
+	"\x0fHeroUpgradeResp\x12\"\n" +
+	"\x06result\x18\x01 \x01(\v2\n" +
+	".pb.ResultR\x06result\x12,\n" +
+	"\n" +
+	"hero_entry\x18\x02 \x01(\v2\r.pb.HeroEntryR\theroEntry\x12/\n" +
+	"\tattribute\x18\x03 \x01(\v2\x11.pb.HeroAttributeR\tattributeB\x19Z\x17server-cluster/share/pbb\x06proto3"
 
 var (
 	file_hero_proto_rawDescOnce sync.Once
@@ -440,31 +668,42 @@ func file_hero_proto_rawDescGZIP() []byte {
 	return file_hero_proto_rawDescData
 }
 
-var file_hero_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_hero_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_hero_proto_goTypes = []any{
-	(*HeroListReq)(nil),    // 0: pb.HeroListReq
-	(*HeroListResp)(nil),   // 1: pb.HeroListResp
-	(*HeroNotify)(nil),     // 2: pb.HeroNotify
-	(*HeroAddReq)(nil),     // 3: pb.HeroAddReq
-	(*HeroAddResp)(nil),    // 4: pb.HeroAddResp
-	(*HeroUpdateReq)(nil),  // 5: pb.HeroUpdateReq
-	(*HeroUpdateResp)(nil), // 6: pb.HeroUpdateResp
-	(*Result)(nil),         // 7: pb.Result
-	(*HeroEntry)(nil),      // 8: pb.HeroEntry
+	(*HeroListReq)(nil),       // 0: pb.HeroListReq
+	(*HeroListResp)(nil),      // 1: pb.HeroListResp
+	(*HeroNotify)(nil),        // 2: pb.HeroNotify
+	(*HeroAddReq)(nil),        // 3: pb.HeroAddReq
+	(*HeroAddResp)(nil),       // 4: pb.HeroAddResp
+	(*HeroUpdateReq)(nil),     // 5: pb.HeroUpdateReq
+	(*HeroUpdateResp)(nil),    // 6: pb.HeroUpdateResp
+	(*HeroAttributeReq)(nil),  // 7: pb.HeroAttributeReq
+	(*HeroAttributeResp)(nil), // 8: pb.HeroAttributeResp
+	(*HeroUpgradeReq)(nil),    // 9: pb.HeroUpgradeReq
+	(*HeroUpgradeResp)(nil),   // 10: pb.HeroUpgradeResp
+	(*Result)(nil),            // 11: pb.Result
+	(*HeroEntry)(nil),         // 12: pb.HeroEntry
+	(*HeroAttribute)(nil),     // 13: pb.HeroAttribute
 }
 var file_hero_proto_depIdxs = []int32{
-	7, // 0: pb.HeroListResp.result:type_name -> pb.Result
-	8, // 1: pb.HeroListResp.hero_entries:type_name -> pb.HeroEntry
-	8, // 2: pb.HeroNotify.hero_entry:type_name -> pb.HeroEntry
-	7, // 3: pb.HeroAddResp.result:type_name -> pb.Result
-	8, // 4: pb.HeroAddResp.hero_entry:type_name -> pb.HeroEntry
-	7, // 5: pb.HeroUpdateResp.result:type_name -> pb.Result
-	8, // 6: pb.HeroUpdateResp.hero_entry:type_name -> pb.HeroEntry
-	7, // [7:7] is the sub-list for method output_type
-	7, // [7:7] is the sub-list for method input_type
-	7, // [7:7] is the sub-list for extension type_name
-	7, // [7:7] is the sub-list for extension extendee
-	0, // [0:7] is the sub-list for field type_name
+	11, // 0: pb.HeroListResp.result:type_name -> pb.Result
+	12, // 1: pb.HeroListResp.hero_entries:type_name -> pb.HeroEntry
+	12, // 2: pb.HeroNotify.hero_entry:type_name -> pb.HeroEntry
+	11, // 3: pb.HeroAddResp.result:type_name -> pb.Result
+	12, // 4: pb.HeroAddResp.hero_entry:type_name -> pb.HeroEntry
+	11, // 5: pb.HeroUpdateResp.result:type_name -> pb.Result
+	12, // 6: pb.HeroUpdateResp.hero_entry:type_name -> pb.HeroEntry
+	11, // 7: pb.HeroAttributeResp.result:type_name -> pb.Result
+	12, // 8: pb.HeroAttributeResp.hero_entry:type_name -> pb.HeroEntry
+	13, // 9: pb.HeroAttributeResp.attribute:type_name -> pb.HeroAttribute
+	11, // 10: pb.HeroUpgradeResp.result:type_name -> pb.Result
+	12, // 11: pb.HeroUpgradeResp.hero_entry:type_name -> pb.HeroEntry
+	13, // 12: pb.HeroUpgradeResp.attribute:type_name -> pb.HeroAttribute
+	13, // [13:13] is the sub-list for method output_type
+	13, // [13:13] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_hero_proto_init() }
@@ -479,7 +718,7 @@ func file_hero_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_hero_proto_rawDesc), len(file_hero_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

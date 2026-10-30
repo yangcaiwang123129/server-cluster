@@ -1185,6 +1185,36 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/gm/equip/upgrade": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 装备升级",
+                "parameters": [
+                    {
+                        "description": "升级参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmUpgradeReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/gm/hero": {
             "get": {
                 "produces": [
@@ -1269,6 +1299,70 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/gm/hero/attribute": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 英雄累计属性",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "玩家ID",
+                        "name": "playerId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "英雄配置ID（0 表示出战英雄）",
+                        "name": "heroId",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/hero/upgrade": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 英雄升级",
+                "parameters": [
+                    {
+                        "description": "升级参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmUpgradeReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/gm/item": {
             "get": {
                 "produces": [
@@ -1289,7 +1383,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "物品容器类型 0全部 1背包 2仓库 3保险箱",
-                        "name": "itemType",
+                        "name": "containerType",
                         "in": "query"
                     }
                 ],
@@ -1700,6 +1794,36 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/gm/skill/upgrade": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 技能升级",
+                "parameters": [
+                    {
+                        "description": "升级参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmUpgradeReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/gm/weapon": {
             "get": {
                 "produces": [
@@ -1771,6 +1895,36 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/dto.GmWeaponAddReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/weapon/upgrade": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 武器升级",
+                "parameters": [
+                    {
+                        "description": "升级参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmUpgradeReq"
                         }
                     }
                 ],
@@ -3330,6 +3484,10 @@ const docTemplate = `{
         "dto.GmItemAddEntryReq": {
             "type": "object",
             "properties": {
+                "containerType": {
+                    "description": "物品容器类型：1 背包 2 仓库 3 保险箱",
+                    "type": "integer"
+                },
                 "count": {
                     "description": "堆叠数量",
                     "type": "integer"
@@ -3346,10 +3504,6 @@ const docTemplate = `{
                     "description": "物品配置ID",
                     "type": "integer"
                 },
-                "itemType": {
-                    "description": "物品容器类型：1 背包 2 仓库 3 保险箱",
-                    "type": "integer"
-                },
                 "playerId": {
                     "description": "玩家ID",
                     "type": "integer"
@@ -3363,14 +3517,14 @@ const docTemplate = `{
         "dto.GmItemMoveReq": {
             "type": "object",
             "properties": {
+                "containerType": {
+                    "description": "物品容器类型",
+                    "type": "integer"
+                },
                 "itemId": {
                     "description": "物品实例ID（雪花，按字符串接收）",
                     "type": "string",
                     "example": "0"
-                },
-                "itemType": {
-                    "description": "物品容器类型",
-                    "type": "integer"
                 },
                 "playerId": {
                     "description": "玩家ID",
@@ -3393,14 +3547,14 @@ const docTemplate = `{
         "dto.GmItemRotateReq": {
             "type": "object",
             "properties": {
+                "containerType": {
+                    "description": "物品容器类型",
+                    "type": "integer"
+                },
                 "itemId": {
                     "description": "物品实例ID（雪花，按字符串接收）",
                     "type": "string",
                     "example": "0"
-                },
-                "itemType": {
-                    "description": "物品容器类型",
-                    "type": "integer"
                 },
                 "playerId": {
                     "description": "玩家ID",
@@ -3411,7 +3565,7 @@ const docTemplate = `{
         "dto.GmItemSortReq": {
             "type": "object",
             "properties": {
-                "itemType": {
+                "containerType": {
                     "description": "物品容器类型",
                     "type": "integer"
                 },
@@ -3485,6 +3639,19 @@ const docTemplate = `{
                 },
                 "skillId": {
                     "description": "技能配置ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GmUpgradeReq": {
+            "type": "object",
+            "properties": {
+                "cfgId": {
+                    "description": "配置ID",
+                    "type": "integer"
+                },
+                "playerId": {
+                    "description": "玩家ID",
                     "type": "integer"
                 }
             }

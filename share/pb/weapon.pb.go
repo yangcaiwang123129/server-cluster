@@ -376,6 +376,112 @@ func (x *WeaponUpdateResp) GetWeaponEntry() *WeaponEntry {
 	return nil
 }
 
+// 武器升级请求（路由 10034，消耗升级素材）
+type WeaponUpgradeReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 武器配置ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WeaponUpgradeReq) Reset() {
+	*x = WeaponUpgradeReq{}
+	mi := &file_weapon_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WeaponUpgradeReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WeaponUpgradeReq) ProtoMessage() {}
+
+func (x *WeaponUpgradeReq) ProtoReflect() protoreflect.Message {
+	mi := &file_weapon_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WeaponUpgradeReq.ProtoReflect.Descriptor instead.
+func (*WeaponUpgradeReq) Descriptor() ([]byte, []int) {
+	return file_weapon_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *WeaponUpgradeReq) GetCfgId() int32 {
+	if x != nil {
+		return x.CfgId
+	}
+	return 0
+}
+
+// 武器升级响应
+type WeaponUpgradeResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	WeaponEntry   *WeaponEntry           `protobuf:"bytes,2,opt,name=weapon_entry,json=weaponEntry,proto3" json:"weapon_entry,omitempty"` // 升级后的持有状态
+	Attribute     *HeroAttribute         `protobuf:"bytes,3,opt,name=attribute,proto3" json:"attribute,omitempty"`                        // 升级后的英雄累计属性
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WeaponUpgradeResp) Reset() {
+	*x = WeaponUpgradeResp{}
+	mi := &file_weapon_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WeaponUpgradeResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WeaponUpgradeResp) ProtoMessage() {}
+
+func (x *WeaponUpgradeResp) ProtoReflect() protoreflect.Message {
+	mi := &file_weapon_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WeaponUpgradeResp.ProtoReflect.Descriptor instead.
+func (*WeaponUpgradeResp) Descriptor() ([]byte, []int) {
+	return file_weapon_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *WeaponUpgradeResp) GetResult() *Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
+func (x *WeaponUpgradeResp) GetWeaponEntry() *WeaponEntry {
+	if x != nil {
+		return x.WeaponEntry
+	}
+	return nil
+}
+
+func (x *WeaponUpgradeResp) GetAttribute() *HeroAttribute {
+	if x != nil {
+		return x.Attribute
+	}
+	return nil
+}
+
 var File_weapon_proto protoreflect.FileDescriptor
 
 const file_weapon_proto_rawDesc = "" +
@@ -404,7 +510,14 @@ const file_weapon_proto_rawDesc = "" +
 	"\x10WeaponUpdateResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\x122\n" +
-	"\fweapon_entry\x18\x02 \x01(\v2\x0f.pb.WeaponEntryR\vweaponEntryB\x19Z\x17server-cluster/share/pbb\x06proto3"
+	"\fweapon_entry\x18\x02 \x01(\v2\x0f.pb.WeaponEntryR\vweaponEntry\")\n" +
+	"\x10WeaponUpgradeReq\x12\x15\n" +
+	"\x06cfg_id\x18\x01 \x01(\x05R\x05cfgId\"\x9c\x01\n" +
+	"\x11WeaponUpgradeResp\x12\"\n" +
+	"\x06result\x18\x01 \x01(\v2\n" +
+	".pb.ResultR\x06result\x122\n" +
+	"\fweapon_entry\x18\x02 \x01(\v2\x0f.pb.WeaponEntryR\vweaponEntry\x12/\n" +
+	"\tattribute\x18\x03 \x01(\v2\x11.pb.HeroAttributeR\tattributeB\x19Z\x17server-cluster/share/pbb\x06proto3"
 
 var (
 	file_weapon_proto_rawDescOnce sync.Once
@@ -418,31 +531,37 @@ func file_weapon_proto_rawDescGZIP() []byte {
 	return file_weapon_proto_rawDescData
 }
 
-var file_weapon_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_weapon_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_weapon_proto_goTypes = []any{
-	(*WeaponListReq)(nil),    // 0: pb.WeaponListReq
-	(*WeaponListResp)(nil),   // 1: pb.WeaponListResp
-	(*WeaponNotify)(nil),     // 2: pb.WeaponNotify
-	(*WeaponAddReq)(nil),     // 3: pb.WeaponAddReq
-	(*WeaponAddResp)(nil),    // 4: pb.WeaponAddResp
-	(*WeaponUpdateReq)(nil),  // 5: pb.WeaponUpdateReq
-	(*WeaponUpdateResp)(nil), // 6: pb.WeaponUpdateResp
-	(*Result)(nil),           // 7: pb.Result
-	(*WeaponEntry)(nil),      // 8: pb.WeaponEntry
+	(*WeaponListReq)(nil),     // 0: pb.WeaponListReq
+	(*WeaponListResp)(nil),    // 1: pb.WeaponListResp
+	(*WeaponNotify)(nil),      // 2: pb.WeaponNotify
+	(*WeaponAddReq)(nil),      // 3: pb.WeaponAddReq
+	(*WeaponAddResp)(nil),     // 4: pb.WeaponAddResp
+	(*WeaponUpdateReq)(nil),   // 5: pb.WeaponUpdateReq
+	(*WeaponUpdateResp)(nil),  // 6: pb.WeaponUpdateResp
+	(*WeaponUpgradeReq)(nil),  // 7: pb.WeaponUpgradeReq
+	(*WeaponUpgradeResp)(nil), // 8: pb.WeaponUpgradeResp
+	(*Result)(nil),            // 9: pb.Result
+	(*WeaponEntry)(nil),       // 10: pb.WeaponEntry
+	(*HeroAttribute)(nil),     // 11: pb.HeroAttribute
 }
 var file_weapon_proto_depIdxs = []int32{
-	7, // 0: pb.WeaponListResp.result:type_name -> pb.Result
-	8, // 1: pb.WeaponListResp.weapon_entries:type_name -> pb.WeaponEntry
-	8, // 2: pb.WeaponNotify.weapon_entry:type_name -> pb.WeaponEntry
-	7, // 3: pb.WeaponAddResp.result:type_name -> pb.Result
-	8, // 4: pb.WeaponAddResp.weapon_entry:type_name -> pb.WeaponEntry
-	7, // 5: pb.WeaponUpdateResp.result:type_name -> pb.Result
-	8, // 6: pb.WeaponUpdateResp.weapon_entry:type_name -> pb.WeaponEntry
-	7, // [7:7] is the sub-list for method output_type
-	7, // [7:7] is the sub-list for method input_type
-	7, // [7:7] is the sub-list for extension type_name
-	7, // [7:7] is the sub-list for extension extendee
-	0, // [0:7] is the sub-list for field type_name
+	9,  // 0: pb.WeaponListResp.result:type_name -> pb.Result
+	10, // 1: pb.WeaponListResp.weapon_entries:type_name -> pb.WeaponEntry
+	10, // 2: pb.WeaponNotify.weapon_entry:type_name -> pb.WeaponEntry
+	9,  // 3: pb.WeaponAddResp.result:type_name -> pb.Result
+	10, // 4: pb.WeaponAddResp.weapon_entry:type_name -> pb.WeaponEntry
+	9,  // 5: pb.WeaponUpdateResp.result:type_name -> pb.Result
+	10, // 6: pb.WeaponUpdateResp.weapon_entry:type_name -> pb.WeaponEntry
+	9,  // 7: pb.WeaponUpgradeResp.result:type_name -> pb.Result
+	10, // 8: pb.WeaponUpgradeResp.weapon_entry:type_name -> pb.WeaponEntry
+	11, // 9: pb.WeaponUpgradeResp.attribute:type_name -> pb.HeroAttribute
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_weapon_proto_init() }
@@ -457,7 +576,7 @@ func file_weapon_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_weapon_proto_rawDesc), len(file_weapon_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

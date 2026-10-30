@@ -20,5 +20,7 @@ export default {
   desc: 'Description',
   pickPlaceholder: 'Search by name or ID',
   level: 'Level',
-  equipped: 'Worn'
+  equipped: 'Worn',
+  upgrade: 'Upgrade',
+  upgradeOk: 'Upgraded'
 }

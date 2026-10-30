@@ -46,3 +46,17 @@ func (p *GmProvider) WeaponUpdate(ctx context.Context, req *pb.GmWeaponUpdateReq
 	flushPlayer(ctx, req.GetPlayerId(), global.PlayerWeaponCache)
 	return resp, nil
 }
+
+// WeaponUpgrade 武器升级（消耗物品）。
+func (p *GmProvider) WeaponUpgrade(ctx context.Context, req *pb.GmWeaponUpgradeReq) (*pb.WeaponUpgradeResp, error) {
+	if err := checkPlayerID(req.GetPlayerId()); err != nil {
+		return nil, err
+	}
+	resp, err := logic.Weapon().WeaponUpgrade(ctx, req.GetPlayerId(), &pb.WeaponUpgradeReq{CfgId: req.GetWeaponId()})
+	if err != nil {
+		return nil, err
+	}
+	flushPlayer(ctx, req.GetPlayerId(), global.PlayerWeaponCache)
+	flushPlayer(ctx, req.GetPlayerId(), global.PlayerItemCache)
+	return resp, nil
+}

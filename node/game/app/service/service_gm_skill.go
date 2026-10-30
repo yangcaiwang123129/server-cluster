@@ -46,3 +46,17 @@ func (p *GmProvider) SkillUpdate(ctx context.Context, req *pb.GmSkillUpdateReq) 
 	flushPlayer(ctx, req.GetPlayerId(), global.PlayerSkillCache)
 	return resp, nil
 }
+
+// SkillUpgrade 技能升级（消耗物品）。
+func (p *GmProvider) SkillUpgrade(ctx context.Context, req *pb.GmSkillUpgradeReq) (*pb.SkillUpgradeResp, error) {
+	if err := checkPlayerID(req.GetPlayerId()); err != nil {
+		return nil, err
+	}
+	resp, err := logic.Skill().SkillUpgrade(ctx, req.GetPlayerId(), &pb.SkillUpgradeReq{CfgId: req.GetSkillId()})
+	if err != nil {
+		return nil, err
+	}
+	flushPlayer(ctx, req.GetPlayerId(), global.PlayerSkillCache)
+	flushPlayer(ctx, req.GetPlayerId(), global.PlayerItemCache)
+	return resp, nil
+}

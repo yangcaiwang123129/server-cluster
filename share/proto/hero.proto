@@ -47,3 +47,27 @@ message HeroUpdateResp {
   Result result = 1;
   HeroEntry hero_entry = 2; // 更新后的持有状态
 }
+
+// 查看英雄累计属性请求（路由 10024）
+message HeroAttributeReq {
+  int32 cfg_id = 1; // 英雄配置ID（0 表示当前出战英雄）
+}
+
+// 查看英雄累计属性响应
+message HeroAttributeResp {
+  Result result = 1;
+  HeroEntry hero_entry = 2;   // 英雄持有状态
+  HeroAttribute attribute = 3; // 累计属性
+}
+
+// 英雄升级请求（路由 10025，消耗升级素材）
+message HeroUpgradeReq {
+  int32 cfg_id = 1; // 英雄配置ID
+}
+
+// 英雄升级响应
+message HeroUpgradeResp {
+  Result result = 1;
+  HeroEntry hero_entry = 2;   // 升级后的持有状态
+  HeroAttribute attribute = 3; // 升级后的累计属性
+}

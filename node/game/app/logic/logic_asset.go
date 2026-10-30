@@ -6,6 +6,7 @@ import (
 
 	"server-cluster/node/game/app/global"
 	"server-cluster/share/errs"
+	"server-cluster/share/pb"
 	"server-cluster/share/singleton"
 	"server-cluster/share/tpl"
 )
@@ -99,4 +100,43 @@ func (this *assetLogic) AssetList(ctx context.Context, playerID int64, assetType
 		return nil, err
 	}
 	return h.List(ctx, playerID)
+}
+
+// deductAssets 依次扣除资产并汇总 wire 条目；nil 条目跳过，任一失败即返回错误（不继续后续扣减）。
+func deductAssets(ctx context.Context, playerID int64, assets []*tpl.Asset) ([]*pb.AssetEntry, error) {
+	entries := make([]*pb.AssetEntry, 0, len(assets))
+	for _, a := range assets {
+		if a == nil {
+			continue
+		}
+		if err := Asset().AssetRemove(ctx, playerID, a); err != nil {
+			return nil, err
+		}
+		entries = append(entries, toAssetEntry(a))
+	}
+	return entries, nil
+}
+
+// grantAssets 依次发放资产并汇总 wire 条目；nil 条目跳过，任一失败即返回错误。
+func grantAssets(ctx context.Context, playerID int64, assets []*tpl.Asset) ([]*pb.AssetEntry, error) {
+	entries := make([]*pb.AssetEntry, 0, len(assets))
+	for _, a := range assets {
+		if a == nil {
+			continue
+		}
+		if err := Asset().AssetAdd(ctx, playerID, a); err != nil {
+			return nil, err
+		}
+		entries = append(entries, toAssetEntry(a))
+	}
+	return entries, nil
+}
+
+// toAssetEntry 资产配置 → wire 条目；Count<=0 与 AssetAdd 一致按 1 处理。
+func toAssetEntry(a *tpl.Asset) *pb.AssetEntry {
+	count := a.Count
+	if count <= 0 {
+		count = 1
+	}
+	return &pb.AssetEntry{Type: int32(a.Type), CfgId: a.Id, Count: count}
 }

@@ -44,3 +44,15 @@ message SkillUpdateResp {
   Result result = 1;
   SkillEntry skill_entry = 2; // 更新后的持有状态
 }
+
+// 技能升级请求（路由 10044，消耗升级素材）
+message SkillUpgradeReq {
+  int32 cfg_id = 1; // 技能配置ID
+}
+
+// 技能升级响应
+message SkillUpgradeResp {
+  Result result = 1;
+  SkillEntry skill_entry = 2; // 升级后的持有状态
+  HeroAttribute attribute = 3; // 升级后的英雄累计属性
+}

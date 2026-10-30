@@ -20,5 +20,7 @@ export default {
   desc: '描述',
   pickPlaceholder: '按名称或ID搜索',
   level: '等级',
-  equipped: '已装备'
+  equipped: '已装备',
+  upgrade: '升级',
+  upgradeOk: '已升级'
 }

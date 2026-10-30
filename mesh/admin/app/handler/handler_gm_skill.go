@@ -14,6 +14,7 @@ func RegisterSkill(router http.Router) {
 	g.Get("/skill", handleGmSkillList)
 	g.Post("/skill", handleGmSkillAdd)
 	g.Put("/skill", handleGmSkillUpdate)
+	g.Post("/skill/upgrade", handleGmSkillUpgrade)
 }
 
 // handleGmSkillList 技能列表。
@@ -71,4 +72,23 @@ func handleGmSkillUpdate(ctx http.Context) error {
 		return errs.FailErr(ctx, err)
 	}
 	return errs.OK(ctx, entry)
+}
+
+// handleGmSkillUpgrade 技能升级（消耗物品）。
+// @Summary GM 技能升级
+// @Tags gm
+// @Produce json
+// @Param body body dto.GmUpgradeReq true "升级参数"
+// @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
+// @Router /api/v1/gm/skill/upgrade [post]
+func handleGmSkillUpgrade(ctx http.Context) error {
+	var req dto.GmUpgradeReq
+	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.CfgID <= 0 {
+		return errs.Fail(ctx, 400, "请求参数错误")
+	}
+	resp, err := logic.GmSkill().SkillUpgrade(req)
+	if err != nil {
+		return errs.FailErr(ctx, err)
+	}
+	return errs.OK(ctx, resp)
 }

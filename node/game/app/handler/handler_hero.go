@@ -15,6 +15,8 @@ func init() {
 	router.OnActor(pb.RouteCode_ROUTE_CODE_HERO_LIST, handleHeroList)
 	router.OnActor(pb.RouteCode_ROUTE_CODE_HERO_ADD, handleHeroAdd)
 	router.OnActor(pb.RouteCode_ROUTE_CODE_HERO_UPDATE, handleHeroUpdate)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_HERO_ATTRIBUTE, handleHeroAttribute)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_HERO_UPGRADE, handleHeroUpgrade)
 }
 
 // handleHeroList 英雄列表。
@@ -55,6 +57,36 @@ func handleHeroUpdate(ctx node.Context) {
 		return
 	}
 	resp, err := logic.Hero().HeroUpdate(ctx.Context(), ctx.UID(), req)
+	if err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	_ = ctx.Response(resp)
+}
+
+// handleHeroAttribute 查看英雄累计属性。
+func handleHeroAttribute(ctx node.Context) {
+	req := &pb.HeroAttributeReq{}
+	if err := ctx.Parse(req); err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	resp, err := logic.Hero().HeroAttribute(ctx.Context(), ctx.UID(), req)
+	if err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	_ = ctx.Response(resp)
+}
+
+// handleHeroUpgrade 英雄升级（消耗物品）。
+func handleHeroUpgrade(ctx node.Context) {
+	req := &pb.HeroUpgradeReq{}
+	if err := ctx.Parse(req); err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	resp, err := logic.Hero().HeroUpgrade(ctx.Context(), ctx.UID(), req)
 	if err != nil {
 		_ = ctx.Response(err)
 		return

@@ -59,6 +59,8 @@ type SkillLogic interface {
 	SkillAdd(ctx context.Context, playerID int64, req *pb.SkillAddReq) (*pb.SkillAddResp, error)
 	// SkillUpdate 更新技能
 	SkillUpdate(ctx context.Context, playerID int64, req *pb.SkillUpdateReq) (*pb.SkillUpdateResp, error)
+	// SkillUpgrade 技能升级（消耗物品）
+	SkillUpgrade(ctx context.Context, playerID int64, req *pb.SkillUpgradeReq) (*pb.SkillUpgradeResp, error)
 }
 
 // WeaponLogic 武器业务接口：玩家武器持有数据生命周期。
@@ -70,6 +72,8 @@ type WeaponLogic interface {
 	WeaponAdd(ctx context.Context, playerID int64, req *pb.WeaponAddReq) (*pb.WeaponAddResp, error)
 	// WeaponUpdate 更新武器
 	WeaponUpdate(ctx context.Context, playerID int64, req *pb.WeaponUpdateReq) (*pb.WeaponUpdateResp, error)
+	// WeaponUpgrade 武器升级（消耗物品）
+	WeaponUpgrade(ctx context.Context, playerID int64, req *pb.WeaponUpgradeReq) (*pb.WeaponUpgradeResp, error)
 }
 
 // HeroLogic 英雄业务接口：玩家英雄持有数据生命周期。
@@ -81,6 +85,10 @@ type HeroLogic interface {
 	HeroAdd(ctx context.Context, playerID int64, req *pb.HeroAddReq) (*pb.HeroAddResp, error)
 	// HeroUpdate 更新英雄
 	HeroUpdate(ctx context.Context, playerID int64, req *pb.HeroUpdateReq) (*pb.HeroUpdateResp, error)
+	// HeroAttribute 查看英雄累计属性（cfg_id 为 0 表示出战英雄）
+	HeroAttribute(ctx context.Context, playerID int64, req *pb.HeroAttributeReq) (*pb.HeroAttributeResp, error)
+	// HeroUpgrade 英雄升级（消耗物品）
+	HeroUpgrade(ctx context.Context, playerID int64, req *pb.HeroUpgradeReq) (*pb.HeroUpgradeResp, error)
 }
 
 // EquipLogic 装备业务接口：玩家装备持有数据生命周期。
@@ -92,6 +100,26 @@ type EquipLogic interface {
 	EquipAdd(ctx context.Context, playerID int64, req *pb.EquipAddReq) (*pb.EquipAddResp, error)
 	// EquipUpdate 更新装备
 	EquipUpdate(ctx context.Context, playerID int64, req *pb.EquipUpdateReq) (*pb.EquipUpdateResp, error)
+	// EquipUpgrade 装备升级（消耗物品）
+	EquipUpgrade(ctx context.Context, playerID int64, req *pb.EquipUpgradeReq) (*pb.EquipUpgradeResp, error)
+}
+
+// BuyLogic 礼包购买业务接口：按 GiftCfg 扣除消耗资产并发放奖励。
+type BuyLogic interface {
+	// GiftBuy 购买礼包
+	GiftBuy(ctx context.Context, playerID int64, req *pb.GiftBuyReq) (*pb.GiftBuyResp, error)
+}
+
+// ExchangeLogic 兑换业务接口：按 ExchangeCfg 扣除消耗资产并发放奖励。
+type ExchangeLogic interface {
+	// Exchange 兑换
+	Exchange(ctx context.Context, playerID int64, req *pb.ExchangeReq) (*pb.ExchangeResp, error)
+}
+
+// RechargeLogic 充值业务接口：当前为假充值，校验配置后直接发放奖励。
+type RechargeLogic interface {
+	// Recharge 充值
+	Recharge(ctx context.Context, playerID int64, req *pb.RechargeReq) (*pb.RechargeResp, error)
 }
 
 // AssetLogic 资产业务统一入口：按 tpl.AssetType 路由到对应实现（item/equip/weapon/skill/hero 等），

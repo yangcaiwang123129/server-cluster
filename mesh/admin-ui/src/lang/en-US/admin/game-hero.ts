@@ -22,5 +22,13 @@ export default {
   exp: 'Exp',
   star: 'Star',
   skinId: 'Skin ID',
-  equipped: 'In battle'
+  equipped: 'In battle',
+  attribute: 'Attributes',
+  attributeTitle: 'Hero total attributes',
+  power: 'Power',
+  hp: 'HP',
+  armor: 'Armor',
+  damage: 'Damage',
+  upgrade: 'Upgrade',
+  upgradeOk: 'Upgraded'
 }

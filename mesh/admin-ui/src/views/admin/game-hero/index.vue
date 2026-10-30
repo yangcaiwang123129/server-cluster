@@ -41,7 +41,7 @@
         <el-table-column :label="$t('admin.gameHero.equipped')" min-width="90">
           <template #default="{ row }">{{ row.equipped ? '✓' : '-' }}</template>
         </el-table-column>
-        <el-table-column :label="$t('common.actions')" width="100" fixed="right">
+        <el-table-column :label="$t('common.actions')" width="170" fixed="right">
           <template #default="{ row }">
             <el-button
               v-permisaction="['game:gm:hero:list']"
@@ -49,6 +49,12 @@
               type="primary"
               @click="openEdit(row)"
             >{{ $t('common.edit') }}</el-button>
+            <el-button
+              v-permisaction="['game:gm:hero:list']"
+              link
+              type="primary"
+              @click="openAttribute(row)"
+            >{{ $t('admin.gameHero.attribute') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -94,6 +100,38 @@
         </el-button>
       </template>
     </el-dialog>
+
+    <el-dialog v-model="attrDialog.visible" :title="$t('admin.gameHero.attributeTitle')" width="440px">
+      <el-descriptions v-loading="attrDialog.loading" :column="2" border>
+        <el-descriptions-item :label="$t('admin.gameHero.name')">
+          {{ attrDialog.name || '-' }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('admin.gameHero.level')">
+          {{ attrDialog.level }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('admin.gameHero.star')">
+          {{ attrDialog.star }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('admin.gameHero.power')">
+          {{ attrDialog.power }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('admin.gameHero.hp')">
+          {{ attrDialog.hp }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('admin.gameHero.armor')">
+          {{ attrDialog.armor }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('admin.gameHero.damage')">
+          {{ attrDialog.damage }}
+        </el-descriptions-item>
+      </el-descriptions>
+      <template #footer>
+        <el-button @click="attrDialog.visible = false">{{ $t('common.dialogCancel') }}</el-button>
+        <el-button type="warning" :loading="attrDialog.upgrading" @click="upgradeFromDialog">
+          {{ $t('admin.gameHero.upgrade') }}
+        </el-button>
+      </template>
+    </el-dialog>
   </PageContainer>
 </template>
 
@@ -106,7 +144,7 @@ import GameItemIcon from '@/components/GameItemIcon/index.vue'
 import GameCatalogList from '@/components/GameCatalogList/index.vue'
 import { msgInfo, msgSuccess } from '@/utils/message'
 
-import { addGmHero, listGmHero, updateGmHero } from '@/api/admin/gm'
+import { addGmHero, getGmHeroAttribute, listGmHero, updateGmHero, upgradeGmHero } from '@/api/admin/gm'
 import type { GameCatalogEntry, GmHero } from '@/types/admin'
 
 // Must match the menu_name the backend serves, or keep-alive silently misses
@@ -129,6 +167,20 @@ const editDialog = reactive({
   star: 0,
   skinId: 0,
   equipped: false
+})
+
+const attrDialog = reactive({
+  visible: false,
+  loading: false,
+  upgrading: false,
+  heroId: 0,
+  name: '',
+  level: 0,
+  star: 0,
+  power: 0,
+  hp: 0,
+  armor: 0,
+  damage: 0
 })
 
 const playerIdOrZero = () => {
@@ -191,6 +243,42 @@ const submitEdit = async() => {
   if (!res) return
   msgSuccess(t('admin.gameHero.updateOk'))
   editDialog.visible = false
+  await loadList()
+}
+
+const loadAttribute = async(heroId: number) => {
+  const id = playerIdOrZero()
+  if (!id) return
+  attrDialog.loading = true
+  const res = await getGmHeroAttribute({ playerId: id, heroId }).catch(() => null)
+  attrDialog.loading = false
+  if (!res) return
+  const attr = res.data
+  attrDialog.level = attr?.level ?? 0
+  attrDialog.star = attr?.star ?? 0
+  attrDialog.power = attr?.power ?? 0
+  attrDialog.hp = attr?.hp ?? 0
+  attrDialog.armor = attr?.armor ?? 0
+  attrDialog.damage = attr?.damage ?? 0
+}
+
+const openAttribute = async(row: GmHero) => {
+  attrDialog.heroId = row.heroId ?? 0
+  attrDialog.name = row.name ?? ''
+  attrDialog.visible = true
+  await loadAttribute(attrDialog.heroId)
+}
+
+const upgradeFromDialog = async() => {
+  const id = playerIdOrZero()
+  if (!id) return
+  attrDialog.upgrading = true
+  // Upgrade consumes upgrade materials from the backpack; the interceptor reports failures.
+  const res = await upgradeGmHero({ playerId: id, cfgId: attrDialog.heroId }).catch(() => null)
+  attrDialog.upgrading = false
+  if (!res) return
+  msgSuccess(t('admin.gameHero.upgradeOk'))
+  await loadAttribute(attrDialog.heroId)
   await loadList()
 }
 </script>

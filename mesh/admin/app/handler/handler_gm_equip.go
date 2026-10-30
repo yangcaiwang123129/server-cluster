@@ -14,6 +14,7 @@ func RegisterEquip(router http.Router) {
 	g.Get("/equip", handleGmEquipList)
 	g.Post("/equip", handleGmEquipAdd)
 	g.Put("/equip", handleGmEquipUpdate)
+	g.Post("/equip/upgrade", handleGmEquipUpgrade)
 }
 
 // handleGmEquipList 装备列表。
@@ -71,4 +72,23 @@ func handleGmEquipUpdate(ctx http.Context) error {
 		return errs.FailErr(ctx, err)
 	}
 	return errs.OK(ctx, entry)
+}
+
+// handleGmEquipUpgrade 装备升级（消耗物品）。
+// @Summary GM 装备升级
+// @Tags gm
+// @Produce json
+// @Param body body dto.GmUpgradeReq true "升级参数"
+// @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
+// @Router /api/v1/gm/equip/upgrade [post]
+func handleGmEquipUpgrade(ctx http.Context) error {
+	var req dto.GmUpgradeReq
+	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.CfgID <= 0 {
+		return errs.Fail(ctx, 400, "请求参数错误")
+	}
+	resp, err := logic.GmEquip().EquipUpgrade(req)
+	if err != nil {
+		return errs.FailErr(ctx, err)
+	}
+	return errs.OK(ctx, resp)
 }

@@ -96,6 +96,59 @@ func (this *equipLogic) EquipUpdate(ctx context.Context, playerID int64, req *pb
 	return &pb.EquipUpdateResp{EquipEntry: toEquipEntry(g)}, nil
 }
 
+// EquipUpgrade 装备升级：星级档位沿用出战英雄，消耗配置表升级素材，等级 +1。
+func (this *equipLogic) EquipUpgrade(ctx context.Context, playerID int64, req *pb.EquipUpgradeReq) (*pb.EquipUpgradeResp, error) {
+	_, hero, err := equippedHero(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+
+	row, err := loadPlayerEquip(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+	g, ok := row.Equips.Get(req.GetCfgId())
+	if !ok {
+		return nil, errs.CodeInvalidParams.WithMessage("装备未拥有").Err()
+	}
+
+	cfg := tpl.T().AttributeGear.Get(attrID(clampTier(hero.Star), g.EquipID))
+	if cfg == nil {
+		return nil, errs.CodeInvalidParams.WithMessage("装备属性配置不存在").Err()
+	}
+	lo, hi := levelBounds(0, 0, false)
+	if cfg.Level != nil {
+		lo, hi = levelBounds(cfg.Level.X, cfg.Level.Y, true)
+	}
+	lvl := clampLevel(g.Level, lo, hi)
+	if lvl >= hi {
+		return nil, errs.CodeInvalidParams.WithMessage("装备已满级").Err()
+	}
+
+	cost := costAt(cfg.UpgradeUse, cfg.GrowUGMaterial, lvl, lo)
+	if cost > 0 {
+		if err := Asset().AssetRemove(ctx, playerID, &tpl.Asset{
+			Type:  tpl.AssetType_Item,
+			Id:    cfg.UpgradeMaterial,
+			Count: cost,
+		}); err != nil {
+			return nil, err
+		}
+	}
+
+	g.Level = lvl + 1
+	if !row.UpdateEquip(g) {
+		return nil, errs.CodeInvalidParams.WithMessage("装备未拥有").Err()
+	}
+	global.PlayerEquipCache.Set(playerID, row)
+
+	_, attr, err := computeHeroAttribute(ctx, playerID, 0)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.EquipUpgradeResp{EquipEntry: toEquipEntry(g), Attribute: attr}, nil
+}
+
 // EnterGame 进入游戏：加载玩家装备持有，未建档则初始化空集合。
 func (this *equipLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq) (*pb.EnterGameResp, error) {
 	if _, err := loadPlayerEquip(ctx, playerID); err != nil {

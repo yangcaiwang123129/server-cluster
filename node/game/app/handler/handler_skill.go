@@ -15,6 +15,22 @@ func init() {
 	router.OnActor(pb.RouteCode_ROUTE_CODE_SKILL_LIST, handleSkillList)
 	router.OnActor(pb.RouteCode_ROUTE_CODE_SKILL_ADD, handleSkillAdd)
 	router.OnActor(pb.RouteCode_ROUTE_CODE_SKILL_UPDATE, handleSkillUpdate)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_SKILL_UPGRADE, handleSkillUpgrade)
+}
+
+// handleSkillUpgrade 技能升级（消耗物品）。
+func handleSkillUpgrade(ctx node.Context) {
+	req := &pb.SkillUpgradeReq{}
+	if err := ctx.Parse(req); err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	resp, err := logic.Skill().SkillUpgrade(ctx.Context(), ctx.UID(), req)
+	if err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	_ = ctx.Response(resp)
 }
 
 // handleSkillList 技能列表。

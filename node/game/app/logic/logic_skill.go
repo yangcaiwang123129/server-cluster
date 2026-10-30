@@ -96,6 +96,59 @@ func (this *skillLogic) SkillUpdate(ctx context.Context, playerID int64, req *pb
 	return &pb.SkillUpdateResp{SkillEntry: toSkillEntry(s)}, nil
 }
 
+// SkillUpgrade 技能升级：星级档位沿用出战英雄，消耗配置表升级素材，等级 +1。
+func (this *skillLogic) SkillUpgrade(ctx context.Context, playerID int64, req *pb.SkillUpgradeReq) (*pb.SkillUpgradeResp, error) {
+	_, hero, err := equippedHero(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+
+	row, err := loadPlayerSkill(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+	s, ok := row.Skills.Get(req.GetCfgId())
+	if !ok {
+		return nil, errs.CodeInvalidParams.WithMessage("技能未拥有").Err()
+	}
+
+	cfg := tpl.T().AttributeSkill.Get(attrID(clampTier(hero.Star), s.SkillID))
+	if cfg == nil {
+		return nil, errs.CodeInvalidParams.WithMessage("技能属性配置不存在").Err()
+	}
+	lo, hi := levelBounds(0, 0, false)
+	if cfg.Level != nil {
+		lo, hi = levelBounds(cfg.Level.X, cfg.Level.Y, true)
+	}
+	lvl := clampLevel(s.Level, lo, hi)
+	if lvl >= hi {
+		return nil, errs.CodeInvalidParams.WithMessage("技能已满级").Err()
+	}
+
+	cost := costAt(cfg.UpgradeUse, cfg.GrowUGMaterial, lvl, lo)
+	if cost > 0 {
+		if err := Asset().AssetRemove(ctx, playerID, &tpl.Asset{
+			Type:  tpl.AssetType_Item,
+			Id:    cfg.UpgradeMaterial,
+			Count: cost,
+		}); err != nil {
+			return nil, err
+		}
+	}
+
+	s.Level = lvl + 1
+	if !row.UpdateSkill(s) {
+		return nil, errs.CodeInvalidParams.WithMessage("技能未拥有").Err()
+	}
+	global.PlayerSkillCache.Set(playerID, row)
+
+	_, attr, err := computeHeroAttribute(ctx, playerID, 0)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.SkillUpgradeResp{SkillEntry: toSkillEntry(s), Attribute: attr}, nil
+}
+
 // EnterGame 进入游戏：加载玩家技能持有，未建档则初始化空集合。
 func (this *skillLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq) (*pb.EnterGameResp, error) {
 	if _, err := loadPlayerSkill(ctx, playerID); err != nil {

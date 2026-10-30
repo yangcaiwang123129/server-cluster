@@ -22,5 +22,13 @@ export default {
   exp: '经验',
   star: '星级',
   skinId: '皮肤ID',
-  equipped: '已出战'
+  equipped: '已出战',
+  attribute: '属性',
+  attributeTitle: '英雄累计属性',
+  power: '战力',
+  hp: '生命值',
+  armor: '护甲',
+  damage: '伤害',
+  upgrade: '升级',
+  upgradeOk: '已升级'
 }

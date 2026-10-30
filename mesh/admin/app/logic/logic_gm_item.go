@@ -50,7 +50,7 @@ func (this *gmItemLogic) ItemContainerList(req dto.GmItemListReq) ([]dto.GmItemR
 	resp := &pb.ItemContainerListResp{}
 	callReq := &pb.GmItemListReq{
 		PlayerId: req.PlayerID,
-		Req:      &pb.ItemContainerListReq{ItemType: pb.ItemType(req.ItemType)},
+		Req:      &pb.ItemContainerListReq{ContainerType: pb.ContainerType(req.ContainerType)},
 	}
 	if err := gmCall(ctx, req.PlayerID, pb.GameAdminService_ItemList_FullMethodName, callReq, resp); err != nil {
 		return nil, err
@@ -66,11 +66,11 @@ func (this *gmItemLogic) ItemMove(req dto.GmItemMoveReq) error {
 	callReq := &pb.GmItemMoveReq{
 		PlayerId: req.PlayerID,
 		Req: &pb.ItemMoveReq{
-			ItemType: pb.ItemType(req.ItemType),
-			Id:       req.ItemID,
-			ToX:      req.ToX,
-			ToY:      req.ToY,
-			Rotated:  req.Rotated,
+			ContainerType: pb.ContainerType(req.ContainerType),
+			Id:            req.ItemID,
+			ToX:           req.ToX,
+			ToY:           req.ToY,
+			Rotated:       req.Rotated,
 		},
 	}
 	return gmCall(ctx, req.PlayerID, pb.GameAdminService_ItemMove_FullMethodName, callReq, &pb.ItemMoveResp{})
@@ -84,8 +84,8 @@ func (this *gmItemLogic) ItemRotate(req dto.GmItemRotateReq) error {
 	callReq := &pb.GmItemRotateReq{
 		PlayerId: req.PlayerID,
 		Req: &pb.ItemRotateReq{
-			ItemType: pb.ItemType(req.ItemType),
-			Id:       req.ItemID,
+			ContainerType: pb.ContainerType(req.ContainerType),
+			Id:            req.ItemID,
 		},
 	}
 	return gmCall(ctx, req.PlayerID, pb.GameAdminService_ItemRotate_FullMethodName, callReq, &pb.ItemRotateResp{})
@@ -98,7 +98,7 @@ func (this *gmItemLogic) ItemSort(req dto.GmItemSortReq) error {
 
 	callReq := &pb.GmItemSortReq{
 		PlayerId: req.PlayerID,
-		Req:      &pb.ItemSortReq{ItemType: pb.ItemType(req.ItemType)},
+		Req:      &pb.ItemSortReq{ContainerType: pb.ContainerType(req.ContainerType)},
 	}
 	return gmCall(ctx, req.PlayerID, pb.GameAdminService_ItemSort_FullMethodName, callReq, &pb.ItemSortResp{})
 }
@@ -111,8 +111,8 @@ func (this *gmItemLogic) ItemTransfer(req dto.GmItemTransferReq) ([]dto.GmItemRe
 	callReq := &pb.GmItemTransferReq{
 		PlayerId: req.PlayerID,
 		Req: &pb.ItemTransferReq{
-			FromType: pb.ItemType(req.FromType),
-			ToType:   pb.ItemType(req.ToType),
+			FromType: pb.ContainerType(req.FromType),
+			ToType:   pb.ContainerType(req.ToType),
 			Id:       req.ItemID,
 			ToX:      req.ToX,
 			ToY:      req.ToY,
@@ -139,13 +139,13 @@ func (this *gmItemLogic) ItemAddEntry(req dto.GmItemAddEntryReq) ([]dto.GmItemRe
 	defer cancel()
 
 	callReq := &pb.GmItemAddEntryReq{
-		PlayerId: req.PlayerID,
-		ItemType: req.ItemType,
-		CfgId:    req.ItemCfgID,
-		Count:    req.Count,
-		GridX:    req.GridX,
-		GridY:    req.GridY,
-		Rotated:  req.Rotated,
+		PlayerId:      req.PlayerID,
+		ContainerType: req.ContainerType,
+		CfgId:         req.ItemCfgID,
+		Count:         req.Count,
+		GridX:         req.GridX,
+		GridY:         req.GridY,
+		Rotated:       req.Rotated,
 	}
 	resp := &pb.ItemContainerListResp{}
 	if err := gmCall(ctx, req.PlayerID, pb.GameAdminService_ItemAddEntry_FullMethodName, callReq, resp); err != nil {
@@ -190,11 +190,11 @@ func toGmItemResp(playerID int64, e *pb.ItemContainer) dto.GmItemResp {
 		items = append(items, row)
 	}
 	return dto.GmItemResp{
-		PlayerID: playerID,
-		ItemType: int32(e.GetType()),
-		GridW:    e.GetGridW(),
-		GridH:    e.GetGridH(),
-		Version:  e.GetVersion(),
-		Items:    items,
+		PlayerID:      playerID,
+		ContainerType: int32(e.GetType()),
+		GridW:         e.GetGridW(),
+		GridH:         e.GetGridH(),
+		Version:       e.GetVersion(),
+		Items:         items,
 	}
 }

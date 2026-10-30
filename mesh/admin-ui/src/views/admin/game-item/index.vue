@@ -5,7 +5,7 @@
         <div class="card-header">
           <span>{{ $t('admin.gameItem.title') }}</span>
           <span v-if="itemContainer.loaded" class="grid-size">
-            {{ itemTypeLabel(query.itemType) }} ·
+            {{ containerTypeLabel(query.containerType) }} ·
             {{ $t('admin.gameItem.gridSize') }} {{ itemContainer.gridW }} × {{ itemContainer.gridH }}
           </span>
           <span class="hint">{{ $t('admin.gameItem.hint') }}</span>
@@ -21,8 +21,8 @@
             style="width: 200px"
           />
         </el-form-item>
-        <el-form-item :label="$t('admin.gameItem.itemType')">
-          <el-select v-model="query.itemType" style="width: 140px">
+        <el-form-item :label="$t('admin.gameItem.containerType')">
+          <el-select v-model="query.containerType" style="width: 140px">
             <el-option :label="$t('admin.gameItem.backpack')" :value="1" />
             <el-option :label="$t('admin.gameItem.stash')" :value="2" />
             <el-option :label="$t('admin.gameItem.secure')" :value="3" />
@@ -119,14 +119,14 @@
           {{ transferDialog.name }}
         </el-form-item>
         <el-form-item :label="$t('admin.gameItem.fromType')">
-          {{ itemTypeLabel(query.itemType) }}
+          {{ containerTypeLabel(query.containerType) }}
         </el-form-item>
         <el-form-item :label="$t('admin.gameItem.toType')">
           <el-select v-model="transferDialog.toType" style="width: 140px">
             <el-option
-              v-for="t in [1, 2, 3].filter(t => t !== query.itemType)"
+              v-for="t in [1, 2, 3].filter(t => t !== query.containerType)"
               :key="t"
-              :label="itemTypeLabel(t)"
+              :label="containerTypeLabel(t)"
               :value="t"
             />
           </el-select>
@@ -214,7 +214,7 @@ const RARITY_COLORS: Record<number, string> = {
 
 const query = reactive({
   playerId: '',
-  itemType: 1
+  containerType: 1
 })
 
 const loading = ref(false)
@@ -348,7 +348,7 @@ const dropValid = computed(() => {
 const itemTitle = (item: GmItemEntry) =>
   `${item.name || '#' + item.itemCfgId} x${item.count ?? 0} (${item.gridX}, ${item.gridY})`
 
-const itemTypeLabel = (type: number) => {
+const containerTypeLabel = (type: number) => {
   switch (type) {
     case 1:
       return t('admin.gameItem.backpack')
@@ -367,7 +367,7 @@ const playerIdOrZero = () => {
 }
 
 const applyItemContainers = (list?: GmItem[]) => {
-  const current = (list ?? []).find(c => c.itemType === query.itemType)
+  const current = (list ?? []).find(c => c.containerType === query.containerType)
   if (!current) return
   itemContainer.gridW = current.gridW ?? 0
   itemContainer.gridH = current.gridH ?? 0
@@ -383,7 +383,7 @@ const loadItemContainer = async() => {
   }
   loading.value = true
   // The interceptor has already reported any failure; null means we stop here.
-  const res = await listGmItem({ playerId, itemType: query.itemType }).catch(() => null)
+  const res = await listGmItem({ playerId, containerType: query.containerType }).catch(() => null)
   loading.value = false
   if (!res) return
   applyItemContainers(res.data)
@@ -393,7 +393,7 @@ const sortItemContainer = async() => {
   const playerId = playerIdOrZero()
   if (!playerId) return
   sorting.value = true
-  const res = await sortGmItem({ playerId, itemType: query.itemType }).catch(() => null)
+  const res = await sortGmItem({ playerId, containerType: query.containerType }).catch(() => null)
   sorting.value = false
   if (!res) return
   msgSuccess(t('admin.gameItem.sortOk'))
@@ -437,7 +437,7 @@ const onPointerUp = () => {
   if (!playerId) return
   moveGmItem({
     playerId,
-    itemType: query.itemType,
+    containerType: query.containerType,
     itemId: item.itemId ?? '',
     toX,
     toY,
@@ -485,7 +485,7 @@ const rotateItem = async() => {
   rotating.value = true
   const res = await rotateGmItem({
     playerId,
-    itemType: query.itemType,
+    containerType: query.containerType,
     itemId: item.itemId ?? ''
   }).catch(() => null)
   rotating.value = false
@@ -500,7 +500,7 @@ const openTransfer = () => {
   if (!item) return
   transferDialog.name = item.name || `#${item.itemCfgId}`
   transferDialog.itemId = item.itemId ?? ''
-  transferDialog.toType = query.itemType === 1 ? 2 : 1
+  transferDialog.toType = query.containerType === 1 ? 2 : 1
   transferDialog.toX = 0
   transferDialog.toY = 0
   transferDialog.rotated = item.rotated ?? false
@@ -514,7 +514,7 @@ const submitTransfer = async() => {
   transferDialog.loading = true
   const res = await transferGmItem({
     playerId,
-    fromType: query.itemType,
+    fromType: query.containerType,
     toType: transferDialog.toType,
     itemId: transferDialog.itemId,
     toX: transferDialog.toX,
@@ -562,7 +562,7 @@ const submitAdd = async() => {
   addDialog.loading = true
   const res = await addGmItem({
     playerId,
-    itemType: query.itemType,
+    containerType: query.containerType,
     itemCfgId: addDialog.itemCfgId,
     count: addDialog.count,
     gridX: addDialog.gridX,

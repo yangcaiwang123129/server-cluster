@@ -17,6 +17,8 @@ type GmWeaponLogic interface {
 	WeaponAdd(req dto.GmWeaponAddReq) (*dto.GmWeaponEntry, error)
 	// WeaponUpdate 更新武器
 	WeaponUpdate(req dto.GmWeaponUpdateReq) (*dto.GmWeaponEntry, error)
+	// WeaponUpgrade 武器升级（消耗物品）
+	WeaponUpgrade(req dto.GmUpgradeReq) (*dto.GmUpgradeResp, error)
 }
 
 // gmWeaponLogicInst 武器 GM 业务单例容器。
@@ -89,6 +91,19 @@ func (this *gmWeaponLogic) WeaponUpdate(req dto.GmWeaponUpdateReq) (*dto.GmWeapo
 	}
 	entry := toGmWeaponEntry(resp.GetWeaponEntry())
 	return &entry, nil
+}
+
+// WeaponUpgrade 武器升级（消耗物品）。
+func (this *gmWeaponLogic) WeaponUpgrade(req dto.GmUpgradeReq) (*dto.GmUpgradeResp, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), rpcTimeout)
+	defer cancel()
+
+	resp := &pb.WeaponUpgradeResp{}
+	callReq := &pb.GmWeaponUpgradeReq{PlayerId: req.PlayerID, WeaponId: req.CfgID}
+	if err := gmCall(ctx, req.PlayerID, pb.GameAdminService_WeaponUpgrade_FullMethodName, callReq, resp); err != nil {
+		return nil, err
+	}
+	return toGmUpgradeResp(resp.GetWeaponEntry().GetCfgId(), resp.GetWeaponEntry().GetLevel(), resp.GetAttribute()), nil
 }
 
 // toGmWeaponEntry 武器条目转响应。

@@ -173,6 +173,9 @@ definitions:
     type: object
   dto.GmItemAddEntryReq:
     properties:
+      containerType:
+        description: 物品容器类型：1 背包 2 仓库 3 保险箱
+        type: integer
       count:
         description: 堆叠数量
         type: integer
@@ -185,9 +188,6 @@ definitions:
       itemCfgId:
         description: 物品配置ID
         type: integer
-      itemType:
-        description: 物品容器类型：1 背包 2 仓库 3 保险箱
-        type: integer
       playerId:
         description: 玩家ID
         type: integer
@@ -197,13 +197,13 @@ definitions:
     type: object
   dto.GmItemMoveReq:
     properties:
+      containerType:
+        description: 物品容器类型
+        type: integer
       itemId:
         description: 物品实例ID（雪花，按字符串接收）
         example: "0"
         type: string
-      itemType:
-        description: 物品容器类型
-        type: integer
       playerId:
         description: 玩家ID
         type: integer
@@ -219,20 +219,20 @@ definitions:
     type: object
   dto.GmItemRotateReq:
     properties:
+      containerType:
+        description: 物品容器类型
+        type: integer
       itemId:
         description: 物品实例ID（雪花，按字符串接收）
         example: "0"
         type: string
-      itemType:
-        description: 物品容器类型
-        type: integer
       playerId:
         description: 玩家ID
         type: integer
     type: object
   dto.GmItemSortReq:
     properties:
-      itemType:
+      containerType:
         description: 物品容器类型
         type: integer
       playerId:
@@ -286,6 +286,15 @@ definitions:
         type: integer
       skillId:
         description: 技能配置ID
+        type: integer
+    type: object
+  dto.GmUpgradeReq:
+    properties:
+      cfgId:
+        description: 配置ID
+        type: integer
+      playerId:
+        description: 玩家ID
         type: integer
     type: object
   dto.GmWeaponAddReq:
@@ -1267,6 +1276,25 @@ paths:
       summary: GM 更新装备
       tags:
       - gm
+  /api/v1/gm/equip/upgrade:
+    post:
+      parameters:
+      - description: 升级参数
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GmUpgradeReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 响应包在 {code, message, data} 中
+          schema:
+            $ref: '#/definitions/dto.Resp'
+      summary: GM 装备升级
+      tags:
+      - gm
   /api/v1/gm/hero:
     get:
       parameters:
@@ -1321,6 +1349,47 @@ paths:
       summary: GM 更新英雄
       tags:
       - gm
+  /api/v1/gm/hero/attribute:
+    get:
+      parameters:
+      - description: 玩家ID
+        in: query
+        name: playerId
+        required: true
+        type: integer
+      - description: 英雄配置ID（0 表示出战英雄）
+        in: query
+        name: heroId
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 响应包在 {code, message, data} 中
+          schema:
+            $ref: '#/definitions/dto.Resp'
+      summary: GM 英雄累计属性
+      tags:
+      - gm
+  /api/v1/gm/hero/upgrade:
+    post:
+      parameters:
+      - description: 升级参数
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GmUpgradeReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 响应包在 {code, message, data} 中
+          schema:
+            $ref: '#/definitions/dto.Resp'
+      summary: GM 英雄升级
+      tags:
+      - gm
   /api/v1/gm/item:
     get:
       parameters:
@@ -1331,7 +1400,7 @@ paths:
         type: integer
       - description: 物品容器类型 0全部 1背包 2仓库 3保险箱
         in: query
-        name: itemType
+        name: containerType
         type: integer
       produces:
       - application/json
@@ -1599,6 +1668,25 @@ paths:
       summary: GM 更新技能
       tags:
       - gm
+  /api/v1/gm/skill/upgrade:
+    post:
+      parameters:
+      - description: 升级参数
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GmUpgradeReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 响应包在 {code, message, data} 中
+          schema:
+            $ref: '#/definitions/dto.Resp'
+      summary: GM 技能升级
+      tags:
+      - gm
   /api/v1/gm/weapon:
     get:
       parameters:
@@ -1651,6 +1739,25 @@ paths:
           schema:
             $ref: '#/definitions/dto.Resp'
       summary: GM 更新武器
+      tags:
+      - gm
+  /api/v1/gm/weapon/upgrade:
+    post:
+      parameters:
+      - description: 升级参数
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GmUpgradeReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 响应包在 {code, message, data} 中
+          schema:
+            $ref: '#/definitions/dto.Resp'
+      summary: GM 武器升级
       tags:
       - gm
   /api/v1/login:

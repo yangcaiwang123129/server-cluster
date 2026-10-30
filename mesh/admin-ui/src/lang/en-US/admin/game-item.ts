@@ -9,7 +9,7 @@ export default {
   playerId: 'Player ID',
   playerIdPlaceholder: 'Enter a player ID',
   playerIdInvalid: 'Enter a valid player ID',
-  itemType: 'Container',
+  containerType: 'Container',
   backpack: 'Backpack',
   stash: 'Stash',
   secure: 'Secure',

@@ -17,6 +17,8 @@ type GmEquipLogic interface {
 	EquipAdd(req dto.GmEquipAddReq) (*dto.GmEquipEntry, error)
 	// EquipUpdate 更新装备
 	EquipUpdate(req dto.GmEquipUpdateReq) (*dto.GmEquipEntry, error)
+	// EquipUpgrade 装备升级（消耗物品）
+	EquipUpgrade(req dto.GmUpgradeReq) (*dto.GmUpgradeResp, error)
 }
 
 // gmEquipLogicInst 装备 GM 业务单例容器。
@@ -88,6 +90,19 @@ func (this *gmEquipLogic) EquipUpdate(req dto.GmEquipUpdateReq) (*dto.GmEquipEnt
 	}
 	entry := toGmEquipEntry(resp.GetEquipEntry())
 	return &entry, nil
+}
+
+// EquipUpgrade 装备升级（消耗物品）。
+func (this *gmEquipLogic) EquipUpgrade(req dto.GmUpgradeReq) (*dto.GmUpgradeResp, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), rpcTimeout)
+	defer cancel()
+
+	resp := &pb.EquipUpgradeResp{}
+	callReq := &pb.GmEquipUpgradeReq{PlayerId: req.PlayerID, EquipId: req.CfgID}
+	if err := gmCall(ctx, req.PlayerID, pb.GameAdminService_EquipUpgrade_FullMethodName, callReq, resp); err != nil {
+		return nil, err
+	}
+	return toGmUpgradeResp(resp.GetEquipEntry().GetCfgId(), resp.GetEquipEntry().GetLevel(), resp.GetAttribute()), nil
 }
 
 // toGmEquipEntry 装备条目转响应。

@@ -32,15 +32,20 @@ const (
 	GameAdminService_HeroList_FullMethodName         = "/internal.GameAdminService/HeroList"
 	GameAdminService_HeroAdd_FullMethodName          = "/internal.GameAdminService/HeroAdd"
 	GameAdminService_HeroUpdate_FullMethodName       = "/internal.GameAdminService/HeroUpdate"
+	GameAdminService_HeroAttribute_FullMethodName    = "/internal.GameAdminService/HeroAttribute"
+	GameAdminService_HeroUpgrade_FullMethodName      = "/internal.GameAdminService/HeroUpgrade"
 	GameAdminService_WeaponList_FullMethodName       = "/internal.GameAdminService/WeaponList"
 	GameAdminService_WeaponAdd_FullMethodName        = "/internal.GameAdminService/WeaponAdd"
 	GameAdminService_WeaponUpdate_FullMethodName     = "/internal.GameAdminService/WeaponUpdate"
+	GameAdminService_WeaponUpgrade_FullMethodName    = "/internal.GameAdminService/WeaponUpgrade"
 	GameAdminService_SkillList_FullMethodName        = "/internal.GameAdminService/SkillList"
 	GameAdminService_SkillAdd_FullMethodName         = "/internal.GameAdminService/SkillAdd"
 	GameAdminService_SkillUpdate_FullMethodName      = "/internal.GameAdminService/SkillUpdate"
+	GameAdminService_SkillUpgrade_FullMethodName     = "/internal.GameAdminService/SkillUpgrade"
 	GameAdminService_EquipList_FullMethodName        = "/internal.GameAdminService/EquipList"
 	GameAdminService_EquipAdd_FullMethodName         = "/internal.GameAdminService/EquipAdd"
 	GameAdminService_EquipUpdate_FullMethodName      = "/internal.GameAdminService/EquipUpdate"
+	GameAdminService_EquipUpgrade_FullMethodName     = "/internal.GameAdminService/EquipUpgrade"
 )
 
 // GameAdminServiceClient is the client API for GameAdminService service.
@@ -71,24 +76,34 @@ type GameAdminServiceClient interface {
 	HeroAdd(ctx context.Context, in *GmHeroAddReq, opts ...grpc.CallOption) (*HeroAddResp, error)
 	// HeroUpdate 更新英雄
 	HeroUpdate(ctx context.Context, in *GmHeroUpdateReq, opts ...grpc.CallOption) (*HeroUpdateResp, error)
+	// HeroAttribute 查看英雄累计属性
+	HeroAttribute(ctx context.Context, in *GmHeroAttributeReq, opts ...grpc.CallOption) (*HeroAttributeResp, error)
+	// HeroUpgrade 英雄升级（消耗物品）
+	HeroUpgrade(ctx context.Context, in *GmHeroUpgradeReq, opts ...grpc.CallOption) (*HeroUpgradeResp, error)
 	// WeaponList 武器列表
 	WeaponList(ctx context.Context, in *GmWeaponListReq, opts ...grpc.CallOption) (*WeaponListResp, error)
 	// WeaponAdd 新增武器
 	WeaponAdd(ctx context.Context, in *GmWeaponAddReq, opts ...grpc.CallOption) (*WeaponAddResp, error)
 	// WeaponUpdate 更新武器
 	WeaponUpdate(ctx context.Context, in *GmWeaponUpdateReq, opts ...grpc.CallOption) (*WeaponUpdateResp, error)
+	// WeaponUpgrade 武器升级（消耗物品）
+	WeaponUpgrade(ctx context.Context, in *GmWeaponUpgradeReq, opts ...grpc.CallOption) (*WeaponUpgradeResp, error)
 	// SkillList 技能列表
 	SkillList(ctx context.Context, in *GmSkillListReq, opts ...grpc.CallOption) (*SkillListResp, error)
 	// SkillAdd 新增技能
 	SkillAdd(ctx context.Context, in *GmSkillAddReq, opts ...grpc.CallOption) (*SkillAddResp, error)
 	// SkillUpdate 更新技能
 	SkillUpdate(ctx context.Context, in *GmSkillUpdateReq, opts ...grpc.CallOption) (*SkillUpdateResp, error)
+	// SkillUpgrade 技能升级（消耗物品）
+	SkillUpgrade(ctx context.Context, in *GmSkillUpgradeReq, opts ...grpc.CallOption) (*SkillUpgradeResp, error)
 	// EquipList 装备列表
 	EquipList(ctx context.Context, in *GmEquipListReq, opts ...grpc.CallOption) (*EquipListResp, error)
 	// EquipAdd 新增装备
 	EquipAdd(ctx context.Context, in *GmEquipAddReq, opts ...grpc.CallOption) (*EquipAddResp, error)
 	// EquipUpdate 更新装备
 	EquipUpdate(ctx context.Context, in *GmEquipUpdateReq, opts ...grpc.CallOption) (*EquipUpdateResp, error)
+	// EquipUpgrade 装备升级（消耗物品）
+	EquipUpgrade(ctx context.Context, in *GmEquipUpgradeReq, opts ...grpc.CallOption) (*EquipUpgradeResp, error)
 }
 
 type gameAdminServiceClient struct {
@@ -209,6 +224,26 @@ func (c *gameAdminServiceClient) HeroUpdate(ctx context.Context, in *GmHeroUpdat
 	return out, nil
 }
 
+func (c *gameAdminServiceClient) HeroAttribute(ctx context.Context, in *GmHeroAttributeReq, opts ...grpc.CallOption) (*HeroAttributeResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HeroAttributeResp)
+	err := c.cc.Invoke(ctx, GameAdminService_HeroAttribute_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameAdminServiceClient) HeroUpgrade(ctx context.Context, in *GmHeroUpgradeReq, opts ...grpc.CallOption) (*HeroUpgradeResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HeroUpgradeResp)
+	err := c.cc.Invoke(ctx, GameAdminService_HeroUpgrade_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *gameAdminServiceClient) WeaponList(ctx context.Context, in *GmWeaponListReq, opts ...grpc.CallOption) (*WeaponListResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(WeaponListResp)
@@ -233,6 +268,16 @@ func (c *gameAdminServiceClient) WeaponUpdate(ctx context.Context, in *GmWeaponU
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(WeaponUpdateResp)
 	err := c.cc.Invoke(ctx, GameAdminService_WeaponUpdate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameAdminServiceClient) WeaponUpgrade(ctx context.Context, in *GmWeaponUpgradeReq, opts ...grpc.CallOption) (*WeaponUpgradeResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WeaponUpgradeResp)
+	err := c.cc.Invoke(ctx, GameAdminService_WeaponUpgrade_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -269,6 +314,16 @@ func (c *gameAdminServiceClient) SkillUpdate(ctx context.Context, in *GmSkillUpd
 	return out, nil
 }
 
+func (c *gameAdminServiceClient) SkillUpgrade(ctx context.Context, in *GmSkillUpgradeReq, opts ...grpc.CallOption) (*SkillUpgradeResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SkillUpgradeResp)
+	err := c.cc.Invoke(ctx, GameAdminService_SkillUpgrade_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *gameAdminServiceClient) EquipList(ctx context.Context, in *GmEquipListReq, opts ...grpc.CallOption) (*EquipListResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(EquipListResp)
@@ -293,6 +348,16 @@ func (c *gameAdminServiceClient) EquipUpdate(ctx context.Context, in *GmEquipUpd
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(EquipUpdateResp)
 	err := c.cc.Invoke(ctx, GameAdminService_EquipUpdate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameAdminServiceClient) EquipUpgrade(ctx context.Context, in *GmEquipUpgradeReq, opts ...grpc.CallOption) (*EquipUpgradeResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(EquipUpgradeResp)
+	err := c.cc.Invoke(ctx, GameAdminService_EquipUpgrade_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -327,24 +392,34 @@ type GameAdminServiceServer interface {
 	HeroAdd(context.Context, *GmHeroAddReq) (*HeroAddResp, error)
 	// HeroUpdate 更新英雄
 	HeroUpdate(context.Context, *GmHeroUpdateReq) (*HeroUpdateResp, error)
+	// HeroAttribute 查看英雄累计属性
+	HeroAttribute(context.Context, *GmHeroAttributeReq) (*HeroAttributeResp, error)
+	// HeroUpgrade 英雄升级（消耗物品）
+	HeroUpgrade(context.Context, *GmHeroUpgradeReq) (*HeroUpgradeResp, error)
 	// WeaponList 武器列表
 	WeaponList(context.Context, *GmWeaponListReq) (*WeaponListResp, error)
 	// WeaponAdd 新增武器
 	WeaponAdd(context.Context, *GmWeaponAddReq) (*WeaponAddResp, error)
 	// WeaponUpdate 更新武器
 	WeaponUpdate(context.Context, *GmWeaponUpdateReq) (*WeaponUpdateResp, error)
+	// WeaponUpgrade 武器升级（消耗物品）
+	WeaponUpgrade(context.Context, *GmWeaponUpgradeReq) (*WeaponUpgradeResp, error)
 	// SkillList 技能列表
 	SkillList(context.Context, *GmSkillListReq) (*SkillListResp, error)
 	// SkillAdd 新增技能
 	SkillAdd(context.Context, *GmSkillAddReq) (*SkillAddResp, error)
 	// SkillUpdate 更新技能
 	SkillUpdate(context.Context, *GmSkillUpdateReq) (*SkillUpdateResp, error)
+	// SkillUpgrade 技能升级（消耗物品）
+	SkillUpgrade(context.Context, *GmSkillUpgradeReq) (*SkillUpgradeResp, error)
 	// EquipList 装备列表
 	EquipList(context.Context, *GmEquipListReq) (*EquipListResp, error)
 	// EquipAdd 新增装备
 	EquipAdd(context.Context, *GmEquipAddReq) (*EquipAddResp, error)
 	// EquipUpdate 更新装备
 	EquipUpdate(context.Context, *GmEquipUpdateReq) (*EquipUpdateResp, error)
+	// EquipUpgrade 装备升级（消耗物品）
+	EquipUpgrade(context.Context, *GmEquipUpgradeReq) (*EquipUpgradeResp, error)
 	mustEmbedUnimplementedGameAdminServiceServer()
 }
 
@@ -388,6 +463,12 @@ func (UnimplementedGameAdminServiceServer) HeroAdd(context.Context, *GmHeroAddRe
 func (UnimplementedGameAdminServiceServer) HeroUpdate(context.Context, *GmHeroUpdateReq) (*HeroUpdateResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method HeroUpdate not implemented")
 }
+func (UnimplementedGameAdminServiceServer) HeroAttribute(context.Context, *GmHeroAttributeReq) (*HeroAttributeResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method HeroAttribute not implemented")
+}
+func (UnimplementedGameAdminServiceServer) HeroUpgrade(context.Context, *GmHeroUpgradeReq) (*HeroUpgradeResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method HeroUpgrade not implemented")
+}
 func (UnimplementedGameAdminServiceServer) WeaponList(context.Context, *GmWeaponListReq) (*WeaponListResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method WeaponList not implemented")
 }
@@ -396,6 +477,9 @@ func (UnimplementedGameAdminServiceServer) WeaponAdd(context.Context, *GmWeaponA
 }
 func (UnimplementedGameAdminServiceServer) WeaponUpdate(context.Context, *GmWeaponUpdateReq) (*WeaponUpdateResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method WeaponUpdate not implemented")
+}
+func (UnimplementedGameAdminServiceServer) WeaponUpgrade(context.Context, *GmWeaponUpgradeReq) (*WeaponUpgradeResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method WeaponUpgrade not implemented")
 }
 func (UnimplementedGameAdminServiceServer) SkillList(context.Context, *GmSkillListReq) (*SkillListResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method SkillList not implemented")
@@ -406,6 +490,9 @@ func (UnimplementedGameAdminServiceServer) SkillAdd(context.Context, *GmSkillAdd
 func (UnimplementedGameAdminServiceServer) SkillUpdate(context.Context, *GmSkillUpdateReq) (*SkillUpdateResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method SkillUpdate not implemented")
 }
+func (UnimplementedGameAdminServiceServer) SkillUpgrade(context.Context, *GmSkillUpgradeReq) (*SkillUpgradeResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method SkillUpgrade not implemented")
+}
 func (UnimplementedGameAdminServiceServer) EquipList(context.Context, *GmEquipListReq) (*EquipListResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method EquipList not implemented")
 }
@@ -414,6 +501,9 @@ func (UnimplementedGameAdminServiceServer) EquipAdd(context.Context, *GmEquipAdd
 }
 func (UnimplementedGameAdminServiceServer) EquipUpdate(context.Context, *GmEquipUpdateReq) (*EquipUpdateResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method EquipUpdate not implemented")
+}
+func (UnimplementedGameAdminServiceServer) EquipUpgrade(context.Context, *GmEquipUpgradeReq) (*EquipUpgradeResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method EquipUpgrade not implemented")
 }
 func (UnimplementedGameAdminServiceServer) mustEmbedUnimplementedGameAdminServiceServer() {}
 func (UnimplementedGameAdminServiceServer) testEmbeddedByValue()                          {}
@@ -634,6 +724,42 @@ func _GameAdminService_HeroUpdate_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GameAdminService_HeroAttribute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GmHeroAttributeReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameAdminServiceServer).HeroAttribute(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameAdminService_HeroAttribute_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameAdminServiceServer).HeroAttribute(ctx, req.(*GmHeroAttributeReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameAdminService_HeroUpgrade_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GmHeroUpgradeReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameAdminServiceServer).HeroUpgrade(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameAdminService_HeroUpgrade_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameAdminServiceServer).HeroUpgrade(ctx, req.(*GmHeroUpgradeReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _GameAdminService_WeaponList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GmWeaponListReq)
 	if err := dec(in); err != nil {
@@ -684,6 +810,24 @@ func _GameAdminService_WeaponUpdate_Handler(srv interface{}, ctx context.Context
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GameAdminServiceServer).WeaponUpdate(ctx, req.(*GmWeaponUpdateReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameAdminService_WeaponUpgrade_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GmWeaponUpgradeReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameAdminServiceServer).WeaponUpgrade(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameAdminService_WeaponUpgrade_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameAdminServiceServer).WeaponUpgrade(ctx, req.(*GmWeaponUpgradeReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -742,6 +886,24 @@ func _GameAdminService_SkillUpdate_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GameAdminService_SkillUpgrade_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GmSkillUpgradeReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameAdminServiceServer).SkillUpgrade(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameAdminService_SkillUpgrade_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameAdminServiceServer).SkillUpgrade(ctx, req.(*GmSkillUpgradeReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _GameAdminService_EquipList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GmEquipListReq)
 	if err := dec(in); err != nil {
@@ -792,6 +954,24 @@ func _GameAdminService_EquipUpdate_Handler(srv interface{}, ctx context.Context,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GameAdminServiceServer).EquipUpdate(ctx, req.(*GmEquipUpdateReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameAdminService_EquipUpgrade_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GmEquipUpgradeReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameAdminServiceServer).EquipUpgrade(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameAdminService_EquipUpgrade_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameAdminServiceServer).EquipUpgrade(ctx, req.(*GmEquipUpgradeReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -848,6 +1028,14 @@ var GameAdminService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _GameAdminService_HeroUpdate_Handler,
 		},
 		{
+			MethodName: "HeroAttribute",
+			Handler:    _GameAdminService_HeroAttribute_Handler,
+		},
+		{
+			MethodName: "HeroUpgrade",
+			Handler:    _GameAdminService_HeroUpgrade_Handler,
+		},
+		{
 			MethodName: "WeaponList",
 			Handler:    _GameAdminService_WeaponList_Handler,
 		},
@@ -858,6 +1046,10 @@ var GameAdminService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "WeaponUpdate",
 			Handler:    _GameAdminService_WeaponUpdate_Handler,
+		},
+		{
+			MethodName: "WeaponUpgrade",
+			Handler:    _GameAdminService_WeaponUpgrade_Handler,
 		},
 		{
 			MethodName: "SkillList",
@@ -872,6 +1064,10 @@ var GameAdminService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _GameAdminService_SkillUpdate_Handler,
 		},
 		{
+			MethodName: "SkillUpgrade",
+			Handler:    _GameAdminService_SkillUpgrade_Handler,
+		},
+		{
 			MethodName: "EquipList",
 			Handler:    _GameAdminService_EquipList_Handler,
 		},
@@ -882,6 +1078,10 @@ var GameAdminService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "EquipUpdate",
 			Handler:    _GameAdminService_EquipUpdate_Handler,
+		},
+		{
+			MethodName: "EquipUpgrade",
+			Handler:    _GameAdminService_EquipUpgrade_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

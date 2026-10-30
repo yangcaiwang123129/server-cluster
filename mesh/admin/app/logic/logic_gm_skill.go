@@ -17,6 +17,8 @@ type GmSkillLogic interface {
 	SkillAdd(req dto.GmSkillAddReq) (*dto.GmSkillEntry, error)
 	// SkillUpdate 更新技能
 	SkillUpdate(req dto.GmSkillUpdateReq) (*dto.GmSkillEntry, error)
+	// SkillUpgrade 技能升级（消耗物品）
+	SkillUpgrade(req dto.GmUpgradeReq) (*dto.GmUpgradeResp, error)
 }
 
 var gmSkillLogicInst = singleton.NewContainer[GmSkillLogic]("GmSkillLogic")
@@ -87,6 +89,19 @@ func (this *gmSkillLogic) SkillUpdate(req dto.GmSkillUpdateReq) (*dto.GmSkillEnt
 	}
 	entry := toGmSkillEntry(resp.GetSkillEntry())
 	return &entry, nil
+}
+
+// SkillUpgrade 技能升级（消耗物品）。
+func (this *gmSkillLogic) SkillUpgrade(req dto.GmUpgradeReq) (*dto.GmUpgradeResp, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), rpcTimeout)
+	defer cancel()
+
+	resp := &pb.SkillUpgradeResp{}
+	callReq := &pb.GmSkillUpgradeReq{PlayerId: req.PlayerID, SkillId: req.CfgID}
+	if err := gmCall(ctx, req.PlayerID, pb.GameAdminService_SkillUpgrade_FullMethodName, callReq, resp); err != nil {
+		return nil, err
+	}
+	return toGmUpgradeResp(resp.GetSkillEntry().GetCfgId(), resp.GetSkillEntry().GetLevel(), resp.GetAttribute()), nil
 }
 
 // toGmSkillEntry 技能条目转响应。

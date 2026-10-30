@@ -368,6 +368,112 @@ func (x *EquipUpdateResp) GetEquipEntry() *EquipEntry {
 	return nil
 }
 
+// 装备升级请求（路由 10054，消耗升级素材）
+type EquipUpgradeReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 装备配置ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EquipUpgradeReq) Reset() {
+	*x = EquipUpgradeReq{}
+	mi := &file_equip_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EquipUpgradeReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EquipUpgradeReq) ProtoMessage() {}
+
+func (x *EquipUpgradeReq) ProtoReflect() protoreflect.Message {
+	mi := &file_equip_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EquipUpgradeReq.ProtoReflect.Descriptor instead.
+func (*EquipUpgradeReq) Descriptor() ([]byte, []int) {
+	return file_equip_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *EquipUpgradeReq) GetCfgId() int32 {
+	if x != nil {
+		return x.CfgId
+	}
+	return 0
+}
+
+// 装备升级响应
+type EquipUpgradeResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	EquipEntry    *EquipEntry            `protobuf:"bytes,2,opt,name=equip_entry,json=equipEntry,proto3" json:"equip_entry,omitempty"` // 升级后的持有状态
+	Attribute     *HeroAttribute         `protobuf:"bytes,3,opt,name=attribute,proto3" json:"attribute,omitempty"`                     // 升级后的英雄累计属性
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EquipUpgradeResp) Reset() {
+	*x = EquipUpgradeResp{}
+	mi := &file_equip_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EquipUpgradeResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EquipUpgradeResp) ProtoMessage() {}
+
+func (x *EquipUpgradeResp) ProtoReflect() protoreflect.Message {
+	mi := &file_equip_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EquipUpgradeResp.ProtoReflect.Descriptor instead.
+func (*EquipUpgradeResp) Descriptor() ([]byte, []int) {
+	return file_equip_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *EquipUpgradeResp) GetResult() *Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
+func (x *EquipUpgradeResp) GetEquipEntry() *EquipEntry {
+	if x != nil {
+		return x.EquipEntry
+	}
+	return nil
+}
+
+func (x *EquipUpgradeResp) GetAttribute() *HeroAttribute {
+	if x != nil {
+		return x.Attribute
+	}
+	return nil
+}
+
 var File_equip_proto protoreflect.FileDescriptor
 
 const file_equip_proto_rawDesc = "" +
@@ -396,7 +502,15 @@ const file_equip_proto_rawDesc = "" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\x12/\n" +
 	"\vequip_entry\x18\x02 \x01(\v2\x0e.pb.EquipEntryR\n" +
-	"equipEntryB\x19Z\x17server-cluster/share/pbb\x06proto3"
+	"equipEntry\"(\n" +
+	"\x0fEquipUpgradeReq\x12\x15\n" +
+	"\x06cfg_id\x18\x01 \x01(\x05R\x05cfgId\"\x98\x01\n" +
+	"\x10EquipUpgradeResp\x12\"\n" +
+	"\x06result\x18\x01 \x01(\v2\n" +
+	".pb.ResultR\x06result\x12/\n" +
+	"\vequip_entry\x18\x02 \x01(\v2\x0e.pb.EquipEntryR\n" +
+	"equipEntry\x12/\n" +
+	"\tattribute\x18\x03 \x01(\v2\x11.pb.HeroAttributeR\tattributeB\x19Z\x17server-cluster/share/pbb\x06proto3"
 
 var (
 	file_equip_proto_rawDescOnce sync.Once
@@ -410,31 +524,37 @@ func file_equip_proto_rawDescGZIP() []byte {
 	return file_equip_proto_rawDescData
 }
 
-var file_equip_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_equip_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_equip_proto_goTypes = []any{
-	(*EquipListReq)(nil),    // 0: pb.EquipListReq
-	(*EquipListResp)(nil),   // 1: pb.EquipListResp
-	(*EquipNotify)(nil),     // 2: pb.EquipNotify
-	(*EquipAddReq)(nil),     // 3: pb.EquipAddReq
-	(*EquipAddResp)(nil),    // 4: pb.EquipAddResp
-	(*EquipUpdateReq)(nil),  // 5: pb.EquipUpdateReq
-	(*EquipUpdateResp)(nil), // 6: pb.EquipUpdateResp
-	(*Result)(nil),          // 7: pb.Result
-	(*EquipEntry)(nil),      // 8: pb.EquipEntry
+	(*EquipListReq)(nil),     // 0: pb.EquipListReq
+	(*EquipListResp)(nil),    // 1: pb.EquipListResp
+	(*EquipNotify)(nil),      // 2: pb.EquipNotify
+	(*EquipAddReq)(nil),      // 3: pb.EquipAddReq
+	(*EquipAddResp)(nil),     // 4: pb.EquipAddResp
+	(*EquipUpdateReq)(nil),   // 5: pb.EquipUpdateReq
+	(*EquipUpdateResp)(nil),  // 6: pb.EquipUpdateResp
+	(*EquipUpgradeReq)(nil),  // 7: pb.EquipUpgradeReq
+	(*EquipUpgradeResp)(nil), // 8: pb.EquipUpgradeResp
+	(*Result)(nil),           // 9: pb.Result
+	(*EquipEntry)(nil),       // 10: pb.EquipEntry
+	(*HeroAttribute)(nil),    // 11: pb.HeroAttribute
 }
 var file_equip_proto_depIdxs = []int32{
-	7, // 0: pb.EquipListResp.result:type_name -> pb.Result
-	8, // 1: pb.EquipListResp.equip_entries:type_name -> pb.EquipEntry
-	8, // 2: pb.EquipNotify.equip_entry:type_name -> pb.EquipEntry
-	7, // 3: pb.EquipAddResp.result:type_name -> pb.Result
-	8, // 4: pb.EquipAddResp.equip_entry:type_name -> pb.EquipEntry
-	7, // 5: pb.EquipUpdateResp.result:type_name -> pb.Result
-	8, // 6: pb.EquipUpdateResp.equip_entry:type_name -> pb.EquipEntry
-	7, // [7:7] is the sub-list for method output_type
-	7, // [7:7] is the sub-list for method input_type
-	7, // [7:7] is the sub-list for extension type_name
-	7, // [7:7] is the sub-list for extension extendee
-	0, // [0:7] is the sub-list for field type_name
+	9,  // 0: pb.EquipListResp.result:type_name -> pb.Result
+	10, // 1: pb.EquipListResp.equip_entries:type_name -> pb.EquipEntry
+	10, // 2: pb.EquipNotify.equip_entry:type_name -> pb.EquipEntry
+	9,  // 3: pb.EquipAddResp.result:type_name -> pb.Result
+	10, // 4: pb.EquipAddResp.equip_entry:type_name -> pb.EquipEntry
+	9,  // 5: pb.EquipUpdateResp.result:type_name -> pb.Result
+	10, // 6: pb.EquipUpdateResp.equip_entry:type_name -> pb.EquipEntry
+	9,  // 7: pb.EquipUpgradeResp.result:type_name -> pb.Result
+	10, // 8: pb.EquipUpgradeResp.equip_entry:type_name -> pb.EquipEntry
+	11, // 9: pb.EquipUpgradeResp.attribute:type_name -> pb.HeroAttribute
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_equip_proto_init() }
@@ -449,7 +569,7 @@ func file_equip_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_equip_proto_rawDesc), len(file_equip_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

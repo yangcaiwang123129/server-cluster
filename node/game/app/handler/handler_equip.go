@@ -15,6 +15,22 @@ func init() {
 	router.OnActor(pb.RouteCode_ROUTE_CODE_EQUIP_LIST, handleEquipList)
 	router.OnActor(pb.RouteCode_ROUTE_CODE_EQUIP_ADD, handleEquipAdd)
 	router.OnActor(pb.RouteCode_ROUTE_CODE_EQUIP_UPDATE, handleEquipUpdate)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_EQUIP_UPGRADE, handleEquipUpgrade)
+}
+
+// handleEquipUpgrade 装备升级（消耗物品）。
+func handleEquipUpgrade(ctx node.Context) {
+	req := &pb.EquipUpgradeReq{}
+	if err := ctx.Parse(req); err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	resp, err := logic.Equip().EquipUpgrade(ctx.Context(), ctx.UID(), req)
+	if err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	_ = ctx.Response(resp)
 }
 
 // handleEquipList 装备列表。

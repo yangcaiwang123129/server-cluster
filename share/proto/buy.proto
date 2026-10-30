@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package pb;
+
+import "common.proto";
+
+option go_package = "server-cluster/share/pb";
+
+// 购买礼包请求（路由 10060）
+message GiftBuyReq {
+  int32 cfg_id = 1; // 礼包配置ID（GiftCfg.Id）
+}
+
+// 购买礼包响应
+message GiftBuyResp {
+  Result result = 1;
+  repeated AssetEntry costs = 2;    // 实际消耗的资产
+  repeated AssetEntry rewards = 3;  // 实际发放的奖励
+}

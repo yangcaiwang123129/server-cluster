@@ -368,6 +368,112 @@ func (x *SkillUpdateResp) GetSkillEntry() *SkillEntry {
 	return nil
 }
 
+// 技能升级请求（路由 10044，消耗升级素材）
+type SkillUpgradeReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 技能配置ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SkillUpgradeReq) Reset() {
+	*x = SkillUpgradeReq{}
+	mi := &file_skill_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SkillUpgradeReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SkillUpgradeReq) ProtoMessage() {}
+
+func (x *SkillUpgradeReq) ProtoReflect() protoreflect.Message {
+	mi := &file_skill_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SkillUpgradeReq.ProtoReflect.Descriptor instead.
+func (*SkillUpgradeReq) Descriptor() ([]byte, []int) {
+	return file_skill_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *SkillUpgradeReq) GetCfgId() int32 {
+	if x != nil {
+		return x.CfgId
+	}
+	return 0
+}
+
+// 技能升级响应
+type SkillUpgradeResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	SkillEntry    *SkillEntry            `protobuf:"bytes,2,opt,name=skill_entry,json=skillEntry,proto3" json:"skill_entry,omitempty"` // 升级后的持有状态
+	Attribute     *HeroAttribute         `protobuf:"bytes,3,opt,name=attribute,proto3" json:"attribute,omitempty"`                     // 升级后的英雄累计属性
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SkillUpgradeResp) Reset() {
+	*x = SkillUpgradeResp{}
+	mi := &file_skill_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SkillUpgradeResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SkillUpgradeResp) ProtoMessage() {}
+
+func (x *SkillUpgradeResp) ProtoReflect() protoreflect.Message {
+	mi := &file_skill_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SkillUpgradeResp.ProtoReflect.Descriptor instead.
+func (*SkillUpgradeResp) Descriptor() ([]byte, []int) {
+	return file_skill_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *SkillUpgradeResp) GetResult() *Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
+func (x *SkillUpgradeResp) GetSkillEntry() *SkillEntry {
+	if x != nil {
+		return x.SkillEntry
+	}
+	return nil
+}
+
+func (x *SkillUpgradeResp) GetAttribute() *HeroAttribute {
+	if x != nil {
+		return x.Attribute
+	}
+	return nil
+}
+
 var File_skill_proto protoreflect.FileDescriptor
 
 const file_skill_proto_rawDesc = "" +
@@ -396,7 +502,15 @@ const file_skill_proto_rawDesc = "" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\x12/\n" +
 	"\vskill_entry\x18\x02 \x01(\v2\x0e.pb.SkillEntryR\n" +
-	"skillEntryB\x19Z\x17server-cluster/share/pbb\x06proto3"
+	"skillEntry\"(\n" +
+	"\x0fSkillUpgradeReq\x12\x15\n" +
+	"\x06cfg_id\x18\x01 \x01(\x05R\x05cfgId\"\x98\x01\n" +
+	"\x10SkillUpgradeResp\x12\"\n" +
+	"\x06result\x18\x01 \x01(\v2\n" +
+	".pb.ResultR\x06result\x12/\n" +
+	"\vskill_entry\x18\x02 \x01(\v2\x0e.pb.SkillEntryR\n" +
+	"skillEntry\x12/\n" +
+	"\tattribute\x18\x03 \x01(\v2\x11.pb.HeroAttributeR\tattributeB\x19Z\x17server-cluster/share/pbb\x06proto3"
 
 var (
 	file_skill_proto_rawDescOnce sync.Once
@@ -410,31 +524,37 @@ func file_skill_proto_rawDescGZIP() []byte {
 	return file_skill_proto_rawDescData
 }
 
-var file_skill_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_skill_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_skill_proto_goTypes = []any{
-	(*SkillListReq)(nil),    // 0: pb.SkillListReq
-	(*SkillListResp)(nil),   // 1: pb.SkillListResp
-	(*SkillNotify)(nil),     // 2: pb.SkillNotify
-	(*SkillAddReq)(nil),     // 3: pb.SkillAddReq
-	(*SkillAddResp)(nil),    // 4: pb.SkillAddResp
-	(*SkillUpdateReq)(nil),  // 5: pb.SkillUpdateReq
-	(*SkillUpdateResp)(nil), // 6: pb.SkillUpdateResp
-	(*Result)(nil),          // 7: pb.Result
-	(*SkillEntry)(nil),      // 8: pb.SkillEntry
+	(*SkillListReq)(nil),     // 0: pb.SkillListReq
+	(*SkillListResp)(nil),    // 1: pb.SkillListResp
+	(*SkillNotify)(nil),      // 2: pb.SkillNotify
+	(*SkillAddReq)(nil),      // 3: pb.SkillAddReq
+	(*SkillAddResp)(nil),     // 4: pb.SkillAddResp
+	(*SkillUpdateReq)(nil),   // 5: pb.SkillUpdateReq
+	(*SkillUpdateResp)(nil),  // 6: pb.SkillUpdateResp
+	(*SkillUpgradeReq)(nil),  // 7: pb.SkillUpgradeReq
+	(*SkillUpgradeResp)(nil), // 8: pb.SkillUpgradeResp
+	(*Result)(nil),           // 9: pb.Result
+	(*SkillEntry)(nil),       // 10: pb.SkillEntry
+	(*HeroAttribute)(nil),    // 11: pb.HeroAttribute
 }
 var file_skill_proto_depIdxs = []int32{
-	7, // 0: pb.SkillListResp.result:type_name -> pb.Result
-	8, // 1: pb.SkillListResp.skill_entries:type_name -> pb.SkillEntry
-	8, // 2: pb.SkillNotify.skill_entry:type_name -> pb.SkillEntry
-	7, // 3: pb.SkillAddResp.result:type_name -> pb.Result
-	8, // 4: pb.SkillAddResp.skill_entry:type_name -> pb.SkillEntry
-	7, // 5: pb.SkillUpdateResp.result:type_name -> pb.Result
-	8, // 6: pb.SkillUpdateResp.skill_entry:type_name -> pb.SkillEntry
-	7, // [7:7] is the sub-list for method output_type
-	7, // [7:7] is the sub-list for method input_type
-	7, // [7:7] is the sub-list for extension type_name
-	7, // [7:7] is the sub-list for extension extendee
-	0, // [0:7] is the sub-list for field type_name
+	9,  // 0: pb.SkillListResp.result:type_name -> pb.Result
+	10, // 1: pb.SkillListResp.skill_entries:type_name -> pb.SkillEntry
+	10, // 2: pb.SkillNotify.skill_entry:type_name -> pb.SkillEntry
+	9,  // 3: pb.SkillAddResp.result:type_name -> pb.Result
+	10, // 4: pb.SkillAddResp.skill_entry:type_name -> pb.SkillEntry
+	9,  // 5: pb.SkillUpdateResp.result:type_name -> pb.Result
+	10, // 6: pb.SkillUpdateResp.skill_entry:type_name -> pb.SkillEntry
+	9,  // 7: pb.SkillUpgradeResp.result:type_name -> pb.Result
+	10, // 8: pb.SkillUpgradeResp.skill_entry:type_name -> pb.SkillEntry
+	11, // 9: pb.SkillUpgradeResp.attribute:type_name -> pb.HeroAttribute
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_skill_proto_init() }
@@ -449,7 +569,7 @@ func file_skill_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_skill_proto_rawDesc), len(file_skill_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

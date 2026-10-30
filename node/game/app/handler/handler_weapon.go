@@ -15,6 +15,7 @@ func init() {
 	router.OnActor(pb.RouteCode_ROUTE_CODE_WEAPON_LIST, handleWeaponList)
 	router.OnActor(pb.RouteCode_ROUTE_CODE_WEAPON_ADD, handleWeaponAdd)
 	router.OnActor(pb.RouteCode_ROUTE_CODE_WEAPON_UPDATE, handleWeaponUpdate)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_WEAPON_UPGRADE, handleWeaponUpgrade)
 }
 
 // handleWeaponList 武器列表。
@@ -55,6 +56,21 @@ func handleWeaponUpdate(ctx node.Context) {
 		return
 	}
 	resp, err := logic.Weapon().WeaponUpdate(ctx.Context(), ctx.UID(), req)
+	if err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	_ = ctx.Response(resp)
+}
+
+// handleWeaponUpgrade 武器升级（消耗物品）。
+func handleWeaponUpgrade(ctx node.Context) {
+	req := &pb.WeaponUpgradeReq{}
+	if err := ctx.Parse(req); err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	resp, err := logic.Weapon().WeaponUpgrade(ctx.Context(), ctx.UID(), req)
 	if err != nil {
 		_ = ctx.Response(err)
 		return
