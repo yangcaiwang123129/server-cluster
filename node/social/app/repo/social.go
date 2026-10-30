@@ -14,7 +14,6 @@ type SocialRepo interface {
 
 var socialRepo = singleton.NewContainer[SocialRepo]("SocialRepo")
 
-// init 装配期自注册实现。
 func init() {
 	socialRepo.Register(NewSocialRepo())
 }

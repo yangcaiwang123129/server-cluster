@@ -21,7 +21,6 @@ type heroLogic struct{}
 
 var heroLogicInst = singleton.NewContainer[global.HeroLogic]("HeroLogic")
 
-// init 装配期自注册实现。
 func init() {
 	heroLogicInst.Register(&heroLogic{})
 }

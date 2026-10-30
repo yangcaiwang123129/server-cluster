@@ -31,7 +31,6 @@ func GmHero() GmHeroLogic { return gmHeroLogicInst.MustGet() }
 // gmHeroLogic 英雄 GM 业务实现。
 type gmHeroLogic struct{}
 
-// init 装配期自注册实现。
 func init() {
 	RegisterGmHeroLogic(&gmHeroLogic{})
 }

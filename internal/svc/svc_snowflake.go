@@ -36,7 +36,14 @@ func (this *Snowflake) Next() int64 {
 	this.mu.Lock()
 	defer this.mu.Unlock()
 	now := time.Now().UnixMilli() - epochMilli
-	if now == this.last {
+	switch {
+	case now < this.last:
+		// 时钟回拨（如 NTP 校时）：等待时钟追平，避免生成重复 ID。
+		for now <= this.last {
+			now = time.Now().UnixMilli() - epochMilli
+		}
+		this.seq = 0
+	case now == this.last:
 		this.seq = (this.seq + 1) & maxSeq
 		if this.seq == 0 {
 			// 序列耗尽，自旋到下一毫秒。
@@ -44,7 +51,7 @@ func (this *Snowflake) Next() int64 {
 				now = time.Now().UnixMilli() - epochMilli
 			}
 		}
-	} else {
+	default:
 		this.seq = 0
 	}
 	this.last = now

@@ -10,7 +10,6 @@ type socialLogic struct{}
 
 var socialLogicInst = singleton.NewContainer[global.SocialLogic]("SocialLogic")
 
-// init 装配期自注册实现。
 func init() {
 	socialLogicInst.Register(&socialLogic{})
 }

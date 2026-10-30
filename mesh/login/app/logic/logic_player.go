@@ -4,10 +4,12 @@ package logic
 import (
 	"context"
 	"errors"
+	"strconv"
 
 	"server-cluster/internal/svc"
 	"server-cluster/mesh/login/app/global"
 	"server-cluster/mesh/login/app/repo"
+	"server-cluster/share/consts"
 	"server-cluster/share/dto"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
@@ -19,22 +21,18 @@ import (
 	"gorm.io/gorm"
 )
 
-// defaultGateAddr 未配置 etc.gate.addr 时的回退网关地址。
-const defaultGateAddr = "127.0.0.1:9000"
-
 // gateAddr 下发给客户端的网关地址，优先取 etc.gate.addr。
 func gateAddr() string {
 	if addr := etc.Get("etc.gate.addr").String(); addr != "" {
 		return addr
 	}
-	return defaultGateAddr
+	return consts.DefaultGateAddr
 }
 
 type playerBaseLogic struct{}
 
 var playerBaseLogicInst = singleton.NewContainer[global.PlayerLogic]("PlayerBaseLogic")
 
-// init 装配期自注册实现。
 func init() {
 	playerBaseLogicInst.Register(&playerBaseLogic{})
 }
@@ -64,8 +62,8 @@ func (this *playerBaseLogic) PlayerRegister(ctx context.Context, req *dto.Player
 	if err := repo.Repo().Save(ctx, m); err != nil {
 		return nil, err
 	}
-	// 注册成功后直接自动登录签发 token
-	token, err := svc.JWT().GenerateToken(jwt.Payload{svc.PayloadPlayerID: m.PlayerID})
+	// 注册成功后直接自动登录签发 token（player_id 以字符串写入，避免雪花 ID 经 float64 丢精度）
+	token, err := svc.JWT().GenerateToken(jwt.Payload{svc.PayloadPlayerID: strconv.FormatInt(m.PlayerID, 10)})
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +95,7 @@ func (this *playerBaseLogic) loginByUsername(ctx context.Context, req *dto.Playe
 	if err := bcrypt.CompareHashAndPassword([]byte(m.Password), []byte(req.Password)); err != nil {
 		return nil, errs.CodePasswordWrong.Err()
 	}
-	token, err := svc.JWT().GenerateToken(jwt.Payload{svc.PayloadPlayerID: m.PlayerID})
+	token, err := svc.JWT().GenerateToken(jwt.Payload{svc.PayloadPlayerID: strconv.FormatInt(m.PlayerID, 10)})
 	if err != nil {
 		return nil, err
 	}

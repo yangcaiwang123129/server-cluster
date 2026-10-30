@@ -13,7 +13,7 @@ func Init() error {
 	return nil
 }
 
-// Destroy 进程退出后释放 DB / Redis 等资源。
+// Destroy 进程退出后释放 DB / Redis 等资源，并按统一停服日志输出。
 func Destroy() {
-	_ = svc.Close()
+	svc.CloseWithLog("login")
 }

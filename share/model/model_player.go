@@ -24,7 +24,7 @@ func (this *PlayerBase) Unmarshal(data []byte) error { return json.Unmarshal(dat
 func (this *PlayerBase) Scan(src any) error          { return ScanJSON(src, this) }
 func (this PlayerBase) Value() (driver.Value, error) { return ValueJSON(this) }
 
-// PlayerExtra 玩家核心数值（1:1），热数据，对应 player_core 表。
+// PlayerExtra 玩家核心数值（1:1），热数据，对应 player_extra 表。
 type PlayerExtra struct {
 	PlayerID     int64  `gorm:"column:player_id;type:bigint;not null;primaryKey;comment:玩家ID" json:"player_id"`
 	Nickname     string `gorm:"column:nickname;type:varchar(64);not null;default:'';comment:昵称" json:"nickname"`

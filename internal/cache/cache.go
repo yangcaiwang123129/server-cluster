@@ -9,6 +9,8 @@ import (
 	"github.com/Yiling-J/theine-go"
 
 	"github.com/dobyte/due/v2/log"
+
+	"server-cluster/share/consts"
 )
 
 // CacheEntry 批量落库条目。
@@ -29,9 +31,9 @@ type Deleter[K comparable] func(ctx context.Context, keys []K) error
 // CacherConfig 存储配置；零值字段取默认值。
 type CacherConfig struct {
 	Name          string        // 实例名（日志标识）
-	MaxSize       int64         // LRU 最大条目数，默认 100000
-	TTL           time.Duration // 条目 TTL，默认 1m
-	FlushInterval time.Duration // 异步落库间隔，默认 200ms
+	MaxSize       int64         // LRU 最大条目数，默认 consts.CacheMaxSize
+	TTL           time.Duration // 条目 TTL，默认 consts.CacheTTL
+	FlushInterval time.Duration // 异步落库间隔，默认 consts.CacheFlushInterval
 }
 
 // Cache 泛型存储：theine LRU（内置 singleflight 回源防击穿）+ 异步批量写回。
@@ -60,13 +62,13 @@ type Cache[K comparable, V any] struct {
 // loader 必填；saver 为 nil 时写仅进缓存不落库；deleter 为 nil 时 Delete 仅逐出缓存。
 func NewCache[K comparable, V any](cfg CacherConfig, loader Loader[K, V], saver Saver[K, V], deleter Deleter[K]) *Cache[K, V] {
 	if cfg.MaxSize <= 0 {
-		cfg.MaxSize = 100000
+		cfg.MaxSize = consts.CacheMaxSize
 	}
 	if cfg.TTL <= 0 {
-		cfg.TTL = time.Minute
+		cfg.TTL = consts.CacheTTL
 	}
 	if cfg.FlushInterval <= 0 {
-		cfg.FlushInterval = 200 * time.Millisecond
+		cfg.FlushInterval = consts.CacheFlushInterval
 	}
 	cache, err := theine.NewBuilder[K, V](cfg.MaxSize).BuildWithLoader(
 		func(ctx context.Context, key K) (theine.Loaded[V], error) {
@@ -181,6 +183,16 @@ func (this *Cache[K, V]) FlushKey(ctx context.Context, key K) error {
 // Evict 仅逐出内存缓存，不落库也不删库（下线清理内存用）。
 func (this *Cache[K, V]) Evict(key K) {
 	this.cache.Delete(key)
+}
+
+// Name 返回缓存实例名（日志标识）。
+func (this *Cache[K, V]) Name() string { return this.name }
+
+// PendingLen 返回当前待落库条目数（停服日志展示用）。
+func (this *Cache[K, V]) PendingLen() int {
+	this.mu.Lock()
+	defer this.mu.Unlock()
+	return len(this.pending)
 }
 
 // Close 停止后台协程，剩余 pending 全部落库后释放缓存。

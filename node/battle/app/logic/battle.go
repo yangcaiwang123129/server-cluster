@@ -10,7 +10,6 @@ type battleLogic struct{}
 
 var battleLogicInst = singleton.NewContainer[global.BattleLogic]("BattleLogic")
 
-// init 装配期自注册实现。
 func init() {
 	battleLogicInst.Register(&battleLogic{})
 }

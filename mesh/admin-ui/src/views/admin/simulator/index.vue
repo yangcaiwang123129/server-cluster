@@ -239,7 +239,7 @@ const canRun = (key: StepKey) => {
   return false
 }
 
-const closeSession = async (silent = false) => {
+const closeSession = async(silent = false) => {
   if (!session.id) return
   const id = session.id
   session.id = ''
@@ -250,7 +250,7 @@ const closeSession = async (silent = false) => {
   if (!silent) ElMessage.success(t('admin.simulator.resetDone'))
 }
 
-const reset = async () => {
+const reset = async() => {
   await closeSession(true)
   session.playerId = 0
   session.token = ''
@@ -258,7 +258,7 @@ const reset = async () => {
   clearSteps(flow)
 }
 
-const runStep = async (key: StepKey): Promise<boolean> => {
+const runStep = async(key: StepKey): Promise<boolean> => {
   if (!canRun(key)) return false
 
   const state = steps[key]
@@ -329,14 +329,14 @@ const runStep = async (key: StepKey): Promise<boolean> => {
     }
     state.status = 'success'
     return true
-  } catch (error) {
+  } catch(error) {
     state.status = 'error'
     state.error = asReportedError(error).message
     return false
   }
 }
 
-const runFlow = async (keys: StepKey[], doneMessage: string) => {
+const runFlow = async(keys: StepKey[], doneMessage: string) => {
   if (runningAll.value) return
   if (!form.username.trim() || !form.password) {
     ElMessage.warning(t('admin.simulator.credentialsRequired'))
@@ -360,7 +360,7 @@ const runAll = () => runFlow(flow, t('admin.simulator.flowDone'))
 
 const runToLobby = () => runFlow(lobbyFlow, t('admin.simulator.lobbyDone'))
 
-const loadOptions = async () => {
+const loadOptions = async() => {
   const res = await getSimOptions().catch(() => null)
   if (!res?.data) return
   if (!form.loginAddr) form.loginAddr = res.data.loginAddr || ''

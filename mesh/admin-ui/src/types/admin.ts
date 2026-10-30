@@ -220,8 +220,14 @@ export interface PlayerQuery {
 export interface Player {
   playerId?: number
   username?: string
+  /** nickname from player_extra */
+  nickname?: string
   zone?: number
   phoneNumber?: number
+  /** currencies from player_asset */
+  coupon?: number
+  gold?: number
+  coin?: number
   createdAt?: number
 }
 

@@ -3,7 +3,6 @@ package logic
 import (
 	"context"
 	"errors"
-	"server-cluster/share/util"
 	"strconv"
 
 	"github.com/dobyte/due/v2/cluster"
@@ -17,10 +16,12 @@ import (
 	"server-cluster/internal/cache"
 	"server-cluster/internal/svc"
 	"server-cluster/node/game/app/global"
+	"server-cluster/share/consts"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
 	"server-cluster/share/singleton"
+	"server-cluster/share/util"
 )
 
 // actorKindPlayer 玩家 actor 类型。
@@ -32,7 +33,6 @@ type playerLogic struct {
 
 var playerLogicInst = singleton.NewContainer[global.PlayerLogic]("PlayerLogic")
 
-// init 装配期自注册实现。
 func init() {
 	playerLogicInst.Register(&playerLogic{PlayerActors: util.NewSafeMap[int64, *global.PlayerActor]()})
 }
@@ -49,21 +49,28 @@ func PlayerLogic() global.PlayerLogic { return playerLogicInst.MustGet() }
 // EnterGame 进入游戏：playerID 由 handler 层从 ctx.UID() 取得（首包 verify 已完成绑定）。
 // 先加载核心数据并驱动各玩家模块预热/建档，全部成功后才创建在线 actor。
 func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.EnterGameReq) (*pb.EnterGameResp, error) {
-	if _, err := global.PlayerCoreCache.Get(ctx, playerID); errors.Is(err, gorm.ErrRecordNotFound) {
+	core, err := global.PlayerExtraCache.Get(ctx, playerID)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
 		// 首次进入，建档并异步落库
-		global.PlayerCoreCache.Set(playerID, &model.PlayerExtra{
-			PlayerID: playerID,
-			Nickname: "player_" + strconv.FormatInt(playerID, 10),
-			Level:    1,
-			// settings_json 是 MySQL json 列，空字符串不是合法 JSON，必须显式给空对象
-			SettingsJSON: "{}",
-		})
+		core = &model.PlayerExtra{
+			PlayerID:     playerID,
+			Nickname:     consts.DefaultNicknamePrefix + strconv.FormatInt(playerID, 10),
+			Level:        consts.DefaultPlayerLevel,
+			SettingsJSON: consts.DefaultPlayerSettingsJSON,
+		}
+		global.PlayerExtraCache.Set(playerID, core)
 	} else if err != nil {
 		return nil, err
 	}
 
+	// 资产行可能尚未创建，读不到时按全 0 处理
+	assets, err := global.PlayerAssetCache.Get(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+
 	// 各玩家数据模块预热/建档，并把各自需要下发的初始状态合并进响应；任一失败则不进入游戏
-	resp := &pb.EnterGameResp{}
+	resp := &pb.EnterGameResp{PlayerMagicAttr: buildPlayerMagicAttr(core, assets)}
 	for _, mod := range moduleLogics() {
 		part, err := mod.EnterGame(ctx, playerID, req)
 		if err != nil {
@@ -95,6 +102,26 @@ func mergeEnterGameResp(dst, src *pb.EnterGameResp) {
 	}
 }
 
+// buildPlayerMagicAttr 组装下发给客户端的玩家属性表：
+// 昵称/等级/经验/vip 取自 player_extra，币/金取自 player_asset。
+// 键为 MagicAttr 枚举值，值按实际类型放入 ObjectValue。
+func buildPlayerMagicAttr(core *model.PlayerExtra, assets []*model.PlayerAsset) *pb.MagicAttrMap {
+	var coin, gold int64
+	for _, a := range assets {
+		coin += a.Coin
+		gold += a.Gold
+	}
+	return &pb.MagicAttrMap{Values: map[int32]*pb.ObjectValue{
+		int32(pb.MagicAttr_PLAYER_ATTR_NAME):      {Kind: &pb.ObjectValue_StringValue{StringValue: core.Nickname}},
+		int32(pb.MagicAttr_PLAYER_ATTR_LEVEL):     {Kind: &pb.ObjectValue_IntValue{IntValue: core.Level}},
+		int32(pb.MagicAttr_PLAYER_ATTR_EXP):       {Kind: &pb.ObjectValue_BigintValue{BigintValue: core.Exp}},
+		int32(pb.MagicAttr_PLAYER_ATTR_VIP_LEVEL): {Kind: &pb.ObjectValue_IntValue{IntValue: core.VipLevel}},
+		int32(pb.MagicAttr_PLAYER_ATTR_VIP_EXP):   {Kind: &pb.ObjectValue_BigintValue{BigintValue: core.VipExp}},
+		int32(pb.MagicAttr_PLAYER_ATTR_COIN):      {Kind: &pb.ObjectValue_BigintValue{BigintValue: coin}},
+		int32(pb.MagicAttr_PLAYER_ATTR_GOLD):      {Kind: &pb.ObjectValue_BigintValue{BigintValue: gold}},
+	}}
+}
+
 // LeaveGame 离开游戏：各模块待写数据同步落库并清缓存，再销毁玩家 actor。
 // 单个模块失败不阻断其余模块，返回首个错误。
 func (this *playerLogic) LeaveGame(ctx context.Context, playerID int64, req *pb.LeaveGameReq) (*pb.LeaveGameResp, error) {
@@ -116,7 +143,7 @@ func (this *playerLogic) LeaveGame(ctx context.Context, playerID int64, req *pb.
 	}
 	// 无独立模块的玩家表：账号、核心、资产
 	record("player_base", flushAndEvict(ctx, global.PlayerBaseCache, playerID))
-	record("player_core", flushAndEvict(ctx, global.PlayerCoreCache, playerID))
+	record("player_core", flushAndEvict(ctx, global.PlayerExtraCache, playerID))
 	record("player_asset", flushAndEvict(ctx, global.PlayerAssetCache, playerID))
 
 	record("player_actor", this.PlayerDestroyActor(ctx, playerID))

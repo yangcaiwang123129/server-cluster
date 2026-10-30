@@ -14,7 +14,6 @@ type BattleRepo interface {
 
 var battleRepo = singleton.NewContainer[BattleRepo]("BattleRepo")
 
-// init 装配期自注册实现。
 func init() {
 	battleRepo.Register(NewBattleRepo())
 }

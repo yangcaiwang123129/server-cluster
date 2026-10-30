@@ -31,8 +31,17 @@
         min-width="120"
         show-overflow-tooltip
       />
+      <el-table-column
+        :label="$t('admin.player.nickname')"
+        prop="nickname"
+        min-width="120"
+        show-overflow-tooltip
+      />
       <el-table-column :label="$t('admin.player.zone')" prop="zone" min-width="80" />
       <el-table-column :label="$t('admin.player.phoneNumber')" prop="phoneNumber" min-width="120" />
+      <el-table-column :label="$t('admin.player.coupon')" prop="coupon" min-width="100" />
+      <el-table-column :label="$t('admin.player.gold')" prop="gold" min-width="100" />
+      <el-table-column :label="$t('admin.player.coin')" prop="coin" min-width="100" />
       <el-table-column
         :label="$t('admin.player.createdAt')"
         prop="createdAt"

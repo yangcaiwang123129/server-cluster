@@ -31,7 +31,6 @@ func GmWeapon() GmWeaponLogic { return gmWeaponLogicInst.MustGet() }
 // gmWeaponLogic 武器 GM 业务实现。
 type gmWeaponLogic struct{}
 
-// init 装配期自注册实现。
 func init() {
 	RegisterGmWeaponLogic(&gmWeaponLogic{})
 }

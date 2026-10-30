@@ -26,7 +26,6 @@ func GmRecord() GmRecordLogic { return gmRecordLogicInst.MustGet() }
 // gmRecordLogic 打点记录业务实现。
 type gmRecordLogic struct{}
 
-// init 装配期自注册实现。
 func init() {
 	RegisterGmRecordLogic(&gmRecordLogic{})
 }

@@ -44,7 +44,6 @@ func Player() PlayerLogic { return playerLogicInst.MustGet() }
 // playerLogic 玩家管理业务实现。
 type playerLogic struct{}
 
-// init 装配期自注册实现。
 func init() {
 	RegisterPlayerLogic(&playerLogic{})
 }

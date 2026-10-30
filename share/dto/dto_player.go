@@ -7,12 +7,16 @@ type PlayerListReq struct {
 	Order    string
 }
 
-// PlayerResp 玩家账号信息（player_base）。
+// PlayerResp 玩家账号信息（player_base + player_extra 昵称 + player_asset 货币）。
 type PlayerResp struct {
 	PlayerID    int64  `json:"playerId"`
 	Username    string `json:"username"`
+	Nickname    string `json:"nickname"`
 	Zone        int32  `json:"zone"`
 	PhoneNumber int32  `json:"phoneNumber"`
+	Coupon      int64  `json:"coupon"` // 点券
+	Gold        int64  `json:"gold"`   // 金
+	Coin        int64  `json:"coin"`   // 币
 	CreatedAt   int64  `json:"createdAt"`
 }
 

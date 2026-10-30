@@ -7,8 +7,12 @@ export default {
   usernamePlaceholder: 'Enter username',
 
   playerId: 'Player ID',
+  nickname: 'Nickname',
   zone: 'Zone',
   phoneNumber: 'Phone Number',
+  coupon: 'Coupon',
+  gold: 'Gold',
+  coin: 'Coin',
   createdAt: 'Created At',
 
   online: 'Online Players',

@@ -21,7 +21,6 @@ type skillLogic struct{}
 
 var skillLogicInst = singleton.NewContainer[global.SkillLogic]("SkillLogic")
 
-// init 装配期自注册实现。
 func init() {
 	skillLogicInst.Register(&skillLogic{})
 }

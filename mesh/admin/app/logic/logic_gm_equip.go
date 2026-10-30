@@ -31,7 +31,6 @@ func GmEquip() GmEquipLogic { return gmEquipLogicInst.MustGet() }
 // gmEquipLogic 装备 GM 业务实现。
 type gmEquipLogic struct{}
 
-// init 装配期自注册实现。
 func init() {
 	RegisterGmEquipLogic(&gmEquipLogic{})
 }

@@ -1,12 +1,16 @@
 package global
 
 import (
+	"fmt"
+	"strings"
+
 	"server-cluster/share/tpl"
 
 	"github.com/dobyte/due/v2/log"
 
 	"server-cluster/internal/svc"
 	"server-cluster/share/model"
+	"server-cluster/share/util"
 )
 
 // Init 初始化应用：svc（DB/Redis/雪花ID/JWT）→ 配置表 → 自动建表。
@@ -52,8 +56,30 @@ func Init() error {
 	return nil
 }
 
-// Destroy 进程退出后释放缓存刷盘、DB / Redis 等资源。
+// Destroy 进程退出后释放缓存刷盘、DB / Redis 等资源，并按统一停服日志输出。
 func Destroy() {
-	CloseCaches()
-	_ = svc.Close()
+	sl := util.NewShutdownLog("game-node", 2)
+	sl.Start()
+
+	sl.Step("玩家数据缓存落盘", func() (string, error) {
+		stats := CloseCaches()
+		rows := 0
+		lines := make([]string, 0, len(stats))
+		for _, s := range stats {
+			rows += s.Rows
+			lines = append(lines, fmt.Sprintf("%s · %d 条待写 · %s", s.Name, s.Rows, util.FormatDuration(s.Cost)))
+		}
+		detail := fmt.Sprintf("%d 个缓存 · %d 条待写", len(stats), rows)
+		if len(lines) > 0 {
+			detail += "\n" + strings.Join(lines, "\n")
+		}
+		return detail, nil
+	})
+
+	sl.Step("MySQL / Redis 连接关闭", func() (string, error) {
+		mysql, redis := svc.Counts()
+		return fmt.Sprintf("MySQL %d 实例 · Redis %d 实例", mysql, redis), svc.Close()
+	})
+
+	sl.End()
 }

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"server-cluster/internal/svc"
+	"server-cluster/share/consts"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -16,9 +17,6 @@ import (
 
 // schemaCache 表结构解析缓存。
 var schemaCache sync.Map
-
-// upsertChunkSize 单条 upsert 语句最大行数（防占位符超限）。
-const upsertChunkSize = 500
 
 // tableMeta 表元信息：主键列 + 非主键更新列 + int64 时间字段。
 type tableMeta struct {
@@ -95,8 +93,8 @@ func fillTimestamps[T any](meta *tableMeta, rows []T) {
 // upsertRows 批量 upsert：冲突列 = 主键列，更新列 = 非 PK 列（按 chunk 切分）。
 func upsertRows[T any](db *gorm.DB, rows []T, meta *tableMeta) error {
 	fillTimestamps(meta, rows)
-	for start := 0; start < len(rows); start += upsertChunkSize {
-		end := start + upsertChunkSize
+	for start := 0; start < len(rows); start += consts.CacheUpsertChunkSize {
+		end := start + consts.CacheUpsertChunkSize
 		if end > len(rows) {
 			end = len(rows)
 		}

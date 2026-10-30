@@ -7,18 +7,17 @@ import (
 	"github.com/dobyte/due/v2/core/value"
 	"github.com/dobyte/due/v2/etc"
 	"github.com/redis/go-redis/v9"
+
+	"server-cluster/share/consts"
 )
 
 const keyRedisInstances = "etc.redis.instances"
-
-// defaultRedisAddr 未配置 addrs 时的回退地址。
-const defaultRedisAddr = "127.0.0.1:6379"
 
 // RedisConfig 单个 Redis 实例配置（对应 [[redis.instances]]）。
 // 不同业务可按实例使用不同 db 号或不同集群，业务按 name 获取。
 type RedisConfig struct {
 	Name     string   `json:"name"`
-	Addrs    []string `json:"addrs"` // 为空时回退 127.0.0.1:6379
+	Addrs    []string `json:"addrs"` // 为空时回退 consts.DefaultRedisAddr
 	Username string   `json:"username"`
 	Password string   `json:"password"`
 	DB       int      `json:"db"`
@@ -49,7 +48,7 @@ func NewRedisManager() (*RedisManager, error) {
 		}
 		addrs := cfg.Addrs
 		if len(addrs) == 0 {
-			addrs = []string{defaultRedisAddr}
+			addrs = []string{consts.DefaultRedisAddr}
 		}
 		m.insts[cfg.Name] = redis.NewUniversalClient(&redis.UniversalOptions{
 			Addrs:    addrs,
@@ -74,6 +73,13 @@ func (this *RedisManager) Get(name string) (redis.UniversalClient, error) {
 
 // Default 获取默认 Redis 实例。
 func (this *RedisManager) Default() (redis.UniversalClient, error) { return this.Get(DefaultInstance) }
+
+// Len 返回已建立的 Redis 实例数（停服日志展示用）。
+func (this *RedisManager) Len() int {
+	this.mu.RLock()
+	defer this.mu.RUnlock()
+	return len(this.insts)
+}
 
 // Close 关闭全部客户端。
 func (this *RedisManager) Close() error {

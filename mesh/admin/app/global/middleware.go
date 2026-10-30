@@ -12,10 +12,10 @@ import (
 	"github.com/gofiber/fiber/v3/middleware/cors"
 	"gorm.io/gorm"
 
+	"github.com/dobyte/due/v2/codes"
 	"server-cluster/internal/svc"
 	"server-cluster/share/consts"
 	"server-cluster/share/errs"
-	"github.com/dobyte/due/v2/codes"
 	"server-cluster/share/model"
 )
 
@@ -59,7 +59,7 @@ func CORSMiddleware() fiber.Handler {
 // RequireDB 数据库未配置时直接拒绝请求，避免空句柄穿透到业务层。
 func RequireDB(c fiber.Ctx) error {
 	if _, err := svc.Ctx().DB(); err != nil {
-		return errs.FailCtx(c, 500, "数据库未配置")
+		return errs.FailCtx(c, errs.HTTPInternal, "数据库未配置")
 	}
 	return c.Next()
 }
@@ -71,7 +71,7 @@ func AuthMiddleware(c fiber.Ctx) error {
 	}
 	token := strings.TrimSpace(strings.TrimPrefix(c.Get("Authorization"), "Bearer "))
 	if token == "" {
-		return errs.FailCtx(c, 401, "未登录或登录已过期")
+		return errs.FailCtx(c, errs.HTTPUnauthorized, "未登录或登录已过期")
 	}
 	user, role, err := Authenticate(token)
 	if err != nil {
@@ -89,17 +89,17 @@ func PermissionMiddleware(c fiber.Ctx) error {
 	}
 	role, ok := c.Locals(localRole).(*model.SysRole)
 	if !ok {
-		return errs.FailCtx(c, 401, "未登录或登录已过期")
+		return errs.FailCtx(c, errs.HTTPUnauthorized, "未登录或登录已过期")
 	}
 	if _, skip := alwaysAllowed[c.Path()]; skip {
 		return c.Next()
 	}
 	allowed, err := Allow(role.RoleKey, c.Path(), c.Method())
 	if err != nil {
-		return errs.FailCtx(c, 500, "权限校验失败")
+		return errs.FailCtx(c, errs.HTTPInternal, "权限校验失败")
 	}
 	if !allowed {
-		return errs.FailCtx(c, 403, "无接口访问权限")
+		return errs.FailCtx(c, errs.HTTPForbidden, "无接口访问权限")
 	}
 	return c.Next()
 }
@@ -127,7 +127,7 @@ func OperaLogMiddleware(c fiber.Ctx) error {
 	if user := CurrentUser(c); user != nil {
 		entry.OperName = user.Username
 	}
-	if nextErr != nil || responseCode(c) != 200 {
+	if nextErr != nil || responseCode(c) != errs.HTTPStatusOK {
 		entry.Status = consts.LogStatusFail
 	}
 	RecordOpera(entry)
@@ -139,32 +139,32 @@ func OperaLogMiddleware(c fiber.Ctx) error {
 func Authenticate(token string) (*model.SysUser, *model.SysRole, error) {
 	payload, err := svc.JWT().ExtractPayload(token)
 	if err != nil {
-		return nil, nil, codes.NewCode(401, "未登录或登录已过期").Err()
+		return nil, nil, codes.NewCode(errs.HTTPUnauthorized, "未登录或登录已过期").Err()
 	}
-	uid, ok := payload["uid"].(float64)
+	uid, ok := payload[consts.PayloadAdminUID].(float64)
 	if !ok {
-		return nil, nil, codes.NewCode(401, "令牌无效").Err()
+		return nil, nil, codes.NewCode(errs.HTTPUnauthorized, "令牌无效").Err()
 	}
 	d, err := svc.Ctx().DB()
 	if err != nil {
-		return nil, nil, codes.NewCode(500, "数据库未配置").Err()
+		return nil, nil, codes.NewCode(errs.HTTPInternal, "数据库未配置").Err()
 	}
 	var user model.SysUser
 	if err := d.First(&user, "user_id = ?", int(uid)).Error; err != nil {
-		return nil, nil, codes.NewCode(401, "账号不存在").Err()
+		return nil, nil, codes.NewCode(errs.HTTPUnauthorized, "账号不存在").Err()
 	}
 	if user.Status != consts.StatusEnabled {
-		return nil, nil, codes.NewCode(403, "账号已停用").Err()
+		return nil, nil, codes.NewCode(errs.HTTPForbidden, "账号已停用").Err()
 	}
 	var role model.SysRole
 	if err := d.First(&role, "role_id = ?", user.RoleId).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil, codes.NewCode(403, "账号未绑定角色").Err()
+			return nil, nil, codes.NewCode(errs.HTTPForbidden, "账号未绑定角色").Err()
 		}
-		return nil, nil, codes.NewCode(500, "查询角色失败").Err()
+		return nil, nil, codes.NewCode(errs.HTTPInternal, "查询角色失败").Err()
 	}
 	if role.Status != consts.StatusEnabled {
-		return nil, nil, codes.NewCode(403, "角色已停用").Err()
+		return nil, nil, codes.NewCode(errs.HTTPForbidden, "角色已停用").Err()
 	}
 	return &user, &role, nil
 }
@@ -241,7 +241,7 @@ func responseCode(c fiber.Ctx) int {
 		Code int `json:"code"`
 	}
 	if err := json.Unmarshal(c.Response().Body(), &envelope); err != nil {
-		return 200
+		return errs.HTTPStatusOK
 	}
 	return envelope.Code
 }
@@ -250,13 +250,13 @@ func responseCode(c fiber.Ctx) int {
 func businessType(method string) string {
 	switch method {
 	case fiber.MethodPost:
-		return "1"
+		return consts.OperTypeCreate
 	case fiber.MethodPut:
-		return "2"
+		return consts.OperTypeUpdate
 	case fiber.MethodDelete:
-		return "3"
+		return consts.OperTypeDelete
 	default:
-		return "0"
+		return consts.OperTypeOther
 	}
 }
 

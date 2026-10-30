@@ -1,14 +1,5 @@
 // Package model 业务模型：与存储/传输解耦的领域结构。
-// 容器通用逻辑（BaseContainer[T] 泛型实现、GridItem 约束、错误、
-// Container 类型常量、TransferFrom 跨容器锁）在 internal/container 包里。
-// 本文件只放：
-//   - ItemEntry struct（实现 container.Grid，具体物品业务类型）
-//   - PlayerContainer（玩家三容器聚合，gorm 持久化）
-//   - container 包常量/错误的重新导出（保持调用方引用面稳定）
-//   - SizeOf/RawSizeOf 注入（依赖 share/tpl 配置表）
-//   - NewItemContainer / NewPlayerContainer / NewWorldItemContainer 构造包装
-//
-// import container "server-cluster/internal/container"
+// 容器通用逻辑（BaseContainer[T]、GridItem 约束、跨容器转移）在 internal/container 包。
 package model
 
 import (

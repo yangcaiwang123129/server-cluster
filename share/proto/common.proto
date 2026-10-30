@@ -96,6 +96,12 @@ enum MagicAttr {
   // 10001~20000 红点相关属性
 }
 
+// 属性表：键为 MagicAttr 枚举值，值为动态类型（字符串/整数/长整数）。
+// 例如 {1:"昵称", 2:等级, 3:经验, 4:vip等级, 5:vip经验, 6:币, 7:金}
+message MagicAttrMap {
+  map<int32, ObjectValue> values = 1;
+}
+
 // 通用业务结果：每个响应包统一携带。
 // code 用于客户端逻辑分支；msg 为空时按 code 取默认文案；args 为可变参数，
 message Result {

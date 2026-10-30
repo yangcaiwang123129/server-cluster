@@ -387,6 +387,52 @@ func (MagicAttr) EnumDescriptor() ([]byte, []int) {
 	return file_common_proto_rawDescGZIP(), []int{4}
 }
 
+// 属性表：键为 MagicAttr 枚举值，值为动态类型（字符串/整数/长整数）。
+// 例如 {1:"昵称", 2:等级, 3:经验, 4:vip等级, 5:vip经验, 6:币, 7:金}
+type MagicAttrMap struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Values        map[int32]*ObjectValue `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty" protobuf_key:"varint,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MagicAttrMap) Reset() {
+	*x = MagicAttrMap{}
+	mi := &file_common_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MagicAttrMap) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MagicAttrMap) ProtoMessage() {}
+
+func (x *MagicAttrMap) ProtoReflect() protoreflect.Message {
+	mi := &file_common_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MagicAttrMap.ProtoReflect.Descriptor instead.
+func (*MagicAttrMap) Descriptor() ([]byte, []int) {
+	return file_common_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *MagicAttrMap) GetValues() map[int32]*ObjectValue {
+	if x != nil {
+		return x.Values
+	}
+	return nil
+}
+
 // 通用业务结果：每个响应包统一携带。
 // code 用于客户端逻辑分支；msg 为空时按 code 取默认文案；args 为可变参数，
 type Result struct {
@@ -400,7 +446,7 @@ type Result struct {
 
 func (x *Result) Reset() {
 	*x = Result{}
-	mi := &file_common_proto_msgTypes[0]
+	mi := &file_common_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -412,7 +458,7 @@ func (x *Result) String() string {
 func (*Result) ProtoMessage() {}
 
 func (x *Result) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[0]
+	mi := &file_common_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -425,7 +471,7 @@ func (x *Result) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Result.ProtoReflect.Descriptor instead.
 func (*Result) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{0}
+	return file_common_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Result) GetCode() ErrCode {
@@ -459,7 +505,7 @@ type Object struct {
 
 func (x *Object) Reset() {
 	*x = Object{}
-	mi := &file_common_proto_msgTypes[1]
+	mi := &file_common_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -471,7 +517,7 @@ func (x *Object) String() string {
 func (*Object) ProtoMessage() {}
 
 func (x *Object) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[1]
+	mi := &file_common_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -484,7 +530,7 @@ func (x *Object) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Object.ProtoReflect.Descriptor instead.
 func (*Object) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{1}
+	return file_common_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Object) GetValues() map[string]*ObjectValue {
@@ -504,7 +550,7 @@ type ObjectList struct {
 
 func (x *ObjectList) Reset() {
 	*x = ObjectList{}
-	mi := &file_common_proto_msgTypes[2]
+	mi := &file_common_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -516,7 +562,7 @@ func (x *ObjectList) String() string {
 func (*ObjectList) ProtoMessage() {}
 
 func (x *ObjectList) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[2]
+	mi := &file_common_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -529,7 +575,7 @@ func (x *ObjectList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ObjectList.ProtoReflect.Descriptor instead.
 func (*ObjectList) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{2}
+	return file_common_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ObjectList) GetValues() []*ObjectValue {
@@ -556,7 +602,7 @@ type ObjectValue struct {
 
 func (x *ObjectValue) Reset() {
 	*x = ObjectValue{}
-	mi := &file_common_proto_msgTypes[3]
+	mi := &file_common_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -568,7 +614,7 @@ func (x *ObjectValue) String() string {
 func (*ObjectValue) ProtoMessage() {}
 
 func (x *ObjectValue) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[3]
+	mi := &file_common_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -581,7 +627,7 @@ func (x *ObjectValue) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ObjectValue.ProtoReflect.Descriptor instead.
 func (*ObjectValue) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{3}
+	return file_common_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ObjectValue) GetKind() isObjectValue_Kind {
@@ -685,7 +731,7 @@ type ItemEntry struct {
 
 func (x *ItemEntry) Reset() {
 	*x = ItemEntry{}
-	mi := &file_common_proto_msgTypes[4]
+	mi := &file_common_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -697,7 +743,7 @@ func (x *ItemEntry) String() string {
 func (*ItemEntry) ProtoMessage() {}
 
 func (x *ItemEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[4]
+	mi := &file_common_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -710,7 +756,7 @@ func (x *ItemEntry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ItemEntry.ProtoReflect.Descriptor instead.
 func (*ItemEntry) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{4}
+	return file_common_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ItemEntry) GetId() int64 {
@@ -770,7 +816,7 @@ type ContainerEntry struct {
 
 func (x *ContainerEntry) Reset() {
 	*x = ContainerEntry{}
-	mi := &file_common_proto_msgTypes[5]
+	mi := &file_common_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -782,7 +828,7 @@ func (x *ContainerEntry) String() string {
 func (*ContainerEntry) ProtoMessage() {}
 
 func (x *ContainerEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[5]
+	mi := &file_common_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -795,7 +841,7 @@ func (x *ContainerEntry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ContainerEntry.ProtoReflect.Descriptor instead.
 func (*ContainerEntry) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{5}
+	return file_common_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ContainerEntry) GetId() int64 {
@@ -856,7 +902,7 @@ type HeroEntry struct {
 
 func (x *HeroEntry) Reset() {
 	*x = HeroEntry{}
-	mi := &file_common_proto_msgTypes[6]
+	mi := &file_common_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -868,7 +914,7 @@ func (x *HeroEntry) String() string {
 func (*HeroEntry) ProtoMessage() {}
 
 func (x *HeroEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[6]
+	mi := &file_common_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -881,7 +927,7 @@ func (x *HeroEntry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HeroEntry.ProtoReflect.Descriptor instead.
 func (*HeroEntry) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{6}
+	return file_common_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *HeroEntry) GetId() int64 {
@@ -947,7 +993,7 @@ type WeaponEntry struct {
 
 func (x *WeaponEntry) Reset() {
 	*x = WeaponEntry{}
-	mi := &file_common_proto_msgTypes[7]
+	mi := &file_common_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -959,7 +1005,7 @@ func (x *WeaponEntry) String() string {
 func (*WeaponEntry) ProtoMessage() {}
 
 func (x *WeaponEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[7]
+	mi := &file_common_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -972,7 +1018,7 @@ func (x *WeaponEntry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WeaponEntry.ProtoReflect.Descriptor instead.
 func (*WeaponEntry) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{7}
+	return file_common_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *WeaponEntry) GetId() int64 {
@@ -1023,7 +1069,7 @@ type SkillEntry struct {
 
 func (x *SkillEntry) Reset() {
 	*x = SkillEntry{}
-	mi := &file_common_proto_msgTypes[8]
+	mi := &file_common_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1035,7 +1081,7 @@ func (x *SkillEntry) String() string {
 func (*SkillEntry) ProtoMessage() {}
 
 func (x *SkillEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[8]
+	mi := &file_common_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1048,7 +1094,7 @@ func (x *SkillEntry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SkillEntry.ProtoReflect.Descriptor instead.
 func (*SkillEntry) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{8}
+	return file_common_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *SkillEntry) GetId() int64 {
@@ -1092,7 +1138,7 @@ type EquipEntry struct {
 
 func (x *EquipEntry) Reset() {
 	*x = EquipEntry{}
-	mi := &file_common_proto_msgTypes[9]
+	mi := &file_common_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1104,7 +1150,7 @@ func (x *EquipEntry) String() string {
 func (*EquipEntry) ProtoMessage() {}
 
 func (x *EquipEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[9]
+	mi := &file_common_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1117,7 +1163,7 @@ func (x *EquipEntry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EquipEntry.ProtoReflect.Descriptor instead.
 func (*EquipEntry) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{9}
+	return file_common_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *EquipEntry) GetId() int64 {
@@ -1152,7 +1198,12 @@ var File_common_proto protoreflect.FileDescriptor
 
 const file_common_proto_rawDesc = "" +
 	"\n" +
-	"\fcommon.proto\x12\x02pb\"O\n" +
+	"\fcommon.proto\x12\x02pb\"\x90\x01\n" +
+	"\fMagicAttrMap\x124\n" +
+	"\x06values\x18\x01 \x03(\v2\x1c.pb.MagicAttrMap.ValuesEntryR\x06values\x1aJ\n" +
+	"\vValuesEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\x05R\x03key\x12%\n" +
+	"\x05value\x18\x02 \x01(\v2\x0f.pb.ObjectValueR\x05value:\x028\x01\"O\n" +
 	"\x06Result\x12\x1f\n" +
 	"\x04code\x18\x01 \x01(\x0e2\v.pb.ErrCodeR\x04code\x12\x10\n" +
 	"\x03msg\x18\x02 \x01(\tR\x03msg\x12\x12\n" +
@@ -1285,37 +1336,41 @@ func file_common_proto_rawDescGZIP() []byte {
 }
 
 var file_common_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
-var file_common_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_common_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_common_proto_goTypes = []any{
 	(RouteCode)(0),         // 0: pb.RouteCode
 	(ErrCode)(0),           // 1: pb.ErrCode
 	(NOTIFY_TYPE)(0),       // 2: pb.NOTIFY_TYPE
 	(ContainerType)(0),     // 3: pb.ContainerType
 	(MagicAttr)(0),         // 4: pb.MagicAttr
-	(*Result)(nil),         // 5: pb.Result
-	(*Object)(nil),         // 6: pb.Object
-	(*ObjectList)(nil),     // 7: pb.ObjectList
-	(*ObjectValue)(nil),    // 8: pb.ObjectValue
-	(*ItemEntry)(nil),      // 9: pb.ItemEntry
-	(*ContainerEntry)(nil), // 10: pb.ContainerEntry
-	(*HeroEntry)(nil),      // 11: pb.HeroEntry
-	(*WeaponEntry)(nil),    // 12: pb.WeaponEntry
-	(*SkillEntry)(nil),     // 13: pb.SkillEntry
-	(*EquipEntry)(nil),     // 14: pb.EquipEntry
-	nil,                    // 15: pb.Object.ValuesEntry
+	(*MagicAttrMap)(nil),   // 5: pb.MagicAttrMap
+	(*Result)(nil),         // 6: pb.Result
+	(*Object)(nil),         // 7: pb.Object
+	(*ObjectList)(nil),     // 8: pb.ObjectList
+	(*ObjectValue)(nil),    // 9: pb.ObjectValue
+	(*ItemEntry)(nil),      // 10: pb.ItemEntry
+	(*ContainerEntry)(nil), // 11: pb.ContainerEntry
+	(*HeroEntry)(nil),      // 12: pb.HeroEntry
+	(*WeaponEntry)(nil),    // 13: pb.WeaponEntry
+	(*SkillEntry)(nil),     // 14: pb.SkillEntry
+	(*EquipEntry)(nil),     // 15: pb.EquipEntry
+	nil,                    // 16: pb.MagicAttrMap.ValuesEntry
+	nil,                    // 17: pb.Object.ValuesEntry
 }
 var file_common_proto_depIdxs = []int32{
-	1,  // 0: pb.Result.code:type_name -> pb.ErrCode
-	15, // 1: pb.Object.values:type_name -> pb.Object.ValuesEntry
-	8,  // 2: pb.ObjectList.values:type_name -> pb.ObjectValue
-	3,  // 3: pb.ContainerEntry.type:type_name -> pb.ContainerType
-	9,  // 4: pb.ContainerEntry.item_entries:type_name -> pb.ItemEntry
-	8,  // 5: pb.Object.ValuesEntry.value:type_name -> pb.ObjectValue
-	6,  // [6:6] is the sub-list for method output_type
-	6,  // [6:6] is the sub-list for method input_type
-	6,  // [6:6] is the sub-list for extension type_name
-	6,  // [6:6] is the sub-list for extension extendee
-	0,  // [0:6] is the sub-list for field type_name
+	16, // 0: pb.MagicAttrMap.values:type_name -> pb.MagicAttrMap.ValuesEntry
+	1,  // 1: pb.Result.code:type_name -> pb.ErrCode
+	17, // 2: pb.Object.values:type_name -> pb.Object.ValuesEntry
+	9,  // 3: pb.ObjectList.values:type_name -> pb.ObjectValue
+	3,  // 4: pb.ContainerEntry.type:type_name -> pb.ContainerType
+	10, // 5: pb.ContainerEntry.item_entries:type_name -> pb.ItemEntry
+	9,  // 6: pb.MagicAttrMap.ValuesEntry.value:type_name -> pb.ObjectValue
+	9,  // 7: pb.Object.ValuesEntry.value:type_name -> pb.ObjectValue
+	8,  // [8:8] is the sub-list for method output_type
+	8,  // [8:8] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_common_proto_init() }
@@ -1323,7 +1378,7 @@ func file_common_proto_init() {
 	if File_common_proto != nil {
 		return
 	}
-	file_common_proto_msgTypes[3].OneofWrappers = []any{
+	file_common_proto_msgTypes[4].OneofWrappers = []any{
 		(*ObjectValue_BoolValue)(nil),
 		(*ObjectValue_IntValue)(nil),
 		(*ObjectValue_BigintValue)(nil),
@@ -1336,7 +1391,7 @@ func file_common_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_common_proto_rawDesc), len(file_common_proto_rawDesc)),
 			NumEnums:      5,
-			NumMessages:   11,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

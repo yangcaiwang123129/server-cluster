@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 
 	"server-cluster/share/consts"
+	"server-cluster/share/enum"
 	"server-cluster/share/model"
 )
 
@@ -44,7 +45,7 @@ func seed(gdb *gorm.DB) error {
 		if err := tx.Create(&role).Error; err != nil {
 			return err
 		}
-		hash, err := bcrypt.GenerateFromPassword([]byte("123456"), bcrypt.DefaultCost)
+		hash, err := bcrypt.GenerateFromPassword([]byte(consts.DefaultInitPassword), bcrypt.DefaultCost)
 		if err != nil {
 			return err
 		}
@@ -79,31 +80,31 @@ func seedConfigs(tx *gorm.DB) error {
 // seedDicts 写入常用字典。
 func seedDicts(tx *gorm.DB) error {
 	types := []model.SysDictType{
-		{DictName: "系统开关", DictType: "sys_normal_disable", Status: "2"},
-		{DictName: "显示状态", DictType: "sys_show_hide", Status: "2"},
-		{DictName: "用户性别", DictType: "sys_user_sex", Status: "2"},
-		{DictName: "系统是否", DictType: "sys_yes_no", Status: "2"},
-		{DictName: "通用状态", DictType: "sys_common_status", Status: "2"},
-		{DictName: "操作类型", DictType: "sys_oper_type", Status: "2"},
+		{DictName: "系统开关", DictType: "sys_normal_disable", Status: consts.StatusEnabled},
+		{DictName: "显示状态", DictType: "sys_show_hide", Status: consts.StatusEnabled},
+		{DictName: "用户性别", DictType: "sys_user_sex", Status: consts.StatusEnabled},
+		{DictName: "系统是否", DictType: "sys_yes_no", Status: consts.StatusEnabled},
+		{DictName: "通用状态", DictType: "sys_common_status", Status: consts.StatusEnabled},
+		{DictName: "操作类型", DictType: "sys_oper_type", Status: consts.StatusEnabled},
 	}
 	if err := tx.Create(&types).Error; err != nil {
 		return err
 	}
 	data := []model.SysDictData{
-		{DictSort: 1, DictLabel: "正常", DictValue: "2", DictType: "sys_normal_disable", ListClass: "primary", IsDefault: "Y", Status: "2"},
-		{DictSort: 2, DictLabel: "停用", DictValue: "1", DictType: "sys_normal_disable", ListClass: "danger", IsDefault: "N", Status: "2"},
-		{DictSort: 1, DictLabel: "显示", DictValue: "0", DictType: "sys_show_hide", ListClass: "primary", IsDefault: "Y", Status: "2"},
-		{DictSort: 2, DictLabel: "隐藏", DictValue: "1", DictType: "sys_show_hide", ListClass: "danger", IsDefault: "N", Status: "2"},
-		{DictSort: 1, DictLabel: "男", DictValue: "1", DictType: "sys_user_sex", ListClass: "", IsDefault: "Y", Status: "2"},
-		{DictSort: 2, DictLabel: "女", DictValue: "2", DictType: "sys_user_sex", ListClass: "", IsDefault: "N", Status: "2"},
-		{DictSort: 3, DictLabel: "未知", DictValue: "0", DictType: "sys_user_sex", ListClass: "", IsDefault: "N", Status: "2"},
-		{DictSort: 1, DictLabel: "是", DictValue: "Y", DictType: "sys_yes_no", ListClass: "primary", IsDefault: "Y", Status: "2"},
-		{DictSort: 2, DictLabel: "否", DictValue: "N", DictType: "sys_yes_no", ListClass: "danger", IsDefault: "N", Status: "2"},
-		{DictSort: 1, DictLabel: "成功", DictValue: "2", DictType: "sys_common_status", ListClass: "primary", IsDefault: "Y", Status: "2"},
-		{DictSort: 2, DictLabel: "失败", DictValue: "1", DictType: "sys_common_status", ListClass: "danger", IsDefault: "N", Status: "2"},
-		{DictSort: 1, DictLabel: "新增", DictValue: "1", DictType: "sys_oper_type", ListClass: "success", IsDefault: "Y", Status: "2"},
-		{DictSort: 2, DictLabel: "修改", DictValue: "2", DictType: "sys_oper_type", ListClass: "primary", IsDefault: "N", Status: "2"},
-		{DictSort: 3, DictLabel: "删除", DictValue: "3", DictType: "sys_oper_type", ListClass: "danger", IsDefault: "N", Status: "2"},
+		{DictSort: 1, DictLabel: "正常", DictValue: "2", DictType: "sys_normal_disable", ListClass: "primary", IsDefault: consts.FlagYes, Status: consts.StatusEnabled},
+		{DictSort: 2, DictLabel: "停用", DictValue: "1", DictType: "sys_normal_disable", ListClass: "danger", IsDefault: consts.FlagNo, Status: consts.StatusEnabled},
+		{DictSort: 1, DictLabel: "显示", DictValue: "0", DictType: "sys_show_hide", ListClass: "primary", IsDefault: consts.FlagYes, Status: consts.StatusEnabled},
+		{DictSort: 2, DictLabel: "隐藏", DictValue: "1", DictType: "sys_show_hide", ListClass: "danger", IsDefault: consts.FlagNo, Status: consts.StatusEnabled},
+		{DictSort: 1, DictLabel: "男", DictValue: "1", DictType: "sys_user_sex", ListClass: "", IsDefault: consts.FlagYes, Status: consts.StatusEnabled},
+		{DictSort: 2, DictLabel: "女", DictValue: "2", DictType: "sys_user_sex", ListClass: "", IsDefault: consts.FlagNo, Status: consts.StatusEnabled},
+		{DictSort: 3, DictLabel: "未知", DictValue: "0", DictType: "sys_user_sex", ListClass: "", IsDefault: consts.FlagNo, Status: consts.StatusEnabled},
+		{DictSort: 1, DictLabel: "是", DictValue: "Y", DictType: "sys_yes_no", ListClass: "primary", IsDefault: consts.FlagYes, Status: consts.StatusEnabled},
+		{DictSort: 2, DictLabel: "否", DictValue: "N", DictType: "sys_yes_no", ListClass: "danger", IsDefault: consts.FlagNo, Status: consts.StatusEnabled},
+		{DictSort: 1, DictLabel: "成功", DictValue: "2", DictType: "sys_common_status", ListClass: "primary", IsDefault: consts.FlagYes, Status: consts.StatusEnabled},
+		{DictSort: 2, DictLabel: "失败", DictValue: "1", DictType: "sys_common_status", ListClass: "danger", IsDefault: consts.FlagNo, Status: consts.StatusEnabled},
+		{DictSort: 1, DictLabel: "新增", DictValue: "1", DictType: "sys_oper_type", ListClass: "success", IsDefault: consts.FlagYes, Status: consts.StatusEnabled},
+		{DictSort: 2, DictLabel: "修改", DictValue: "2", DictType: "sys_oper_type", ListClass: "primary", IsDefault: consts.FlagNo, Status: consts.StatusEnabled},
+		{DictSort: 3, DictLabel: "删除", DictValue: "3", DictType: "sys_oper_type", ListClass: "danger", IsDefault: consts.FlagNo, Status: consts.StatusEnabled},
 	}
 	return tx.Create(&data).Error
 }
@@ -127,7 +128,7 @@ func seedMenus(tx *gorm.DB, items []seedMenu, parentId int) error {
 			} else if err != nil {
 				return err
 			}
-			if err := tx.Table("sys_menu_api_rule").
+			if err := tx.Table(enum.TableSysMenuApiRule.String()).
 				Create(map[string]any{"menu_id": m.MenuId, "api_id": record.ApiId}).Error; err != nil {
 				return err
 			}
@@ -199,13 +200,13 @@ func syncMenuNodes(tx *gorm.DB, items []seedMenu, parentId int) error {
 			}
 
 			var count int64
-			if err := tx.Table("sys_menu_api_rule").
+			if err := tx.Table(enum.TableSysMenuApiRule.String()).
 				Where("menu_id = ? AND api_id = ?", menu.MenuId, record.ApiId).
 				Count(&count).Error; err != nil {
 				return err
 			}
 			if count == 0 {
-				if err := tx.Table("sys_menu_api_rule").
+				if err := tx.Table(enum.TableSysMenuApiRule.String()).
 					Create(map[string]any{"menu_id": menu.MenuId, "api_id": record.ApiId}).Error; err != nil {
 					return err
 				}

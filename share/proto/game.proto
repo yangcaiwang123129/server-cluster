@@ -24,7 +24,7 @@ message EnterGameReq {
 // 进入游戏响应（登录成功后返回给客户端的结构体）
 message EnterGameResp {
   Result result = 1;               // 业务结果
-  MagicAttr player_magic_attr = 2; // 玩家属性
+  MagicAttrMap player_magic_attr = 2; // 玩家属性（键为 MagicAttr 枚举值）
   HeroEntry hero_entry = 3;        // 当前英雄
   WeaponEntry weapon_entry = 4;    // 当前武器
   int64 server_time = 5;           // 服务器毫秒时间戳

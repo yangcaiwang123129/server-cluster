@@ -26,17 +26,18 @@ const (
 
 // 管理后台表（mesh/admin）。
 const (
-	TableSysUser       Table = "sys_user"        // 后台账号
-	TableSysRole       Table = "sys_role"        // 角色
-	TableSysMenu       Table = "sys_menu"        // 菜单/按钮权限
-	TableSysApi        Table = "sys_api"         // 后台接口登记
-	TableSysDictType   Table = "sys_dict_type"   // 字典类型
-	TableSysDictData   Table = "sys_dict_data"   // 字典项
-	TableSysConfig     Table = "sys_config"      // 系统配置
-	TableSysLoginLog   Table = "sys_login_log"   // 登录审计
-	TableSysOperaLog   Table = "sys_opera_log"   // 操作审计
-	TableSysCasbinRule Table = "sys_casbin_rule" // 接口放行规则
-	TableClientVersion Table = "client_version"  // 客户端版本
+	TableSysUser        Table = "sys_user"          // 后台账号
+	TableSysRole        Table = "sys_role"          // 角色
+	TableSysMenu        Table = "sys_menu"          // 菜单/按钮权限
+	TableSysApi         Table = "sys_api"           // 后台接口登记
+	TableSysDictType    Table = "sys_dict_type"     // 字典类型
+	TableSysDictData    Table = "sys_dict_data"     // 字典项
+	TableSysConfig      Table = "sys_config"        // 系统配置
+	TableSysLoginLog    Table = "sys_login_log"     // 登录审计
+	TableSysOperaLog    Table = "sys_opera_log"     // 操作审计
+	TableSysCasbinRule  Table = "sys_casbin_rule"   // 接口放行规则
+	TableSysMenuApiRule Table = "sys_menu_api_rule" // 菜单与接口关联
+	TableClientVersion  Table = "client_version"    // 客户端版本
 )
 
 // String 返回表名字符串。

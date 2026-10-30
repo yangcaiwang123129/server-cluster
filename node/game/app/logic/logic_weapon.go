@@ -21,7 +21,6 @@ type weaponLogic struct{}
 
 var weaponLogicInst = singleton.NewContainer[global.WeaponLogic]("WeaponLogic")
 
-// init 装配期自注册实现。
 func init() {
 	weaponLogicInst.Register(&weaponLogic{})
 }

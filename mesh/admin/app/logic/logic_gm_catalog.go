@@ -31,7 +31,6 @@ func Catalog() CatalogLogic { return catalogLogicInst.MustGet() }
 // catalogLogic 目录业务实现。
 type catalogLogic struct{}
 
-// init 装配期自注册实现。
 func init() {
 	RegisterCatalogLogic(&catalogLogic{})
 }

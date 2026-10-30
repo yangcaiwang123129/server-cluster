@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"server-cluster/internal/record"
 
 	"gorm.io/gorm"
 
+	"server-cluster/internal/record"
 	"server-cluster/internal/svc"
 	"server-cluster/node/game/app/global"
+	"server-cluster/share/consts"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
@@ -21,7 +22,6 @@ type containerLogic struct{}
 
 var containerLogicInst = singleton.NewContainer[global.ContainerLogic]("ContainerLogic")
 
-// init 装配期自注册实现。
 func init() {
 	containerLogicInst.Register(&containerLogic{})
 }
@@ -43,9 +43,9 @@ func containerTypeToModel(t pb.ContainerType) (int32, bool) {
 	}
 }
 
-// containerID 容器实例 ID：playerID 与容器类型编码（playerID*10 + type）。
+// containerID 容器实例 ID：playerID 与容器类型编码（playerID*ContainerTypeStride + type）。
 func containerID(playerID int64, typ int32) int64 {
-	return playerID*10 + int64(typ)
+	return playerID*consts.ContainerTypeStride + int64(typ)
 }
 
 // containerToEntry 容器 → wire 容器条目。
@@ -225,7 +225,7 @@ func (this *containerLogic) ContainerTransfer(ctx context.Context, playerID int6
 		return nil, errs.CodeInvalidParams.Err()
 	}
 
-	// 新接口：目标容器调 TransferFrom 把源容器的物品搬过来
+	// 目标容器调 TransferFrom 把源容器的物品搬过来
 	if err := toC.TransferFrom(fromC, req.GetId(), req.GetToX(), req.GetToY(), req.GetRotated()); err != nil {
 		return nil, containerErr(err)
 	}
@@ -247,7 +247,7 @@ func (this *containerLogic) ContainerAddEntry(ctx context.Context, playerID int6
 	if err != nil {
 		return nil, err
 	}
-	// 存量脏数据缺配置时占格计算会 panic，先校验（新接口 Items() 返回 []*Item）
+	// 存量脏数据缺配置时占格计算会 panic，先校验
 	for _, it := range c.Entries() {
 		if !tpl.T().Item.Has(it.ItemCfgID) {
 			return nil, errs.CodeInvalidParams.WithMessage(fmt.Sprintf("容器内物品配置缺失，物品配置ID: %d", it.ItemCfgID)).Err()
@@ -258,7 +258,7 @@ func (this *containerLogic) ContainerAddEntry(ctx context.Context, playerID int6
 	if count <= 0 {
 		count = 1
 	}
-	// 新接口 AddItem 接收 *Item（指针化）
+	// AddItem 接收 *Item（指针化）
 	if err := c.AddEntry(&model.ItemEntry{
 		ItemID:    svc.NextID(),
 		ItemCfgID: req.GetCfgId(),

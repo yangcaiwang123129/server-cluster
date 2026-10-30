@@ -9,6 +9,8 @@ import (
 	"github.com/dobyte/due/v2/etc"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+
+	"server-cluster/share/consts"
 )
 
 // DefaultInstance 默认实例名；未显式指定实例时使用。
@@ -20,8 +22,8 @@ const keyMySQLInstances = "etc.db.mysql.instances"
 type MySQLConfig struct {
 	Name         string `json:"name"`           // 实例名，业务按 name 获取
 	DSN          string `json:"dsn"`            // 留空则该实例跳过（模板可无 MySQL 启动）
-	MaxOpenConns int    `json:"max_open_conns"` // 默认 50
-	MaxIdleConns int    `json:"max_idle_conns"` // 默认 20
+	MaxOpenConns int    `json:"max_open_conns"` // 默认 consts.MySQLMaxOpenConns
+	MaxIdleConns int    `json:"max_idle_conns"` // 默认 consts.MySQLMaxIdleConns
 }
 
 // MySQL 命名实例：gorm 句柄与底层 *sql.DB 共用同一连接池，
@@ -83,6 +85,13 @@ func (this *MySQLManager) Get(name string) (*MySQL, error) {
 // Default 获取默认 MySQL 实例。
 func (this *MySQLManager) Default() (*MySQL, error) { return this.Get(DefaultInstance) }
 
+// Len 返回已打开的 MySQL 实例数（停服日志展示用）。
+func (this *MySQLManager) Len() int {
+	this.mu.RLock()
+	defer this.mu.RUnlock()
+	return len(this.instMap)
+}
+
 // AutoMigrate 自动构建表：对给定实体执行 gorm AutoMigrate（只增不删，已存在的表做增量补列）。
 // entities 为表模型指针（实现 TableName，如 &model.AccountModel{}）；gdb 为空或无实体时直接返回。
 func AutoMigrate(gdb *gorm.DB, entities ...any) error {
@@ -124,10 +133,10 @@ func openMySQL(cfg MySQLConfig) (*MySQL, error) {
 	}
 	maxOpen, maxIdle := cfg.MaxOpenConns, cfg.MaxIdleConns
 	if maxOpen <= 0 {
-		maxOpen = 50
+		maxOpen = consts.MySQLMaxOpenConns
 	}
 	if maxIdle <= 0 {
-		maxIdle = 20
+		maxIdle = consts.MySQLMaxIdleConns
 	}
 	sqlDB.SetMaxOpenConns(maxOpen)
 	sqlDB.SetMaxIdleConns(maxIdle)

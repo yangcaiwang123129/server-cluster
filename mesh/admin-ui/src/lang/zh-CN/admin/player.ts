@@ -9,8 +9,12 @@ export default {
 
   // ── Columns ─────────────────────────────────────────────────────
   playerId: '玩家ID',
+  nickname: '昵称',
   zone: '区号',
   phoneNumber: '手机号',
+  coupon: '点券',
+  gold: '金',
+  coin: '币',
   createdAt: '创建时间',
 
   // ── Online dialog ───────────────────────────────────────────────

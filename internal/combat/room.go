@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"server-cluster/internal/actor"
+	"server-cluster/share/consts"
 )
 
 // 房间消息类型。
@@ -14,22 +15,14 @@ const (
 	MsgQuery = "query"
 )
 
-// 玩家初始属性。
-const (
-	initialHP       = 100
-	initialAttack   = 100
-	initialDefense  = 0
-	initialSpeed    = 100
-)
-
 // PlayerState 房间内玩家的战斗状态。
 type PlayerState struct {
-	ID          int64
+	ID           int64
 	GridX, GridY int
-	HP          int
-	BaseAttack  int
-	BaseDefense int
-	BaseSpeed   int
+	HP           int
+	BaseAttack   int
+	BaseDefense  int
+	BaseSpeed    int
 	// Attack/Defense/Speed 为叠加 buff 后的实时属性。
 	Attack    int
 	Defense   int
@@ -104,13 +97,13 @@ func (r *CombatRoom) handleJoin(m *CombatMsg) {
 		ID:          m.PlayerID,
 		GridX:       m.X,
 		GridY:       m.Y,
-		HP:          initialHP,
-		BaseAttack:  initialAttack,
-		BaseDefense: initialDefense,
-		BaseSpeed:   initialSpeed,
-		Attack:      initialAttack,
-		Defense:     initialDefense,
-		Speed:       initialSpeed,
+		HP:          consts.CombatInitialHP,
+		BaseAttack:  consts.CombatInitialAttack,
+		BaseDefense: consts.CombatInitialDefense,
+		BaseSpeed:   consts.CombatInitialSpeed,
+		Attack:      consts.CombatInitialAttack,
+		Defense:     consts.CombatInitialDefense,
+		Speed:       consts.CombatInitialSpeed,
 		Cooldowns:   make(map[int]int64),
 	}
 	r.Players[p.ID] = p

@@ -1496,6 +1496,55 @@ paths:
       summary: 在线玩家
       tags:
       - system
+  /api/v1/gm/record:
+    get:
+      parameters:
+      - description: 动作：1 获得 2 消耗
+        in: query
+        name: action
+        required: true
+        type: integer
+      - description: 模块：item|equip|weapon|skill|hero
+        in: query
+        name: module
+        required: true
+        type: string
+      - description: 玩家ID
+        in: query
+        name: playerId
+        type: integer
+      - description: 配置ID
+        in: query
+        name: cfgId
+        type: integer
+      - description: 创建时间起（毫秒）
+        in: query
+        name: begin
+        type: integer
+      - description: 创建时间止（毫秒）
+        in: query
+        name: end
+        type: integer
+      - default: 1
+        description: 页码
+        in: query
+        name: pageIndex
+        type: integer
+      - default: 10
+        description: 每页条数
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 响应包在 {code, message, data} 中
+          schema:
+            $ref: '#/definitions/dto.Resp'
+      summary: GM 打点记录列表
+      tags:
+      - gm
   /api/v1/gm/skill:
     get:
       parameters:

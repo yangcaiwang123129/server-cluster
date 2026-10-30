@@ -1543,6 +1543,79 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/gm/record": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 打点记录列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "动作：1 获得 2 消耗",
+                        "name": "action",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "模块：item|equip|weapon|skill|hero",
+                        "name": "module",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "玩家ID",
+                        "name": "playerId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "配置ID",
+                        "name": "cfgId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "创建时间起（毫秒）",
+                        "name": "begin",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "创建时间止（毫秒）",
+                        "name": "end",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "页码",
+                        "name": "pageIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "每页条数",
+                        "name": "pageSize",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/gm/skill": {
             "get": {
                 "produces": [

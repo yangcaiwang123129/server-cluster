@@ -19,7 +19,6 @@ type GmSkillLogic interface {
 	SkillUpdate(req dto.GmSkillUpdateReq) (*dto.GmSkillEntry, error)
 }
 
-// gmSkillLogicInst 技能 GM 业务单例容器。
 var gmSkillLogicInst = singleton.NewContainer[GmSkillLogic]("GmSkillLogic")
 
 // RegisterGmSkillLogic 装配期注册技能 GM 业务实现。
@@ -31,7 +30,6 @@ func GmSkill() GmSkillLogic { return gmSkillLogicInst.MustGet() }
 // gmSkillLogic 技能 GM 业务实现。
 type gmSkillLogic struct{}
 
-// init 装配期自注册实现。
 func init() {
 	RegisterGmSkillLogic(&gmSkillLogic{})
 }

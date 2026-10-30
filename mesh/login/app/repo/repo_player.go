@@ -21,7 +21,6 @@ type PlayerRepo interface {
 
 var playerRepo = singleton.NewContainer[PlayerRepo]("PlayerRepo")
 
-// init 装配期自注册实现。
 func init() {
 	playerRepo.Register(NewAccountRepo())
 }

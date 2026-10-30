@@ -21,7 +21,6 @@ type equipLogic struct{}
 
 var equipLogicInst = singleton.NewContainer[global.EquipLogic]("EquipLogic")
 
-// init 装配期自注册实现。
 func init() {
 	equipLogicInst.Register(&equipLogic{})
 }

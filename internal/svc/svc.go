@@ -2,6 +2,8 @@
 package svc
 
 import (
+	"fmt"
+
 	"github.com/dobyte/due/component/http/v2"
 	"github.com/dobyte/due/v2/cluster/node"
 	"github.com/dobyte/due/v2/etc"
@@ -9,6 +11,9 @@ import (
 	"github.com/dobyte/due/v2/registry"
 	"github.com/dobyte/jwt"
 	"gorm.io/gorm"
+
+	"server-cluster/share/consts"
+	"server-cluster/share/util"
 )
 
 // Context 基础设施句柄集合，以后扩展 etcd、kafka 等都挂在这里。
@@ -38,7 +43,7 @@ func Init() error {
 	}
 	c := &Context{MySQL: mysqlMgr, Redis: redisMgr}
 	// 雪花 ID 生成器：节点号由 etc.snowflake.node_id 配置（∈[0,1023]），单机默认 1
-	sf, err := newSnowflake(etc.Get("etc.snowflake.node_id", 1).Int64())
+	sf, err := newSnowflake(etc.Get("etc.snowflake.node_id", consts.SnowflakeNodeID).Int64())
 	if err != nil {
 		_ = mysqlMgr.Close()
 		_ = redisMgr.Close()
@@ -50,7 +55,7 @@ func Init() error {
 		inst, err := jwt.NewJWT(
 			jwt.WithSecretKey(secret),
 			jwt.WithSignAlgorithm(jwt.HS256),
-			jwt.WithValidDuration(etc.Get("etc.jwt.valid_duration", 7200).Int()),
+			jwt.WithValidDuration(etc.Get("etc.jwt.valid_duration", consts.JWTValidDuration).Int()),
 		)
 		if err != nil {
 			_ = mysqlMgr.Close()
@@ -132,4 +137,29 @@ func Close() error {
 	}
 	ctx = nil
 	return err
+}
+
+// Counts 返回已建立的 MySQL / Redis 实例数（未初始化或已释放时返回 0）。
+func Counts() (mysql, redis int) {
+	if ctx == nil {
+		return 0, 0
+	}
+	if ctx.MySQL != nil {
+		mysql = ctx.MySQL.Len()
+	}
+	if ctx.Redis != nil {
+		redis = ctx.Redis.Len()
+	}
+	return
+}
+
+// CloseWithLog 释放 MySQL / Redis 并按统一停服日志输出，供各服务 Destroy 调用。
+func CloseWithLog(service string) {
+	sl := util.NewShutdownLog(service, 1)
+	sl.Start()
+	mysql, redis := Counts()
+	sl.Step("MySQL / Redis 连接关闭", func() (string, error) {
+		return fmt.Sprintf("MySQL %d 实例 · Redis %d 实例", mysql, redis), Close()
+	})
+	sl.End()
 }

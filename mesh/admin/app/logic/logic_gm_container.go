@@ -38,7 +38,6 @@ func GmContainer() GmContainerLogic { return gmContainerLogicInst.MustGet() }
 // gmContainerLogic 容器 GM 业务实现。
 type gmContainerLogic struct{}
 
-// init 装配期自注册实现。
 func init() {
 	RegisterGmContainerLogic(&gmContainerLogic{})
 }

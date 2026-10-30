@@ -7,14 +7,7 @@ import (
 	"time"
 
 	"server-cluster/internal/actor"
-)
-
-// 房间 actor 默认参数。
-const (
-	// defaultTickRate 房间逻辑帧率。
-	defaultTickRate = 50 * time.Millisecond
-	// defaultQueueSize 房间消息队列长度。
-	defaultQueueSize = 512
+	"server-cluster/share/consts"
 )
 
 // RoomManager 管理所有战斗房间 actor 的生命周期。
@@ -44,7 +37,7 @@ func (m *RoomManager) CreateRoom(id int64, grid *RuntimeGrid) bool {
 		return false
 	}
 	room := NewCombatRoom(id, grid)
-	a := actor.New(room, defaultTickRate, defaultQueueSize)
+	a := actor.New(room, consts.CombatTickRate, consts.CombatQueueSize)
 	m.rooms[id] = a
 	m.mu.Unlock()
 
