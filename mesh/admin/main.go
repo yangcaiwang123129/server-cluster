@@ -8,11 +8,12 @@
 package main
 
 import (
+	"server-cluster/share/consts"
+
 	"github.com/dobyte/due/component/http/v2"
 	"github.com/dobyte/due/registry/etcd/v2"
 	"github.com/dobyte/due/transport/grpc/v2"
 	"github.com/dobyte/due/v2"
-	"github.com/dobyte/due/v2/etc"
 	"github.com/dobyte/due/v2/log"
 
 	"server-cluster/internal/singleinstance"
@@ -23,8 +24,7 @@ import (
 
 func main() {
 	// 单实例保护：重复启动会触发 due 日志 rotate 失败 panic，提前拦截
-	// 实例标识读取 etc 中的集群实例 ID，避免写死
-	singleinstance.Check(instanceID())
+	singleinstance.Check(consts.MeshInstanceID())
 	// 创建容器
 	container := due.NewContainer()
 	// 创建服务注册发现（admin 经 etcd 发现 game 节点）
@@ -33,7 +33,7 @@ func main() {
 	transporter := grpc.NewTransporter()
 	// 创建 HTTP 组件（监听地址由 etc.http.addr 配置驱动）
 	httpComponent := http.NewServer(
-		http.WithName("admin"),
+		http.WithName(consts.MeshAlias()),
 		http.WithRegistry(registry),
 		http.WithTransporter(transporter),
 	)
@@ -50,7 +50,7 @@ func main() {
 	handler.RegisterClient(httpComponent.Proxy().Router())
 	handler.RegisterCatalog(httpComponent.Proxy().Router())
 	handler.RegisterPlayer(httpComponent.Proxy().Router())
-	handler.RegisterContainer(httpComponent.Proxy().Router())
+	handler.RegisterItem(httpComponent.Proxy().Router())
 	handler.RegisterEquip(httpComponent.Proxy().Router())
 	handler.RegisterHero(httpComponent.Proxy().Router())
 	handler.RegisterSkill(httpComponent.Proxy().Router())
@@ -62,12 +62,4 @@ func main() {
 	container.Serve()
 	// 释放资源
 	global.Destroy()
-}
-
-// instanceID 读取 etc 中配置的集群实例 ID（cluster.mesh.id），未配置时退回服务名。
-func instanceID() string {
-	if id := etc.Get("cluster.mesh.id").String(); id != "" {
-		return id
-	}
-	return "admin"
 }

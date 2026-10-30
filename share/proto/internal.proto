@@ -3,7 +3,7 @@ syntax = "proto3";
 
 package internal;
 
-import "container.proto";
+import "item.proto";
 import "equip.proto";
 import "hero.proto";
 import "skill.proto";
@@ -38,45 +38,45 @@ message KickPlayerResp {
 
 //  ========== 管理后台 GM（admin 服经 mesh 定向调用 game 服，入参统一携带 playerID） ==========
 
-// GmContainerListReq 容器列表请求。
-message GmContainerListReq {
-  int64 player_id = 1;   // 玩家ID
-  pb.ContainerListReq req = 2; // 业务参数（容器类型）
+// GmItemListReq 物品容器列表请求。
+message GmItemListReq {
+  int64 player_id = 1;            // 玩家ID
+  pb.ItemContainerListReq req = 2; // 业务参数（物品容器类型）
 }
 
-// GmContainerMoveReq 容器内移动对象请求。
-message GmContainerMoveReq {
-  int64 player_id = 1;   // 玩家ID
-  pb.ContainerMoveReq req = 2; // 业务参数
-}
-
-// GmContainerRotateReq 容器内旋转对象请求。
-message GmContainerRotateReq {
-  int64 player_id = 1;     // 玩家ID
-  pb.ContainerRotateReq req = 2; // 业务参数
-}
-
-// GmContainerSortReq 容器一键整理请求。
-message GmContainerSortReq {
-  int64 player_id = 1;    // 玩家ID
-  pb.SortContainerReq req = 2; // 业务参数
-}
-
-// GmContainerTransferReq 容器间移动对象请求。
-message GmContainerTransferReq {
-  int64 player_id = 1;       // 玩家ID
-  pb.ContainerTransferReq req = 2; // 业务参数
-}
-
-// GmContainerAddEntryReq 向容器放入对象请求（坐标为左上角格）。
-message GmContainerAddEntryReq {
+// GmItemMoveReq 物品容器内移动对象请求。
+message GmItemMoveReq {
   int64 player_id = 1;      // 玩家ID
-  int32 container_type = 2; // 容器类型：1 背包 2 仓库 3 保险箱
-  int32 cfg_id = 3;    // 对象配置ID
-  int32 count = 4;          // 堆叠数量
-  int32 grid_x = 5;         // 网格X
-  int32 grid_y = 6;         // 网格Y
-  bool rotated = 7;         // 是否旋转放置
+  pb.ItemMoveReq req = 2;   // 业务参数
+}
+
+// GmItemRotateReq 物品容器内旋转对象请求。
+message GmItemRotateReq {
+  int64 player_id = 1;      // 玩家ID
+  pb.ItemRotateReq req = 2; // 业务参数
+}
+
+// GmItemSortReq 物品容器一键整理请求。
+message GmItemSortReq {
+  int64 player_id = 1;    // 玩家ID
+  pb.ItemSortReq req = 2; // 业务参数
+}
+
+// GmItemTransferReq 物品容器间移动对象请求。
+message GmItemTransferReq {
+  int64 player_id = 1;        // 玩家ID
+  pb.ItemTransferReq req = 2; // 业务参数
+}
+
+// GmItemAddEntryReq 向物品容器放入对象请求（坐标为左上角格）。
+message GmItemAddEntryReq {
+  int64 player_id = 1;  // 玩家ID
+  int32 item_type = 2;  // 物品容器类型：1 背包 2 仓库 3 保险箱
+  int32 cfg_id = 3;     // 对象配置ID
+  int32 count = 4;      // 堆叠数量
+  int32 grid_x = 5;     // 网格X
+  int32 grid_y = 6;     // 网格Y
+  bool rotated = 7;     // 是否旋转放置
 }
 
 // GmHeroListReq 英雄列表请求。
@@ -154,18 +154,18 @@ service GameAdminService {
   // KickPlayer 踢玩家下线
   rpc KickPlayer (KickPlayerReq) returns (KickPlayerResp);
 
-  // ContainerList 容器列表
-  rpc ContainerList (GmContainerListReq) returns (pb.ContainerListResp);
-  // ContainerMove 容器内移动对象
-  rpc ContainerMove (GmContainerMoveReq) returns (pb.ContainerMoveResp);
-  // ContainerRotate 容器内旋转对象
-  rpc ContainerRotate (GmContainerRotateReq) returns (pb.ContainerRotateResp);
-  // ContainerSort 容器一键整理
-  rpc ContainerSort (GmContainerSortReq) returns (pb.SortContainerResp);
-  // ContainerTransfer 容器间移动对象
-  rpc ContainerTransfer (GmContainerTransferReq) returns (pb.ContainerTransferResp);
-  // ContainerAddEntry 向容器放入对象（返回变更后的容器）
-  rpc ContainerAddEntry (GmContainerAddEntryReq) returns (pb.ContainerListResp);
+  // ItemList 物品容器列表
+  rpc ItemList (GmItemListReq) returns (pb.ItemContainerListResp);
+  // ItemMove 物品容器内移动对象
+  rpc ItemMove (GmItemMoveReq) returns (pb.ItemMoveResp);
+  // ItemRotate 物品容器内旋转对象
+  rpc ItemRotate (GmItemRotateReq) returns (pb.ItemRotateResp);
+  // ItemSort 物品容器一键整理
+  rpc ItemSort (GmItemSortReq) returns (pb.ItemSortResp);
+  // ItemTransfer 物品容器间移动对象
+  rpc ItemTransfer (GmItemTransferReq) returns (pb.ItemTransferResp);
+  // ItemAddEntry 向物品容器放入对象（返回变更后的物品容器）
+  rpc ItemAddEntry (GmItemAddEntryReq) returns (pb.ItemContainerListResp);
 
   // HeroList 英雄列表
   rpc HeroList (GmHeroListReq) returns (pb.HeroListResp);
@@ -195,4 +195,3 @@ service GameAdminService {
   // EquipUpdate 更新装备
   rpc EquipUpdate (GmEquipUpdateReq) returns (pb.EquipUpdateResp);
 }
-

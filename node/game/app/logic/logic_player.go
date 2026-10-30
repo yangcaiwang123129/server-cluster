@@ -40,7 +40,7 @@ func init() {
 // moduleLogics 持有玩家数据的模块，按进入/离开的统一顺序驱动。
 // 延迟获取单例：各模块的 init 注册顺序不确定，不能在包初始化阶段调用。
 func moduleLogics() []global.ModuleLogic {
-	return []global.ModuleLogic{Container(), Hero(), Skill(), Weapon(), Equip()}
+	return []global.ModuleLogic{Item(), Hero(), Skill(), Weapon(), Equip()}
 }
 
 // PlayerLogic 获取玩家模块业务单例。
@@ -63,14 +63,16 @@ func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.
 		return nil, err
 	}
 
-	// 资产行可能尚未创建，读不到时按全 0 处理
-	assets, err := global.PlayerAssetCache.Get(ctx, playerID)
-	if err != nil {
+	// 账号行由 login 服建档；异常缺失时按全 0 货币处理，不阻断进入游戏
+	player, err := global.PlayerCache.Get(ctx, playerID)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		player = &model.Player{PlayerID: playerID}
+	} else if err != nil {
 		return nil, err
 	}
 
 	// 各玩家数据模块预热/建档，并把各自需要下发的初始状态合并进响应；任一失败则不进入游戏
-	resp := &pb.EnterGameResp{PlayerMagicAttr: buildPlayerMagicAttr(core, assets)}
+	resp := &pb.EnterGameResp{PlayerMagicAttr: buildPlayerMagicAttr(core, player)}
 	for _, mod := range moduleLogics() {
 		part, err := mod.EnterGame(ctx, playerID, req)
 		if err != nil {
@@ -103,22 +105,17 @@ func mergeEnterGameResp(dst, src *pb.EnterGameResp) {
 }
 
 // buildPlayerMagicAttr 组装下发给客户端的玩家属性表：
-// 昵称/等级/经验/vip 取自 player_extra，币/金取自 player_asset。
+// 昵称/等级/经验/vip 取自 player_extra，币/金取自 player。
 // 键为 MagicAttr 枚举值，值按实际类型放入 ObjectValue。
-func buildPlayerMagicAttr(core *model.PlayerExtra, assets []*model.PlayerAsset) *pb.MagicAttrMap {
-	var coin, gold int64
-	for _, a := range assets {
-		coin += a.Coin
-		gold += a.Gold
-	}
+func buildPlayerMagicAttr(core *model.PlayerExtra, player *model.Player) *pb.MagicAttrMap {
 	return &pb.MagicAttrMap{Values: map[int32]*pb.ObjectValue{
 		int32(pb.MagicAttr_PLAYER_ATTR_NAME):      {Kind: &pb.ObjectValue_StringValue{StringValue: core.Nickname}},
 		int32(pb.MagicAttr_PLAYER_ATTR_LEVEL):     {Kind: &pb.ObjectValue_IntValue{IntValue: core.Level}},
 		int32(pb.MagicAttr_PLAYER_ATTR_EXP):       {Kind: &pb.ObjectValue_BigintValue{BigintValue: core.Exp}},
 		int32(pb.MagicAttr_PLAYER_ATTR_VIP_LEVEL): {Kind: &pb.ObjectValue_IntValue{IntValue: core.VipLevel}},
 		int32(pb.MagicAttr_PLAYER_ATTR_VIP_EXP):   {Kind: &pb.ObjectValue_BigintValue{BigintValue: core.VipExp}},
-		int32(pb.MagicAttr_PLAYER_ATTR_COIN):      {Kind: &pb.ObjectValue_BigintValue{BigintValue: coin}},
-		int32(pb.MagicAttr_PLAYER_ATTR_GOLD):      {Kind: &pb.ObjectValue_BigintValue{BigintValue: gold}},
+		int32(pb.MagicAttr_PLAYER_ATTR_COIN):      {Kind: &pb.ObjectValue_BigintValue{BigintValue: player.Coin}},
+		int32(pb.MagicAttr_PLAYER_ATTR_GOLD):      {Kind: &pb.ObjectValue_BigintValue{BigintValue: player.Gold}},
 	}}
 }
 
@@ -141,10 +138,9 @@ func (this *playerLogic) LeaveGame(ctx context.Context, playerID int64, req *pb.
 		_, err := mod.LeaveGame(ctx, playerID, req)
 		record("module", err)
 	}
-	// 无独立模块的玩家表：账号、核心、资产
-	record("player_base", flushAndEvict(ctx, global.PlayerBaseCache, playerID))
+	// 无独立模块的玩家表：账号（含货币）、核心
+	record("player", flushAndEvict(ctx, global.PlayerCache, playerID))
 	record("player_core", flushAndEvict(ctx, global.PlayerExtraCache, playerID))
-	record("player_asset", flushAndEvict(ctx, global.PlayerAssetCache, playerID))
 
 	record("player_actor", this.PlayerDestroyActor(ctx, playerID))
 	return &pb.LeaveGameResp{}, firstErr

@@ -2,55 +2,70 @@
   {
     "id": 1001,
     "desc": "给玩家加弹药",
-    "name": "弹夹",
+    "name": "弹药包",
     "collectionType": 0,
     "characterId": 1006,
+    "collectionIcon": "Collection_Ammo1",
     "collectionTime": 2,
     "collection": {
-      "$type": "BulletCollection",
-      "count": 60
+      "$type": "LBulletCollection",
+      "count": 30
     },
-    "tips": "弹药",
-    "tipsTween": "+60弹药",
-    "useWays": [],
-    "rarity": 0,
-    "type": 0,
-    "maxCount": 0,
-    "overlayMaxCount": 0,
-    "storageType": 0,
-    "price": 0,
-    "sellingPrice": 0,
-    "usedInBackpack": false
+    "tips": "小弹药",
+    "tipsTween": "+30弹药"
   },
   {
     "id": 1002,
+    "desc": "给玩家加弹药",
+    "name": "弹药包",
+    "collectionType": 0,
+    "characterId": 1006,
+    "collectionIcon": "Collection_Ammo1",
+    "collectionTime": 2,
+    "collection": {
+      "$type": "MBulletCollection",
+      "count": 60
+    },
+    "tips": "中弹药",
+    "tipsTween": "+60弹药"
+  },
+  {
+    "id": 1003,
+    "desc": "给玩家加弹药",
+    "name": "弹药包",
+    "collectionType": 0,
+    "characterId": 1006,
+    "collectionIcon": "Collection_Ammo1",
+    "collectionTime": 2,
+    "collection": {
+      "$type": "HBulletCollection",
+      "count": 90
+    },
+    "tips": "大弹药",
+    "tipsTween": "+90弹药"
+  },
+  {
+    "id": 1004,
     "desc": "给玩家加护甲",
     "name": "护甲",
     "collectionType": 2,
-    "characterId": 1007,
+    "characterId": 1006,
+    "collectionIcon": "Collection_Armor1",
     "collectionTime": 2,
     "collection": {
       "$type": "ArmorCollection",
       "value": 50
     },
     "tips": "护甲",
-    "tipsTween": "+50护甲",
-    "useWays": [],
-    "rarity": 0,
-    "type": 0,
-    "maxCount": 0,
-    "overlayMaxCount": 0,
-    "storageType": 0,
-    "price": 0,
-    "sellingPrice": 0,
-    "usedInBackpack": false
+    "tipsTween": "+50护甲"
   },
   {
-    "id": 1003,
+    "id": 1005,
     "desc": "给玩家加血包",
     "name": "血包",
     "collectionType": 1,
-    "characterId": 1008,
+    "characterId": 1006,
+    "collectionIcon": "Collection_Cure1",
     "collectionTime": 2,
     "collection": {
       "$type": "CureCollection",
@@ -58,84 +73,276 @@
       "duration": 2
     },
     "tips": "血包",
-    "tipsTween": "+30血包",
-    "useWays": [],
-    "rarity": 0,
-    "type": 0,
-    "maxCount": 0,
-    "overlayMaxCount": 0,
-    "storageType": 0,
-    "price": 0,
-    "sellingPrice": 0,
-    "usedInBackpack": false
-  },
-  {
-    "id": 1004,
-    "desc": "给玩家加防弹衣",
-    "name": "防弹衣",
-    "collectionType": 3,
-    "characterId": 1009,
-    "collectionTime": 2,
-    "collection": {
-      "$type": "BodyArmorCollection",
-      "level": 1
-    },
-    "tips": "防弹衣",
-    "tipsTween": "+1级防弹衣",
-    "useWays": [],
-    "rarity": 0,
-    "type": 0,
-    "maxCount": 0,
-    "overlayMaxCount": 0,
-    "storageType": 0,
-    "price": 0,
-    "sellingPrice": 0,
-    "usedInBackpack": false
-  },
-  {
-    "id": 1005,
-    "desc": "给玩家加防弹衣",
-    "name": "防弹衣",
-    "collectionType": 3,
-    "characterId": 1009,
-    "collectionTime": 2,
-    "collection": {
-      "$type": "BodyArmorCollection",
-      "level": 2
-    },
-    "tips": "防弹衣",
-    "tipsTween": "+2级防弹衣",
-    "useWays": [],
-    "rarity": 0,
-    "type": 0,
-    "maxCount": 0,
-    "overlayMaxCount": 0,
-    "storageType": 0,
-    "price": 0,
-    "sellingPrice": 0,
-    "usedInBackpack": false
+    "tipsTween": "+30血包"
   },
   {
     "id": 1006,
     "desc": "给玩家加防弹衣",
-    "name": "防弹衣",
+    "name": "防弹衣1",
     "collectionType": 3,
-    "characterId": 1009,
+    "characterId": 1006,
+    "collectionIcon": "Collection_BodyArmor1",
     "collectionTime": 2,
     "collection": {
-      "$type": "BodyArmorCollection",
+      "$type": "LBodyArmorCollection",
+      "level": 1
+    },
+    "tips": "防弹衣",
+    "tipsTween": "+1级防弹衣"
+  },
+  {
+    "id": 1007,
+    "desc": "给玩家加防弹衣",
+    "name": "防弹衣2",
+    "collectionType": 3,
+    "characterId": 1006,
+    "collectionIcon": "Collection_BodyArmor2",
+    "collectionTime": 2,
+    "collection": {
+      "$type": "MBodyArmorCollection",
+      "level": 2
+    },
+    "tips": "防弹衣",
+    "tipsTween": "+2级防弹衣"
+  },
+  {
+    "id": 1008,
+    "desc": "给玩家加防弹衣",
+    "name": "防弹衣3",
+    "collectionType": 3,
+    "characterId": 1006,
+    "collectionIcon": "Collection_BodyArmor3",
+    "collectionTime": 2,
+    "collection": {
+      "$type": "HBodyArmorCollection",
       "level": 3
     },
-    "tips": "血包",
-    "tipsTween": "+3级防弹衣",
-    "useWays": [],
-    "rarity": 0,
-    "type": 0,
-    "maxCount": 0,
-    "overlayMaxCount": 0,
-    "storageType": 0,
-    "price": 0,
-    "sellingPrice": 0,
-    "usedInBackpack": false
+    "tips": "防弹衣",
+    "tipsTween": "+3级防弹衣"
+  },
+  {
+    "id": 1009,
+    "desc": "给玩家加穿透等级",
+    "name": "穿甲弹1",
+    "collectionType": 4,
+    "characterId": 1006,
+    "collectionIcon": "Collection_Grip1",
+    "collectionTime": 2,
+    "collection": {
+      "$type": "LGripCollection",
+      "level": 1
+    },
+    "tips": "穿甲弹",
+    "tipsTween": "+1级穿透等级"
+  },
+  {
+    "id": 1010,
+    "desc": "给玩家加穿透等级",
+    "name": "穿甲弹2",
+    "collectionType": 4,
+    "characterId": 1006,
+    "collectionIcon": "Collection_Grip2",
+    "collectionTime": 2,
+    "collection": {
+      "$type": "MGripCollection",
+      "level": 2
+    },
+    "tips": "穿甲弹",
+    "tipsTween": "+2级穿透等级"
+  },
+  {
+    "id": 1011,
+    "desc": "给玩家加穿透等级",
+    "name": "穿甲弹3",
+    "collectionType": 4,
+    "characterId": 1006,
+    "collectionIcon": "Collection_Grip3",
+    "collectionTime": 2,
+    "collection": {
+      "$type": "HGripCollection",
+      "level": 3
+    },
+    "tips": "穿甲弹",
+    "tipsTween": "+3级穿透等级"
+  },
+  {
+    "id": 1012,
+    "desc": "使玩家的瞄准更快",
+    "name": "握把1",
+    "collectionType": 5,
+    "characterId": 1006,
+    "collectionIcon": "Collection_Handle1",
+    "collectionTime": 2,
+    "collection": {
+      "$type": "LHandleCollection",
+      "lever": 1
+    },
+    "tips": "握把",
+    "tipsTween": "-15%子弹散布"
+  },
+  {
+    "id": 1013,
+    "desc": "使玩家的瞄准更快，散步更低",
+    "name": "握把2",
+    "collectionType": 5,
+    "characterId": 1006,
+    "collectionIcon": "Collection_Handle2",
+    "collectionTime": 2,
+    "collection": {
+      "$type": "MHandleCollection",
+      "lever": 2
+    },
+    "tips": "握把",
+    "tipsTween": "-20%子弹散布，-20%瞄准时间"
+  },
+  {
+    "id": 1014,
+    "desc": "使玩家的瞄准更快，散步更低",
+    "name": "握把3",
+    "collectionType": 5,
+    "characterId": 1006,
+    "collectionIcon": "Collection_Handle3",
+    "collectionTime": 2,
+    "collection": {
+      "$type": "HHandleCollection",
+      "lever": 3
+    },
+    "tips": "握把",
+    "tipsTween": "-30%子弹散布，-40%瞄准时间"
+  },
+  {
+    "id": 1015,
+    "desc": "使玩家弹夹容量扩大",
+    "name": "弹夹",
+    "collectionType": 6,
+    "characterId": 1006,
+    "collectionIcon": "Collection_Magazine1",
+    "collectionTime": 2,
+    "collection": {
+      "$type": "LMagazineCollection",
+      "level": 1
+    },
+    "tips": "弹夹",
+    "tipsTween": "+20%装弹速度"
+  },
+  {
+    "id": 1016,
+    "desc": "使玩家的拾音范围扩大",
+    "name": "战术雷达1",
+    "collectionType": 7,
+    "characterId": 1006,
+    "collectionIcon": "Collection_Radar1",
+    "collectionTime": 2,
+    "collection": {
+      "$type": "LRadarCollection",
+      "level": 1
+    },
+    "tips": "战术雷达",
+    "tipsTween": "+10%拾音范围"
+  },
+  {
+    "id": 1017,
+    "desc": "使玩家的拾音范围扩大",
+    "name": "战术雷达2",
+    "collectionType": 7,
+    "characterId": 1006,
+    "collectionIcon": "Collection_Radar2",
+    "collectionTime": 2,
+    "collection": {
+      "$type": "MRadarCollection",
+      "level": 2
+    },
+    "tips": "战术雷达",
+    "tipsTween": "+20%拾音范围"
+  },
+  {
+    "id": 1018,
+    "desc": "使玩家的拾音范围扩大",
+    "name": "战术雷达3",
+    "collectionType": 7,
+    "characterId": 1006,
+    "collectionIcon": "Collection_Radar3",
+    "collectionTime": 2,
+    "collection": {
+      "$type": "HRadarCollection",
+      "level": 3
+    },
+    "tips": "战术雷达",
+    "tipsTween": "+30%拾音范围"
+  },
+  {
+    "id": 1019,
+    "desc": "使玩家视野和射击距离提升",
+    "name": "瞄准镜",
+    "collectionType": 8,
+    "characterId": 1006,
+    "collectionIcon": "Collection_Scope1",
+    "collectionTime": 2,
+    "collection": {
+      "$type": "LScopeCollection",
+      "level": 1
+    },
+    "tips": "瞄准镜",
+    "tipsTween": "+10%视野范围"
+  },
+  {
+    "id": 1020,
+    "desc": "使玩家移速提升，移动响度降低",
+    "name": "战术靴1",
+    "collectionType": 9,
+    "characterId": 1006,
+    "collectionIcon": "Collection_Shoe1",
+    "collectionTime": 2,
+    "collection": {
+      "$type": "LShoeCollection",
+      "level": 1
+    },
+    "tips": "战术靴",
+    "tipsTween": "-10%移动响度"
+  },
+  {
+    "id": 1021,
+    "desc": "使玩家移速提升，移动响度降低",
+    "name": "战术靴2",
+    "collectionType": 9,
+    "characterId": 1006,
+    "collectionIcon": "Collection_Shoe2",
+    "collectionTime": 2,
+    "collection": {
+      "$type": "MShoeCollection",
+      "level": 2
+    },
+    "tips": "战术靴",
+    "tipsTween": "-15%移动响度，+5%移动速度"
+  },
+  {
+    "id": 1022,
+    "desc": "使玩家移速提升，移动响度降低",
+    "name": "战术靴3",
+    "collectionType": 9,
+    "characterId": 1006,
+    "collectionIcon": "Collection_Shoe3",
+    "collectionTime": 2,
+    "collection": {
+      "$type": "HShoeCollection",
+      "level": 3
+    },
+    "tips": "战术靴",
+    "tipsTween": "-25%移动响度，+10%移动速度"
+  },
+  {
+    "id": 1023,
+    "desc": "降低射击响度，提升子弹射速",
+    "name": "消音器",
+    "collectionType": 10,
+    "characterId": 1006,
+    "collectionIcon": "Collection_Silencer1",
+    "collectionTime": 2,
+    "collection": {
+      "$type": "LSilencerCollection",
+      "level": 1
+    },
+    "tips": "消音器",
+    "tipsTween": "-20%射击响度"
   }
 ]

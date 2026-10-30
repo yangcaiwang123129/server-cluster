@@ -130,15 +130,15 @@ var defaultMenus = []seedMenu{
 				},
 			},
 			{
-				Menu: model.SysMenu{MenuName: "GameContainerManage", Title: "容器管理", Path: "/game/container/index", Component: "/admin/game-container/index", MenuType: "C", Icon: "component", Permission: "game:gm:container:list", Sort: 2, Visible: "0", IsFrame: "1"},
+				Menu: model.SysMenu{MenuName: "GameItemManage", Title: "物品管理", Path: "/game/item/index", Component: "/admin/game-item/index", MenuType: "C", Icon: "component", Permission: "game:gm:item:list", Sort: 2, Visible: "0", IsFrame: "1"},
 				Apis: []seedAPI{
 					{"物品配置列表", "/api/v1/gm/catalog", "GET"},
-					{"GM容器列表", "/api/v1/gm/container", "GET"},
-					{"GM添加物品", "/api/v1/gm/container/item", "POST"},
-					{"GM移动物品", "/api/v1/gm/container/move", "POST"},
-					{"GM旋转物品", "/api/v1/gm/container/rotate", "POST"},
-					{"GM整理容器", "/api/v1/gm/container/sort", "POST"},
-					{"GM转移物品", "/api/v1/gm/container/transfer", "POST"},
+					{"GM物品容器列表", "/api/v1/gm/item", "GET"},
+					{"GM添加物品", "/api/v1/gm/item/add", "POST"},
+					{"GM移动物品", "/api/v1/gm/item/move", "POST"},
+					{"GM旋转物品", "/api/v1/gm/item/rotate", "POST"},
+					{"GM整理物品容器", "/api/v1/gm/item/sort", "POST"},
+					{"GM转移物品", "/api/v1/gm/item/transfer", "POST"},
 				},
 			},
 			{

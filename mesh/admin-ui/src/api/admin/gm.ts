@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 import type { ApiResponse, PageResult } from '@/types/api'
-import type { GameCatalogEntry, GmContainer, GmEquip, GmHero, GmRecord, GmSkill, GmWeapon } from '@/types/admin'
+import type { GameCatalogEntry, GmEquip, GmHero, GmItem, GmRecord, GmSkill, GmWeapon } from '@/types/admin'
 
 /**
  * GM 接口：admin 经 mesh 转发到 game 服，每个方法对应 game 侧 logic 的一个函数。
@@ -21,53 +21,53 @@ export function listGameCatalog(params: {
   })
 }
 
-// ── 容器 ──────────────────────────────────────────────────────────
+// ── 物品 ──────────────────────────────────────────────────────────
 
-/** 容器列表，containerType 为 0 时返回全部容器。 */
-export function listGmContainer(params: { playerId: number; containerType?: number }) {
-  return request<ApiResponse<GmContainer[]>>({
-    url: '/api/v1/gm/container',
+/** 物品容器列表，itemType 为 0 时返回全部物品容器。 */
+export function listGmItem(params: { playerId: number; itemType?: number }) {
+  return request<ApiResponse<GmItem[]>>({
+    url: '/api/v1/gm/item',
     method: 'get',
     params
   })
 }
 
-/** 容器内移动物品。itemId 为雪花 ID 字符串（JSON 大 int64 会丢精度）。 */
-export function moveGmContainerItem(data: {
+/** 物品容器内移动物品。itemId 为雪花 ID 字符串（JSON 大 int64 会丢精度）。 */
+export function moveGmItem(data: {
   playerId: number
-  containerType: number
+  itemType: number
   itemId: string
   toX: number
   toY: number
   rotated: boolean
 }) {
   return request<ApiResponse<null>>({
-    url: '/api/v1/gm/container/move',
+    url: '/api/v1/gm/item/move',
     method: 'post',
     data
   })
 }
 
-/** 容器内旋转物品。 */
-export function rotateGmContainerItem(data: { playerId: number; containerType: number; itemId: string }) {
+/** 物品容器内旋转物品。 */
+export function rotateGmItem(data: { playerId: number; itemType: number; itemId: string }) {
   return request<ApiResponse<null>>({
-    url: '/api/v1/gm/container/rotate',
+    url: '/api/v1/gm/item/rotate',
     method: 'post',
     data
   })
 }
 
-/** 容器一键整理。 */
-export function sortGmContainer(data: { playerId: number; containerType: number }) {
+/** 物品容器一键整理。 */
+export function sortGmItem(data: { playerId: number; itemType: number }) {
   return request<ApiResponse<null>>({
-    url: '/api/v1/gm/container/sort',
+    url: '/api/v1/gm/item/sort',
     method: 'post',
     data
   })
 }
 
-/** 容器间移动物品（返回变更后的源/目标容器）。 */
-export function transferGmContainerItem(data: {
+/** 物品容器间移动物品（返回变更后的源/目标容器）。 */
+export function transferGmItem(data: {
   playerId: number
   fromType: number
   toType: number
@@ -76,25 +76,25 @@ export function transferGmContainerItem(data: {
   toY: number
   rotated: boolean
 }) {
-  return request<ApiResponse<GmContainer[]>>({
-    url: '/api/v1/gm/container/transfer',
+  return request<ApiResponse<GmItem[]>>({
+    url: '/api/v1/gm/item/transfer',
     method: 'post',
     data
   })
 }
 
-/** 向容器放入物品（返回变更后的容器）。 */
-export function addGmContainerItem(data: {
+/** 向物品容器放入物品（返回变更后的容器）。 */
+export function addGmItem(data: {
   playerId: number
-  containerType: number
+  itemType: number
   itemCfgId: number
   count: number
   gridX: number
   gridY: number
   rotated: boolean
 }) {
-  return request<ApiResponse<GmContainer[]>>({
-    url: '/api/v1/gm/container/item',
+  return request<ApiResponse<GmItem[]>>({
+    url: '/api/v1/gm/item/add',
     method: 'post',
     data
   })

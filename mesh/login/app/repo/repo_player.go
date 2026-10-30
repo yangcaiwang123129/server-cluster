@@ -14,9 +14,9 @@ import (
 // PlayerRepo 账号数据访问接口。
 type PlayerRepo interface {
 	// Save 创建账号
-	Save(ctx context.Context, m *model.PlayerBase) error
+	Save(ctx context.Context, m *model.Player) error
 	// FindByUsername 按用户名查询
-	FindByUsername(ctx context.Context, username string) (*model.PlayerBase, error)
+	FindByUsername(ctx context.Context, username string) (*model.Player, error)
 }
 
 var playerRepo = singleton.NewContainer[PlayerRepo]("PlayerRepo")
@@ -33,7 +33,7 @@ type playerRepoImpl struct{}
 // NewAccountRepo 构造 gorm 实现。
 func NewAccountRepo() PlayerRepo { return &playerRepoImpl{} }
 
-func (this *playerRepoImpl) Save(ctx context.Context, m *model.PlayerBase) error {
+func (this *playerRepoImpl) Save(ctx context.Context, m *model.Player) error {
 	db, err := svc.Ctx().DB()
 	if err != nil {
 		return gorm.ErrInvalidDB
@@ -41,24 +41,24 @@ func (this *playerRepoImpl) Save(ctx context.Context, m *model.PlayerBase) error
 	return db.WithContext(ctx).Save(m).Error
 }
 
-func (this *playerRepoImpl) FindByUsername(ctx context.Context, username string) (*model.PlayerBase, error) {
+func (this *playerRepoImpl) FindByUsername(ctx context.Context, username string) (*model.Player, error) {
 	db, err := svc.Ctx().DB()
 	if err != nil {
 		return nil, gorm.ErrInvalidDB
 	}
-	var m *model.PlayerBase
+	var m *model.Player
 	if err := db.WithContext(ctx).Where("username = ?", username).First(&m).Error; err != nil {
 		return nil, err
 	}
 	return m, nil
 }
 
-func (this *playerRepoImpl) FindByPhoneNumber(ctx context.Context, username string) (*model.PlayerBase, error) {
+func (this *playerRepoImpl) FindByPhoneNumber(ctx context.Context, username string) (*model.Player, error) {
 	db, err := svc.Ctx().DB()
 	if err != nil {
 		return nil, gorm.ErrInvalidDB
 	}
-	var m *model.PlayerBase
+	var m *model.Player
 	if err := db.WithContext(ctx).Where("phone_number = ?", username).First(&m).Error; err != nil {
 		return nil, err
 	}

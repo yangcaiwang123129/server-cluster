@@ -2,6 +2,7 @@ package global
 
 import (
 	"server-cluster/internal/svc"
+	"server-cluster/share/consts"
 )
 
 // Init 初始化应用：svc（DB/Redis/雪花ID/JWT）→ 自动建表。
@@ -15,5 +16,5 @@ func Init() error {
 
 // Destroy 进程退出后释放 DB / Redis 等资源，并按统一停服日志输出。
 func Destroy() {
-	svc.CloseWithLog("login")
+	svc.CloseWithLog(consts.MeshInstanceID())
 }

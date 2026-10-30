@@ -9,13 +9,13 @@
 package tpl
 
 type SceneCfg struct {
-	Id         int32       `json:"id"`         // id
-	Key        string      `json:"key"`        // 场景加载名字
-	TeamPos    []*TeamPos  `json:"teamPos"`    // 团队位置
-	ItemPos    []*vector3  `json:"itemPos"`    // 物品位置
-	MovePos    []*vector3  `json:"movePos"`    // 移动位置
-	Name       string      `json:"name"`       // 场景名字
-	Desc       string      `json:"desc"`       // 描述
-	BattleType BattleType  `json:"battleType"` // 战斗类型
-	Rewards    []*ItemData `json:"rewards"`    // 奖励
+	Id            int32            `json:"id"`            // id
+	Key           string           `json:"key"`           // 场景加载名字
+	TeamPos       []*TeamPos       `json:"teamPos"`       // 团队位置
+	CollectionPos []*CollectionPos `json:"collectionPos"` // 物品位置
+	MovePos       []*vector3       `json:"movePos"`       // 移动位置
+	Name          string           `json:"name"`          // 场景名字
+	Desc          string           `json:"desc"`          // 描述
+	BattleType    BattleType       `json:"battleType"`    // 战斗类型
+	Rewards       []*ItemData      `json:"rewards"`       // 奖励
 }

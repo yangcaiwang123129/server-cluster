@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# 关服：按 <服务器id>.pid 发送 SIGTERM 优雅停止，跟踪日志等待资源释放完成标记，之后再按需强杀。
+# 关服：按 <服务器id>.pid 发送停止信号，跟踪日志等待资源释放完成标记，之后再按需强杀。
 #
 # 流程：
 #   1. 读取 pid 文件，记录 stdout 日志当前字节偏移（避免误匹配历史标记）
-#   2. kill -15，实时输出该实例新增的停服日志
+#   2. 发优雅停止信号（Unix: kill -15；Windows: taskkill /PID）
 #   3. 等到日志出现 [shutdown] === DONE ===（资源释放完成）或进程自行退出
-#   4. 标记出现后给进程少量时间自然退出；仍未退出或等待超时则 kill -9 兜底
+#   4. 标记出现后给进程少量时间自然退出；仍未退出或等待超时则强杀兜底
 #
 # 环境变量：
 #   SHUTDOWN_TIMEOUT  等待资源释放完成标记的秒数（默认 20）
@@ -20,7 +20,41 @@ DONE_MARK="[shutdown] === DONE ==="
 SHUTDOWN_TIMEOUT="${SHUTDOWN_TIMEOUT:-20}"
 EXIT_TIMEOUT="${EXIT_TIMEOUT:-5}"
 
-alive() { kill -0 "$1" 2>/dev/null; }
+is_windows() {
+    case "$(uname -s)" in
+        *MINGW*|*CYGWIN*|*MSYS*) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+alive() {
+    local pid="$1"
+    if is_windows; then
+        # Git Bash kill -0 不认 Windows PID；用 tasklist 查 PID 列
+        tasklist 2>/dev/null | awk -v p="$pid" '$2==p {found=1; exit} END {exit !found}'
+    else
+        kill -0 "$pid" 2>/dev/null
+    fi
+}
+
+send_term() {
+    # 优雅停止信号：Unix 用 SIGTERM；Windows 用 taskkill /PID（触发 Go 的 signal.Notify 关闭）
+    local pid="$1"
+    if is_windows; then
+        taskkill //PID "$pid" 2>/dev/null || true
+    else
+        kill -15 "$pid" 2>/dev/null || true
+    fi
+}
+
+force_kill() {
+    local pid="$1"
+    if is_windows; then
+        taskkill //F //PID "$pid" 2>/dev/null || true
+    else
+        kill -9 "$pid" 2>/dev/null || true
+    fi
+}
 
 # 日志文件当前字节数；不存在时按 0 处理。
 log_size() {
@@ -50,7 +84,7 @@ if ! alive "$pid"; then
     exit 0
 fi
 
-# 从 offset 之后增量读取日志并回显，命中完成标记时置 marked=1（只消费一次，不重复输出）。
+# 从 offset 之后增量读取日志并回显，命中完成标记时置 marked=1（只消费一次）。
 offset="$(log_size)"
 marked=0
 drain_log() {
@@ -67,12 +101,8 @@ drain_log() {
     fi
 }
 
-echo "[关服] $APP 发送 SIGTERM (pid=$pid)，等待资源释放完成标记…"
-if ! kill -15 "$pid" 2>/dev/null; then
-    rm -f "$PID_FILE"
-    echo "[关服] $APP 信号发送失败（进程可能已退出），已清理 pid 文件"
-    exit 0
-fi
+echo "[关服] $APP 发送停止信号 (pid=$pid)，等待资源释放完成标记…"
+send_term "$pid"
 
 deadline=$((SECONDS + SHUTDOWN_TIMEOUT))
 timed_out=0
@@ -106,8 +136,8 @@ done
 
 forced=0
 if alive "$pid"; then
-    echo "[关服] $APP 进程仍在，kill -9 强制结束 (pid=$pid)"
-    kill -9 "$pid" 2>/dev/null || true
+    echo "[关服] $APP 进程仍在，强制结束 (pid=$pid)"
+    force_kill "$pid"
     forced=1
     for _ in 1 2 3 4 5; do
         alive "$pid" || break

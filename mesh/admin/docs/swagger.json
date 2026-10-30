@@ -1095,190 +1095,6 @@
                 }
             }
         },
-        "/api/v1/gm/container": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "gm"
-                ],
-                "summary": "GM 容器列表",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "玩家ID",
-                        "name": "playerId",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "容器类型 0全部 1背包 2仓库 3保险箱",
-                        "name": "containerType",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "响应包在 {code, message, data} 中",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Resp"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/gm/container/item": {
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "gm"
-                ],
-                "summary": "GM 添加物品",
-                "parameters": [
-                    {
-                        "description": "添加参数",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.GmContainerAddEntryReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "响应包在 {code, message, data} 中",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Resp"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/gm/container/move": {
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "gm"
-                ],
-                "summary": "GM 移动物品",
-                "parameters": [
-                    {
-                        "description": "移动参数",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.GmContainerMoveReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "响应包在 {code, message, data} 中",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Resp"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/gm/container/rotate": {
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "gm"
-                ],
-                "summary": "GM 旋转物品",
-                "parameters": [
-                    {
-                        "description": "旋转参数",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.GmContainerRotateReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "响应包在 {code, message, data} 中",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Resp"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/gm/container/sort": {
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "gm"
-                ],
-                "summary": "GM 整理容器",
-                "parameters": [
-                    {
-                        "description": "整理参数",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.GmContainerSortReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "响应包在 {code, message, data} 中",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Resp"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/gm/container/transfer": {
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "gm"
-                ],
-                "summary": "GM 容器间移动物品",
-                "parameters": [
-                    {
-                        "description": "转移参数",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.GmContainerTransferReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "响应包在 {code, message, data} 中",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Resp"
-                        }
-                    }
-                }
-            }
-        },
         "/api/v1/gm/equip": {
             "get": {
                 "produces": [
@@ -1434,6 +1250,190 @@
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/dto.GmHeroAddReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/item": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 物品容器列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "玩家ID",
+                        "name": "playerId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "物品容器类型 0全部 1背包 2仓库 3保险箱",
+                        "name": "itemType",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/item/add": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 添加物品",
+                "parameters": [
+                    {
+                        "description": "添加参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmItemAddEntryReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/item/move": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 移动物品",
+                "parameters": [
+                    {
+                        "description": "移动参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmItemMoveReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/item/rotate": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 旋转物品",
+                "parameters": [
+                    {
+                        "description": "旋转参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmItemRotateReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/item/sort": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 整理物品容器",
+                "parameters": [
+                    {
+                        "description": "整理参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmItemSortReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/item/transfer": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 物品容器间移动物品",
+                "parameters": [
+                    {
+                        "description": "转移参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmItemTransferReq"
                         }
                     }
                 ],
@@ -3241,134 +3241,6 @@
                 }
             }
         },
-        "dto.GmContainerAddEntryReq": {
-            "type": "object",
-            "properties": {
-                "containerType": {
-                    "description": "容器类型：1 背包 2 仓库 3 保险箱",
-                    "type": "integer"
-                },
-                "count": {
-                    "description": "堆叠数量",
-                    "type": "integer"
-                },
-                "gridX": {
-                    "description": "网格X",
-                    "type": "integer"
-                },
-                "gridY": {
-                    "description": "网格Y",
-                    "type": "integer"
-                },
-                "itemCfgId": {
-                    "description": "物品配置ID",
-                    "type": "integer"
-                },
-                "playerId": {
-                    "description": "玩家ID",
-                    "type": "integer"
-                },
-                "rotated": {
-                    "description": "是否旋转放置",
-                    "type": "boolean"
-                }
-            }
-        },
-        "dto.GmContainerMoveReq": {
-            "type": "object",
-            "properties": {
-                "containerType": {
-                    "description": "容器类型",
-                    "type": "integer"
-                },
-                "itemId": {
-                    "description": "物品实例ID（雪花，按字符串接收）",
-                    "type": "string",
-                    "example": "0"
-                },
-                "playerId": {
-                    "description": "玩家ID",
-                    "type": "integer"
-                },
-                "rotated": {
-                    "description": "是否旋转放置",
-                    "type": "boolean"
-                },
-                "toX": {
-                    "description": "目标X",
-                    "type": "integer"
-                },
-                "toY": {
-                    "description": "目标Y",
-                    "type": "integer"
-                }
-            }
-        },
-        "dto.GmContainerRotateReq": {
-            "type": "object",
-            "properties": {
-                "containerType": {
-                    "description": "容器类型",
-                    "type": "integer"
-                },
-                "itemId": {
-                    "description": "物品实例ID（雪花，按字符串接收）",
-                    "type": "string",
-                    "example": "0"
-                },
-                "playerId": {
-                    "description": "玩家ID",
-                    "type": "integer"
-                }
-            }
-        },
-        "dto.GmContainerSortReq": {
-            "type": "object",
-            "properties": {
-                "containerType": {
-                    "description": "容器类型",
-                    "type": "integer"
-                },
-                "playerId": {
-                    "description": "玩家ID",
-                    "type": "integer"
-                }
-            }
-        },
-        "dto.GmContainerTransferReq": {
-            "type": "object",
-            "properties": {
-                "fromType": {
-                    "description": "源容器类型",
-                    "type": "integer"
-                },
-                "itemId": {
-                    "description": "物品实例ID（雪花，按字符串接收）",
-                    "type": "string",
-                    "example": "0"
-                },
-                "playerId": {
-                    "description": "玩家ID",
-                    "type": "integer"
-                },
-                "rotated": {
-                    "description": "是否旋转放置",
-                    "type": "boolean"
-                },
-                "toType": {
-                    "description": "目标容器类型",
-                    "type": "integer"
-                },
-                "toX": {
-                    "description": "目标X",
-                    "type": "integer"
-                },
-                "toY": {
-                    "description": "目标Y",
-                    "type": "integer"
-                }
-            }
-        },
         "dto.GmEquipAddReq": {
             "type": "object",
             "properties": {
@@ -3445,6 +3317,134 @@
                 },
                 "star": {
                     "description": "星级",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GmItemAddEntryReq": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "description": "堆叠数量",
+                    "type": "integer"
+                },
+                "gridX": {
+                    "description": "网格X",
+                    "type": "integer"
+                },
+                "gridY": {
+                    "description": "网格Y",
+                    "type": "integer"
+                },
+                "itemCfgId": {
+                    "description": "物品配置ID",
+                    "type": "integer"
+                },
+                "itemType": {
+                    "description": "物品容器类型：1 背包 2 仓库 3 保险箱",
+                    "type": "integer"
+                },
+                "playerId": {
+                    "description": "玩家ID",
+                    "type": "integer"
+                },
+                "rotated": {
+                    "description": "是否旋转放置",
+                    "type": "boolean"
+                }
+            }
+        },
+        "dto.GmItemMoveReq": {
+            "type": "object",
+            "properties": {
+                "itemId": {
+                    "description": "物品实例ID（雪花，按字符串接收）",
+                    "type": "string",
+                    "example": "0"
+                },
+                "itemType": {
+                    "description": "物品容器类型",
+                    "type": "integer"
+                },
+                "playerId": {
+                    "description": "玩家ID",
+                    "type": "integer"
+                },
+                "rotated": {
+                    "description": "是否旋转放置",
+                    "type": "boolean"
+                },
+                "toX": {
+                    "description": "目标X",
+                    "type": "integer"
+                },
+                "toY": {
+                    "description": "目标Y",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GmItemRotateReq": {
+            "type": "object",
+            "properties": {
+                "itemId": {
+                    "description": "物品实例ID（雪花，按字符串接收）",
+                    "type": "string",
+                    "example": "0"
+                },
+                "itemType": {
+                    "description": "物品容器类型",
+                    "type": "integer"
+                },
+                "playerId": {
+                    "description": "玩家ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GmItemSortReq": {
+            "type": "object",
+            "properties": {
+                "itemType": {
+                    "description": "物品容器类型",
+                    "type": "integer"
+                },
+                "playerId": {
+                    "description": "玩家ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GmItemTransferReq": {
+            "type": "object",
+            "properties": {
+                "fromType": {
+                    "description": "源物品容器类型",
+                    "type": "integer"
+                },
+                "itemId": {
+                    "description": "物品实例ID（雪花，按字符串接收）",
+                    "type": "string",
+                    "example": "0"
+                },
+                "playerId": {
+                    "description": "玩家ID",
+                    "type": "integer"
+                },
+                "rotated": {
+                    "description": "是否旋转放置",
+                    "type": "boolean"
+                },
+                "toType": {
+                    "description": "目标物品容器类型",
+                    "type": "integer"
+                },
+                "toX": {
+                    "description": "目标X",
+                    "type": "integer"
+                },
+                "toY": {
+                    "description": "目标Y",
                     "type": "integer"
                 }
             }

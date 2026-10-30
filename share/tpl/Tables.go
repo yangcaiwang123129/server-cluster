@@ -115,11 +115,14 @@ type Tables struct {
 	RoleInfo        *Table[RoleInfoCfg]        //
 	AttributeRole   *Table[AttributeRoleCfg]   //
 	AttributeWeapon *Table[AttributeWeaponCfg] //
-	AttributeEquip  *Table[AttributeEquipCfg]  //
+	AttributeGear   *Table[AttributeGearCfg]   //
 	AttributeSkill  *Table[AttributeSkillCfg]  //
 	Weapon          *Table[WeaponCfg]          //
 	Equip           *Table[EquipCfg]           //
 	Damage          *Table[DamageCfg]          //
+	Recharge        *Table[RechargeCfg]        //
+	Gift            *Table[GiftCfg]            //
+	Exchange        *Table[ExchangeCfg]        //
 }
 
 var (
@@ -194,7 +197,7 @@ func Load() error {
 	if t.AttributeWeapon, err = LoadTable("attributeweaponconfig", func(r *AttributeWeaponCfg) int32 { return r.Id }); err != nil {
 		return err
 	}
-	if t.AttributeEquip, err = LoadTable("attributeequipconfig", func(r *AttributeEquipCfg) int32 { return r.Id }); err != nil {
+	if t.AttributeGear, err = LoadTable("attributegearconfig", func(r *AttributeGearCfg) int32 { return r.Id }); err != nil {
 		return err
 	}
 	if t.AttributeSkill, err = LoadTable("attributeskillconfig", func(r *AttributeSkillCfg) int32 { return r.Id }); err != nil {
@@ -207,6 +210,15 @@ func Load() error {
 		return err
 	}
 	if t.Damage, err = LoadTable("damageconfig", func(r *DamageCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.Recharge, err = LoadTable("rechargeconfig", func(r *RechargeCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.Gift, err = LoadTable("giftconfig", func(r *GiftCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.Exchange, err = LoadTable("exchangeconfig", func(r *ExchangeCfg) int32 { return r.Id }); err != nil {
 		return err
 	}
 	tables = t

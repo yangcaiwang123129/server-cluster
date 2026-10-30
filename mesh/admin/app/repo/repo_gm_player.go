@@ -12,28 +12,27 @@ type PlayerQuery struct {
 	Order    string
 }
 
-// ListPlayers 玩家分页列表（直查 player_base）。
+// ListPlayers 玩家分页列表（直查 player）。
 func (r *Repo) ListPlayers(q PlayerQuery, pageIndex, pageSize int) ([]dto.PlayerResp, int64, error) {
 	d, err := r.db()
 	if err != nil {
 		return nil, 0, err
 	}
-	tx := d.Model(&model.PlayerBase{})
+	tx := d.Model(&model.Player{})
 	if q.Username != "" {
 		tx = tx.Where("username LIKE ?", util.Like(q.Username))
 	}
-	rows, total, err := util.PageQuery[model.PlayerBase](tx, pageIndex, pageSize, q.Order, "player_id desc")
+	rows, total, err := util.PageQuery[model.Player](tx, pageIndex, pageSize, q.Order, "player_id desc")
 	if err != nil {
 		return nil, 0, err
 	}
 
-	// 本页玩家ID，批量补齐昵称（player_extra）与货币（player_asset），避免逐行查询
+	// 本页玩家ID，批量补齐昵称（player_extra），避免逐行查询
 	ids := make([]int64, 0, len(rows))
 	for i := range rows {
 		ids = append(ids, rows[i].PlayerID)
 	}
 	extras := map[int64]*model.PlayerExtra{}
-	assets := map[int64]*model.PlayerAsset{}
 	if len(ids) > 0 {
 		var extraRows []model.PlayerExtra
 		if err := d.Model(&model.PlayerExtra{}).Where("player_id IN ?", ids).Find(&extraRows).Error; err != nil {
@@ -41,13 +40,6 @@ func (r *Repo) ListPlayers(q PlayerQuery, pageIndex, pageSize int) ([]dto.Player
 		}
 		for i := range extraRows {
 			extras[extraRows[i].PlayerID] = &extraRows[i]
-		}
-		var assetRows []model.PlayerAsset
-		if err := d.Model(&model.PlayerAsset{}).Where("player_id IN ?", ids).Find(&assetRows).Error; err != nil {
-			return nil, 0, err
-		}
-		for i := range assetRows {
-			assets[assetRows[i].PlayerID] = &assetRows[i]
 		}
 	}
 
@@ -59,15 +51,13 @@ func (r *Repo) ListPlayers(q PlayerQuery, pageIndex, pageSize int) ([]dto.Player
 			Username:    m.Username,
 			Zone:        m.Zone,
 			PhoneNumber: m.PhoneNumber,
+			Coupon:      m.Coupon,
+			Gold:        m.Gold,
+			Coin:        m.Coin,
 			CreatedAt:   m.CreatedAt,
 		}
 		if extra, ok := extras[m.PlayerID]; ok {
 			row.Nickname = extra.Nickname
-		}
-		if asset, ok := assets[m.PlayerID]; ok {
-			row.Coupon = asset.Coupon
-			row.Gold = asset.Gold
-			row.Coin = asset.Coin
 		}
 		list = append(list, row)
 	}

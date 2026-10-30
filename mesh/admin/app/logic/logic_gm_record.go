@@ -68,7 +68,7 @@ func recordDisplay(module string, cfgID int32) (name, icon string) {
 		}
 	case model.RecordModuleEquip:
 		if c := tpl.T().Equip.Get(cfgID); c != nil {
-			return c.EquipName, c.Icon
+			return c.EquiqName, c.Icon
 		}
 	case model.RecordModuleWeapon:
 		if c := tpl.T().Weapon.Get(cfgID); c != nil {

@@ -10,7 +10,7 @@ package tpl
 
 type EquipCfg struct {
 	Id        int32  `json:"id"`        // id
-	EquipName string `json:"equipName"` // 装备名字
+	EquiqName string `json:"equiqName"` // 装备名字
 	Icon      string `json:"icon"`      // 装备icon
 	Desc      string `json:"desc"`      // 描述
 }

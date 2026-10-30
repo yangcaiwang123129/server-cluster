@@ -33,14 +33,14 @@ const (
 	RouteCode_ROUTE_CODE_ENTER_GAME   RouteCode = 10001 // 进入游戏
 	RouteCode_ROUTE_CODE_LEAVE_GAME   RouteCode = 10002 // 离开游戏
 	RouteCode_ROUTE_CODE_SEVER_NOTIFY RouteCode = 10003 // 服务器通知
-	// 玩家容器 10010~10019
-	RouteCode_ROUTE_CODE_CONTAINER_LIST     RouteCode = 10010 // 容器列表
-	RouteCode_ROUTE_CODE_CONTAINER_NOTIFY   RouteCode = 10011 // 容器内变化通知
-	RouteCode_ROUTE_CODE_CONTAINER_ADD      RouteCode = 10012 // 容器内对象添加(预发布和生成环境不开放)
-	RouteCode_ROUTE_CODE_CONTAINER_MOVE     RouteCode = 10013 // 容器内对象移动
-	RouteCode_ROUTE_CODE_CONTAINER_ROTATE   RouteCode = 10014 // 容器内对象旋转
-	RouteCode_ROUTE_CODE_CONTAINER_SORT     RouteCode = 10015 // 容器一键整理对象
-	RouteCode_ROUTE_CODE_CONTAINER_TRANSFER RouteCode = 10016 // 容器间对象移动
+	// 玩家物品 10010~10019
+	RouteCode_ROUTE_CODE_ITEM_LIST     RouteCode = 10010 // 物品容器列表
+	RouteCode_ROUTE_CODE_ITEM_NOTIFY   RouteCode = 10011 // 物品容器内变化通知
+	RouteCode_ROUTE_CODE_ITEM_ADD      RouteCode = 10012 // 物品容器内对象添加(预发布和生成环境不开放)
+	RouteCode_ROUTE_CODE_ITEM_MOVE     RouteCode = 10013 // 物品容器内对象移动
+	RouteCode_ROUTE_CODE_ITEM_ROTATE   RouteCode = 10014 // 物品容器内对象旋转
+	RouteCode_ROUTE_CODE_ITEM_SORT     RouteCode = 10015 // 物品容器一键整理对象
+	RouteCode_ROUTE_CODE_ITEM_TRANSFER RouteCode = 10016 // 物品容器间对象移动
 	// 英雄 10020~10029
 	RouteCode_ROUTE_CODE_HERO_LIST   RouteCode = 10020 // 英雄列表
 	RouteCode_ROUTE_CODE_HERO_NOTIFY RouteCode = 10021 // 英雄变化通知
@@ -71,13 +71,13 @@ var (
 		10001: "ROUTE_CODE_ENTER_GAME",
 		10002: "ROUTE_CODE_LEAVE_GAME",
 		10003: "ROUTE_CODE_SEVER_NOTIFY",
-		10010: "ROUTE_CODE_CONTAINER_LIST",
-		10011: "ROUTE_CODE_CONTAINER_NOTIFY",
-		10012: "ROUTE_CODE_CONTAINER_ADD",
-		10013: "ROUTE_CODE_CONTAINER_MOVE",
-		10014: "ROUTE_CODE_CONTAINER_ROTATE",
-		10015: "ROUTE_CODE_CONTAINER_SORT",
-		10016: "ROUTE_CODE_CONTAINER_TRANSFER",
+		10010: "ROUTE_CODE_ITEM_LIST",
+		10011: "ROUTE_CODE_ITEM_NOTIFY",
+		10012: "ROUTE_CODE_ITEM_ADD",
+		10013: "ROUTE_CODE_ITEM_MOVE",
+		10014: "ROUTE_CODE_ITEM_ROTATE",
+		10015: "ROUTE_CODE_ITEM_SORT",
+		10016: "ROUTE_CODE_ITEM_TRANSFER",
 		10020: "ROUTE_CODE_HERO_LIST",
 		10021: "ROUTE_CODE_HERO_NOTIFY",
 		10022: "ROUTE_CODE_HERO_ADD",
@@ -96,34 +96,34 @@ var (
 		10053: "ROUTE_CODE_EQUIP_UPDATE",
 	}
 	RouteCode_value = map[string]int32{
-		"ROUTE_CODE_UNSPECIFIED":        0,
-		"ROUTE_CODE_VERIFY":             10000,
-		"ROUTE_CODE_ENTER_GAME":         10001,
-		"ROUTE_CODE_LEAVE_GAME":         10002,
-		"ROUTE_CODE_SEVER_NOTIFY":       10003,
-		"ROUTE_CODE_CONTAINER_LIST":     10010,
-		"ROUTE_CODE_CONTAINER_NOTIFY":   10011,
-		"ROUTE_CODE_CONTAINER_ADD":      10012,
-		"ROUTE_CODE_CONTAINER_MOVE":     10013,
-		"ROUTE_CODE_CONTAINER_ROTATE":   10014,
-		"ROUTE_CODE_CONTAINER_SORT":     10015,
-		"ROUTE_CODE_CONTAINER_TRANSFER": 10016,
-		"ROUTE_CODE_HERO_LIST":          10020,
-		"ROUTE_CODE_HERO_NOTIFY":        10021,
-		"ROUTE_CODE_HERO_ADD":           10022,
-		"ROUTE_CODE_HERO_UPDATE":        10023,
-		"ROUTE_CODE_WEAPON_LIST":        10030,
-		"ROUTE_CODE_WEAPON_NOTIFY":      10031,
-		"ROUTE_CODE_WEAPON_ADD":         10032,
-		"ROUTE_CODE_WEAPON_UPDATE":      10033,
-		"ROUTE_CODE_SKILL_LIST":         10040,
-		"ROUTE_CODE_SKILL_NOTIFY":       10041,
-		"ROUTE_CODE_SKILL_ADD":          10042,
-		"ROUTE_CODE_SKILL_UPDATE":       10043,
-		"ROUTE_CODE_EQUIP_LIST":         10050,
-		"ROUTE_CODE_EQUIP_NOTIFY":       10051,
-		"ROUTE_CODE_EQUIP_ADD":          10052,
-		"ROUTE_CODE_EQUIP_UPDATE":       10053,
+		"ROUTE_CODE_UNSPECIFIED":   0,
+		"ROUTE_CODE_VERIFY":        10000,
+		"ROUTE_CODE_ENTER_GAME":    10001,
+		"ROUTE_CODE_LEAVE_GAME":    10002,
+		"ROUTE_CODE_SEVER_NOTIFY":  10003,
+		"ROUTE_CODE_ITEM_LIST":     10010,
+		"ROUTE_CODE_ITEM_NOTIFY":   10011,
+		"ROUTE_CODE_ITEM_ADD":      10012,
+		"ROUTE_CODE_ITEM_MOVE":     10013,
+		"ROUTE_CODE_ITEM_ROTATE":   10014,
+		"ROUTE_CODE_ITEM_SORT":     10015,
+		"ROUTE_CODE_ITEM_TRANSFER": 10016,
+		"ROUTE_CODE_HERO_LIST":     10020,
+		"ROUTE_CODE_HERO_NOTIFY":   10021,
+		"ROUTE_CODE_HERO_ADD":      10022,
+		"ROUTE_CODE_HERO_UPDATE":   10023,
+		"ROUTE_CODE_WEAPON_LIST":   10030,
+		"ROUTE_CODE_WEAPON_NOTIFY": 10031,
+		"ROUTE_CODE_WEAPON_ADD":    10032,
+		"ROUTE_CODE_WEAPON_UPDATE": 10033,
+		"ROUTE_CODE_SKILL_LIST":    10040,
+		"ROUTE_CODE_SKILL_NOTIFY":  10041,
+		"ROUTE_CODE_SKILL_ADD":     10042,
+		"ROUTE_CODE_SKILL_UPDATE":  10043,
+		"ROUTE_CODE_EQUIP_LIST":    10050,
+		"ROUTE_CODE_EQUIP_NOTIFY":  10051,
+		"ROUTE_CODE_EQUIP_ADD":     10052,
+		"ROUTE_CODE_EQUIP_UPDATE":  10053,
 	}
 )
 
@@ -269,55 +269,55 @@ func (NOTIFY_TYPE) EnumDescriptor() ([]byte, []int) {
 	return file_common_proto_rawDescGZIP(), []int{2}
 }
 
-type ContainerType int32
+type ItemType int32
 
 const (
-	ContainerType_CONTAINER_TYPE_UNSPECIFIED ContainerType = 0
-	ContainerType_CONTAINER_TYPE_BACKPACK    ContainerType = 1 // 背包（局内随身，死亡掉落）
-	ContainerType_CONTAINER_TYPE_STASH       ContainerType = 2 // 仓库（局外固定，不掉落）
-	ContainerType_CONTAINER_TYPE_SECURE      ContainerType = 3 // 保险箱（局内随身，不掉落）
+	ItemType_ITEM_TYPE_UNSPECIFIED ItemType = 0
+	ItemType_ITEM_TYPE_BACKPACK    ItemType = 1 // 背包（局内随身，死亡掉落）
+	ItemType_ITEM_TYPE_STASH       ItemType = 2 // 仓库（局外固定，不掉落）
+	ItemType_ITEM_TYPE_SECURE      ItemType = 3 // 保险箱（局内随身，不掉落）
 )
 
-// Enum value maps for ContainerType.
+// Enum value maps for ItemType.
 var (
-	ContainerType_name = map[int32]string{
-		0: "CONTAINER_TYPE_UNSPECIFIED",
-		1: "CONTAINER_TYPE_BACKPACK",
-		2: "CONTAINER_TYPE_STASH",
-		3: "CONTAINER_TYPE_SECURE",
+	ItemType_name = map[int32]string{
+		0: "ITEM_TYPE_UNSPECIFIED",
+		1: "ITEM_TYPE_BACKPACK",
+		2: "ITEM_TYPE_STASH",
+		3: "ITEM_TYPE_SECURE",
 	}
-	ContainerType_value = map[string]int32{
-		"CONTAINER_TYPE_UNSPECIFIED": 0,
-		"CONTAINER_TYPE_BACKPACK":    1,
-		"CONTAINER_TYPE_STASH":       2,
-		"CONTAINER_TYPE_SECURE":      3,
+	ItemType_value = map[string]int32{
+		"ITEM_TYPE_UNSPECIFIED": 0,
+		"ITEM_TYPE_BACKPACK":    1,
+		"ITEM_TYPE_STASH":       2,
+		"ITEM_TYPE_SECURE":      3,
 	}
 )
 
-func (x ContainerType) Enum() *ContainerType {
-	p := new(ContainerType)
+func (x ItemType) Enum() *ItemType {
+	p := new(ItemType)
 	*p = x
 	return p
 }
 
-func (x ContainerType) String() string {
+func (x ItemType) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (ContainerType) Descriptor() protoreflect.EnumDescriptor {
+func (ItemType) Descriptor() protoreflect.EnumDescriptor {
 	return file_common_proto_enumTypes[3].Descriptor()
 }
 
-func (ContainerType) Type() protoreflect.EnumType {
+func (ItemType) Type() protoreflect.EnumType {
 	return &file_common_proto_enumTypes[3]
 }
 
-func (x ContainerType) Number() protoreflect.EnumNumber {
+func (x ItemType) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use ContainerType.Descriptor instead.
-func (ContainerType) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use ItemType.Descriptor instead.
+func (ItemType) EnumDescriptor() ([]byte, []int) {
 	return file_common_proto_rawDescGZIP(), []int{3}
 }
 
@@ -716,7 +716,7 @@ func (*ObjectValue_DoubleValue) isObjectValue_Kind() {}
 
 func (*ObjectValue_StringValue) isObjectValue_Kind() {}
 
-// 容器中的物品
+// 物品容器中的物品
 type ItemEntry struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                    // 实例ID
@@ -801,11 +801,11 @@ func (x *ItemEntry) GetRotated() bool {
 	return false
 }
 
-// 容器条目
-type ContainerEntry struct {
+// 物品容器条目
+type ItemContainer struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                     // 容器实例ID（=playerID + type 编码）
-	Type          ContainerType          `protobuf:"varint,2,opt,name=type,proto3,enum=pb.ContainerType" json:"type,omitempty"`           // 容器类型
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                     // 物品容器实例ID（=playerID + type 编码）
+	Type          ItemType               `protobuf:"varint,2,opt,name=type,proto3,enum=pb.ItemType" json:"type,omitempty"`                // 物品容器类型
 	GridW         int32                  `protobuf:"varint,3,opt,name=grid_w,json=gridW,proto3" json:"grid_w,omitempty"`                  // 网格宽度
 	GridH         int32                  `protobuf:"varint,4,opt,name=grid_h,json=gridH,proto3" json:"grid_h,omitempty"`                  // 网格高度
 	Version       int32                  `protobuf:"varint,5,opt,name=version,proto3" json:"version,omitempty"`                           // 操作版本号（每次修改+1）
@@ -814,20 +814,20 @@ type ContainerEntry struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ContainerEntry) Reset() {
-	*x = ContainerEntry{}
+func (x *ItemContainer) Reset() {
+	*x = ItemContainer{}
 	mi := &file_common_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ContainerEntry) String() string {
+func (x *ItemContainer) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ContainerEntry) ProtoMessage() {}
+func (*ItemContainer) ProtoMessage() {}
 
-func (x *ContainerEntry) ProtoReflect() protoreflect.Message {
+func (x *ItemContainer) ProtoReflect() protoreflect.Message {
 	mi := &file_common_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -839,47 +839,47 @@ func (x *ContainerEntry) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ContainerEntry.ProtoReflect.Descriptor instead.
-func (*ContainerEntry) Descriptor() ([]byte, []int) {
+// Deprecated: Use ItemContainer.ProtoReflect.Descriptor instead.
+func (*ItemContainer) Descriptor() ([]byte, []int) {
 	return file_common_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *ContainerEntry) GetId() int64 {
+func (x *ItemContainer) GetId() int64 {
 	if x != nil {
 		return x.Id
 	}
 	return 0
 }
 
-func (x *ContainerEntry) GetType() ContainerType {
+func (x *ItemContainer) GetType() ItemType {
 	if x != nil {
 		return x.Type
 	}
-	return ContainerType_CONTAINER_TYPE_UNSPECIFIED
+	return ItemType_ITEM_TYPE_UNSPECIFIED
 }
 
-func (x *ContainerEntry) GetGridW() int32 {
+func (x *ItemContainer) GetGridW() int32 {
 	if x != nil {
 		return x.GridW
 	}
 	return 0
 }
 
-func (x *ContainerEntry) GetGridH() int32 {
+func (x *ItemContainer) GetGridH() int32 {
 	if x != nil {
 		return x.GridH
 	}
 	return 0
 }
 
-func (x *ContainerEntry) GetVersion() int32 {
+func (x *ItemContainer) GetVersion() int32 {
 	if x != nil {
 		return x.Version
 	}
 	return 0
 }
 
-func (x *ContainerEntry) GetItemEntries() []*ItemEntry {
+func (x *ItemContainer) GetItemEntries() []*ItemEntry {
 	if x != nil {
 		return x.ItemEntries
 	}
@@ -1230,10 +1230,10 @@ const file_common_proto_rawDesc = "" +
 	"\x05count\x18\x03 \x01(\x05R\x05count\x12\x15\n" +
 	"\x06grid_x\x18\x04 \x01(\x05R\x05gridX\x12\x15\n" +
 	"\x06grid_y\x18\x05 \x01(\x05R\x05gridY\x12\x18\n" +
-	"\arotated\x18\x06 \x01(\bR\arotated\"\xc1\x01\n" +
-	"\x0eContainerEntry\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x12%\n" +
-	"\x04type\x18\x02 \x01(\x0e2\x11.pb.ContainerTypeR\x04type\x12\x15\n" +
+	"\arotated\x18\x06 \x01(\bR\arotated\"\xbb\x01\n" +
+	"\rItemContainer\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12 \n" +
+	"\x04type\x18\x02 \x01(\x0e2\f.pb.ItemTypeR\x04type\x12\x15\n" +
 	"\x06grid_w\x18\x03 \x01(\x05R\x05gridW\x12\x15\n" +
 	"\x06grid_h\x18\x04 \x01(\x05R\x05gridH\x12\x18\n" +
 	"\aversion\x18\x05 \x01(\x05R\aversion\x120\n" +
@@ -1265,20 +1265,20 @@ const file_common_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x15\n" +
 	"\x06cfg_id\x18\x02 \x01(\x05R\x05cfgId\x12\x14\n" +
 	"\x05level\x18\x03 \x01(\x05R\x05level\x12\x1a\n" +
-	"\bequipped\x18\x04 \x01(\bR\bequipped*\xc8\x06\n" +
+	"\bequipped\x18\x04 \x01(\bR\bequipped*\xa5\x06\n" +
 	"\tRouteCode\x12\x1a\n" +
 	"\x16ROUTE_CODE_UNSPECIFIED\x10\x00\x12\x16\n" +
 	"\x11ROUTE_CODE_VERIFY\x10\x90N\x12\x1a\n" +
 	"\x15ROUTE_CODE_ENTER_GAME\x10\x91N\x12\x1a\n" +
 	"\x15ROUTE_CODE_LEAVE_GAME\x10\x92N\x12\x1c\n" +
-	"\x17ROUTE_CODE_SEVER_NOTIFY\x10\x93N\x12\x1e\n" +
-	"\x19ROUTE_CODE_CONTAINER_LIST\x10\x9aN\x12 \n" +
-	"\x1bROUTE_CODE_CONTAINER_NOTIFY\x10\x9bN\x12\x1d\n" +
-	"\x18ROUTE_CODE_CONTAINER_ADD\x10\x9cN\x12\x1e\n" +
-	"\x19ROUTE_CODE_CONTAINER_MOVE\x10\x9dN\x12 \n" +
-	"\x1bROUTE_CODE_CONTAINER_ROTATE\x10\x9eN\x12\x1e\n" +
-	"\x19ROUTE_CODE_CONTAINER_SORT\x10\x9fN\x12\"\n" +
-	"\x1dROUTE_CODE_CONTAINER_TRANSFER\x10\xa0N\x12\x19\n" +
+	"\x17ROUTE_CODE_SEVER_NOTIFY\x10\x93N\x12\x19\n" +
+	"\x14ROUTE_CODE_ITEM_LIST\x10\x9aN\x12\x1b\n" +
+	"\x16ROUTE_CODE_ITEM_NOTIFY\x10\x9bN\x12\x18\n" +
+	"\x13ROUTE_CODE_ITEM_ADD\x10\x9cN\x12\x19\n" +
+	"\x14ROUTE_CODE_ITEM_MOVE\x10\x9dN\x12\x1b\n" +
+	"\x16ROUTE_CODE_ITEM_ROTATE\x10\x9eN\x12\x19\n" +
+	"\x14ROUTE_CODE_ITEM_SORT\x10\x9fN\x12\x1d\n" +
+	"\x18ROUTE_CODE_ITEM_TRANSFER\x10\xa0N\x12\x19\n" +
 	"\x14ROUTE_CODE_HERO_LIST\x10\xa4N\x12\x1b\n" +
 	"\x16ROUTE_CODE_HERO_NOTIFY\x10\xa5N\x12\x18\n" +
 	"\x13ROUTE_CODE_HERO_ADD\x10\xa6N\x12\x1b\n" +
@@ -1307,12 +1307,12 @@ const file_common_proto_rawDesc = "" +
 	"\vNOTIFY_TYPE\x12\x14\n" +
 	"\x10NOTIFY_TYPE_KICK\x10\x00\x12\x18\n" +
 	"\x14NOTIFY_TYPE_MAINTAIN\x10\x02\x12\x19\n" +
-	"\x15NOTIFY_TYPE_BROADCAST\x10\x03*\x81\x01\n" +
-	"\rContainerType\x12\x1e\n" +
-	"\x1aCONTAINER_TYPE_UNSPECIFIED\x10\x00\x12\x1b\n" +
-	"\x17CONTAINER_TYPE_BACKPACK\x10\x01\x12\x18\n" +
-	"\x14CONTAINER_TYPE_STASH\x10\x02\x12\x19\n" +
-	"\x15CONTAINER_TYPE_SECURE\x10\x03*\xca\x01\n" +
+	"\x15NOTIFY_TYPE_BROADCAST\x10\x03*h\n" +
+	"\bItemType\x12\x19\n" +
+	"\x15ITEM_TYPE_UNSPECIFIED\x10\x00\x12\x16\n" +
+	"\x12ITEM_TYPE_BACKPACK\x10\x01\x12\x13\n" +
+	"\x0fITEM_TYPE_STASH\x10\x02\x12\x14\n" +
+	"\x10ITEM_TYPE_SECURE\x10\x03*\xca\x01\n" +
 	"\tMagicAttr\x12\x1b\n" +
 	"\x17PLAYER_ATTR_UNSPECIFIED\x10\x00\x12\x14\n" +
 	"\x10PLAYER_ATTR_NAME\x10\x01\x12\x15\n" +
@@ -1338,32 +1338,32 @@ func file_common_proto_rawDescGZIP() []byte {
 var file_common_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
 var file_common_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_common_proto_goTypes = []any{
-	(RouteCode)(0),         // 0: pb.RouteCode
-	(ErrCode)(0),           // 1: pb.ErrCode
-	(NOTIFY_TYPE)(0),       // 2: pb.NOTIFY_TYPE
-	(ContainerType)(0),     // 3: pb.ContainerType
-	(MagicAttr)(0),         // 4: pb.MagicAttr
-	(*MagicAttrMap)(nil),   // 5: pb.MagicAttrMap
-	(*Result)(nil),         // 6: pb.Result
-	(*Object)(nil),         // 7: pb.Object
-	(*ObjectList)(nil),     // 8: pb.ObjectList
-	(*ObjectValue)(nil),    // 9: pb.ObjectValue
-	(*ItemEntry)(nil),      // 10: pb.ItemEntry
-	(*ContainerEntry)(nil), // 11: pb.ContainerEntry
-	(*HeroEntry)(nil),      // 12: pb.HeroEntry
-	(*WeaponEntry)(nil),    // 13: pb.WeaponEntry
-	(*SkillEntry)(nil),     // 14: pb.SkillEntry
-	(*EquipEntry)(nil),     // 15: pb.EquipEntry
-	nil,                    // 16: pb.MagicAttrMap.ValuesEntry
-	nil,                    // 17: pb.Object.ValuesEntry
+	(RouteCode)(0),        // 0: pb.RouteCode
+	(ErrCode)(0),          // 1: pb.ErrCode
+	(NOTIFY_TYPE)(0),      // 2: pb.NOTIFY_TYPE
+	(ItemType)(0),         // 3: pb.ItemType
+	(MagicAttr)(0),        // 4: pb.MagicAttr
+	(*MagicAttrMap)(nil),  // 5: pb.MagicAttrMap
+	(*Result)(nil),        // 6: pb.Result
+	(*Object)(nil),        // 7: pb.Object
+	(*ObjectList)(nil),    // 8: pb.ObjectList
+	(*ObjectValue)(nil),   // 9: pb.ObjectValue
+	(*ItemEntry)(nil),     // 10: pb.ItemEntry
+	(*ItemContainer)(nil), // 11: pb.ItemContainer
+	(*HeroEntry)(nil),     // 12: pb.HeroEntry
+	(*WeaponEntry)(nil),   // 13: pb.WeaponEntry
+	(*SkillEntry)(nil),    // 14: pb.SkillEntry
+	(*EquipEntry)(nil),    // 15: pb.EquipEntry
+	nil,                   // 16: pb.MagicAttrMap.ValuesEntry
+	nil,                   // 17: pb.Object.ValuesEntry
 }
 var file_common_proto_depIdxs = []int32{
 	16, // 0: pb.MagicAttrMap.values:type_name -> pb.MagicAttrMap.ValuesEntry
 	1,  // 1: pb.Result.code:type_name -> pb.ErrCode
 	17, // 2: pb.Object.values:type_name -> pb.Object.ValuesEntry
 	9,  // 3: pb.ObjectList.values:type_name -> pb.ObjectValue
-	3,  // 4: pb.ContainerEntry.type:type_name -> pb.ContainerType
-	10, // 5: pb.ContainerEntry.item_entries:type_name -> pb.ItemEntry
+	3,  // 4: pb.ItemContainer.type:type_name -> pb.ItemType
+	10, // 5: pb.ItemContainer.item_entries:type_name -> pb.ItemEntry
 	9,  // 6: pb.MagicAttrMap.ValuesEntry.value:type_name -> pb.ObjectValue
 	9,  // 7: pb.Object.ValuesEntry.value:type_name -> pb.ObjectValue
 	8,  // [8:8] is the sub-list for method output_type

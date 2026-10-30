@@ -149,7 +149,7 @@ func NewPlayerTableCache[M any](cfg CacherConfig) *Cache[int64, *M] {
 	return NewCache[int64, *M](cfg, loader, saver, deleter)
 }
 
-// NewPlayerRowsCache 多行表缓存：key=playerID，value=[]*M（一玩家多行，如 PlayerAsset）。
+// NewPlayerRowsCache 多行表缓存：key=playerID，value=[]*M（一玩家多行，主键 (player_id, 业务ID)）。
 // 读：SELECT * WHERE player_id=?，无行返回空切片。
 // 写/删：同单行表缓存。
 func NewPlayerRowsCache[M any](cfg CacherConfig) *Cache[int64, []*M] {

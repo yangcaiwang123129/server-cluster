@@ -29,7 +29,7 @@ func register(ctx http.Context) error {
 	if err := ctx.Bind().Body(req); err != nil {
 		return ctx.Failure(errs.CodeInvalidParams.Err())
 	}
-	data, err := logic.PlayerBaseLogic().PlayerRegister(ctx.Context(), req)
+	data, err := logic.Player().PlayerRegister(ctx.Context(), req)
 	if err != nil {
 		return ctx.Failure(err)
 	}
@@ -49,7 +49,7 @@ func login(ctx http.Context) error {
 	if err := ctx.Bind().Body(req); err != nil {
 		return ctx.Failure(errs.CodeInvalidParams.Err())
 	}
-	data, err := logic.PlayerBaseLogic().PlayerLogin(ctx.Context(), req)
+	data, err := logic.Player().PlayerLogin(ctx.Context(), req)
 	if err != nil {
 		return ctx.Failure(err)
 	}

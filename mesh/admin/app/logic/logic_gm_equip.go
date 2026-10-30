@@ -98,7 +98,7 @@ func toGmEquipEntry(e *pb.EquipEntry) dto.GmEquipEntry {
 		Equipped: e.GetEquipped(),
 	}
 	if cfg := tpl.T().Equip.Get(e.GetCfgId()); cfg != nil {
-		row.Name = cfg.EquipName
+		row.Name = cfg.EquiqName
 		row.IconKey = cfg.Icon
 		row.Desc = cfg.Desc
 	}

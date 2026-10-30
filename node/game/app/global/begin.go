@@ -2,6 +2,7 @@ package global
 
 import (
 	"fmt"
+	"server-cluster/share/consts"
 	"strings"
 
 	"server-cluster/share/tpl"
@@ -27,14 +28,13 @@ func Init() error {
 	// 自动建表（玩家相关表）
 	if inst, err := svc.Ctx().MySQL.Default(); err == nil {
 		if err = svc.AutoMigrate(inst.Gorm(),
-			&model.PlayerBase{},
+			&model.Player{},
 			&model.PlayerExtra{},
-			&model.PlayerAsset{},
 			&model.PlayerHero{},
 			&model.PlayerSkill{},
 			&model.PlayerWeapon{},
 			&model.PlayerEquip{},
-			&model.PlayerContainer{},
+			&model.PlayerItem{},
 		); err != nil {
 			return err
 		}
@@ -58,7 +58,7 @@ func Init() error {
 
 // Destroy 进程退出后释放缓存刷盘、DB / Redis 等资源，并按统一停服日志输出。
 func Destroy() {
-	sl := util.NewShutdownLog("game-node", 2)
+	sl := util.NewShutdownLog(consts.NodeInstanceID(), 2)
 	sl.Start()
 
 	sl.Step("玩家数据缓存落盘", func() (string, error) {

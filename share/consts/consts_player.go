@@ -8,6 +8,6 @@ const (
 	DefaultPlayerLevel int32 = 1
 	// DefaultPlayerSettingsJSON 新建档玩家的个性化设置（MySQL json 列，空串非法）。
 	DefaultPlayerSettingsJSON = "{}"
-	// ContainerTypeStride 容器实例 ID 步长：ID = playerID*Stride + 容器类型。
-	ContainerTypeStride int64 = 10
+	// ItemTypeStride 物品容器实例 ID 步长：ID = playerID*Stride + 物品容器类型。
+	ItemTypeStride int64 = 10
 )

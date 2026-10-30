@@ -7,7 +7,7 @@ import sysApi from './sys-api'
 import sysOperLog from './sys-oper-log'
 import sysLoginLog from './sys-login-log'
 import player from './player'
-import gameContainer from './game-container'
+import gameItem from './game-item'
 import gameHero from './game-hero'
 import gameWeapon from './game-weapon'
 import gameSkill from './game-skill'
@@ -26,7 +26,7 @@ export default {
   sysOperLog,
   sysLoginLog,
   player,
-  gameContainer,
+  gameItem,
   gameHero,
   gameWeapon,
   gameSkill,

@@ -55,7 +55,7 @@ func (this *catalogLogic) Catalog(typ, keyword string, pageIndex, pageSize int) 
 		}
 	case "equip":
 		for _, c := range tpl.T().Equip.GetDataList() {
-			list = append(list, dto.GameCatalogEntry{ID: c.Id, Name: c.EquipName, IconKey: c.Icon, Desc: c.Desc})
+			list = append(list, dto.GameCatalogEntry{ID: c.Id, Name: c.EquiqName, IconKey: c.Icon, Desc: c.Desc})
 		}
 	case "item":
 		for _, c := range tpl.T().Item.GetDataList() {

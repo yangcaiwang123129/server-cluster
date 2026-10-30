@@ -23,6 +23,7 @@ var skillLogicInst = singleton.NewContainer[global.SkillLogic]("SkillLogic")
 
 func init() {
 	skillLogicInst.Register(&skillLogic{})
+	registerAssetHandler(&skillAssetHandler{})
 }
 
 // Skill 获取技能业务单例。
@@ -127,4 +128,90 @@ func loadPlayerSkill(ctx context.Context, playerID int64) (*model.PlayerSkill, e
 		row.Skills = util.NewSafeMap[int32, model.SkillInfo]()
 	}
 	return row, nil
+}
+
+// ============ 资产接口实现（AssetHandler，唯一持有型） ============
+
+// skillAssetHandler 技能资产实现：落在 player_skill。
+type skillAssetHandler struct{}
+
+// AssetType 资产类型：技能。
+func (this *skillAssetHandler) AssetType() tpl.AssetType { return AssetTypeSkill }
+
+// Add 发放技能；已拥有返回错误。
+func (this *skillAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _ int32) error {
+	if !tpl.T().Skill.Has(cfgID) {
+		return errs.CodeInvalidParams.WithMessage("技能配置不存在").Err()
+	}
+
+	row, err := loadPlayerSkill(ctx, playerID)
+	if err != nil {
+		return err
+	}
+	if !row.AddSkill(model.SkillInfo{SkillID: cfgID}) {
+		return errs.CodeInvalidParams.WithMessage("技能已拥有").Err()
+	}
+
+	global.PlayerSkillCache.Set(playerID, row)
+	record.Record(ctx, model.RecordModuleSkill, playerID, model.RecordActionGain, cfgID, 1)
+	return nil
+}
+
+// Remove 扣除技能；未拥有返回错误。
+func (this *skillAssetHandler) Remove(ctx context.Context, playerID int64, cfgID, _ int32) error {
+	row, err := loadPlayerSkill(ctx, playerID)
+	if err != nil {
+		return err
+	}
+	if !row.Skills.Delete(cfgID) {
+		return errs.CodeInvalidParams.WithMessage("技能未拥有").Err()
+	}
+
+	global.PlayerSkillCache.Set(playerID, row)
+	record.Record(ctx, model.RecordModuleSkill, playerID, model.RecordActionConsume, cfgID, 1)
+	return nil
+}
+
+// Update 覆盖持有：count<=0 移除，>0 确保持有。
+func (this *skillAssetHandler) Update(ctx context.Context, playerID int64, cfgID, count int32) error {
+	owned, err := this.Query(ctx, playerID, cfgID)
+	if err != nil {
+		return err
+	}
+	switch {
+	case count <= 0 && owned > 0:
+		return this.Remove(ctx, playerID, cfgID, 1)
+	case count > 0 && owned == 0:
+		return this.Add(ctx, playerID, cfgID, 1)
+	default:
+		return nil
+	}
+}
+
+// Query 查询是否持有：持有 1，未持有 0。
+func (this *skillAssetHandler) Query(ctx context.Context, playerID int64, cfgID int32) (int32, error) {
+	row, err := loadPlayerSkill(ctx, playerID)
+	if err != nil {
+		return 0, err
+	}
+	if _, ok := row.Skills.Get(cfgID); !ok {
+		return 0, nil
+	}
+	return 1, nil
+}
+
+// List 列出全部技能（按配置ID升序）。
+func (this *skillAssetHandler) List(ctx context.Context, playerID int64) ([]*tpl.Asset, error) {
+	row, err := loadPlayerSkill(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+
+	assets := make([]*tpl.Asset, 0, row.Skills.Len())
+	row.Skills.Range(func(cfgID int32, _ model.SkillInfo) bool {
+		assets = append(assets, &tpl.Asset{Type: AssetTypeSkill, Id: cfgID, Count: 1})
+		return true
+	})
+	sort.Slice(assets, func(i, j int) bool { return assets[i].Id < assets[j].Id })
+	return assets, nil
 }

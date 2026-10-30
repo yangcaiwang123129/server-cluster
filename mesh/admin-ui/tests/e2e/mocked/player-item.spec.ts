@@ -53,7 +53,7 @@ const rifle = {
 
 const container = (items: unknown[], version: number) => ({
   playerId: 10001,
-  containerType: 1,
+  itemType: 1,
   gridW: 8,
   gridH: 12,
   version,
@@ -156,7 +156,7 @@ test.describe('player item management', () => {
     await page.locator('.container-card').getByRole('button', { name: '整理' }).click()
 
     await expect.poll(() => calls.sort).toBe(1)
-    expect(JSON.parse(bodies.at(-1) || '{}')).toMatchObject({ playerId: 10001, containerType: 1 })
+    expect(JSON.parse(bodies.at(-1) || '{}')).toMatchObject({ playerId: 10001, itemType: 1 })
 
     // The stub moved the rifle to the first column; the page must have taken
     // the response instead of keeping the pre-sort layout.
@@ -177,7 +177,7 @@ test.describe('player item management', () => {
     await expect.poll(() => calls.add).toBe(1)
     expect(JSON.parse(bodies.at(-1) || '{}')).toMatchObject({
       playerId: 10001,
-      containerType: 1,
+      itemType: 1,
       itemCfgId: 2,
       count: 1
     })
@@ -199,7 +199,7 @@ test.describe('player item management', () => {
     await expect.poll(() => calls.move).toBe(1)
     expect(JSON.parse(bodies.at(-1) || '{}')).toMatchObject({
       playerId: 10001,
-      containerType: 1,
+      itemType: 1,
       itemId: 11,
       rotated: true
     })

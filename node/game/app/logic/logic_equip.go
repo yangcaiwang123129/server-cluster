@@ -23,6 +23,7 @@ var equipLogicInst = singleton.NewContainer[global.EquipLogic]("EquipLogic")
 
 func init() {
 	equipLogicInst.Register(&equipLogic{})
+	registerAssetHandler(&equipAssetHandler{})
 }
 
 // Equip 获取装备业务单例。
@@ -127,4 +128,90 @@ func loadPlayerEquip(ctx context.Context, playerID int64) (*model.PlayerEquip, e
 		row.Equips = util.NewSafeMap[int32, model.EquipInfo]()
 	}
 	return row, nil
+}
+
+// ============ 资产接口实现（AssetHandler，唯一持有型） ============
+
+// equipAssetHandler 装备资产实现：落在 player_equip。
+type equipAssetHandler struct{}
+
+// AssetType 资产类型：装备。
+func (this *equipAssetHandler) AssetType() tpl.AssetType { return tpl.AssetType_Equip }
+
+// Add 发放装备；已拥有返回错误。
+func (this *equipAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _ int32) error {
+	if !tpl.T().Equip.Has(cfgID) {
+		return errs.CodeInvalidParams.WithMessage("装备配置不存在").Err()
+	}
+
+	row, err := loadPlayerEquip(ctx, playerID)
+	if err != nil {
+		return err
+	}
+	if !row.AddEquip(model.EquipInfo{EquipID: cfgID}) {
+		return errs.CodeInvalidParams.WithMessage("装备已拥有").Err()
+	}
+
+	global.PlayerEquipCache.Set(playerID, row)
+	record.Record(ctx, model.RecordModuleEquip, playerID, model.RecordActionGain, cfgID, 1)
+	return nil
+}
+
+// Remove 扣除装备；未拥有返回错误。
+func (this *equipAssetHandler) Remove(ctx context.Context, playerID int64, cfgID, _ int32) error {
+	row, err := loadPlayerEquip(ctx, playerID)
+	if err != nil {
+		return err
+	}
+	if !row.Equips.Delete(cfgID) {
+		return errs.CodeInvalidParams.WithMessage("装备未拥有").Err()
+	}
+
+	global.PlayerEquipCache.Set(playerID, row)
+	record.Record(ctx, model.RecordModuleEquip, playerID, model.RecordActionConsume, cfgID, 1)
+	return nil
+}
+
+// Update 覆盖持有：count<=0 移除，>0 确保持有。
+func (this *equipAssetHandler) Update(ctx context.Context, playerID int64, cfgID, count int32) error {
+	owned, err := this.Query(ctx, playerID, cfgID)
+	if err != nil {
+		return err
+	}
+	switch {
+	case count <= 0 && owned > 0:
+		return this.Remove(ctx, playerID, cfgID, 1)
+	case count > 0 && owned == 0:
+		return this.Add(ctx, playerID, cfgID, 1)
+	default:
+		return nil
+	}
+}
+
+// Query 查询是否持有：持有 1，未持有 0。
+func (this *equipAssetHandler) Query(ctx context.Context, playerID int64, cfgID int32) (int32, error) {
+	row, err := loadPlayerEquip(ctx, playerID)
+	if err != nil {
+		return 0, err
+	}
+	if _, ok := row.Equips.Get(cfgID); !ok {
+		return 0, nil
+	}
+	return 1, nil
+}
+
+// List 列出全部装备（按配置ID升序）。
+func (this *equipAssetHandler) List(ctx context.Context, playerID int64) ([]*tpl.Asset, error) {
+	row, err := loadPlayerEquip(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+
+	assets := make([]*tpl.Asset, 0, row.Equips.Len())
+	row.Equips.Range(func(cfgID int32, _ model.EquipInfo) bool {
+		assets = append(assets, &tpl.Asset{Type: tpl.AssetType_Equip, Id: cfgID, Count: 1})
+		return true
+	})
+	sort.Slice(assets, func(i, j int) bool { return assets[i].Id < assets[j].Id })
+	return assets, nil
 }

@@ -43,7 +43,7 @@
 ## T6 注释与死代码清理
 
 - [x] 删除 `share/enum/enum.go`（仅包声明）。
-- [x] 删除 `share/model/model_container.go` 中注释掉的 import。
+- [x] 删除 `../../../share/model/model_item.go` 中注释掉的 import。
 - [x] 修正 `player_core` 过期注释（`share/model/model_player.go`、`node/game/app/global/cache.go`）。
 - [x] 删除各 logic 文件重复的 `// init 装配期自注册实现。` 及纯复述注释（node/game logic_*、mesh/login logic_player、mesh/admin logic_*、node/social、node/battle）。
 - 验证：`go build ./...` + `go vet ./...`。

@@ -16,7 +16,7 @@ func RegisterPlayer(router http.Router) {
 	g.Post("/player/kick", handlePlayerKick)
 }
 
-// handlePlayerList 玩家分页列表（player_base）。
+// handlePlayerList 玩家分页列表（player）。
 // @Summary 玩家列表
 // @Tags system
 // @Produce json

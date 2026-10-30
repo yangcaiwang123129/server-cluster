@@ -256,29 +256,29 @@ func (x *KickPlayerResp) GetFailedIds() []int64 {
 	return nil
 }
 
-// GmContainerListReq 容器列表请求。
-type GmContainerListReq struct {
+// GmItemListReq 物品容器列表请求。
+type GmItemListReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
-	Req           *ContainerListReq      `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数（容器类型）
+	Req           *ItemContainerListReq  `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数（物品容器类型）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GmContainerListReq) Reset() {
-	*x = GmContainerListReq{}
+func (x *GmItemListReq) Reset() {
+	*x = GmItemListReq{}
 	mi := &file_internal_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GmContainerListReq) String() string {
+func (x *GmItemListReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GmContainerListReq) ProtoMessage() {}
+func (*GmItemListReq) ProtoMessage() {}
 
-func (x *GmContainerListReq) ProtoReflect() protoreflect.Message {
+func (x *GmItemListReq) ProtoReflect() protoreflect.Message {
 	mi := &file_internal_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -290,48 +290,48 @@ func (x *GmContainerListReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GmContainerListReq.ProtoReflect.Descriptor instead.
-func (*GmContainerListReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use GmItemListReq.ProtoReflect.Descriptor instead.
+func (*GmItemListReq) Descriptor() ([]byte, []int) {
 	return file_internal_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *GmContainerListReq) GetPlayerId() int64 {
+func (x *GmItemListReq) GetPlayerId() int64 {
 	if x != nil {
 		return x.PlayerId
 	}
 	return 0
 }
 
-func (x *GmContainerListReq) GetReq() *ContainerListReq {
+func (x *GmItemListReq) GetReq() *ItemContainerListReq {
 	if x != nil {
 		return x.Req
 	}
 	return nil
 }
 
-// GmContainerMoveReq 容器内移动对象请求。
-type GmContainerMoveReq struct {
+// GmItemMoveReq 物品容器内移动对象请求。
+type GmItemMoveReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
-	Req           *ContainerMoveReq      `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数
+	Req           *ItemMoveReq           `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GmContainerMoveReq) Reset() {
-	*x = GmContainerMoveReq{}
+func (x *GmItemMoveReq) Reset() {
+	*x = GmItemMoveReq{}
 	mi := &file_internal_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GmContainerMoveReq) String() string {
+func (x *GmItemMoveReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GmContainerMoveReq) ProtoMessage() {}
+func (*GmItemMoveReq) ProtoMessage() {}
 
-func (x *GmContainerMoveReq) ProtoReflect() protoreflect.Message {
+func (x *GmItemMoveReq) ProtoReflect() protoreflect.Message {
 	mi := &file_internal_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -343,48 +343,48 @@ func (x *GmContainerMoveReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GmContainerMoveReq.ProtoReflect.Descriptor instead.
-func (*GmContainerMoveReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use GmItemMoveReq.ProtoReflect.Descriptor instead.
+func (*GmItemMoveReq) Descriptor() ([]byte, []int) {
 	return file_internal_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *GmContainerMoveReq) GetPlayerId() int64 {
+func (x *GmItemMoveReq) GetPlayerId() int64 {
 	if x != nil {
 		return x.PlayerId
 	}
 	return 0
 }
 
-func (x *GmContainerMoveReq) GetReq() *ContainerMoveReq {
+func (x *GmItemMoveReq) GetReq() *ItemMoveReq {
 	if x != nil {
 		return x.Req
 	}
 	return nil
 }
 
-// GmContainerRotateReq 容器内旋转对象请求。
-type GmContainerRotateReq struct {
+// GmItemRotateReq 物品容器内旋转对象请求。
+type GmItemRotateReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
-	Req           *ContainerRotateReq    `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数
+	Req           *ItemRotateReq         `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GmContainerRotateReq) Reset() {
-	*x = GmContainerRotateReq{}
+func (x *GmItemRotateReq) Reset() {
+	*x = GmItemRotateReq{}
 	mi := &file_internal_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GmContainerRotateReq) String() string {
+func (x *GmItemRotateReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GmContainerRotateReq) ProtoMessage() {}
+func (*GmItemRotateReq) ProtoMessage() {}
 
-func (x *GmContainerRotateReq) ProtoReflect() protoreflect.Message {
+func (x *GmItemRotateReq) ProtoReflect() protoreflect.Message {
 	mi := &file_internal_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -396,48 +396,48 @@ func (x *GmContainerRotateReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GmContainerRotateReq.ProtoReflect.Descriptor instead.
-func (*GmContainerRotateReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use GmItemRotateReq.ProtoReflect.Descriptor instead.
+func (*GmItemRotateReq) Descriptor() ([]byte, []int) {
 	return file_internal_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *GmContainerRotateReq) GetPlayerId() int64 {
+func (x *GmItemRotateReq) GetPlayerId() int64 {
 	if x != nil {
 		return x.PlayerId
 	}
 	return 0
 }
 
-func (x *GmContainerRotateReq) GetReq() *ContainerRotateReq {
+func (x *GmItemRotateReq) GetReq() *ItemRotateReq {
 	if x != nil {
 		return x.Req
 	}
 	return nil
 }
 
-// GmContainerSortReq 容器一键整理请求。
-type GmContainerSortReq struct {
+// GmItemSortReq 物品容器一键整理请求。
+type GmItemSortReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
-	Req           *SortContainerReq      `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数
+	Req           *ItemSortReq           `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GmContainerSortReq) Reset() {
-	*x = GmContainerSortReq{}
+func (x *GmItemSortReq) Reset() {
+	*x = GmItemSortReq{}
 	mi := &file_internal_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GmContainerSortReq) String() string {
+func (x *GmItemSortReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GmContainerSortReq) ProtoMessage() {}
+func (*GmItemSortReq) ProtoMessage() {}
 
-func (x *GmContainerSortReq) ProtoReflect() protoreflect.Message {
+func (x *GmItemSortReq) ProtoReflect() protoreflect.Message {
 	mi := &file_internal_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -449,48 +449,48 @@ func (x *GmContainerSortReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GmContainerSortReq.ProtoReflect.Descriptor instead.
-func (*GmContainerSortReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use GmItemSortReq.ProtoReflect.Descriptor instead.
+func (*GmItemSortReq) Descriptor() ([]byte, []int) {
 	return file_internal_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *GmContainerSortReq) GetPlayerId() int64 {
+func (x *GmItemSortReq) GetPlayerId() int64 {
 	if x != nil {
 		return x.PlayerId
 	}
 	return 0
 }
 
-func (x *GmContainerSortReq) GetReq() *SortContainerReq {
+func (x *GmItemSortReq) GetReq() *ItemSortReq {
 	if x != nil {
 		return x.Req
 	}
 	return nil
 }
 
-// GmContainerTransferReq 容器间移动对象请求。
-type GmContainerTransferReq struct {
+// GmItemTransferReq 物品容器间移动对象请求。
+type GmItemTransferReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
-	Req           *ContainerTransferReq  `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数
+	Req           *ItemTransferReq       `protobuf:"bytes,2,opt,name=req,proto3" json:"req,omitempty"`                            // 业务参数
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GmContainerTransferReq) Reset() {
-	*x = GmContainerTransferReq{}
+func (x *GmItemTransferReq) Reset() {
+	*x = GmItemTransferReq{}
 	mi := &file_internal_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GmContainerTransferReq) String() string {
+func (x *GmItemTransferReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GmContainerTransferReq) ProtoMessage() {}
+func (*GmItemTransferReq) ProtoMessage() {}
 
-func (x *GmContainerTransferReq) ProtoReflect() protoreflect.Message {
+func (x *GmItemTransferReq) ProtoReflect() protoreflect.Message {
 	mi := &file_internal_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -502,53 +502,53 @@ func (x *GmContainerTransferReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GmContainerTransferReq.ProtoReflect.Descriptor instead.
-func (*GmContainerTransferReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use GmItemTransferReq.ProtoReflect.Descriptor instead.
+func (*GmItemTransferReq) Descriptor() ([]byte, []int) {
 	return file_internal_proto_rawDescGZIP(), []int{9}
 }
 
-func (x *GmContainerTransferReq) GetPlayerId() int64 {
+func (x *GmItemTransferReq) GetPlayerId() int64 {
 	if x != nil {
 		return x.PlayerId
 	}
 	return 0
 }
 
-func (x *GmContainerTransferReq) GetReq() *ContainerTransferReq {
+func (x *GmItemTransferReq) GetReq() *ItemTransferReq {
 	if x != nil {
 		return x.Req
 	}
 	return nil
 }
 
-// GmContainerAddEntryReq 向容器放入对象请求（坐标为左上角格）。
-type GmContainerAddEntryReq struct {
+// GmItemAddEntryReq 向物品容器放入对象请求（坐标为左上角格）。
+type GmItemAddEntryReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"`                // 玩家ID
-	ContainerType int32                  `protobuf:"varint,2,opt,name=container_type,json=containerType,proto3" json:"container_type,omitempty"` // 容器类型：1 背包 2 仓库 3 保险箱
-	CfgId         int32                  `protobuf:"varint,3,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"`                         // 对象配置ID
-	Count         int32                  `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`                                      // 堆叠数量
-	GridX         int32                  `protobuf:"varint,5,opt,name=grid_x,json=gridX,proto3" json:"grid_x,omitempty"`                         // 网格X
-	GridY         int32                  `protobuf:"varint,6,opt,name=grid_y,json=gridY,proto3" json:"grid_y,omitempty"`                         // 网格Y
-	Rotated       bool                   `protobuf:"varint,7,opt,name=rotated,proto3" json:"rotated,omitempty"`                                  // 是否旋转放置
+	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
+	ItemType      int32                  `protobuf:"varint,2,opt,name=item_type,json=itemType,proto3" json:"item_type,omitempty"` // 物品容器类型：1 背包 2 仓库 3 保险箱
+	CfgId         int32                  `protobuf:"varint,3,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"`          // 对象配置ID
+	Count         int32                  `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`                       // 堆叠数量
+	GridX         int32                  `protobuf:"varint,5,opt,name=grid_x,json=gridX,proto3" json:"grid_x,omitempty"`          // 网格X
+	GridY         int32                  `protobuf:"varint,6,opt,name=grid_y,json=gridY,proto3" json:"grid_y,omitempty"`          // 网格Y
+	Rotated       bool                   `protobuf:"varint,7,opt,name=rotated,proto3" json:"rotated,omitempty"`                   // 是否旋转放置
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GmContainerAddEntryReq) Reset() {
-	*x = GmContainerAddEntryReq{}
+func (x *GmItemAddEntryReq) Reset() {
+	*x = GmItemAddEntryReq{}
 	mi := &file_internal_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GmContainerAddEntryReq) String() string {
+func (x *GmItemAddEntryReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GmContainerAddEntryReq) ProtoMessage() {}
+func (*GmItemAddEntryReq) ProtoMessage() {}
 
-func (x *GmContainerAddEntryReq) ProtoReflect() protoreflect.Message {
+func (x *GmItemAddEntryReq) ProtoReflect() protoreflect.Message {
 	mi := &file_internal_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -560,54 +560,54 @@ func (x *GmContainerAddEntryReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GmContainerAddEntryReq.ProtoReflect.Descriptor instead.
-func (*GmContainerAddEntryReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use GmItemAddEntryReq.ProtoReflect.Descriptor instead.
+func (*GmItemAddEntryReq) Descriptor() ([]byte, []int) {
 	return file_internal_proto_rawDescGZIP(), []int{10}
 }
 
-func (x *GmContainerAddEntryReq) GetPlayerId() int64 {
+func (x *GmItemAddEntryReq) GetPlayerId() int64 {
 	if x != nil {
 		return x.PlayerId
 	}
 	return 0
 }
 
-func (x *GmContainerAddEntryReq) GetContainerType() int32 {
+func (x *GmItemAddEntryReq) GetItemType() int32 {
 	if x != nil {
-		return x.ContainerType
+		return x.ItemType
 	}
 	return 0
 }
 
-func (x *GmContainerAddEntryReq) GetCfgId() int32 {
+func (x *GmItemAddEntryReq) GetCfgId() int32 {
 	if x != nil {
 		return x.CfgId
 	}
 	return 0
 }
 
-func (x *GmContainerAddEntryReq) GetCount() int32 {
+func (x *GmItemAddEntryReq) GetCount() int32 {
 	if x != nil {
 		return x.Count
 	}
 	return 0
 }
 
-func (x *GmContainerAddEntryReq) GetGridX() int32 {
+func (x *GmItemAddEntryReq) GetGridX() int32 {
 	if x != nil {
 		return x.GridX
 	}
 	return 0
 }
 
-func (x *GmContainerAddEntryReq) GetGridY() int32 {
+func (x *GmItemAddEntryReq) GetGridY() int32 {
 	if x != nil {
 		return x.GridY
 	}
 	return 0
 }
 
-func (x *GmContainerAddEntryReq) GetRotated() bool {
+func (x *GmItemAddEntryReq) GetRotated() bool {
 	if x != nil {
 		return x.Rotated
 	}
@@ -1222,7 +1222,8 @@ var File_internal_proto protoreflect.FileDescriptor
 
 const file_internal_proto_rawDesc = "" +
 	"\n" +
-	"\x0einternal.proto\x12\binternal\x1a\x0fcontainer.proto\x1a\vequip.proto\x1a\n" +
+	"\x0einternal.proto\x12\binternal\x1a\n" +
+	"item.proto\x1a\vequip.proto\x1a\n" +
 	"hero.proto\x1a\vskill.proto\x1a\fweapon.proto\"c\n" +
 	"\fOnlinePlayer\x12\x1b\n" +
 	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12\x1d\n" +
@@ -1237,25 +1238,25 @@ const file_internal_proto_rawDesc = "" +
 	"player_ids\x18\x01 \x03(\x03R\tplayerIds\"/\n" +
 	"\x0eKickPlayerResp\x12\x1d\n" +
 	"\n" +
-	"failed_ids\x18\x01 \x03(\x03R\tfailedIds\"Y\n" +
-	"\x12GmContainerListReq\x12\x1b\n" +
-	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12&\n" +
-	"\x03req\x18\x02 \x01(\v2\x14.pb.ContainerListReqR\x03req\"Y\n" +
-	"\x12GmContainerMoveReq\x12\x1b\n" +
-	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12&\n" +
-	"\x03req\x18\x02 \x01(\v2\x14.pb.ContainerMoveReqR\x03req\"]\n" +
-	"\x14GmContainerRotateReq\x12\x1b\n" +
-	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12(\n" +
-	"\x03req\x18\x02 \x01(\v2\x16.pb.ContainerRotateReqR\x03req\"Y\n" +
-	"\x12GmContainerSortReq\x12\x1b\n" +
-	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12&\n" +
-	"\x03req\x18\x02 \x01(\v2\x14.pb.SortContainerReqR\x03req\"a\n" +
-	"\x16GmContainerTransferReq\x12\x1b\n" +
+	"failed_ids\x18\x01 \x03(\x03R\tfailedIds\"X\n" +
+	"\rGmItemListReq\x12\x1b\n" +
 	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12*\n" +
-	"\x03req\x18\x02 \x01(\v2\x18.pb.ContainerTransferReqR\x03req\"\xd1\x01\n" +
-	"\x16GmContainerAddEntryReq\x12\x1b\n" +
+	"\x03req\x18\x02 \x01(\v2\x18.pb.ItemContainerListReqR\x03req\"O\n" +
+	"\rGmItemMoveReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12!\n" +
+	"\x03req\x18\x02 \x01(\v2\x0f.pb.ItemMoveReqR\x03req\"S\n" +
+	"\x0fGmItemRotateReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12#\n" +
+	"\x03req\x18\x02 \x01(\v2\x11.pb.ItemRotateReqR\x03req\"O\n" +
+	"\rGmItemSortReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12!\n" +
+	"\x03req\x18\x02 \x01(\v2\x0f.pb.ItemSortReqR\x03req\"W\n" +
+	"\x11GmItemTransferReq\x12\x1b\n" +
 	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12%\n" +
-	"\x0econtainer_type\x18\x02 \x01(\x05R\rcontainerType\x12\x15\n" +
+	"\x03req\x18\x02 \x01(\v2\x13.pb.ItemTransferReqR\x03req\"\xc2\x01\n" +
+	"\x11GmItemAddEntryReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12\x1b\n" +
+	"\titem_type\x18\x02 \x01(\x05R\bitemType\x12\x15\n" +
 	"\x06cfg_id\x18\x03 \x01(\x05R\x05cfgId\x12\x14\n" +
 	"\x05count\x18\x04 \x01(\x05R\x05count\x12\x15\n" +
 	"\x06grid_x\x18\x05 \x01(\x05R\x05gridX\x12\x15\n" +
@@ -1292,18 +1293,18 @@ const file_internal_proto_rawDesc = "" +
 	"\x03req\x18\x02 \x01(\v2\x0f.pb.EquipAddReqR\x03req\"U\n" +
 	"\x10GmEquipUpdateReq\x12\x1b\n" +
 	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12$\n" +
-	"\x03req\x18\x02 \x01(\v2\x12.pb.EquipUpdateReqR\x03req2\xa8\n" +
-	"\n" +
+	"\x03req\x18\x02 \x01(\v2\x12.pb.EquipUpdateReqR\x03req2\xe0\t\n" +
 	"\x10GameAdminService\x12Q\n" +
 	"\x10GetOnlinePlayers\x12\x1d.internal.GetOnlinePlayersReq\x1a\x1e.internal.GetOnlinePlayersResp\x12?\n" +
 	"\n" +
-	"KickPlayer\x12\x17.internal.KickPlayerReq\x1a\x18.internal.KickPlayerResp\x12D\n" +
-	"\rContainerList\x12\x1c.internal.GmContainerListReq\x1a\x15.pb.ContainerListResp\x12D\n" +
-	"\rContainerMove\x12\x1c.internal.GmContainerMoveReq\x1a\x15.pb.ContainerMoveResp\x12J\n" +
-	"\x0fContainerRotate\x12\x1e.internal.GmContainerRotateReq\x1a\x17.pb.ContainerRotateResp\x12D\n" +
-	"\rContainerSort\x12\x1c.internal.GmContainerSortReq\x1a\x15.pb.SortContainerResp\x12P\n" +
-	"\x11ContainerTransfer\x12 .internal.GmContainerTransferReq\x1a\x19.pb.ContainerTransferResp\x12L\n" +
-	"\x11ContainerAddEntry\x12 .internal.GmContainerAddEntryReq\x1a\x15.pb.ContainerListResp\x125\n" +
+	"KickPlayer\x12\x17.internal.KickPlayerReq\x1a\x18.internal.KickPlayerResp\x12>\n" +
+	"\bItemList\x12\x17.internal.GmItemListReq\x1a\x19.pb.ItemContainerListResp\x125\n" +
+	"\bItemMove\x12\x17.internal.GmItemMoveReq\x1a\x10.pb.ItemMoveResp\x12;\n" +
+	"\n" +
+	"ItemRotate\x12\x19.internal.GmItemRotateReq\x1a\x12.pb.ItemRotateResp\x125\n" +
+	"\bItemSort\x12\x17.internal.GmItemSortReq\x1a\x10.pb.ItemSortResp\x12A\n" +
+	"\fItemTransfer\x12\x1b.internal.GmItemTransferReq\x1a\x14.pb.ItemTransferResp\x12F\n" +
+	"\fItemAddEntry\x12\x1b.internal.GmItemAddEntryReq\x1a\x19.pb.ItemContainerListResp\x125\n" +
 	"\bHeroList\x12\x17.internal.GmHeroListReq\x1a\x10.pb.HeroListResp\x122\n" +
 	"\aHeroAdd\x12\x16.internal.GmHeroAddReq\x1a\x0f.pb.HeroAddResp\x12;\n" +
 	"\n" +
@@ -1333,67 +1334,67 @@ func file_internal_proto_rawDescGZIP() []byte {
 
 var file_internal_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_internal_proto_goTypes = []any{
-	(*OnlinePlayer)(nil),           // 0: internal.OnlinePlayer
-	(*GetOnlinePlayersReq)(nil),    // 1: internal.GetOnlinePlayersReq
-	(*GetOnlinePlayersResp)(nil),   // 2: internal.GetOnlinePlayersResp
-	(*KickPlayerReq)(nil),          // 3: internal.KickPlayerReq
-	(*KickPlayerResp)(nil),         // 4: internal.KickPlayerResp
-	(*GmContainerListReq)(nil),     // 5: internal.GmContainerListReq
-	(*GmContainerMoveReq)(nil),     // 6: internal.GmContainerMoveReq
-	(*GmContainerRotateReq)(nil),   // 7: internal.GmContainerRotateReq
-	(*GmContainerSortReq)(nil),     // 8: internal.GmContainerSortReq
-	(*GmContainerTransferReq)(nil), // 9: internal.GmContainerTransferReq
-	(*GmContainerAddEntryReq)(nil), // 10: internal.GmContainerAddEntryReq
-	(*GmHeroListReq)(nil),          // 11: internal.GmHeroListReq
-	(*GmHeroAddReq)(nil),           // 12: internal.GmHeroAddReq
-	(*GmHeroUpdateReq)(nil),        // 13: internal.GmHeroUpdateReq
-	(*GmWeaponListReq)(nil),        // 14: internal.GmWeaponListReq
-	(*GmWeaponAddReq)(nil),         // 15: internal.GmWeaponAddReq
-	(*GmWeaponUpdateReq)(nil),      // 16: internal.GmWeaponUpdateReq
-	(*GmSkillListReq)(nil),         // 17: internal.GmSkillListReq
-	(*GmSkillAddReq)(nil),          // 18: internal.GmSkillAddReq
-	(*GmSkillUpdateReq)(nil),       // 19: internal.GmSkillUpdateReq
-	(*GmEquipListReq)(nil),         // 20: internal.GmEquipListReq
-	(*GmEquipAddReq)(nil),          // 21: internal.GmEquipAddReq
-	(*GmEquipUpdateReq)(nil),       // 22: internal.GmEquipUpdateReq
-	(*ContainerListReq)(nil),       // 23: pb.ContainerListReq
-	(*ContainerMoveReq)(nil),       // 24: pb.ContainerMoveReq
-	(*ContainerRotateReq)(nil),     // 25: pb.ContainerRotateReq
-	(*SortContainerReq)(nil),       // 26: pb.SortContainerReq
-	(*ContainerTransferReq)(nil),   // 27: pb.ContainerTransferReq
-	(*HeroAddReq)(nil),             // 28: pb.HeroAddReq
-	(*HeroUpdateReq)(nil),          // 29: pb.HeroUpdateReq
-	(*WeaponAddReq)(nil),           // 30: pb.WeaponAddReq
-	(*WeaponUpdateReq)(nil),        // 31: pb.WeaponUpdateReq
-	(*SkillAddReq)(nil),            // 32: pb.SkillAddReq
-	(*SkillUpdateReq)(nil),         // 33: pb.SkillUpdateReq
-	(*EquipAddReq)(nil),            // 34: pb.EquipAddReq
-	(*EquipUpdateReq)(nil),         // 35: pb.EquipUpdateReq
-	(*ContainerListResp)(nil),      // 36: pb.ContainerListResp
-	(*ContainerMoveResp)(nil),      // 37: pb.ContainerMoveResp
-	(*ContainerRotateResp)(nil),    // 38: pb.ContainerRotateResp
-	(*SortContainerResp)(nil),      // 39: pb.SortContainerResp
-	(*ContainerTransferResp)(nil),  // 40: pb.ContainerTransferResp
-	(*HeroListResp)(nil),           // 41: pb.HeroListResp
-	(*HeroAddResp)(nil),            // 42: pb.HeroAddResp
-	(*HeroUpdateResp)(nil),         // 43: pb.HeroUpdateResp
-	(*WeaponListResp)(nil),         // 44: pb.WeaponListResp
-	(*WeaponAddResp)(nil),          // 45: pb.WeaponAddResp
-	(*WeaponUpdateResp)(nil),       // 46: pb.WeaponUpdateResp
-	(*SkillListResp)(nil),          // 47: pb.SkillListResp
-	(*SkillAddResp)(nil),           // 48: pb.SkillAddResp
-	(*SkillUpdateResp)(nil),        // 49: pb.SkillUpdateResp
-	(*EquipListResp)(nil),          // 50: pb.EquipListResp
-	(*EquipAddResp)(nil),           // 51: pb.EquipAddResp
-	(*EquipUpdateResp)(nil),        // 52: pb.EquipUpdateResp
+	(*OnlinePlayer)(nil),          // 0: internal.OnlinePlayer
+	(*GetOnlinePlayersReq)(nil),   // 1: internal.GetOnlinePlayersReq
+	(*GetOnlinePlayersResp)(nil),  // 2: internal.GetOnlinePlayersResp
+	(*KickPlayerReq)(nil),         // 3: internal.KickPlayerReq
+	(*KickPlayerResp)(nil),        // 4: internal.KickPlayerResp
+	(*GmItemListReq)(nil),         // 5: internal.GmItemListReq
+	(*GmItemMoveReq)(nil),         // 6: internal.GmItemMoveReq
+	(*GmItemRotateReq)(nil),       // 7: internal.GmItemRotateReq
+	(*GmItemSortReq)(nil),         // 8: internal.GmItemSortReq
+	(*GmItemTransferReq)(nil),     // 9: internal.GmItemTransferReq
+	(*GmItemAddEntryReq)(nil),     // 10: internal.GmItemAddEntryReq
+	(*GmHeroListReq)(nil),         // 11: internal.GmHeroListReq
+	(*GmHeroAddReq)(nil),          // 12: internal.GmHeroAddReq
+	(*GmHeroUpdateReq)(nil),       // 13: internal.GmHeroUpdateReq
+	(*GmWeaponListReq)(nil),       // 14: internal.GmWeaponListReq
+	(*GmWeaponAddReq)(nil),        // 15: internal.GmWeaponAddReq
+	(*GmWeaponUpdateReq)(nil),     // 16: internal.GmWeaponUpdateReq
+	(*GmSkillListReq)(nil),        // 17: internal.GmSkillListReq
+	(*GmSkillAddReq)(nil),         // 18: internal.GmSkillAddReq
+	(*GmSkillUpdateReq)(nil),      // 19: internal.GmSkillUpdateReq
+	(*GmEquipListReq)(nil),        // 20: internal.GmEquipListReq
+	(*GmEquipAddReq)(nil),         // 21: internal.GmEquipAddReq
+	(*GmEquipUpdateReq)(nil),      // 22: internal.GmEquipUpdateReq
+	(*ItemContainerListReq)(nil),  // 23: pb.ItemContainerListReq
+	(*ItemMoveReq)(nil),           // 24: pb.ItemMoveReq
+	(*ItemRotateReq)(nil),         // 25: pb.ItemRotateReq
+	(*ItemSortReq)(nil),           // 26: pb.ItemSortReq
+	(*ItemTransferReq)(nil),       // 27: pb.ItemTransferReq
+	(*HeroAddReq)(nil),            // 28: pb.HeroAddReq
+	(*HeroUpdateReq)(nil),         // 29: pb.HeroUpdateReq
+	(*WeaponAddReq)(nil),          // 30: pb.WeaponAddReq
+	(*WeaponUpdateReq)(nil),       // 31: pb.WeaponUpdateReq
+	(*SkillAddReq)(nil),           // 32: pb.SkillAddReq
+	(*SkillUpdateReq)(nil),        // 33: pb.SkillUpdateReq
+	(*EquipAddReq)(nil),           // 34: pb.EquipAddReq
+	(*EquipUpdateReq)(nil),        // 35: pb.EquipUpdateReq
+	(*ItemContainerListResp)(nil), // 36: pb.ItemContainerListResp
+	(*ItemMoveResp)(nil),          // 37: pb.ItemMoveResp
+	(*ItemRotateResp)(nil),        // 38: pb.ItemRotateResp
+	(*ItemSortResp)(nil),          // 39: pb.ItemSortResp
+	(*ItemTransferResp)(nil),      // 40: pb.ItemTransferResp
+	(*HeroListResp)(nil),          // 41: pb.HeroListResp
+	(*HeroAddResp)(nil),           // 42: pb.HeroAddResp
+	(*HeroUpdateResp)(nil),        // 43: pb.HeroUpdateResp
+	(*WeaponListResp)(nil),        // 44: pb.WeaponListResp
+	(*WeaponAddResp)(nil),         // 45: pb.WeaponAddResp
+	(*WeaponUpdateResp)(nil),      // 46: pb.WeaponUpdateResp
+	(*SkillListResp)(nil),         // 47: pb.SkillListResp
+	(*SkillAddResp)(nil),          // 48: pb.SkillAddResp
+	(*SkillUpdateResp)(nil),       // 49: pb.SkillUpdateResp
+	(*EquipListResp)(nil),         // 50: pb.EquipListResp
+	(*EquipAddResp)(nil),          // 51: pb.EquipAddResp
+	(*EquipUpdateResp)(nil),       // 52: pb.EquipUpdateResp
 }
 var file_internal_proto_depIdxs = []int32{
 	0,  // 0: internal.GetOnlinePlayersResp.players:type_name -> internal.OnlinePlayer
-	23, // 1: internal.GmContainerListReq.req:type_name -> pb.ContainerListReq
-	24, // 2: internal.GmContainerMoveReq.req:type_name -> pb.ContainerMoveReq
-	25, // 3: internal.GmContainerRotateReq.req:type_name -> pb.ContainerRotateReq
-	26, // 4: internal.GmContainerSortReq.req:type_name -> pb.SortContainerReq
-	27, // 5: internal.GmContainerTransferReq.req:type_name -> pb.ContainerTransferReq
+	23, // 1: internal.GmItemListReq.req:type_name -> pb.ItemContainerListReq
+	24, // 2: internal.GmItemMoveReq.req:type_name -> pb.ItemMoveReq
+	25, // 3: internal.GmItemRotateReq.req:type_name -> pb.ItemRotateReq
+	26, // 4: internal.GmItemSortReq.req:type_name -> pb.ItemSortReq
+	27, // 5: internal.GmItemTransferReq.req:type_name -> pb.ItemTransferReq
 	28, // 6: internal.GmHeroAddReq.req:type_name -> pb.HeroAddReq
 	29, // 7: internal.GmHeroUpdateReq.req:type_name -> pb.HeroUpdateReq
 	30, // 8: internal.GmWeaponAddReq.req:type_name -> pb.WeaponAddReq
@@ -1404,12 +1405,12 @@ var file_internal_proto_depIdxs = []int32{
 	35, // 13: internal.GmEquipUpdateReq.req:type_name -> pb.EquipUpdateReq
 	1,  // 14: internal.GameAdminService.GetOnlinePlayers:input_type -> internal.GetOnlinePlayersReq
 	3,  // 15: internal.GameAdminService.KickPlayer:input_type -> internal.KickPlayerReq
-	5,  // 16: internal.GameAdminService.ContainerList:input_type -> internal.GmContainerListReq
-	6,  // 17: internal.GameAdminService.ContainerMove:input_type -> internal.GmContainerMoveReq
-	7,  // 18: internal.GameAdminService.ContainerRotate:input_type -> internal.GmContainerRotateReq
-	8,  // 19: internal.GameAdminService.ContainerSort:input_type -> internal.GmContainerSortReq
-	9,  // 20: internal.GameAdminService.ContainerTransfer:input_type -> internal.GmContainerTransferReq
-	10, // 21: internal.GameAdminService.ContainerAddEntry:input_type -> internal.GmContainerAddEntryReq
+	5,  // 16: internal.GameAdminService.ItemList:input_type -> internal.GmItemListReq
+	6,  // 17: internal.GameAdminService.ItemMove:input_type -> internal.GmItemMoveReq
+	7,  // 18: internal.GameAdminService.ItemRotate:input_type -> internal.GmItemRotateReq
+	8,  // 19: internal.GameAdminService.ItemSort:input_type -> internal.GmItemSortReq
+	9,  // 20: internal.GameAdminService.ItemTransfer:input_type -> internal.GmItemTransferReq
+	10, // 21: internal.GameAdminService.ItemAddEntry:input_type -> internal.GmItemAddEntryReq
 	11, // 22: internal.GameAdminService.HeroList:input_type -> internal.GmHeroListReq
 	12, // 23: internal.GameAdminService.HeroAdd:input_type -> internal.GmHeroAddReq
 	13, // 24: internal.GameAdminService.HeroUpdate:input_type -> internal.GmHeroUpdateReq
@@ -1424,12 +1425,12 @@ var file_internal_proto_depIdxs = []int32{
 	22, // 33: internal.GameAdminService.EquipUpdate:input_type -> internal.GmEquipUpdateReq
 	2,  // 34: internal.GameAdminService.GetOnlinePlayers:output_type -> internal.GetOnlinePlayersResp
 	4,  // 35: internal.GameAdminService.KickPlayer:output_type -> internal.KickPlayerResp
-	36, // 36: internal.GameAdminService.ContainerList:output_type -> pb.ContainerListResp
-	37, // 37: internal.GameAdminService.ContainerMove:output_type -> pb.ContainerMoveResp
-	38, // 38: internal.GameAdminService.ContainerRotate:output_type -> pb.ContainerRotateResp
-	39, // 39: internal.GameAdminService.ContainerSort:output_type -> pb.SortContainerResp
-	40, // 40: internal.GameAdminService.ContainerTransfer:output_type -> pb.ContainerTransferResp
-	36, // 41: internal.GameAdminService.ContainerAddEntry:output_type -> pb.ContainerListResp
+	36, // 36: internal.GameAdminService.ItemList:output_type -> pb.ItemContainerListResp
+	37, // 37: internal.GameAdminService.ItemMove:output_type -> pb.ItemMoveResp
+	38, // 38: internal.GameAdminService.ItemRotate:output_type -> pb.ItemRotateResp
+	39, // 39: internal.GameAdminService.ItemSort:output_type -> pb.ItemSortResp
+	40, // 40: internal.GameAdminService.ItemTransfer:output_type -> pb.ItemTransferResp
+	36, // 41: internal.GameAdminService.ItemAddEntry:output_type -> pb.ItemContainerListResp
 	41, // 42: internal.GameAdminService.HeroList:output_type -> pb.HeroListResp
 	42, // 43: internal.GameAdminService.HeroAdd:output_type -> pb.HeroAddResp
 	43, // 44: internal.GameAdminService.HeroUpdate:output_type -> pb.HeroUpdateResp
@@ -1454,7 +1455,7 @@ func file_internal_proto_init() {
 	if File_internal_proto != nil {
 		return
 	}
-	file_container_proto_init()
+	file_item_proto_init()
 	file_equip_proto_init()
 	file_hero_proto_init()
 	file_skill_proto_init()

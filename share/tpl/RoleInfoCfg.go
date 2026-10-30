@@ -18,5 +18,5 @@ type RoleInfoCfg struct {
 	Rarity            int32   `json:"rarity"`            // 稀有度
 	CharacterId       int32   `json:"characterId"`       // 角色
 	SkillID           []int32 `json:"skillID"`           // 携带技能
-	EquipID           []int32 `json:"equipID"`           // 穿戴装备
+	GearID            []int32 `json:"gearID"`            // 穿戴装备
 }

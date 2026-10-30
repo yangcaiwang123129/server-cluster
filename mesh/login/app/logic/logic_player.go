@@ -29,18 +29,18 @@ func gateAddr() string {
 	return consts.DefaultGateAddr
 }
 
-type playerBaseLogic struct{}
+type playerLogic struct{}
 
-var playerBaseLogicInst = singleton.NewContainer[global.PlayerLogic]("PlayerBaseLogic")
+var playerLogicInst = singleton.NewContainer[global.PlayerLogic]("PlayerLogic")
 
 func init() {
-	playerBaseLogicInst.Register(&playerBaseLogic{})
+	playerLogicInst.Register(&playerLogic{})
 }
 
-// PlayerBaseLogic 获取账号模块业务单例。
-func PlayerBaseLogic() global.PlayerLogic { return playerBaseLogicInst.MustGet() }
+// Player 获取账号模块业务单例。
+func Player() global.PlayerLogic { return playerLogicInst.MustGet() }
 
-func (this *playerBaseLogic) PlayerRegister(ctx context.Context, req *dto.PlayerRegisterReq) (*dto.PlayerRegisterResp, error) {
+func (this *playerLogic) PlayerRegister(ctx context.Context, req *dto.PlayerRegisterReq) (*dto.PlayerRegisterResp, error) {
 	// 检查用户名是否已存在
 	_, err := repo.Repo().FindByUsername(ctx, req.Username)
 	if err == nil {
@@ -54,7 +54,7 @@ func (this *playerBaseLogic) PlayerRegister(ctx context.Context, req *dto.Player
 	if err != nil {
 		return nil, err
 	}
-	m := &model.PlayerBase{
+	m := &model.Player{
 		PlayerID: svc.NextID(),
 		Username: req.Username,
 		Password: string(hash),
@@ -70,7 +70,7 @@ func (this *playerBaseLogic) PlayerRegister(ctx context.Context, req *dto.Player
 	return &dto.PlayerRegisterResp{Token: token.Token, GateAddr: gateAddr()}, nil
 }
 
-func (this *playerBaseLogic) PlayerLogin(ctx context.Context, req *dto.PlayerLoginReq) (*dto.PlayerLoginResp, error) {
+func (this *playerLogic) PlayerLogin(ctx context.Context, req *dto.PlayerLoginReq) (*dto.PlayerLoginResp, error) {
 	switch req.LoginType {
 	case dto.LoginTypePassword:
 		return this.loginByUsername(ctx, req)
@@ -84,7 +84,7 @@ func (this *playerBaseLogic) PlayerLogin(ctx context.Context, req *dto.PlayerLog
 }
 
 // loginByUsername 账号密码登录分支。
-func (this *playerBaseLogic) loginByUsername(ctx context.Context, req *dto.PlayerLoginReq) (*dto.PlayerLoginResp, error) {
+func (this *playerLogic) loginByUsername(ctx context.Context, req *dto.PlayerLoginReq) (*dto.PlayerLoginResp, error) {
 	m, err := repo.Repo().FindByUsername(ctx, req.Username)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

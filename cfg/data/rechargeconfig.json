@@ -1,0 +1,29 @@
+[
+  {
+    "id": 3,
+    "desc": "3元",
+    "assetReward": {
+      "type": 1,
+      "id": 2,
+      "count": 30
+    }
+  },
+  {
+    "id": 6,
+    "desc": "6元",
+    "assetReward": {
+      "type": 1,
+      "id": 2,
+      "count": 60
+    }
+  },
+  {
+    "id": 60,
+    "desc": "60元",
+    "assetReward": {
+      "type": 1,
+      "id": 2,
+      "count": 600
+    }
+  }
+]

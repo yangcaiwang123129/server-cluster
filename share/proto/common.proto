@@ -16,14 +16,14 @@ enum RouteCode {
   ROUTE_CODE_LEAVE_GAME = 10002; // 离开游戏
   ROUTE_CODE_SEVER_NOTIFY = 10003; // 服务器通知
 
-  // 玩家容器 10010~10019
-  ROUTE_CODE_CONTAINER_LIST = 10010;  // 容器列表
-  ROUTE_CODE_CONTAINER_NOTIFY = 10011;  // 容器内变化通知
-  ROUTE_CODE_CONTAINER_ADD = 10012;  // 容器内对象添加(预发布和生成环境不开放)
-  ROUTE_CODE_CONTAINER_MOVE = 10013;  // 容器内对象移动
-  ROUTE_CODE_CONTAINER_ROTATE = 10014;  // 容器内对象旋转
-  ROUTE_CODE_CONTAINER_SORT = 10015;  // 容器一键整理对象
-  ROUTE_CODE_CONTAINER_TRANSFER = 10016;  // 容器间对象移动
+  // 玩家物品 10010~10019
+  ROUTE_CODE_ITEM_LIST = 10010;  // 物品容器列表
+  ROUTE_CODE_ITEM_NOTIFY = 10011;  // 物品容器内变化通知
+  ROUTE_CODE_ITEM_ADD = 10012;  // 物品容器内对象添加(预发布和生成环境不开放)
+  ROUTE_CODE_ITEM_MOVE = 10013;  // 物品容器内对象移动
+  ROUTE_CODE_ITEM_ROTATE = 10014;  // 物品容器内对象旋转
+  ROUTE_CODE_ITEM_SORT = 10015;  // 物品容器一键整理对象
+  ROUTE_CODE_ITEM_TRANSFER = 10016;  // 物品容器间对象移动
 
   // 英雄 10020~10029
   ROUTE_CODE_HERO_LIST = 10020; // 英雄列表
@@ -73,13 +73,13 @@ enum NOTIFY_TYPE {
   NOTIFY_TYPE_BROADCAST = 3; // 公告
 }
 
-// ========== 容器类型枚举 ==========
+// ========== 物品容器类型枚举 ==========
 
-enum ContainerType {
-  CONTAINER_TYPE_UNSPECIFIED = 0;
-  CONTAINER_TYPE_BACKPACK = 1; // 背包（局内随身，死亡掉落）
-  CONTAINER_TYPE_STASH = 2;    // 仓库（局外固定，不掉落）
-  CONTAINER_TYPE_SECURE = 3;   // 保险箱（局内随身，不掉落）
+enum ItemType {
+  ITEM_TYPE_UNSPECIFIED = 0;
+  ITEM_TYPE_BACKPACK = 1; // 背包（局内随身，死亡掉落）
+  ITEM_TYPE_STASH = 2;    // 仓库（局外固定，不掉落）
+  ITEM_TYPE_SECURE = 3;   // 保险箱（局内随身，不掉落）
 }
 
 //  ========== 属性枚举 ==========
@@ -131,7 +131,7 @@ message ObjectValue {
   }
 }
 
-// 容器中的物品
+// 物品容器中的物品
 message ItemEntry {
   int64 id = 1;     // 实例ID
   int32 cfg_id = 2; // 配置ID
@@ -141,10 +141,10 @@ message ItemEntry {
   bool rotated = 6;      // 是否旋转
 }
 
-// 容器条目
-message ContainerEntry {
-  int64 id = 1;              // 容器实例ID（=playerID + type 编码）
-  ContainerType type = 2;              // 容器类型
+// 物品容器条目
+message ItemContainer {
+  int64 id = 1;                        // 物品容器实例ID（=playerID + type 编码）
+  ItemType type = 2;                   // 物品容器类型
   int32 grid_w = 3;                    // 网格宽度
   int32 grid_h = 4;                    // 网格高度
   int32 version = 5;                   // 操作版本号（每次修改+1）

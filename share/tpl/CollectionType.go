@@ -15,4 +15,11 @@ const (
 	CollectionType_Cure      CollectionType = 1
 	CollectionType_Armor     CollectionType = 2
 	CollectionType_BodyArmor CollectionType = 3
+	CollectionType_Grip      CollectionType = 4
+	CollectionType_Handle    CollectionType = 5
+	CollectionType_Magazine  CollectionType = 6
+	CollectionType_Radar     CollectionType = 7
+	CollectionType_Scope     CollectionType = 8
+	CollectionType_Shoe      CollectionType = 9
+	CollectionType_Silencer  CollectionType = 10
 )

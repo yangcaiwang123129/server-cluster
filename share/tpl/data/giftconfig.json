@@ -1,0 +1,90 @@
+[
+  {
+    "id": 1001,
+    "desc": "礼包1",
+    "name": "礼包1",
+    "AssetCost": {
+      "type": 1,
+      "id": 1,
+      "count": 10
+    },
+    "AssetRewards": [
+      {
+        "type": 1,
+        "id": 4,
+        "count": 1
+      },
+      {
+        "type": 1,
+        "id": 5,
+        "count": 1
+      }
+    ]
+  },
+  {
+    "id": 1002,
+    "desc": "礼包2",
+    "name": "礼包2",
+    "AssetCost": {
+      "type": 1,
+      "id": 1,
+      "count": 10
+    },
+    "AssetRewards": [
+      {
+        "type": 3,
+        "id": 1000,
+        "count": 1
+      },
+      {
+        "type": 3,
+        "id": 1000,
+        "count": 1
+      }
+    ]
+  },
+  {
+    "id": 1003,
+    "desc": "礼包3",
+    "name": "礼包3",
+    "AssetCost": {
+      "type": 1,
+      "id": 1,
+      "count": 10
+    },
+    "AssetRewards": [
+      {
+        "type": 4,
+        "id": 1001,
+        "count": 1
+      },
+      {
+        "type": 4,
+        "id": 2001,
+        "count": 1
+      }
+    ]
+  },
+  {
+    "id": 1004,
+    "desc": "礼包4",
+    "name": "礼包4",
+    "AssetCost": {
+      "type": 1,
+      "id": 1,
+      "count": 10
+    },
+    "AssetRewards": [
+      {
+        "type": 4,
+        "id": 1001,
+        "count": 1
+      },
+      {
+        "type": 4,
+        "id": 2001,
+        "count": 1
+      }
+    ]
+  }
+]

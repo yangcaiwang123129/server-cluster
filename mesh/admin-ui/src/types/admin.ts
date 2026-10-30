@@ -216,7 +216,7 @@ export interface PlayerQuery {
   username?: string
 }
 
-/** A player account row from player_base. Timestamps are unix milliseconds. */
+/** A player account row from the player table. Timestamps are unix milliseconds. */
 export interface Player {
   playerId?: number
   username?: string
@@ -224,7 +224,7 @@ export interface Player {
   nickname?: string
   zone?: number
   phoneNumber?: number
-  /** currencies from player_asset */
+  /** currencies from player */
   coupon?: number
   gold?: number
   coin?: number
@@ -263,8 +263,8 @@ export interface ItemCfg {
   usedInBackpack?: boolean
 }
 
-/** GM 容器内物品（含配置展示信息）。itemId 为雪花 ID，后端按字符串下发。 */
-export interface GmContainerItem {
+/** GM 物品容器内物品（含配置展示信息）。itemId 为雪花 ID，后端按字符串下发。 */
+export interface GmItemEntry {
   itemId?: string
   itemCfgId?: number
   count?: number
@@ -280,13 +280,13 @@ export interface GmContainerItem {
   maxCount?: number
 }
 
-export interface GmContainer {
+export interface GmItem {
   playerId?: number
-  containerType?: number
+  itemType?: number
   gridW?: number
   gridH?: number
   version?: number
-  items?: GmContainerItem[]
+  items?: GmItemEntry[]
 }
 
 export interface GmHero {

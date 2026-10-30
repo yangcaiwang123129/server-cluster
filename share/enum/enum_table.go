@@ -1,21 +1,19 @@
 package enum
 
-// Table 表名枚举：与 share/model 各表模型的 TableName() 一一对应。
-// 命名规范：全部单数、统一 player_ 前缀；1:1 表主键 player_id，1:N 表主键 (player_id, 业务ID)。
+// Table 表名枚举
 type Table string
 
 const (
-	TablePlayerBase      Table = "player_base"      // 玩家账号（1:1）
-	TablePlayerExtra     Table = "player_extra"     // 玩家拓展（1:1）
-	TablePlayerAsset     Table = "player_asset"     // 玩家资产（1:1）
-	TablePlayerHero      Table = "player_hero"      // 玩家英雄持有（1:1，英雄数组 JSON）
-	TablePlayerSkill     Table = "player_skill"     // 玩家技能持有（1:1，技能数组 JSON）
-	TablePlayerWeapon    Table = "player_weapon"    // 玩家武器持有（1:1，武器数组 JSON）
-	TablePlayerEquip     Table = "player_equip"     // 玩家装备持有（1:1，装备数组 JSON）
-	TablePlayerContainer Table = "player_container" // 玩家容器（1:1）
+	TablePlayer          Table = "player"           // 玩家表（1:1）
+	TablePlayerExtra     Table = "player_extra"     // 玩家拓展表（1:1）
+	TablePlayerItem      Table = "player_item"      // 玩家物品表 持有（1:1，物品容器 JSON）
+	TablePlayerEquip     Table = "player_equip"     // 玩家装备表 持有（1:1，装备 JSON）
+	TablePlayerHero      Table = "player_hero"      // 玩家英雄表 持有（1:1，英雄 JSON）
+	TablePlayerWeapon    Table = "player_weapon"    // 玩家武器表 持有（1:1，武器 JSON）
+	TablePlayerSkill     Table = "player_skill"     // 玩家技能表 持有（1:1，技能 JSON）
 )
 
-// 游戏打点记录表（game_record 库，game 写入、admin 只读）。
+// 游戏打点记录表
 const (
 	TableItemRecord   Table = "item_record"   // 物品打点
 	TableEquipRecord  Table = "equip_record"  // 装备打点
@@ -24,7 +22,7 @@ const (
 	TableHeroRecord   Table = "hero_record"   // 英雄打点
 )
 
-// 管理后台表（mesh/admin）。
+// 管理后台表
 const (
 	TableSysUser        Table = "sys_user"          // 后台账号
 	TableSysRole        Table = "sys_role"          // 角色

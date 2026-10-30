@@ -11,7 +11,7 @@ import { computed } from 'vue'
  * The icon fields in the game configs are atlas coordinates ("1,1") or empty
  * strings, and the admin UI ships no art assets, so there is nothing to put in
  * an <img>. This tile renders the name's first character on a rarity-colored
- * chip instead, keeping the GM pages (container/hero/weapon/skill/equip)
+ * chip instead, keeping the GM pages (item/hero/weapon/skill/equip)
  * visually scannable.
  */
 defineOptions({ name: 'GameItemIcon' })

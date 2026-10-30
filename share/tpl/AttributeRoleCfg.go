@@ -34,9 +34,9 @@ type AttributeRoleCfg struct {
 	ScatterAim      float32  `json:"scatterAim"`      // 瞄准攻击散射
 	TimeAim         float32  `json:"timeAim"`         // 瞄准时间
 	Weapon          int32    `json:"weapon"`          // 穿戴武器
-	Equip1          int32    `json:"equip1"`          // 穿戴装备
-	Equip2          int32    `json:"equip2"`          // 穿戴装备
-	Equip3          int32    `json:"equip3"`          // 穿戴装备
+	Gear1           int32    `json:"gear1"`           // 穿戴装备
+	Gear2           int32    `json:"gear2"`           // 穿戴装备
+	Gear3           int32    `json:"gear3"`           // 穿戴装备
 	Skill1          int32    `json:"skill1"`          // 携带技能
 	Skill2          int32    `json:"skill2"`          // 携带技能
 	Skill3          int32    `json:"skill3"`          // 携带技能

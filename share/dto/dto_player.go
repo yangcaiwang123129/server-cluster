@@ -7,7 +7,7 @@ type PlayerListReq struct {
 	Order    string
 }
 
-// PlayerResp 玩家账号信息（player_base + player_extra 昵称 + player_asset 货币）。
+// PlayerResp 玩家账号信息（player 账号与货币 + player_extra 昵称）。
 type PlayerResp struct {
 	PlayerID    int64  `json:"playerId"`
 	Username    string `json:"username"`

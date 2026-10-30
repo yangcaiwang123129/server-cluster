@@ -5,6 +5,7 @@ import (
 	"server-cluster/internal/router"
 	_ "server-cluster/node/game/app/handler" // 触发 handler_gm_player.go 的 init() 注册路由到 routes 切片
 	"server-cluster/node/game/app/service"
+	"server-cluster/share/consts"
 	"server-cluster/share/pb"
 
 	"github.com/dobyte/due/locate/redis/v2"
@@ -12,7 +13,6 @@ import (
 	"github.com/dobyte/due/transport/grpc/v2"
 	"github.com/dobyte/due/v2"
 	"github.com/dobyte/due/v2/cluster/node"
-	"github.com/dobyte/due/v2/etc"
 	"github.com/dobyte/due/v2/log"
 
 	"server-cluster/internal/singleinstance"
@@ -22,8 +22,7 @@ import (
 
 func main() {
 	// 单实例保护：重复启动会触发 due 日志 rotate 失败 panic，提前拦截
-	// 实例标识读取 etc 中的集群实例 ID，避免写死
-	singleinstance.Check(instanceID())
+	singleinstance.Check(consts.NodeInstanceID())
 	// 创建容器
 	container := due.NewContainer()
 	// 创建用户定位器
@@ -54,12 +53,4 @@ func main() {
 	container.Serve()
 	// 释放资源
 	global.Destroy()
-}
-
-// instanceID 读取 etc 中配置的集群实例 ID（cluster.node.id），未配置时退回服务名。
-func instanceID() string {
-	if id := etc.Get("cluster.node.id").String(); id != "" {
-		return id
-	}
-	return "game"
 }
