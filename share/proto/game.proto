@@ -44,3 +44,38 @@ message ServerNotify {
   NOTIFY_TYPE notify_type = 1;     // 通知类型
   string content = 2; // 通知内容
 }
+
+// 购买礼包请求（路由 10004）
+message GiftBuyReq {
+  int32 cfg_id = 1; // 礼包配置ID（GiftCfg.Id）
+}
+// 购买礼包响应
+message GiftBuyResp {
+  Result result = 1;
+  repeated AssetEntry costs = 2;    // 实际消耗的资产
+  repeated AssetEntry rewards = 3;  // 实际发放的奖励
+}
+
+// 兑换请求（路由 10005）
+message ExchangeReq {
+  int32 cfg_id = 1; // 兑换配置ID（ExchangeCfg.Id）
+}
+
+// 兑换响应
+message ExchangeResp {
+  Result result = 1;
+  repeated AssetEntry costs = 2;    // 实际消耗的资产
+  repeated AssetEntry rewards = 3;  // 实际发放的奖励
+}
+
+// 充值请求（路由 10006）
+// 当前为假充值：服务端不做订单校验，直接按配置发放奖励。
+message RechargeReq {
+  int32 cfg_id = 1; // 充值配置ID（RechargeCfg.Id）
+}
+
+// 充值响应
+message RechargeResp {
+  Result result = 1;
+  repeated AssetEntry rewards = 2; // 实际发放的奖励
+}

@@ -368,6 +368,317 @@ func (x *ServerNotify) GetContent() string {
 	return ""
 }
 
+// 购买礼包请求（路由 10004）
+type GiftBuyReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 礼包配置ID（GiftCfg.Id）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GiftBuyReq) Reset() {
+	*x = GiftBuyReq{}
+	mi := &file_game_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GiftBuyReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GiftBuyReq) ProtoMessage() {}
+
+func (x *GiftBuyReq) ProtoReflect() protoreflect.Message {
+	mi := &file_game_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GiftBuyReq.ProtoReflect.Descriptor instead.
+func (*GiftBuyReq) Descriptor() ([]byte, []int) {
+	return file_game_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *GiftBuyReq) GetCfgId() int32 {
+	if x != nil {
+		return x.CfgId
+	}
+	return 0
+}
+
+// 购买礼包响应
+type GiftBuyResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	Costs         []*AssetEntry          `protobuf:"bytes,2,rep,name=costs,proto3" json:"costs,omitempty"`     // 实际消耗的资产
+	Rewards       []*AssetEntry          `protobuf:"bytes,3,rep,name=rewards,proto3" json:"rewards,omitempty"` // 实际发放的奖励
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GiftBuyResp) Reset() {
+	*x = GiftBuyResp{}
+	mi := &file_game_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GiftBuyResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GiftBuyResp) ProtoMessage() {}
+
+func (x *GiftBuyResp) ProtoReflect() protoreflect.Message {
+	mi := &file_game_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GiftBuyResp.ProtoReflect.Descriptor instead.
+func (*GiftBuyResp) Descriptor() ([]byte, []int) {
+	return file_game_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *GiftBuyResp) GetResult() *Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
+func (x *GiftBuyResp) GetCosts() []*AssetEntry {
+	if x != nil {
+		return x.Costs
+	}
+	return nil
+}
+
+func (x *GiftBuyResp) GetRewards() []*AssetEntry {
+	if x != nil {
+		return x.Rewards
+	}
+	return nil
+}
+
+// 兑换请求（路由 10005）
+type ExchangeReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 兑换配置ID（ExchangeCfg.Id）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ExchangeReq) Reset() {
+	*x = ExchangeReq{}
+	mi := &file_game_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ExchangeReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExchangeReq) ProtoMessage() {}
+
+func (x *ExchangeReq) ProtoReflect() protoreflect.Message {
+	mi := &file_game_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExchangeReq.ProtoReflect.Descriptor instead.
+func (*ExchangeReq) Descriptor() ([]byte, []int) {
+	return file_game_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *ExchangeReq) GetCfgId() int32 {
+	if x != nil {
+		return x.CfgId
+	}
+	return 0
+}
+
+// 兑换响应
+type ExchangeResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	Costs         []*AssetEntry          `protobuf:"bytes,2,rep,name=costs,proto3" json:"costs,omitempty"`     // 实际消耗的资产
+	Rewards       []*AssetEntry          `protobuf:"bytes,3,rep,name=rewards,proto3" json:"rewards,omitempty"` // 实际发放的奖励
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ExchangeResp) Reset() {
+	*x = ExchangeResp{}
+	mi := &file_game_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ExchangeResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExchangeResp) ProtoMessage() {}
+
+func (x *ExchangeResp) ProtoReflect() protoreflect.Message {
+	mi := &file_game_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExchangeResp.ProtoReflect.Descriptor instead.
+func (*ExchangeResp) Descriptor() ([]byte, []int) {
+	return file_game_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *ExchangeResp) GetResult() *Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
+func (x *ExchangeResp) GetCosts() []*AssetEntry {
+	if x != nil {
+		return x.Costs
+	}
+	return nil
+}
+
+func (x *ExchangeResp) GetRewards() []*AssetEntry {
+	if x != nil {
+		return x.Rewards
+	}
+	return nil
+}
+
+// 充值请求（路由 10006）
+// 当前为假充值：服务端不做订单校验，直接按配置发放奖励。
+type RechargeReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 充值配置ID（RechargeCfg.Id）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RechargeReq) Reset() {
+	*x = RechargeReq{}
+	mi := &file_game_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RechargeReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RechargeReq) ProtoMessage() {}
+
+func (x *RechargeReq) ProtoReflect() protoreflect.Message {
+	mi := &file_game_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RechargeReq.ProtoReflect.Descriptor instead.
+func (*RechargeReq) Descriptor() ([]byte, []int) {
+	return file_game_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *RechargeReq) GetCfgId() int32 {
+	if x != nil {
+		return x.CfgId
+	}
+	return 0
+}
+
+// 充值响应
+type RechargeResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	Rewards       []*AssetEntry          `protobuf:"bytes,2,rep,name=rewards,proto3" json:"rewards,omitempty"` // 实际发放的奖励
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RechargeResp) Reset() {
+	*x = RechargeResp{}
+	mi := &file_game_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RechargeResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RechargeResp) ProtoMessage() {}
+
+func (x *RechargeResp) ProtoReflect() protoreflect.Message {
+	mi := &file_game_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RechargeResp.ProtoReflect.Descriptor instead.
+func (*RechargeResp) Descriptor() ([]byte, []int) {
+	return file_game_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *RechargeResp) GetResult() *Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
+func (x *RechargeResp) GetRewards() []*AssetEntry {
+	if x != nil {
+		return x.Rewards
+	}
+	return nil
+}
+
 var File_game_proto protoreflect.FileDescriptor
 
 const file_game_proto_rawDesc = "" +
@@ -399,7 +710,28 @@ const file_game_proto_rawDesc = "" +
 	"\fServerNotify\x120\n" +
 	"\vnotify_type\x18\x01 \x01(\x0e2\x0f.pb.NOTIFY_TYPER\n" +
 	"notifyType\x12\x18\n" +
-	"\acontent\x18\x02 \x01(\tR\acontentB\x19Z\x17server-cluster/share/pbb\x06proto3"
+	"\acontent\x18\x02 \x01(\tR\acontent\"#\n" +
+	"\n" +
+	"GiftBuyReq\x12\x15\n" +
+	"\x06cfg_id\x18\x01 \x01(\x05R\x05cfgId\"\x81\x01\n" +
+	"\vGiftBuyResp\x12\"\n" +
+	"\x06result\x18\x01 \x01(\v2\n" +
+	".pb.ResultR\x06result\x12$\n" +
+	"\x05costs\x18\x02 \x03(\v2\x0e.pb.AssetEntryR\x05costs\x12(\n" +
+	"\arewards\x18\x03 \x03(\v2\x0e.pb.AssetEntryR\arewards\"$\n" +
+	"\vExchangeReq\x12\x15\n" +
+	"\x06cfg_id\x18\x01 \x01(\x05R\x05cfgId\"\x82\x01\n" +
+	"\fExchangeResp\x12\"\n" +
+	"\x06result\x18\x01 \x01(\v2\n" +
+	".pb.ResultR\x06result\x12$\n" +
+	"\x05costs\x18\x02 \x03(\v2\x0e.pb.AssetEntryR\x05costs\x12(\n" +
+	"\arewards\x18\x03 \x03(\v2\x0e.pb.AssetEntryR\arewards\"$\n" +
+	"\vRechargeReq\x12\x15\n" +
+	"\x06cfg_id\x18\x01 \x01(\x05R\x05cfgId\"\\\n" +
+	"\fRechargeResp\x12\"\n" +
+	"\x06result\x18\x01 \x01(\v2\n" +
+	".pb.ResultR\x06result\x12(\n" +
+	"\arewards\x18\x02 \x03(\v2\x0e.pb.AssetEntryR\arewardsB\x19Z\x17server-cluster/share/pbb\x06proto3"
 
 var (
 	file_game_proto_rawDescOnce sync.Once
@@ -413,7 +745,7 @@ func file_game_proto_rawDescGZIP() []byte {
 	return file_game_proto_rawDescData
 }
 
-var file_game_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_game_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_game_proto_goTypes = []any{
 	(*VerifyReq)(nil),     // 0: pb.VerifyReq
 	(*VerifyResp)(nil),    // 1: pb.VerifyResp
@@ -422,25 +754,40 @@ var file_game_proto_goTypes = []any{
 	(*LeaveGameReq)(nil),  // 4: pb.LeaveGameReq
 	(*LeaveGameResp)(nil), // 5: pb.LeaveGameResp
 	(*ServerNotify)(nil),  // 6: pb.ServerNotify
-	(*Result)(nil),        // 7: pb.Result
-	(*AttrMap)(nil),       // 8: pb.AttrMap
-	(*HeroEntry)(nil),     // 9: pb.HeroEntry
-	(*WeaponEntry)(nil),   // 10: pb.WeaponEntry
-	(NOTIFY_TYPE)(0),      // 11: pb.NOTIFY_TYPE
+	(*GiftBuyReq)(nil),    // 7: pb.GiftBuyReq
+	(*GiftBuyResp)(nil),   // 8: pb.GiftBuyResp
+	(*ExchangeReq)(nil),   // 9: pb.ExchangeReq
+	(*ExchangeResp)(nil),  // 10: pb.ExchangeResp
+	(*RechargeReq)(nil),   // 11: pb.RechargeReq
+	(*RechargeResp)(nil),  // 12: pb.RechargeResp
+	(*Result)(nil),        // 13: pb.Result
+	(*AttrMap)(nil),       // 14: pb.AttrMap
+	(*HeroEntry)(nil),     // 15: pb.HeroEntry
+	(*WeaponEntry)(nil),   // 16: pb.WeaponEntry
+	(NOTIFY_TYPE)(0),      // 17: pb.NOTIFY_TYPE
+	(*AssetEntry)(nil),    // 18: pb.AssetEntry
 }
 var file_game_proto_depIdxs = []int32{
-	7,  // 0: pb.VerifyResp.result:type_name -> pb.Result
-	7,  // 1: pb.EnterGameResp.result:type_name -> pb.Result
-	8,  // 2: pb.EnterGameResp.player_attr:type_name -> pb.AttrMap
-	9,  // 3: pb.EnterGameResp.hero_entry:type_name -> pb.HeroEntry
-	10, // 4: pb.EnterGameResp.weapon_entry:type_name -> pb.WeaponEntry
-	7,  // 5: pb.LeaveGameResp.result:type_name -> pb.Result
-	11, // 6: pb.ServerNotify.notify_type:type_name -> pb.NOTIFY_TYPE
-	7,  // [7:7] is the sub-list for method output_type
-	7,  // [7:7] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	13, // 0: pb.VerifyResp.result:type_name -> pb.Result
+	13, // 1: pb.EnterGameResp.result:type_name -> pb.Result
+	14, // 2: pb.EnterGameResp.player_attr:type_name -> pb.AttrMap
+	15, // 3: pb.EnterGameResp.hero_entry:type_name -> pb.HeroEntry
+	16, // 4: pb.EnterGameResp.weapon_entry:type_name -> pb.WeaponEntry
+	13, // 5: pb.LeaveGameResp.result:type_name -> pb.Result
+	17, // 6: pb.ServerNotify.notify_type:type_name -> pb.NOTIFY_TYPE
+	13, // 7: pb.GiftBuyResp.result:type_name -> pb.Result
+	18, // 8: pb.GiftBuyResp.costs:type_name -> pb.AssetEntry
+	18, // 9: pb.GiftBuyResp.rewards:type_name -> pb.AssetEntry
+	13, // 10: pb.ExchangeResp.result:type_name -> pb.Result
+	18, // 11: pb.ExchangeResp.costs:type_name -> pb.AssetEntry
+	18, // 12: pb.ExchangeResp.rewards:type_name -> pb.AssetEntry
+	13, // 13: pb.RechargeResp.result:type_name -> pb.Result
+	18, // 14: pb.RechargeResp.rewards:type_name -> pb.AssetEntry
+	15, // [15:15] is the sub-list for method output_type
+	15, // [15:15] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_game_proto_init() }
@@ -455,7 +802,7 @@ func file_game_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_proto_rawDesc), len(file_game_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
