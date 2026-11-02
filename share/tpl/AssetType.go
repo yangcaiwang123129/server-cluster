@@ -27,4 +27,8 @@ const (
 	 * 武器
 	 */
 	AssetType_Weapon AssetType = 4
+	/**
+	 * 技能
+	 */
+	AssetType_Skill AssetType = 5
 )

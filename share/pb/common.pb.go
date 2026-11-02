@@ -1005,6 +1005,9 @@ type HeroEntry struct {
 	Star          int32                  `protobuf:"varint,4,opt,name=star,proto3" json:"star,omitempty"`                   // 星级
 	SkinId        int32                  `protobuf:"varint,5,opt,name=skin_id,json=skinId,proto3" json:"skin_id,omitempty"` // 皮肤ID
 	Equipped      bool                   `protobuf:"varint,6,opt,name=equipped,proto3" json:"equipped,omitempty"`           // 是否出战
+	Weapon        *WeaponEntry           `protobuf:"bytes,7,opt,name=weapon,proto3" json:"weapon,omitempty"`                // 绑定的武器（配置固定绑定，未拥有时为空）
+	Skills        []*SkillEntry          `protobuf:"bytes,8,rep,name=skills,proto3" json:"skills,omitempty"`                // 绑定的技能
+	Equips        []*EquipEntry          `protobuf:"bytes,9,rep,name=equips,proto3" json:"equips,omitempty"`                // 该英雄已穿戴的装备
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1079,6 +1082,27 @@ func (x *HeroEntry) GetEquipped() bool {
 		return x.Equipped
 	}
 	return false
+}
+
+func (x *HeroEntry) GetWeapon() *WeaponEntry {
+	if x != nil {
+		return x.Weapon
+	}
+	return nil
+}
+
+func (x *HeroEntry) GetSkills() []*SkillEntry {
+	if x != nil {
+		return x.Skills
+	}
+	return nil
+}
+
+func (x *HeroEntry) GetEquips() []*EquipEntry {
+	if x != nil {
+		return x.Equips
+	}
+	return nil
 }
 
 // 武器持有（固定绑定英雄，仅状态，静态属性由 cfg_id 关联武器配置表）
@@ -1368,14 +1392,17 @@ const file_common_proto_rawDesc = "" +
 	"\x06grid_w\x18\x03 \x01(\x05R\x05gridW\x12\x15\n" +
 	"\x06grid_h\x18\x04 \x01(\x05R\x05gridH\x12\x18\n" +
 	"\aversion\x18\x05 \x01(\x05R\aversion\x120\n" +
-	"\fitem_entries\x18\x06 \x03(\v2\r.pb.ItemEntryR\vitemEntries\"\x93\x01\n" +
+	"\fitem_entries\x18\x06 \x03(\v2\r.pb.ItemEntryR\vitemEntries\"\x8c\x02\n" +
 	"\tHeroEntry\x12\x15\n" +
 	"\x06cfg_id\x18\x01 \x01(\x05R\x05cfgId\x12\x14\n" +
 	"\x05level\x18\x02 \x01(\x05R\x05level\x12\x10\n" +
 	"\x03exp\x18\x03 \x01(\x03R\x03exp\x12\x12\n" +
 	"\x04star\x18\x04 \x01(\x05R\x04star\x12\x17\n" +
 	"\askin_id\x18\x05 \x01(\x05R\x06skinId\x12\x1a\n" +
-	"\bequipped\x18\x06 \x01(\bR\bequipped\"\x98\x01\n" +
+	"\bequipped\x18\x06 \x01(\bR\bequipped\x12'\n" +
+	"\x06weapon\x18\a \x01(\v2\x0f.pb.WeaponEntryR\x06weapon\x12&\n" +
+	"\x06skills\x18\b \x03(\v2\x0e.pb.SkillEntryR\x06skills\x12&\n" +
+	"\x06equips\x18\t \x03(\v2\x0e.pb.EquipEntryR\x06equips\"\x98\x01\n" +
 	"\vWeaponEntry\x12\x15\n" +
 	"\x06cfg_id\x18\x01 \x01(\x05R\x05cfgId\x12\x14\n" +
 	"\x05level\x18\x02 \x01(\x05R\x05level\x12\x1e\n" +
@@ -1514,13 +1541,16 @@ var file_common_proto_depIdxs = []int32{
 	9,  // 3: pb.ObjectList.values:type_name -> pb.ObjectValue
 	3,  // 4: pb.ItemContainer.type:type_name -> pb.ContainerType
 	11, // 5: pb.ItemContainer.item_entries:type_name -> pb.ItemEntry
-	9,  // 6: pb.AttrMap.ValuesEntry.value:type_name -> pb.ObjectValue
-	9,  // 7: pb.Object.ValuesEntry.value:type_name -> pb.ObjectValue
-	8,  // [8:8] is the sub-list for method output_type
-	8,  // [8:8] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	14, // 6: pb.HeroEntry.weapon:type_name -> pb.WeaponEntry
+	15, // 7: pb.HeroEntry.skills:type_name -> pb.SkillEntry
+	16, // 8: pb.HeroEntry.equips:type_name -> pb.EquipEntry
+	9,  // 9: pb.AttrMap.ValuesEntry.value:type_name -> pb.ObjectValue
+	9,  // 10: pb.Object.ValuesEntry.value:type_name -> pb.ObjectValue
+	11, // [11:11] is the sub-list for method output_type
+	11, // [11:11] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_common_proto_init() }

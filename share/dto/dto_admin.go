@@ -112,14 +112,17 @@ type GmItemAddEntryReq struct {
 
 // GmHeroEntry GM 英雄持有状态（含配置展示信息）。
 type GmHeroEntry struct {
-	HeroID   int32  `json:"heroId"`   // 英雄配置ID
-	Level    int32  `json:"level"`    // 等级
-	Exp      int64  `json:"exp"`      // 经验
-	Star     int32  `json:"star"`     // 星级
-	SkinID   int32  `json:"skinId"`   // 皮肤ID
-	Equipped bool   `json:"equipped"` // 是否出战
-	Name     string `json:"name"`     // 英雄名称
-	Rarity   int32  `json:"rarity"`   // 稀有度
+	HeroID   int32           `json:"heroId"`   // 英雄配置ID
+	Level    int32           `json:"level"`    // 等级
+	Exp      int64           `json:"exp"`      // 经验
+	Star     int32           `json:"star"`     // 星级
+	SkinID   int32           `json:"skinId"`   // 皮肤ID
+	Equipped bool            `json:"equipped"` // 是否出战
+	Name     string          `json:"name"`     // 英雄名称
+	Rarity   int32           `json:"rarity"`   // 稀有度
+	Weapon   *GmWeaponEntry  `json:"weapon"`   // 绑定的武器
+	Skills   []GmSkillEntry  `json:"skills"`   // 绑定的技能
+	Equips   []GmEquipEntry  `json:"equips"`   // 该英雄的装备
 }
 
 // GmHeroAddReq 新增英雄请求。
@@ -137,6 +140,34 @@ type GmHeroUpdateReq struct {
 	Star     int32 `json:"star"`     // 星级
 	SkinID   int32 `json:"skinId"`   // 皮肤ID
 	Equipped bool  `json:"equipped"` // 是否出战
+}
+
+// GmWeaponEntry GM 武器持有状态（含配置展示信息）。HeroID 由英雄配置的绑定关系反查。
+type GmWeaponEntry struct {
+	WeaponID     int32  `json:"weaponId"`     // 武器配置ID
+	Level        int32  `json:"level"`        // 等级
+	Quality      int32  `json:"quality"`      // 品质
+	Breakthrough int32  `json:"breakthrough"` // 突破
+	Durability   int32  `json:"durability"`   // 耐久度
+	HeroID       int32  `json:"heroId"`       // 绑定英雄ID，0 表示未绑定
+	Name         string `json:"name"`         // 武器名称
+	IconKey      string `json:"iconKey"`      // 图标
+}
+
+// GmSkillEntry GM 技能持有状态（含配置展示信息）。HeroID 由英雄配置的绑定关系反查。
+type GmSkillEntry struct {
+	SkillID      int32  `json:"skillId"`      // 技能配置ID
+	Level        int32  `json:"level"`        // 等级
+	Quality      int32  `json:"quality"`      // 品质
+	Breakthrough int32  `json:"breakthrough"` // 突破
+	HeroID       int32  `json:"heroId"`       // 绑定英雄ID，0 表示未绑定
+	Name         string `json:"name"`         // 技能名称
+	Desc         string `json:"desc"`         // 描述
+}
+
+// GmHeroListResp 英雄列表响应：英雄及其绑定的武器/技能/装备一并下发。
+type GmHeroListResp struct {
+	Heroes []GmHeroEntry `json:"heroes"` // 英雄及其绑定的武器/技能/装备
 }
 
 // ========== 装备（GM） ==========

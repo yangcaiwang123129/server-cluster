@@ -58,14 +58,11 @@ func (*HeroListReq) Descriptor() ([]byte, []int) {
 	return file_hero_proto_rawDescGZIP(), []int{0}
 }
 
-// 英雄列表响应（服务器按模块分表，客户端一次拿全：英雄 + 武器 + 技能 + 装备）
+// 英雄列表响应（服务器按模块分表，但一次下发完整持有：英雄连同绑定的武器/技能/装备）
 type HeroListResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
-	HeroEntries   []*HeroEntry           `protobuf:"bytes,2,rep,name=hero_entries,json=heroEntries,proto3" json:"hero_entries,omitempty"`
-	WeaponEntries []*WeaponEntry         `protobuf:"bytes,3,rep,name=weapon_entries,json=weaponEntries,proto3" json:"weapon_entries,omitempty"` // 武器持有（固定绑定英雄）
-	SkillEntries  []*SkillEntry          `protobuf:"bytes,4,rep,name=skill_entries,json=skillEntries,proto3" json:"skill_entries,omitempty"`    // 技能持有（固定绑定英雄）
-	EquipEntries  []*EquipEntry          `protobuf:"bytes,5,rep,name=equip_entries,json=equipEntries,proto3" json:"equip_entries,omitempty"`    // 装备持有（含未穿戴）
+	HeroEntries   []*HeroEntry           `protobuf:"bytes,2,rep,name=hero_entries,json=heroEntries,proto3" json:"hero_entries,omitempty"` // 英雄及其绑定的武器/技能/装备
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -114,28 +111,7 @@ func (x *HeroListResp) GetHeroEntries() []*HeroEntry {
 	return nil
 }
 
-func (x *HeroListResp) GetWeaponEntries() []*WeaponEntry {
-	if x != nil {
-		return x.WeaponEntries
-	}
-	return nil
-}
-
-func (x *HeroListResp) GetSkillEntries() []*SkillEntry {
-	if x != nil {
-		return x.SkillEntries
-	}
-	return nil
-}
-
-func (x *HeroListResp) GetEquipEntries() []*EquipEntry {
-	if x != nil {
-		return x.EquipEntries
-	}
-	return nil
-}
-
-// 英雄变化通知（路由 10021）
+// 英雄变化通知（路由 10021，结构即完整持有，客户端收到后整体刷新该英雄）
 type HeroNotify struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	HeroEntry     *HeroEntry             `protobuf:"bytes,1,opt,name=hero_entry,json=heroEntry,proto3" json:"hero_entry,omitempty"`
@@ -703,14 +679,11 @@ const file_hero_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
 	"hero.proto\x12\x02pb\x1a\fcommon.proto\"\r\n" +
-	"\vHeroListReq\"\x86\x02\n" +
+	"\vHeroListReq\"d\n" +
 	"\fHeroListResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\x120\n" +
-	"\fhero_entries\x18\x02 \x03(\v2\r.pb.HeroEntryR\vheroEntries\x126\n" +
-	"\x0eweapon_entries\x18\x03 \x03(\v2\x0f.pb.WeaponEntryR\rweaponEntries\x123\n" +
-	"\rskill_entries\x18\x04 \x03(\v2\x0e.pb.SkillEntryR\fskillEntries\x123\n" +
-	"\requip_entries\x18\x05 \x03(\v2\x0e.pb.EquipEntryR\fequipEntries\":\n" +
+	"\fhero_entries\x18\x02 \x03(\v2\r.pb.HeroEntryR\vheroEntries\":\n" +
 	"\n" +
 	"HeroNotify\x12,\n" +
 	"\n" +
@@ -785,32 +758,26 @@ var file_hero_proto_goTypes = []any{
 	(*HeroUpgradeResp)(nil),   // 11: pb.HeroUpgradeResp
 	(*Result)(nil),            // 12: pb.Result
 	(*HeroEntry)(nil),         // 13: pb.HeroEntry
-	(*WeaponEntry)(nil),       // 14: pb.WeaponEntry
-	(*SkillEntry)(nil),        // 15: pb.SkillEntry
-	(*EquipEntry)(nil),        // 16: pb.EquipEntry
 }
 var file_hero_proto_depIdxs = []int32{
 	12, // 0: pb.HeroListResp.result:type_name -> pb.Result
 	13, // 1: pb.HeroListResp.hero_entries:type_name -> pb.HeroEntry
-	14, // 2: pb.HeroListResp.weapon_entries:type_name -> pb.WeaponEntry
-	15, // 3: pb.HeroListResp.skill_entries:type_name -> pb.SkillEntry
-	16, // 4: pb.HeroListResp.equip_entries:type_name -> pb.EquipEntry
-	13, // 5: pb.HeroNotify.hero_entry:type_name -> pb.HeroEntry
-	12, // 6: pb.HeroAddResp.result:type_name -> pb.Result
-	13, // 7: pb.HeroAddResp.hero_entry:type_name -> pb.HeroEntry
-	12, // 8: pb.HeroUpdateResp.result:type_name -> pb.Result
-	13, // 9: pb.HeroUpdateResp.hero_entry:type_name -> pb.HeroEntry
-	12, // 10: pb.HeroAttributeResp.result:type_name -> pb.Result
-	13, // 11: pb.HeroAttributeResp.hero_entry:type_name -> pb.HeroEntry
-	8,  // 12: pb.HeroAttributeResp.attribute:type_name -> pb.HeroAttribute
-	12, // 13: pb.HeroUpgradeResp.result:type_name -> pb.Result
-	13, // 14: pb.HeroUpgradeResp.hero_entry:type_name -> pb.HeroEntry
-	8,  // 15: pb.HeroUpgradeResp.attribute:type_name -> pb.HeroAttribute
-	16, // [16:16] is the sub-list for method output_type
-	16, // [16:16] is the sub-list for method input_type
-	16, // [16:16] is the sub-list for extension type_name
-	16, // [16:16] is the sub-list for extension extendee
-	0,  // [0:16] is the sub-list for field type_name
+	13, // 2: pb.HeroNotify.hero_entry:type_name -> pb.HeroEntry
+	12, // 3: pb.HeroAddResp.result:type_name -> pb.Result
+	13, // 4: pb.HeroAddResp.hero_entry:type_name -> pb.HeroEntry
+	12, // 5: pb.HeroUpdateResp.result:type_name -> pb.Result
+	13, // 6: pb.HeroUpdateResp.hero_entry:type_name -> pb.HeroEntry
+	12, // 7: pb.HeroAttributeResp.result:type_name -> pb.Result
+	13, // 8: pb.HeroAttributeResp.hero_entry:type_name -> pb.HeroEntry
+	8,  // 9: pb.HeroAttributeResp.attribute:type_name -> pb.HeroAttribute
+	12, // 10: pb.HeroUpgradeResp.result:type_name -> pb.Result
+	13, // 11: pb.HeroUpgradeResp.hero_entry:type_name -> pb.HeroEntry
+	8,  // 12: pb.HeroUpgradeResp.attribute:type_name -> pb.HeroAttribute
+	13, // [13:13] is the sub-list for method output_type
+	13, // [13:13] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_hero_proto_init() }

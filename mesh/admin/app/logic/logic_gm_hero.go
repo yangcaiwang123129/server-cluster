@@ -11,8 +11,8 @@ import (
 
 // GmHeroLogic 后台 GM 英雄模块业务接口。
 type GmHeroLogic interface {
-	// HeroList 英雄列表
-	HeroList(req dto.GmPlayerReq) ([]dto.GmHeroEntry, error)
+	// HeroList 英雄列表（含绑定的武器/技能/装备）
+	HeroList(req dto.GmPlayerReq) (*dto.GmHeroListResp, error)
 	// HeroAdd 新增英雄
 	HeroAdd(req dto.GmHeroAddReq) (*dto.GmHeroEntry, error)
 	// HeroUpdate 更新英雄
@@ -39,8 +39,8 @@ func init() {
 	RegisterGmHeroLogic(&gmHeroLogic{})
 }
 
-// HeroList 英雄列表。
-func (this *gmHeroLogic) HeroList(req dto.GmPlayerReq) ([]dto.GmHeroEntry, error) {
+// HeroList 英雄列表（含绑定的武器/技能/装备）。
+func (this *gmHeroLogic) HeroList(req dto.GmPlayerReq) (*dto.GmHeroListResp, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), rpcTimeout)
 	defer cancel()
 
@@ -49,11 +49,12 @@ func (this *gmHeroLogic) HeroList(req dto.GmPlayerReq) ([]dto.GmHeroEntry, error
 		&pb.GmHeroListReq{PlayerId: req.PlayerID}, resp); err != nil {
 		return nil, err
 	}
-	list := make([]dto.GmHeroEntry, 0, len(resp.GetHeroEntries()))
+
+	heroes := make([]dto.GmHeroEntry, 0, len(resp.GetHeroEntries()))
 	for _, e := range resp.GetHeroEntries() {
-		list = append(list, toGmHeroEntry(e))
+		heroes = append(heroes, toGmHeroEntry(e))
 	}
-	return list, nil
+	return &dto.GmHeroListResp{Heroes: heroes}, nil
 }
 
 // HeroAdd 新增英雄。
@@ -145,7 +146,7 @@ func toGmUpgradeResp(cfgID, level int32, attr *pb.HeroAttribute) *dto.GmUpgradeR
 	}
 }
 
-// toGmHeroEntry 英雄条目转响应（补齐名称/稀有度等展示信息；武器/技能由独立模块下发）。
+// toGmHeroEntry 英雄条目转响应（补齐名称/稀有度，并带上绑定的武器/技能/装备）。
 func toGmHeroEntry(e *pb.HeroEntry) dto.GmHeroEntry {
 	row := dto.GmHeroEntry{
 		HeroID:   e.GetCfgId(),
@@ -158,6 +159,49 @@ func toGmHeroEntry(e *pb.HeroEntry) dto.GmHeroEntry {
 	if cfg := tpl.T().RoleInfo.Get(e.GetCfgId()); cfg != nil {
 		row.Name = cfg.Name
 		row.Rarity = cfg.Rarity
+	}
+	if w := e.GetWeapon(); w != nil {
+		weapon := toGmWeaponEntry(w, e.GetCfgId())
+		row.Weapon = &weapon
+	}
+	for _, s := range e.GetSkills() {
+		row.Skills = append(row.Skills, toGmSkillEntry(s, e.GetCfgId()))
+	}
+	for _, g := range e.GetEquips() {
+		row.Equips = append(row.Equips, toGmEquipEntry(g))
+	}
+	return row
+}
+
+// toGmWeaponEntry 武器条目转响应（补齐名称/图标，heroID 为反查到的绑定英雄）。
+func toGmWeaponEntry(e *pb.WeaponEntry, heroID int32) dto.GmWeaponEntry {
+	row := dto.GmWeaponEntry{
+		WeaponID:     e.GetCfgId(),
+		Level:        e.GetLevel(),
+		Quality:      e.GetQuality(),
+		Breakthrough: e.GetBreakthrough(),
+		Durability:   e.GetDurability(),
+		HeroID:       heroID,
+	}
+	if cfg := tpl.T().Weapon.Get(e.GetCfgId()); cfg != nil {
+		row.Name = cfg.WeaponName
+		row.IconKey = cfg.Icon
+	}
+	return row
+}
+
+// toGmSkillEntry 技能条目转响应（补齐名称/描述，heroID 为反查到的绑定英雄）。
+func toGmSkillEntry(e *pb.SkillEntry, heroID int32) dto.GmSkillEntry {
+	row := dto.GmSkillEntry{
+		SkillID:      e.GetCfgId(),
+		Level:        e.GetLevel(),
+		Quality:      e.GetQuality(),
+		Breakthrough: e.GetBreakthrough(),
+		HeroID:       heroID,
+	}
+	if cfg := tpl.T().Skill.Get(e.GetCfgId()); cfg != nil {
+		row.Name = cfg.SkillName
+		row.Desc = cfg.Desc
 	}
 	return row
 }

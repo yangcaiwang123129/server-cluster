@@ -5,6 +5,7 @@ import type {
   GmEquip,
   GmHero,
   GmHeroAttribute,
+  GmHeroListResp,
   GmItem,
   GmMail,
   GmMailAttachment,
@@ -113,7 +114,7 @@ export function addGmItem(data: {
 // ── 英雄 ──────────────────────────────────────────────────────────
 
 export function listGmHero(params: { playerId: number }) {
-  return request<ApiResponse<GmHero[]>>({
+  return request<ApiResponse<GmHeroListResp>>({
     url: '/api/v1/gm/hero',
     method: 'get',
     params

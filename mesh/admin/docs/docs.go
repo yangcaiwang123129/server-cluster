@@ -1748,6 +1748,12 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "integer",
+                        "description": "玩家ID",
+                        "name": "playerId",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "description": "账号",
                         "name": "username",

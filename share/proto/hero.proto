@@ -10,16 +10,13 @@ option go_package = "server-cluster/share/pb";
 message HeroListReq {
 }
 
-// 英雄列表响应（服务器按模块分表，客户端一次拿全：英雄 + 武器 + 技能 + 装备）
+// 英雄列表响应（服务器按模块分表，但一次下发完整持有：英雄连同绑定的武器/技能/装备）
 message HeroListResp {
   Result result = 1;
-  repeated HeroEntry hero_entries = 2;
-  repeated WeaponEntry weapon_entries = 3; // 武器持有（固定绑定英雄）
-  repeated SkillEntry skill_entries = 4;   // 技能持有（固定绑定英雄）
-  repeated EquipEntry equip_entries = 5;   // 装备持有（含未穿戴）
+  repeated HeroEntry hero_entries = 2; // 英雄及其绑定的武器/技能/装备
 }
 
-// 英雄变化通知（路由 10021）
+// 英雄变化通知（路由 10021，结构即完整持有，客户端收到后整体刷新该英雄）
 message HeroNotify {
   HeroEntry hero_entry = 1;
 }

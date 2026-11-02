@@ -83,6 +83,7 @@ func (this *equipLogic) EquipAdd(ctx context.Context, playerID int64, req *pb.Eq
 
 	global.PlayerEquipCache.Set(playerID, row)
 	record.Record(ctx, model.RecordModuleEquip, playerID, model.RecordActionGain, req.GetCfgId(), 1)
+	notifyHero(ctx, playerID, g.HeroID)
 	return &pb.EquipAddResp{EquipEntry: toEquipEntry(g)}, nil
 }
 
@@ -98,7 +99,8 @@ func (this *equipLogic) EquipUpdate(ctx context.Context, playerID int64, req *pb
 		return nil, errs.CodeInvalidParams.WithMessage("装备未拥有").Err()
 	}
 
-	heroID := old.HeroID
+	oldHeroID := old.HeroID
+	heroID := oldHeroID
 	if req.GetHeroId() > 0 {
 		if _, _, err := ownedHero(ctx, playerID, req.GetHeroId()); err != nil {
 			return nil, err
@@ -120,6 +122,10 @@ func (this *equipLogic) EquipUpdate(ctx context.Context, playerID int64, req *pb
 	}
 
 	global.PlayerEquipCache.Set(playerID, row)
+	if oldHeroID != heroID {
+		notifyHero(ctx, playerID, oldHeroID)
+	}
+	notifyHero(ctx, playerID, heroID)
 	return &pb.EquipUpdateResp{EquipEntry: toEquipEntry(g)}, nil
 }
 
@@ -136,6 +142,7 @@ func (this *equipLogic) EquipWear(ctx context.Context, playerID int64, req *pb.E
 		return nil, errs.CodeInvalidParams.WithMessage("装备未拥有").Err()
 	}
 
+	oldHeroID := g.HeroID
 	_, hero, err := ownedHero(ctx, playerID, req.GetHeroId())
 	if err != nil {
 		return nil, err
@@ -161,6 +168,10 @@ func (this *equipLogic) EquipWear(ctx context.Context, playerID int64, req *pb.E
 	}
 
 	global.PlayerEquipCache.Set(playerID, row)
+	if oldHeroID != hero.HeroID {
+		notifyHero(ctx, playerID, oldHeroID)
+	}
+	notifyHero(ctx, playerID, hero.HeroID)
 	_, attr, err := computeHeroAttribute(ctx, playerID, hero.HeroID)
 	if err != nil {
 		return nil, err
@@ -190,6 +201,7 @@ func (this *equipLogic) EquipUnwear(ctx context.Context, playerID int64, req *pb
 	}
 
 	global.PlayerEquipCache.Set(playerID, row)
+	notifyHero(ctx, playerID, heroID)
 	attr := &pb.HeroAttribute{}
 	if heroID > 0 {
 		_, computed, cErr := computeHeroAttribute(ctx, playerID, heroID)
@@ -235,6 +247,7 @@ func equipDimGrow(ctx context.Context, playerID int64, id int64,
 		return model.EquipInfo{}, errs.CodeInvalidParams.WithMessage("装备未拥有").Err()
 	}
 	global.PlayerEquipCache.Set(playerID, row)
+	notifyHero(ctx, playerID, g.HeroID)
 	return g, nil
 }
 
@@ -369,6 +382,7 @@ func (this *equipAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _
 
 	global.PlayerEquipCache.Set(playerID, row)
 	record.Record(ctx, model.RecordModuleEquip, playerID, model.RecordActionGain, cfgID, 1)
+	notifyHero(ctx, playerID, g.HeroID)
 	return nil
 }
 
@@ -379,10 +393,11 @@ func (this *equipAssetHandler) Remove(ctx context.Context, playerID int64, cfgID
 		return err
 	}
 	var target int64
+	var heroID int32
 	found := false
 	row.Equips.Range(func(equipID int64, g model.EquipInfo) bool {
 		if g.CfgID == cfgID {
-			target, found = equipID, true
+			target, heroID, found = equipID, g.HeroID, true
 			return false
 		}
 		return true
@@ -394,6 +409,7 @@ func (this *equipAssetHandler) Remove(ctx context.Context, playerID int64, cfgID
 
 	global.PlayerEquipCache.Set(playerID, row)
 	record.Record(ctx, model.RecordModuleEquip, playerID, model.RecordActionConsume, cfgID, 1)
+	notifyHero(ctx, playerID, heroID)
 	return nil
 }
 

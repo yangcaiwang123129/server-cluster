@@ -79,6 +79,7 @@ func (this *skillLogic) SkillUpdate(ctx context.Context, playerID int64, req *pb
 	}
 
 	global.PlayerSkillCache.Set(playerID, row)
+	notifyHeroBySkill(ctx, playerID, s.SkillID)
 	return &pb.SkillUpdateResp{SkillEntry: toSkillEntry(s)}, nil
 }
 
@@ -124,6 +125,7 @@ func skillDimGrow(ctx context.Context, playerID int64, cfgID int32,
 		return model.SkillInfo{}, 0, errs.CodeInvalidParams.WithMessage("技能未拥有").Err()
 	}
 	global.PlayerSkillCache.Set(playerID, row)
+	notifyHero(ctx, playerID, heroID)
 	return s, heroID, nil
 }
 
@@ -303,6 +305,7 @@ func (this *skillAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _
 
 	global.PlayerSkillCache.Set(playerID, row)
 	record.Record(ctx, model.RecordModuleSkill, playerID, model.RecordActionGain, cfgID, 1)
+	notifyHeroBySkill(ctx, playerID, cfgID)
 	return nil
 }
 
@@ -318,6 +321,7 @@ func (this *skillAssetHandler) Remove(ctx context.Context, playerID int64, cfgID
 
 	global.PlayerSkillCache.Set(playerID, row)
 	record.Record(ctx, model.RecordModuleSkill, playerID, model.RecordActionConsume, cfgID, 1)
+	notifyHeroBySkill(ctx, playerID, cfgID)
 	return nil
 }
 
@@ -364,4 +368,3 @@ func (this *skillAssetHandler) List(ctx context.Context, playerID int64) ([]*tpl
 	sort.Slice(assets, func(i, j int) bool { return assets[i].Id < assets[j].Id })
 	return assets, nil
 }
-

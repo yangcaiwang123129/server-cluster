@@ -5,12 +5,11 @@ package pb;
 option go_package = "server-cluster/share/pb";
 
 // 客户端路由号枚举
-// 按业务分号段：每个业务 10 个号，便于后续在同段内扩展。
 enum RouteCode {
   // 游戏大厅服 10000~49999
   ROUTE_CODE_UNSPECIFIED = 0;
 
-  // 玩家 10000~10009（含礼包购买/兑换/充值的玩家资产消费入口）
+  // 玩家 10000~19999
   ROUTE_CODE_VERIFY = 10000; // 首包，验证账号令牌，用于绑定节点和网关
   ROUTE_CODE_ENTER_GAME = 10001; // 进入游戏
   ROUTE_CODE_LEAVE_GAME = 10002; // 离开游戏
@@ -100,33 +99,28 @@ enum ContainerType {
 }
 
 //  ========== 属性枚举 ==========
-// 属性枚举（通用键值表）：键即 ObjectValue 的存放键，值类型见各行注释（服务器落库字段 / 配置来源 / 使用协议）。
-// 玩家状态、任务/活动标记、红点等也走这里，按区间分段。
 enum Attr {
-  // 1~999 玩家相关属性（服务器有落库，随 EnterGameResp.player_attr 下发）
+  // 1~999 玩家相关属性
   PLAYER_ATTR_UNSPECIFIED = 0;
-  PLAYER_ATTR_NAME = 1;      // 昵称：string；player_extra.nickname
-  PLAYER_ATTR_LEVEL = 2;     // 等级：int32；player_extra.level
-  PLAYER_ATTR_EXP = 3;       // 经验：int64；player_extra.exp
-  PLAYER_ATTR_VIP_LEVEL = 4; // vip等级：int32；player_extra.vip_level
-  PLAYER_ATTR_VIP_EXP = 5;   // vip经验：int64；player_extra.vip_exp
-  PLAYER_ATTR_COIN = 6;      // 币：int64；player.diamond
-  PLAYER_ATTR_GOLD = 7;      // 金：int64；player.gold
+  PLAYER_ATTR_NAME = 1;      // 昵称：string
+  PLAYER_ATTR_LEVEL = 2;     // 等级：int32
+  PLAYER_ATTR_EXP = 3;       // 经验：int64
+  PLAYER_ATTR_VIP_LEVEL = 4; // vip等级：int32
+  PLAYER_ATTR_VIP_EXP = 5;   // vip经验：int64
+  PLAYER_ATTR_COIN = 6;      // 币：int64
+  PLAYER_ATTR_GOLD = 7;      // 金：int64
 
-  // 1000~1999 英雄相关属性：已独立为 hero.proto 的 HeroAttribute（固定字段，不在此枚举）
-  // 2000~4999 任务/成就进度与领奖标记（玩家维度；int32/int64，服务器落库）
-  // 5000~9999 活动状态标记（玩家维度；如参与/阶段/领奖，服务器落库）
+  // 1000~4999 任务/成就进度与领奖标记
+  // 5000~9999 活动状态标记
   // 10001~20000 红点相关属性
 }
 
-// 属性表：键为 Attr 枚举值，值为动态类型；具体类型见 Attr 各行注释
-// （int32 → ObjectValue.int_value，int64 → ObjectValue.Bigint_value，string → ObjectValue.string_value）。
+// 属性表：键为 Attr 枚举值，值为动态类型
 message AttrMap {
   map<int32, ObjectValue> values = 1;
 }
 
 // 通用业务结果：每个响应包统一携带。
-// code 用于客户端逻辑分支；msg 为空时按 code 取默认文案；args 为可变参数，
 message Result {
   ErrCode code = 1;         // 业务错误码，ERR_CODE_OK 表示成功
   string msg = 2;           // 错误描述（服务端可覆盖默认文案）
@@ -189,6 +183,9 @@ message HeroEntry {
   int32 star = 4;      // 星级
   int32 skin_id = 5;   // 皮肤ID
   bool equipped = 6;   // 是否出战
+  WeaponEntry weapon = 7;           // 绑定的武器（配置固定绑定，未拥有时为空）
+  repeated SkillEntry skills = 8;   // 绑定的技能
+  repeated EquipEntry equips = 9;   // 该英雄已穿戴的装备
 }
 
 // 武器持有（固定绑定英雄，仅状态，静态属性由 cfg_id 关联武器配置表）

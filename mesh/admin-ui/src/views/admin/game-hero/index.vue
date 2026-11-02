@@ -24,7 +24,7 @@
         </el-form-item>
       </el-form>
 
-      <el-table v-loading="loading" :data="rows" border>
+      <el-table v-loading="loading" :data="heroes" border>
         <el-table-column prop="name" :label="$t('admin.gameHero.name')" min-width="180">
           <template #default="{ row }">
             <div class="item-cell">
@@ -41,20 +41,30 @@
         <el-table-column :label="$t('admin.gameHero.equipped')" min-width="90">
           <template #default="{ row }">{{ row.equipped ? '✓' : '-' }}</template>
         </el-table-column>
-        <el-table-column :label="$t('common.actions')" width="170" fixed="right">
+        <el-table-column :label="$t('common.actions')" width="200" fixed="right">
           <template #default="{ row }">
+            <el-button
+              v-permisaction="['game:gm:hero:list']"
+              link
+              type="primary"
+              @click="openDetail(row)"
+            >{{ $t('admin.gameHero.detail') }}</el-button>
             <el-button
               v-permisaction="['game:gm:hero:list']"
               link
               type="primary"
               @click="openEdit(row)"
             >{{ $t('common.edit') }}</el-button>
-            <el-button
-              v-permisaction="['game:gm:hero:list']"
-              link
-              type="primary"
-              @click="openAttribute(row)"
-            >{{ $t('admin.gameHero.attribute') }}</el-button>
+            <el-dropdown trigger="click" style="margin-left: 12px">
+              <el-button link type="primary">{{ $t('admin.gameHero.more') }}</el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click="openAttribute(row)">
+                    {{ $t('admin.gameHero.attribute') }}
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </template>
         </el-table-column>
       </el-table>
@@ -67,6 +77,78 @@
       permission="game:gm:hero:list"
       @add="addFromCatalog"
     />
+
+    <el-dialog v-model="detailDialog.visible" :title="$t('admin.gameHero.detailTitle')" width="760px">
+      <el-descriptions :column="4" border>
+        <el-descriptions-item :label="$t('admin.gameHero.name')">
+          {{ detailHero.name || '-' }} #{{ detailHero.heroId }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('admin.gameHero.level')">
+          {{ detailHero.level }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('admin.gameHero.star')">
+          {{ detailHero.star }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('admin.gameHero.equipped')">
+          {{ detailHero.equipped ? '✓' : '-' }}
+        </el-descriptions-item>
+      </el-descriptions>
+
+      <el-tabs v-model="detailTab" style="margin-top: 16px">
+        <el-tab-pane :label="`${$t('admin.gameHero.weapons')} (${detailWeapons.length})`" name="weapon">
+          <el-table :data="detailWeapons" border>
+            <el-table-column :label="$t('admin.gameHero.weapons')" min-width="180">
+              <template #default="{ row }">
+                <div class="item-cell">
+                  <span class="item-name">{{ row.name || '-' }}</span>
+                  <span class="item-id">#{{ row.weaponId }}</span>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="level" :label="$t('admin.gameHero.level')" min-width="80" />
+            <el-table-column prop="quality" :label="$t('admin.gameHero.quality')" min-width="80" />
+            <el-table-column prop="breakthrough" :label="$t('admin.gameHero.breakthrough')" min-width="80" />
+            <el-table-column prop="durability" :label="$t('admin.gameHero.durability')" min-width="80" />
+          </el-table>
+        </el-tab-pane>
+
+        <el-tab-pane :label="`${$t('admin.gameHero.skills')} (${detailSkills.length})`" name="skill">
+          <el-table :data="detailSkills" border>
+            <el-table-column :label="$t('admin.gameHero.skills')" min-width="180">
+              <template #default="{ row }">
+                <div class="item-cell">
+                  <span class="item-name">{{ row.name || '-' }}</span>
+                  <span class="item-id">#{{ row.skillId }}</span>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="level" :label="$t('admin.gameHero.level')" min-width="80" />
+            <el-table-column prop="quality" :label="$t('admin.gameHero.quality')" min-width="80" />
+            <el-table-column prop="breakthrough" :label="$t('admin.gameHero.breakthrough')" min-width="80" />
+            <el-table-column prop="desc" :label="$t('admin.gameHero.desc')" min-width="180" show-overflow-tooltip />
+          </el-table>
+        </el-tab-pane>
+
+        <el-tab-pane :label="`${$t('admin.gameHero.equips')} (${detailEquips.length})`" name="equip">
+          <el-table :data="detailEquips" border>
+            <el-table-column :label="$t('admin.gameHero.equips')" min-width="180">
+              <template #default="{ row }">
+                <div class="item-cell">
+                  <span class="item-name">{{ row.name || '-' }}</span>
+                  <span class="item-id">#{{ row.equipId }}</span>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="level" :label="$t('admin.gameHero.level')" min-width="80" />
+            <el-table-column prop="quality" :label="$t('admin.gameHero.quality')" min-width="80" />
+            <el-table-column prop="breakthrough" :label="$t('admin.gameHero.breakthrough')" min-width="80" />
+            <el-table-column :label="$t('admin.gameHero.equipEquipped')" min-width="90">
+              <template #default="{ row }">{{ row.equipped ? '✓' : '-' }}</template>
+            </el-table-column>
+          </el-table>
+        </el-tab-pane>
+      </el-tabs>
+    </el-dialog>
 
     <el-dialog v-model="editDialog.visible" :title="$t('admin.gameHero.editTitle')" width="420px">
       <el-form label-width="100px">
@@ -136,7 +218,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import PageContainer from '@/components/PageContainer/index.vue'
@@ -160,7 +242,16 @@ const { t } = useI18n()
 
 const playerId = ref('')
 const loading = ref(false)
-const rows = ref<GmHero[]>([])
+const heroes = ref<GmHero[]>([])
+const detailHero = ref<GmHero>({})
+const detailTab = ref('weapon')
+
+const detailDialog = reactive({ visible: false })
+
+// 英雄条目自带绑定的武器/技能/装备，详情弹窗直接展示，不再跨模块筛选。
+const detailWeapons = computed(() => (detailHero.value.weapon ? [detailHero.value.weapon] : []))
+const detailSkills = computed(() => detailHero.value.skills ?? [])
+const detailEquips = computed(() => detailHero.value.equips ?? [])
 
 const editDialog = reactive({
   visible: false,
@@ -205,7 +296,13 @@ const loadList = async() => {
   const res = await listGmHero({ playerId: id }).catch(() => null)
   loading.value = false
   if (!res) return
-  rows.value = res.data ?? []
+  heroes.value = res.data?.heroes ?? []
+}
+
+const openDetail = (row: GmHero) => {
+  detailHero.value = row
+  detailTab.value = 'weapon'
+  detailDialog.visible = true
 }
 
 const addFromCatalog = async(entry: GameCatalogEntry) => {

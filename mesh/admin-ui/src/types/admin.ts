@@ -213,6 +213,7 @@ export interface SysOperaLog {
 
 /** Filters the player list accepts. */
 export interface PlayerQuery {
+  playerId?: number
   username?: string
 }
 
@@ -299,6 +300,40 @@ export interface GmHero {
   /** config-derived display info */
   name?: string
   rarity?: number
+  /** 绑定的武器 */
+  weapon?: GmWeapon
+  /** 绑定的技能 */
+  skills?: GmSkill[]
+  /** 该英雄的装备 */
+  equips?: GmEquip[]
+}
+
+/** GM 武器持有状态。heroId 为英雄配置里的固定绑定关系反查结果，0 表示未绑定。 */
+export interface GmWeapon {
+  weaponId?: number
+  level?: number
+  quality?: number
+  breakthrough?: number
+  durability?: number
+  heroId?: number
+  name?: string
+  iconKey?: string
+}
+
+/** GM 技能持有状态。heroId 同上。 */
+export interface GmSkill {
+  skillId?: number
+  level?: number
+  quality?: number
+  breakthrough?: number
+  heroId?: number
+  name?: string
+  desc?: string
+}
+
+/** 英雄列表响应：英雄连同其绑定的武器/技能/装备一并下发。 */
+export interface GmHeroListResp {
+  heroes?: GmHero[]
 }
 
 export interface GmEquip {

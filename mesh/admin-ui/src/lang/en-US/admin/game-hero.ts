@@ -30,5 +30,19 @@ export default {
   armor: 'Armor',
   damage: 'Damage',
   upgrade: 'Upgrade',
-  upgradeOk: 'Upgraded'
+  upgradeOk: 'Upgraded',
+  detail: 'Detail',
+  detailTitle: 'Hero Detail',
+  more: 'More',
+  weapons: 'Weapons',
+  skills: 'Skills',
+  equips: 'Equips',
+  weaponId: 'Weapon ID',
+  skillId: 'Skill ID',
+  equipId: 'Equip ID',
+  quality: 'Quality',
+  breakthrough: 'Breakthrough',
+  durability: 'Durability',
+  equipEquipped: 'Worn',
+  desc: 'Description'
 }

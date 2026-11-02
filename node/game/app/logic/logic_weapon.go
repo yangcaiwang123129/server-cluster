@@ -81,6 +81,7 @@ func (this *weaponLogic) WeaponUpdate(ctx context.Context, playerID int64, req *
 	}
 
 	global.PlayerWeaponCache.Set(playerID, row)
+	notifyHeroByWeapon(ctx, playerID, w.WeaponID)
 	return &pb.WeaponUpdateResp{WeaponEntry: toWeaponEntry(w)}, nil
 }
 
@@ -127,6 +128,7 @@ func weaponDimGrow(ctx context.Context, playerID int64, cfgID int32,
 		return nil, model.WeaponInfo{}, 0, errs.CodeInvalidParams.WithMessage("武器未拥有").Err()
 	}
 	global.PlayerWeaponCache.Set(playerID, row)
+	notifyHero(ctx, playerID, heroID)
 	return row, w, heroID, nil
 }
 
@@ -301,6 +303,7 @@ func (this *weaponAssetHandler) Add(ctx context.Context, playerID int64, cfgID, 
 
 	global.PlayerWeaponCache.Set(playerID, row)
 	record.Record(ctx, model.RecordModuleWeapon, playerID, model.RecordActionGain, cfgID, 1)
+	notifyHeroByWeapon(ctx, playerID, cfgID)
 	return nil
 }
 
@@ -316,6 +319,7 @@ func (this *weaponAssetHandler) Remove(ctx context.Context, playerID int64, cfgI
 
 	global.PlayerWeaponCache.Set(playerID, row)
 	record.Record(ctx, model.RecordModuleWeapon, playerID, model.RecordActionConsume, cfgID, 1)
+	notifyHeroByWeapon(ctx, playerID, cfgID)
 	return nil
 }
 

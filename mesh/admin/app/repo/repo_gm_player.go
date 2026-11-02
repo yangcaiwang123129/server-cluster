@@ -8,6 +8,7 @@ import (
 
 // PlayerQuery 玩家列表过滤条件。
 type PlayerQuery struct {
+	PlayerID int64
 	Username string
 	Order    string
 }
@@ -19,6 +20,9 @@ func (r *Repo) ListPlayers(q PlayerQuery, pageIndex, pageSize int) ([]dto.Player
 		return nil, 0, err
 	}
 	tx := d.Model(&model.Player{})
+	if q.PlayerID > 0 {
+		tx = tx.Where("player_id = ?", q.PlayerID)
+	}
 	if q.Username != "" {
 		tx = tx.Where("username LIKE ?", util.Like(q.Username))
 	}

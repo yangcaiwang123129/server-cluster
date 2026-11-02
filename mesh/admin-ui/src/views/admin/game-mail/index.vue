@@ -43,7 +43,7 @@
                 :key="i"
                 class="att-tag"
                 type="warning"
-              >{{ a.type }}-{{ a.cfgId }} x{{ a.count }}</el-tag>
+              >{{ typeLabel(a.type) }} #{{ a.cfgId }} x{{ a.count }}</el-tag>
             </span>
           </template>
         </el-table-column>
@@ -60,8 +60,25 @@
 
     <el-dialog v-model="sendDialog.visible" :title="$t('admin.gameMail.sendTitle')" width="560px">
       <el-form label-width="100px">
-        <el-form-item :label="$t('admin.gameMail.playerId')">
-          <el-input-number v-model="sendDialog.playerId" :min="1" />
+        <el-form-item :label="$t('admin.gameMail.playerSelect')" required>
+          <el-select
+            v-model="sendDialog.playerIds"
+            multiple
+            filterable
+            remote
+            reserve-keyword
+            :remote-method="searchPlayers"
+            :loading="playerLoading"
+            :placeholder="$t('admin.gameMail.playerSearchPlaceholder')"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="p in playerOptions"
+              :key="p.playerId"
+              :label="`${p.nickname || p.username} #${p.playerId}`"
+              :value="p.playerId"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item :label="$t('admin.gameMail.titleLabel')" required>
           <el-input v-model="sendDialog.title" />
@@ -72,8 +89,31 @@
         <el-form-item :label="$t('admin.gameMail.attachments')">
           <div class="attachments">
             <div v-for="(a, i) in sendDialog.attachments" :key="i" class="attach-row">
-              <el-input-number v-model="a.type" :min="0" :controls="false" :placeholder="$t('admin.gameMail.attachmentType')" style="width: 110px" />
-              <el-input-number v-model="a.cfgId" :min="0" :controls="false" :placeholder="$t('admin.gameMail.attachmentCfgId')" style="width: 130px" />
+              <el-select v-model="a.type" style="width: 110px" @change="onTypeChange(a)">
+                <el-option
+                  v-for="opt in attachmentTypes"
+                  :key="opt.value"
+                  :label="opt.label"
+                  :value="opt.value"
+                />
+              </el-select>
+              <el-select
+                v-model="a.cfgId"
+                filterable
+                remote
+                reserve-keyword
+                :remote-method="(kw: string) => searchAsset(a, kw)"
+                :loading="a.loading"
+                :placeholder="$t('admin.gameMail.assetSearchPlaceholder')"
+                style="width: 220px"
+              >
+                <el-option
+                  v-for="c in a.options"
+                  :key="c.id"
+                  :label="`${c.name} #${c.id}`"
+                  :value="c.id"
+                />
+              </el-select>
               <el-input-number v-model="a.count" :min="1" :controls="false" :placeholder="$t('admin.gameMail.attachmentCount')" style="width: 100px" />
               <el-button link type="danger" @click="removeAttachment(i)">{{ $t('admin.gameMail.removeAttachment') }}</el-button>
             </div>
@@ -92,14 +132,15 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import PageContainer from '@/components/PageContainer/index.vue'
 import { msgInfo, msgSuccess } from '@/utils/message'
 
-import { listGmMail, sendGmMail } from '@/api/admin/gm'
-import type { GmMail, GmMailAttachment } from '@/types/admin'
+import { listGameCatalog, listGmMail, sendGmMail } from '@/api/admin/gm'
+import { listPlayer } from '@/api/admin/player'
+import type { GameCatalogEntry, GmMail, GmMailAttachment, Player } from '@/types/admin'
 
 defineOptions({ name: 'GameMailManage' })
 
@@ -109,18 +150,71 @@ const playerId = ref('')
 const loading = ref(false)
 const rows = ref<GmMail[]>([])
 
+/** 发送弹窗里的附件行：options/loading 只服务于下拉搜索，不下发给后端。 */
+interface AttachmentRow extends GmMailAttachment {
+  options: GameCatalogEntry[]
+  loading: boolean
+}
+
+const playerOptions = ref<Player[]>([])
+const playerLoading = ref(false)
+
 const sendDialog = reactive({
   visible: false,
   loading: false,
-  playerId: 0,
+  playerIds: [] as number[],
   title: '',
   content: '',
-  attachments: [] as GmMailAttachment[]
+  attachments: [] as AttachmentRow[]
+})
+
+const newAttachmentRow = (): AttachmentRow => ({
+  type: 1,
+  cfgId: undefined,
+  count: 1,
+  options: [],
+  loading: false
 })
 
 const playerIdOrZero = () => {
   const id = Number(playerId.value)
   return Number.isInteger(id) && id > 0 ? id : 0
+}
+
+// 玩家下拉远程搜索：纯数字按玩家ID精确匹配，其余按账号模糊匹配。
+const searchPlayers = async(keyword: string) => {
+  playerLoading.value = true
+  const params: { pageIndex: number; pageSize: number; playerId?: number; username?: string } = {
+    pageIndex: 1,
+    pageSize: 20
+  }
+  if (/^\d+$/.test(keyword)) params.playerId = Number(keyword)
+  else if (keyword) params.username = keyword
+  const res = await listPlayer(params).catch(() => null)
+  playerLoading.value = false
+  playerOptions.value = res?.data?.list ?? []
+}
+
+const assetCatalogType = (type: number): 'item' | 'equip' | 'hero' =>
+  type === 2 ? 'equip' : type === 3 ? 'hero' : 'item'
+
+// 资产下拉远程搜索：第二列的内容随第一列的资产类型切换。
+const searchAsset = async(row: AttachmentRow, keyword: string) => {
+  row.loading = true
+  const res = await listGameCatalog({
+    type: assetCatalogType(row.type ?? 1),
+    keyword,
+    pageIndex: 1,
+    pageSize: 20
+  }).catch(() => null)
+  row.loading = false
+  row.options = res?.data?.list ?? []
+}
+
+const onTypeChange = (row: AttachmentRow) => {
+  row.cfgId = undefined
+  row.options = []
+  void searchAsset(row, '')
 }
 
 const loadList = async() => {
@@ -137,40 +231,84 @@ const loadList = async() => {
 }
 
 const openSend = () => {
-  sendDialog.playerId = playerIdOrZero()
+  const id = playerIdOrZero()
+  sendDialog.playerIds = id ? [id] : []
   sendDialog.title = ''
   sendDialog.content = ''
-  sendDialog.attachments = []
+  sendDialog.attachments = [newAttachmentRow()]
   sendDialog.visible = true
+  void searchPlayers('')
 }
 
 const addAttachment = () => {
-  sendDialog.attachments.push({ type: 0, cfgId: 0, count: 1 })
+  sendDialog.attachments.push(newAttachmentRow())
 }
+
+// 附件类型下拉：只开放可发放的资产类型（1 物品 / 2 装备 / 3 英雄）。
+const attachmentTypes = computed(() => [
+  { value: 1, label: t('admin.gameMail.attachmentTypeItem') },
+  { value: 2, label: t('admin.gameMail.attachmentTypeEquip') },
+  { value: 3, label: t('admin.gameMail.attachmentTypeHero') }
+])
+
+// 列表展示用：历史邮件可能带武器/技能附件，展示名称不随发送下拉收窄。
+const attachmentTypeLabels = computed(() => [
+  ...attachmentTypes.value,
+  { value: 4, label: t('admin.gameMail.attachmentTypeWeapon') },
+  { value: 5, label: t('admin.gameMail.attachmentTypeSkill') }
+])
+
+const typeLabel = (type?: number) =>
+  attachmentTypeLabels.value.find(o => o.value === type)?.label ?? `#${type}`
 
 const removeAttachment = (i: number) => {
   sendDialog.attachments.splice(i, 1)
 }
 
 const submitSend = async() => {
-  if (!sendDialog.playerId || !sendDialog.title) {
-    msgInfo(t('admin.gameMail.playerIdInvalid'))
+  if (!sendDialog.playerIds.length) {
+    msgInfo(t('admin.gameMail.playersRequired'))
     return
   }
+  if (!sendDialog.title) {
+    msgInfo(t('admin.gameMail.titleRequired'))
+    return
+  }
+  const attachments: GmMailAttachment[] = sendDialog.attachments
+    .filter(a => (a.cfgId ?? 0) > 0)
+    .map(a => ({ type: a.type, cfgId: a.cfgId, count: a.count }))
+
   sendDialog.loading = true
-  const res = await sendGmMail({
-    playerId: sendDialog.playerId,
-    title: sendDialog.title,
-    content: sendDialog.content,
-    attachments: sendDialog.attachments.filter(a => (a.cfgId ?? 0) > 0)
-  }).catch(() => null)
+  let ok = 0
+  for (const pid of sendDialog.playerIds) {
+    const res = await sendGmMail({
+      playerId: pid,
+      title: sendDialog.title,
+      content: sendDialog.content,
+      attachments
+    }).catch(() => null)
+    if (res) ok++
+  }
   sendDialog.loading = false
-  if (!res) return
-  msgSuccess(t('admin.gameMail.sendOk'))
+
+  if (ok === 0) {
+    msgInfo(t('admin.gameMail.sendFailed'))
+    return
+  }
+  if (ok < sendDialog.playerIds.length) {
+    msgInfo(t('admin.gameMail.sendPartial', { ok, total: sendDialog.playerIds.length }))
+  } else {
+    msgSuccess(t('admin.gameMail.sendOk'))
+  }
   sendDialog.visible = false
-  if (playerIdOrZero() === sendDialog.playerId) {
+  if (senderIncludesCurrentPlayer()) {
     await loadList()
   }
+}
+
+const senderIncludesCurrentPlayer = () => {
+  const id = playerIdOrZero()
+  return id > 0 && sendDialog.playerIds.includes(id)
 }
 
 const statusText = (s?: number) => {

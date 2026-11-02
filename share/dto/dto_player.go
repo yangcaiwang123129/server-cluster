@@ -3,6 +3,7 @@ package dto
 // PlayerListReq 玩家列表请求。
 type PlayerListReq struct {
 	PageReq
+	PlayerID int64
 	Username string
 	Order    string
 }

@@ -1650,6 +1650,10 @@ paths:
         in: query
         name: pageSize
         type: integer
+      - description: 玩家ID
+        in: query
+        name: playerId
+        type: integer
       - description: 账号
         in: query
         name: username

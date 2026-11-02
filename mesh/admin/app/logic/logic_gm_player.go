@@ -51,6 +51,7 @@ func init() {
 // PlayerList 玩家分页列表（直查 player）。
 func (this *playerLogic) PlayerList(req dto.PlayerListReq) ([]dto.PlayerResp, int64, error) {
 	return repo.R().ListPlayers(repo.PlayerQuery{
+		PlayerID: req.PlayerID,
 		Username: req.Username,
 		Order:    req.Order,
 	}, req.PageIndex, req.PageSize)

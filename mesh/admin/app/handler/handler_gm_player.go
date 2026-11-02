@@ -22,12 +22,14 @@ func RegisterPlayer(router http.Router) {
 // @Produce json
 // @Param pageIndex query int false "页码" default(1)
 // @Param pageSize query int false "每页条数" default(10)
+// @Param playerId query int false "玩家ID"
 // @Param username query string false "账号"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/player [get]
 func handlePlayerList(ctx http.Context) error {
 	var req dto.PlayerListReq
 	req.PageIndex, req.PageSize = pageParams(ctx)
+	req.PlayerID = queryPlayerID(ctx)
 	req.Username = ctx.Query("username")
 	req.Order = orderBy(ctx, map[string]string{
 		"playerId":  "player_id",

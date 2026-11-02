@@ -29,21 +29,23 @@ func init() {
 // Hero 获取英雄业务单例。
 func Hero() global.HeroLogic { return heroLogicInst.MustGet() }
 
-// HeroList 英雄列表：服务器按模块分表，但客户端一次拿全（英雄 + 武器 + 技能 + 装备）。
+// HeroList 英雄列表：一次下发英雄及其绑定的武器/技能/装备（各模块分表，但客户端一次拿全）。
 // 静态属性仍由客户端按各自的配置ID关联配置表。
 func (this *heroLogic) HeroList(ctx context.Context, playerID int64) (*pb.HeroListResp, error) {
+	entries, err := heroEntries(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.HeroListResp{HeroEntries: entries}, nil
+}
+
+// heroEntries 组装英雄完整持有视图：武器/技能按英雄配置的固定绑定反查，装备按所属英雄归组（仅已穿戴）。
+// 客户端以本结构为单位刷新，武器/技能/装备任一变化后重新下发即可整体替换。
+func heroEntries(ctx context.Context, playerID int64) ([]*pb.HeroEntry, error) {
 	row, err := loadPlayerHero(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
-
-	entries := make([]*pb.HeroEntry, 0, row.Heroes.Len())
-	row.Heroes.Range(func(_ int32, h model.HeroInfo) bool {
-		entries = append(entries, toHeroEntry(h))
-		return true
-	})
-	// map 遍历无序，按配置ID排序保证客户端展示稳定
-	sort.Slice(entries, func(i, j int) bool { return entries[i].CfgId < entries[j].CfgId })
 
 	weapons, err := Weapon().WeaponList(ctx, playerID)
 	if err != nil {
@@ -58,15 +60,60 @@ func (this *heroLogic) HeroList(ctx context.Context, playerID int64) (*pb.HeroLi
 		return nil, err
 	}
 
-	return &pb.HeroListResp{
-		HeroEntries:   entries,
-		WeaponEntries: weapons,
-		SkillEntries:  skills,
-		EquipEntries:  equips,
-	}, nil
+	weaponByCfg := make(map[int32]*pb.WeaponEntry, len(weapons))
+	for _, w := range weapons {
+		weaponByCfg[w.GetCfgId()] = w
+	}
+	skillByCfg := make(map[int32]*pb.SkillEntry, len(skills))
+	for _, s := range skills {
+		skillByCfg[s.GetCfgId()] = s
+	}
+	equipByHero := make(map[int32][]*pb.EquipEntry, len(equips))
+	for _, g := range equips {
+		// 客户端只关心已穿戴的装备，未穿戴的不随英雄下发
+		if !g.GetEquipped() {
+			continue
+		}
+		equipByHero[g.GetHeroId()] = append(equipByHero[g.GetHeroId()], g)
+	}
+
+	entries := make([]*pb.HeroEntry, 0, row.Heroes.Len())
+	row.Heroes.Range(func(_ int32, h model.HeroInfo) bool {
+		entry := toHeroEntry(h)
+		if cfg := tpl.T().RoleInfo.Get(h.HeroID); cfg != nil {
+			if cfg.WeaponId != 0 {
+				entry.Weapon = weaponByCfg[cfg.WeaponId]
+			}
+			for _, skillID := range cfg.SkillID {
+				if skill := skillByCfg[skillID]; skill != nil {
+					entry.Skills = append(entry.Skills, skill)
+				}
+			}
+		}
+		entry.Equips = equipByHero[h.HeroID]
+		entries = append(entries, entry)
+		return true
+	})
+	// map 遍历无序，按配置ID排序保证客户端展示稳定
+	sort.Slice(entries, func(i, j int) bool { return entries[i].CfgId < entries[j].CfgId })
+	return entries, nil
 }
 
-// toHeroEntry 持有数据 → wire 条目（仅英雄状态；武器/技能/装备随 HeroList 一并下发）。
+// heroEntry 单个英雄的完整持有视图，用于变更响应与英雄通知。
+func heroEntry(ctx context.Context, playerID int64, heroID int32) (*pb.HeroEntry, error) {
+	entries, err := heroEntries(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+	for _, entry := range entries {
+		if entry.CfgId == heroID {
+			return entry, nil
+		}
+	}
+	return nil, errs.CodeInvalidParams.WithMessage("英雄未拥有").Err()
+}
+
+// toHeroEntry 持有数据 → wire 条目（仅英雄状态；绑定的武器/技能/装备由 heroEntries 组装）。
 func toHeroEntry(h model.HeroInfo) *pb.HeroEntry {
 	return &pb.HeroEntry{
 		CfgId:    h.HeroID,
@@ -126,7 +173,12 @@ func (this *heroLogic) HeroAdd(ctx context.Context, playerID int64, req *pb.Hero
 	if err != nil {
 		return nil, err
 	}
-	return &pb.HeroAddResp{HeroEntry: toHeroEntry(h)}, nil
+	entry, err := heroEntry(ctx, playerID, h.HeroID)
+	if err != nil {
+		return nil, err
+	}
+	notifyHeroEntry(ctx, playerID, entry)
+	return &pb.HeroAddResp{HeroEntry: entry}, nil
 }
 
 // HeroUpdate 更新英雄：整体覆盖持有状态，未拥有返回错误。
@@ -146,11 +198,13 @@ func (this *heroLogic) HeroUpdate(ctx context.Context, playerID int64, req *pb.H
 	h.Star = req.GetStar()
 	h.SkinID = req.GetSkinId()
 	h.Equipped = req.GetEquipped()
-	// 出战英雄全局唯一：设置出战时先取消其它英雄的出战状态
+	// 出战英雄全局唯一：设置出战时先取消其它英雄的出战状态，记录被取消出战的英雄用于推送
+	var unsetHeroIDs []int32
 	if h.Equipped {
 		_ = row.Heroes.UpdateAll(func(m map[int32]model.HeroInfo) error {
 			for id, other := range m {
 				if id != h.HeroID && other.Equipped {
+					unsetHeroIDs = append(unsetHeroIDs, id)
 					other.Equipped = false
 					m[id] = other
 				}
@@ -163,7 +217,15 @@ func (this *heroLogic) HeroUpdate(ctx context.Context, playerID int64, req *pb.H
 	}
 
 	global.PlayerHeroCache.Set(playerID, row)
-	return &pb.HeroUpdateResp{HeroEntry: toHeroEntry(h)}, nil
+	entry, err := heroEntry(ctx, playerID, h.HeroID)
+	if err != nil {
+		return nil, err
+	}
+	for _, id := range unsetHeroIDs {
+		notifyHero(ctx, playerID, id)
+	}
+	notifyHeroEntry(ctx, playerID, entry)
+	return &pb.HeroUpdateResp{HeroEntry: entry}, nil
 }
 
 // HeroAttribute 查看英雄累计属性；cfg_id 为 0 时取当前出战英雄。
@@ -172,7 +234,11 @@ func (this *heroLogic) HeroAttribute(ctx context.Context, playerID int64, req *p
 	if err != nil {
 		return nil, err
 	}
-	return &pb.HeroAttributeResp{HeroEntry: toHeroEntry(*hero), Attribute: attr}, nil
+	entry, err := heroEntry(ctx, playerID, hero.HeroID)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.HeroAttributeResp{HeroEntry: entry, Attribute: attr}, nil
 }
 
 // HeroUpgrade 英雄升级：消耗配置表升级素材，等级 +1，最多到等级区间上限。
@@ -220,33 +286,26 @@ func (this *heroLogic) HeroUpgrade(ctx context.Context, playerID int64, req *pb.
 	if err != nil {
 		return nil, err
 	}
-	return &pb.HeroUpgradeResp{HeroEntry: toHeroEntry(hero), Attribute: attr}, nil
-}
-
-// EnterGame 进入游戏：加载玩家英雄持有，未建档则初始化空集合。
-func (this *heroLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq) (*pb.EnterGameResp, error) {
-	row, err := loadPlayerHero(ctx, playerID)
+	entry, err := heroEntry(ctx, playerID, hero.HeroID)
 	if err != nil {
 		return nil, err
 	}
-	// 只下发当前出战英雄的状态，静态属性由客户端关联英雄配置表
-	return &pb.EnterGameResp{HeroEntry: equippedHeroEntry(row)}, nil
+	notifyHeroEntry(ctx, playerID, entry)
+	return &pb.HeroUpgradeResp{HeroEntry: entry, Attribute: attr}, nil
 }
 
-// equippedHeroEntry 当前出战英雄；未出战返回 nil。
-func equippedHeroEntry(row *model.PlayerHero) *pb.HeroEntry {
-	if row.Heroes == nil {
-		return nil
+// EnterGame 进入游戏：加载玩家英雄持有，只下发当前出战英雄的完整持有状态。
+func (this *heroLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq) (*pb.EnterGameResp, error) {
+	entries, err := heroEntries(ctx, playerID)
+	if err != nil {
+		return nil, err
 	}
-	var entry *pb.HeroEntry
-	row.Heroes.Range(func(_ int32, h model.HeroInfo) bool {
-		if !h.Equipped {
-			return true
+	for _, entry := range entries {
+		if entry.Equipped {
+			return &pb.EnterGameResp{HeroEntry: entry}, nil
 		}
-		entry = toHeroEntry(h)
-		return false
-	})
-	return entry
+	}
+	return &pb.EnterGameResp{}, nil
 }
 
 // LeaveGame 离开游戏：英雄持有数据同步落库，并逐出内存缓存。
@@ -288,8 +347,12 @@ func (this *heroAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _ 
 	if !tpl.T().RoleInfo.Has(cfgID) {
 		return errs.CodeInvalidParams.WithMessage("英雄配置不存在").Err()
 	}
-	_, err := addHeroWithBound(ctx, playerID, cfgID)
-	return err
+	h, err := addHeroWithBound(ctx, playerID, cfgID)
+	if err != nil {
+		return err
+	}
+	notifyHero(ctx, playerID, h.HeroID)
+	return nil
 }
 
 // Remove 扣除英雄；未拥有返回错误。

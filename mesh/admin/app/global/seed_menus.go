@@ -153,7 +153,7 @@ var defaultMenus = []seedMenu{
 				},
 			},
 			{
-				Menu: model.SysMenu{MenuName: "GameEquipManage", Title: "装备管理", Path: "/game/equip/index", Component: "/admin/game-equip/index", MenuType: "C", Icon: "component", Permission: "game:gm:equip:list", Sort: 7, Visible: "0", IsFrame: "1"},
+				Menu: model.SysMenu{MenuName: "GameEquipManage", Title: "装备管理", Path: "/game/equip/index", Component: "/admin/game-equip/index", MenuType: "C", Icon: "component", Permission: "game:gm:equip:list", Sort: 3, Visible: "0", IsFrame: "1"},
 				Apis: []seedAPI{
 					{"游戏配置目录", "/api/v1/gm/catalog", "GET"},
 					{"GM装备列表", "/api/v1/gm/equip", "GET"},
@@ -167,7 +167,7 @@ var defaultMenus = []seedMenu{
 				},
 			},
 			{
-				Menu: model.SysMenu{MenuName: "GameMailManage", Title: "邮件管理", Path: "/game/mail/index", Component: "/admin/game-mail/index", MenuType: "C", Icon: "message", Permission: "game:gm:mail:list", Sort: 8, Visible: "0", IsFrame: "1"},
+				Menu: model.SysMenu{MenuName: "GameMailManage", Title: "邮件管理", Path: "/game/mail/index", Component: "/admin/game-mail/index", MenuType: "C", Icon: "message", Permission: "game:gm:mail:list", Sort: 5, Visible: "0", IsFrame: "1"},
 				Apis: []seedAPI{
 					{"GM邮件列表", "/api/v1/gm/mail", "GET"},
 					{"GM发送邮件", "/api/v1/gm/mail", "POST"},

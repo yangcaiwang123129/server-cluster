@@ -35,6 +35,7 @@ func Init() error {
 			&model.PlayerSkill{},
 			&model.PlayerEquip{},
 			&model.PlayerItem{},
+			&model.PlayerMail{},
 		); err != nil {
 			return err
 		}

@@ -30,5 +30,19 @@ export default {
   armor: '护甲',
   damage: '伤害',
   upgrade: '升级',
-  upgradeOk: '已升级'
+  upgradeOk: '已升级',
+  detail: '详情',
+  detailTitle: '英雄详情',
+  more: '更多',
+  weapons: '武器',
+  skills: '技能',
+  equips: '装备',
+  weaponId: '武器ID',
+  skillId: '技能ID',
+  equipId: '装备ID',
+  quality: '品质',
+  breakthrough: '突破',
+  durability: '耐久',
+  equipEquipped: '已穿戴',
+  desc: '描述'
 }

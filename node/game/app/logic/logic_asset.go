@@ -12,8 +12,7 @@ import (
 )
 
 // AssetTypeSkill 技能资产类型。
-// tpl.AssetType 生成自 cfg/excel/__enums__.xlsx，目前只到 Weapon(4)；技能暂占用 5，
-// 待枚举表补上“技能”并重新生成配置后，把这里换成 tpl.AssetType_Skill 即可。
+const AssetType_Weapon tpl.AssetType = 4
 const AssetTypeSkill tpl.AssetType = 5
 
 type assetLogic struct{}
