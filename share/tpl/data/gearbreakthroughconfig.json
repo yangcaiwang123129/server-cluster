@@ -1,0 +1,1298 @@
+[
+  {
+    "id": 1001000,
+    "gearId": 1001,
+    "breakthrough": 0,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 200
+  },
+  {
+    "id": 1001001,
+    "gearId": 1001,
+    "breakthrough": 1,
+    "hpCoef": 1.15,
+    "armorCoef": 1.15,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 400
+  },
+  {
+    "id": 1001002,
+    "gearId": 1001,
+    "breakthrough": 2,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 600
+  },
+  {
+    "id": 1001003,
+    "gearId": 1001,
+    "breakthrough": 3,
+    "hpCoef": 1.45,
+    "armorCoef": 1.45,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 800
+  },
+  {
+    "id": 1001004,
+    "gearId": 1001,
+    "breakthrough": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 1000
+  },
+  {
+    "id": 1001005,
+    "gearId": 1001,
+    "breakthrough": 5,
+    "hpCoef": 1.75,
+    "armorCoef": 1.75,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 0
+  },
+  {
+    "id": 1002000,
+    "gearId": 1002,
+    "breakthrough": 0,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 200
+  },
+  {
+    "id": 1002001,
+    "gearId": 1002,
+    "breakthrough": 1,
+    "hpCoef": 1.15,
+    "armorCoef": 1.15,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 400
+  },
+  {
+    "id": 1002002,
+    "gearId": 1002,
+    "breakthrough": 2,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 600
+  },
+  {
+    "id": 1002003,
+    "gearId": 1002,
+    "breakthrough": 3,
+    "hpCoef": 1.45,
+    "armorCoef": 1.45,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 800
+  },
+  {
+    "id": 1002004,
+    "gearId": 1002,
+    "breakthrough": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 1000
+  },
+  {
+    "id": 1002005,
+    "gearId": 1002,
+    "breakthrough": 5,
+    "hpCoef": 1.75,
+    "armorCoef": 1.75,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 0
+  },
+  {
+    "id": 1003000,
+    "gearId": 1003,
+    "breakthrough": 0,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 200
+  },
+  {
+    "id": 1003001,
+    "gearId": 1003,
+    "breakthrough": 1,
+    "hpCoef": 1.15,
+    "armorCoef": 1.15,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 400
+  },
+  {
+    "id": 1003002,
+    "gearId": 1003,
+    "breakthrough": 2,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 600
+  },
+  {
+    "id": 1003003,
+    "gearId": 1003,
+    "breakthrough": 3,
+    "hpCoef": 1.45,
+    "armorCoef": 1.45,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 800
+  },
+  {
+    "id": 1003004,
+    "gearId": 1003,
+    "breakthrough": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 1000
+  },
+  {
+    "id": 1003005,
+    "gearId": 1003,
+    "breakthrough": 5,
+    "hpCoef": 1.75,
+    "armorCoef": 1.75,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 0
+  },
+  {
+    "id": 2001000,
+    "gearId": 2001,
+    "breakthrough": 0,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 200
+  },
+  {
+    "id": 2001001,
+    "gearId": 2001,
+    "breakthrough": 1,
+    "hpCoef": 1.15,
+    "armorCoef": 1.15,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 400
+  },
+  {
+    "id": 2001002,
+    "gearId": 2001,
+    "breakthrough": 2,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 600
+  },
+  {
+    "id": 2001003,
+    "gearId": 2001,
+    "breakthrough": 3,
+    "hpCoef": 1.45,
+    "armorCoef": 1.45,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 800
+  },
+  {
+    "id": 2001004,
+    "gearId": 2001,
+    "breakthrough": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 1000
+  },
+  {
+    "id": 2001005,
+    "gearId": 2001,
+    "breakthrough": 5,
+    "hpCoef": 1.75,
+    "armorCoef": 1.75,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 0
+  },
+  {
+    "id": 2002000,
+    "gearId": 2002,
+    "breakthrough": 0,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 200
+  },
+  {
+    "id": 2002001,
+    "gearId": 2002,
+    "breakthrough": 1,
+    "hpCoef": 1.15,
+    "armorCoef": 1.15,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 400
+  },
+  {
+    "id": 2002002,
+    "gearId": 2002,
+    "breakthrough": 2,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 600
+  },
+  {
+    "id": 2002003,
+    "gearId": 2002,
+    "breakthrough": 3,
+    "hpCoef": 1.45,
+    "armorCoef": 1.45,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 800
+  },
+  {
+    "id": 2002004,
+    "gearId": 2002,
+    "breakthrough": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 1000
+  },
+  {
+    "id": 2002005,
+    "gearId": 2002,
+    "breakthrough": 5,
+    "hpCoef": 1.75,
+    "armorCoef": 1.75,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 0
+  },
+  {
+    "id": 2003000,
+    "gearId": 2003,
+    "breakthrough": 0,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 200
+  },
+  {
+    "id": 2003001,
+    "gearId": 2003,
+    "breakthrough": 1,
+    "hpCoef": 1.15,
+    "armorCoef": 1.15,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 400
+  },
+  {
+    "id": 2003002,
+    "gearId": 2003,
+    "breakthrough": 2,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 600
+  },
+  {
+    "id": 2003003,
+    "gearId": 2003,
+    "breakthrough": 3,
+    "hpCoef": 1.45,
+    "armorCoef": 1.45,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 800
+  },
+  {
+    "id": 2003004,
+    "gearId": 2003,
+    "breakthrough": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 1000
+  },
+  {
+    "id": 2003005,
+    "gearId": 2003,
+    "breakthrough": 5,
+    "hpCoef": 1.75,
+    "armorCoef": 1.75,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 0
+  },
+  {
+    "id": 3001000,
+    "gearId": 3001,
+    "breakthrough": 0,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 200
+  },
+  {
+    "id": 3001001,
+    "gearId": 3001,
+    "breakthrough": 1,
+    "hpCoef": 1.15,
+    "armorCoef": 1.15,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 400
+  },
+  {
+    "id": 3001002,
+    "gearId": 3001,
+    "breakthrough": 2,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 600
+  },
+  {
+    "id": 3001003,
+    "gearId": 3001,
+    "breakthrough": 3,
+    "hpCoef": 1.45,
+    "armorCoef": 1.45,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 800
+  },
+  {
+    "id": 3001004,
+    "gearId": 3001,
+    "breakthrough": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 1000
+  },
+  {
+    "id": 3001005,
+    "gearId": 3001,
+    "breakthrough": 5,
+    "hpCoef": 1.75,
+    "armorCoef": 1.75,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 0
+  },
+  {
+    "id": 3002000,
+    "gearId": 3002,
+    "breakthrough": 0,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 200
+  },
+  {
+    "id": 3002001,
+    "gearId": 3002,
+    "breakthrough": 1,
+    "hpCoef": 1.15,
+    "armorCoef": 1.15,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 400
+  },
+  {
+    "id": 3002002,
+    "gearId": 3002,
+    "breakthrough": 2,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 600
+  },
+  {
+    "id": 3002003,
+    "gearId": 3002,
+    "breakthrough": 3,
+    "hpCoef": 1.45,
+    "armorCoef": 1.45,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 800
+  },
+  {
+    "id": 3002004,
+    "gearId": 3002,
+    "breakthrough": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 1000
+  },
+  {
+    "id": 3002005,
+    "gearId": 3002,
+    "breakthrough": 5,
+    "hpCoef": 1.75,
+    "armorCoef": 1.75,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 0
+  },
+  {
+    "id": 3003000,
+    "gearId": 3003,
+    "breakthrough": 0,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 200
+  },
+  {
+    "id": 3003001,
+    "gearId": 3003,
+    "breakthrough": 1,
+    "hpCoef": 1.15,
+    "armorCoef": 1.15,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 400
+  },
+  {
+    "id": 3003002,
+    "gearId": 3003,
+    "breakthrough": 2,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 600
+  },
+  {
+    "id": 3003003,
+    "gearId": 3003,
+    "breakthrough": 3,
+    "hpCoef": 1.45,
+    "armorCoef": 1.45,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 800
+  },
+  {
+    "id": 3003004,
+    "gearId": 3003,
+    "breakthrough": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 1000
+  },
+  {
+    "id": 3003005,
+    "gearId": 3003,
+    "breakthrough": 5,
+    "hpCoef": 1.75,
+    "armorCoef": 1.75,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 0
+  },
+  {
+    "id": 4001000,
+    "gearId": 4001,
+    "breakthrough": 0,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 200
+  },
+  {
+    "id": 4001001,
+    "gearId": 4001,
+    "breakthrough": 1,
+    "hpCoef": 1.15,
+    "armorCoef": 1.15,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 400
+  },
+  {
+    "id": 4001002,
+    "gearId": 4001,
+    "breakthrough": 2,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 600
+  },
+  {
+    "id": 4001003,
+    "gearId": 4001,
+    "breakthrough": 3,
+    "hpCoef": 1.45,
+    "armorCoef": 1.45,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 800
+  },
+  {
+    "id": 4001004,
+    "gearId": 4001,
+    "breakthrough": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 1000
+  },
+  {
+    "id": 4001005,
+    "gearId": 4001,
+    "breakthrough": 5,
+    "hpCoef": 1.75,
+    "armorCoef": 1.75,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 0
+  },
+  {
+    "id": 4002000,
+    "gearId": 4002,
+    "breakthrough": 0,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 200
+  },
+  {
+    "id": 4002001,
+    "gearId": 4002,
+    "breakthrough": 1,
+    "hpCoef": 1.15,
+    "armorCoef": 1.15,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 400
+  },
+  {
+    "id": 4002002,
+    "gearId": 4002,
+    "breakthrough": 2,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 600
+  },
+  {
+    "id": 4002003,
+    "gearId": 4002,
+    "breakthrough": 3,
+    "hpCoef": 1.45,
+    "armorCoef": 1.45,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 800
+  },
+  {
+    "id": 4002004,
+    "gearId": 4002,
+    "breakthrough": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 1000
+  },
+  {
+    "id": 4002005,
+    "gearId": 4002,
+    "breakthrough": 5,
+    "hpCoef": 1.75,
+    "armorCoef": 1.75,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 0
+  },
+  {
+    "id": 4003000,
+    "gearId": 4003,
+    "breakthrough": 0,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 200
+  },
+  {
+    "id": 4003001,
+    "gearId": 4003,
+    "breakthrough": 1,
+    "hpCoef": 1.15,
+    "armorCoef": 1.15,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 400
+  },
+  {
+    "id": 4003002,
+    "gearId": 4003,
+    "breakthrough": 2,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 600
+  },
+  {
+    "id": 4003003,
+    "gearId": 4003,
+    "breakthrough": 3,
+    "hpCoef": 1.45,
+    "armorCoef": 1.45,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 800
+  },
+  {
+    "id": 4003004,
+    "gearId": 4003,
+    "breakthrough": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 1000
+  },
+  {
+    "id": 4003005,
+    "gearId": 4003,
+    "breakthrough": 5,
+    "hpCoef": 1.75,
+    "armorCoef": 1.75,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 0
+  },
+  {
+    "id": 5001000,
+    "gearId": 5001,
+    "breakthrough": 0,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 200
+  },
+  {
+    "id": 5001001,
+    "gearId": 5001,
+    "breakthrough": 1,
+    "hpCoef": 1.15,
+    "armorCoef": 1.15,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 400
+  },
+  {
+    "id": 5001002,
+    "gearId": 5001,
+    "breakthrough": 2,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 600
+  },
+  {
+    "id": 5001003,
+    "gearId": 5001,
+    "breakthrough": 3,
+    "hpCoef": 1.45,
+    "armorCoef": 1.45,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 800
+  },
+  {
+    "id": 5001004,
+    "gearId": 5001,
+    "breakthrough": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 1000
+  },
+  {
+    "id": 5001005,
+    "gearId": 5001,
+    "breakthrough": 5,
+    "hpCoef": 1.75,
+    "armorCoef": 1.75,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 0
+  },
+  {
+    "id": 5002000,
+    "gearId": 5002,
+    "breakthrough": 0,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 200
+  },
+  {
+    "id": 5002001,
+    "gearId": 5002,
+    "breakthrough": 1,
+    "hpCoef": 1.15,
+    "armorCoef": 1.15,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 400
+  },
+  {
+    "id": 5002002,
+    "gearId": 5002,
+    "breakthrough": 2,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 600
+  },
+  {
+    "id": 5002003,
+    "gearId": 5002,
+    "breakthrough": 3,
+    "hpCoef": 1.45,
+    "armorCoef": 1.45,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 800
+  },
+  {
+    "id": 5002004,
+    "gearId": 5002,
+    "breakthrough": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 1000
+  },
+  {
+    "id": 5002005,
+    "gearId": 5002,
+    "breakthrough": 5,
+    "hpCoef": 1.75,
+    "armorCoef": 1.75,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 0
+  },
+  {
+    "id": 5003000,
+    "gearId": 5003,
+    "breakthrough": 0,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 200
+  },
+  {
+    "id": 5003001,
+    "gearId": 5003,
+    "breakthrough": 1,
+    "hpCoef": 1.15,
+    "armorCoef": 1.15,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 400
+  },
+  {
+    "id": 5003002,
+    "gearId": 5003,
+    "breakthrough": 2,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 600
+  },
+  {
+    "id": 5003003,
+    "gearId": 5003,
+    "breakthrough": 3,
+    "hpCoef": 1.45,
+    "armorCoef": 1.45,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 800
+  },
+  {
+    "id": 5003004,
+    "gearId": 5003,
+    "breakthrough": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 1000
+  },
+  {
+    "id": 5003005,
+    "gearId": 5003,
+    "breakthrough": 5,
+    "hpCoef": 1.75,
+    "armorCoef": 1.75,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 0
+  },
+  {
+    "id": 6001000,
+    "gearId": 6001,
+    "breakthrough": 0,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 200
+  },
+  {
+    "id": 6001001,
+    "gearId": 6001,
+    "breakthrough": 1,
+    "hpCoef": 1.15,
+    "armorCoef": 1.15,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 400
+  },
+  {
+    "id": 6001002,
+    "gearId": 6001,
+    "breakthrough": 2,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 600
+  },
+  {
+    "id": 6001003,
+    "gearId": 6001,
+    "breakthrough": 3,
+    "hpCoef": 1.45,
+    "armorCoef": 1.45,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 800
+  },
+  {
+    "id": 6001004,
+    "gearId": 6001,
+    "breakthrough": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 1000
+  },
+  {
+    "id": 6001005,
+    "gearId": 6001,
+    "breakthrough": 5,
+    "hpCoef": 1.75,
+    "armorCoef": 1.75,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 0
+  },
+  {
+    "id": 6002000,
+    "gearId": 6002,
+    "breakthrough": 0,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 200
+  },
+  {
+    "id": 6002001,
+    "gearId": 6002,
+    "breakthrough": 1,
+    "hpCoef": 1.15,
+    "armorCoef": 1.15,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 400
+  },
+  {
+    "id": 6002002,
+    "gearId": 6002,
+    "breakthrough": 2,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 600
+  },
+  {
+    "id": 6002003,
+    "gearId": 6002,
+    "breakthrough": 3,
+    "hpCoef": 1.45,
+    "armorCoef": 1.45,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 800
+  },
+  {
+    "id": 6002004,
+    "gearId": 6002,
+    "breakthrough": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 1000
+  },
+  {
+    "id": 6002005,
+    "gearId": 6002,
+    "breakthrough": 5,
+    "hpCoef": 1.75,
+    "armorCoef": 1.75,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 0
+  },
+  {
+    "id": 6003000,
+    "gearId": 6003,
+    "breakthrough": 0,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 200
+  },
+  {
+    "id": 6003001,
+    "gearId": 6003,
+    "breakthrough": 1,
+    "hpCoef": 1.15,
+    "armorCoef": 1.15,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 400
+  },
+  {
+    "id": 6003002,
+    "gearId": 6003,
+    "breakthrough": 2,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 600
+  },
+  {
+    "id": 6003003,
+    "gearId": 6003,
+    "breakthrough": 3,
+    "hpCoef": 1.45,
+    "armorCoef": 1.45,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 800
+  },
+  {
+    "id": 6003004,
+    "gearId": 6003,
+    "breakthrough": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 1000
+  },
+  {
+    "id": 6003005,
+    "gearId": 6003,
+    "breakthrough": 5,
+    "hpCoef": 1.75,
+    "armorCoef": 1.75,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 0
+  },
+  {
+    "id": 7001000,
+    "gearId": 7001,
+    "breakthrough": 0,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 200
+  },
+  {
+    "id": 7001001,
+    "gearId": 7001,
+    "breakthrough": 1,
+    "hpCoef": 1.15,
+    "armorCoef": 1.15,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 400
+  },
+  {
+    "id": 7001002,
+    "gearId": 7001,
+    "breakthrough": 2,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 600
+  },
+  {
+    "id": 7001003,
+    "gearId": 7001,
+    "breakthrough": 3,
+    "hpCoef": 1.45,
+    "armorCoef": 1.45,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 800
+  },
+  {
+    "id": 7001004,
+    "gearId": 7001,
+    "breakthrough": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 1000
+  },
+  {
+    "id": 7001005,
+    "gearId": 7001,
+    "breakthrough": 5,
+    "hpCoef": 1.75,
+    "armorCoef": 1.75,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 0
+  },
+  {
+    "id": 7002000,
+    "gearId": 7002,
+    "breakthrough": 0,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 200
+  },
+  {
+    "id": 7002001,
+    "gearId": 7002,
+    "breakthrough": 1,
+    "hpCoef": 1.15,
+    "armorCoef": 1.15,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 400
+  },
+  {
+    "id": 7002002,
+    "gearId": 7002,
+    "breakthrough": 2,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 600
+  },
+  {
+    "id": 7002003,
+    "gearId": 7002,
+    "breakthrough": 3,
+    "hpCoef": 1.45,
+    "armorCoef": 1.45,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 800
+  },
+  {
+    "id": 7002004,
+    "gearId": 7002,
+    "breakthrough": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 1000
+  },
+  {
+    "id": 7002005,
+    "gearId": 7002,
+    "breakthrough": 5,
+    "hpCoef": 1.75,
+    "armorCoef": 1.75,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 0
+  },
+  {
+    "id": 7003000,
+    "gearId": 7003,
+    "breakthrough": 0,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 200
+  },
+  {
+    "id": 7003001,
+    "gearId": 7003,
+    "breakthrough": 1,
+    "hpCoef": 1.15,
+    "armorCoef": 1.15,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 400
+  },
+  {
+    "id": 7003002,
+    "gearId": 7003,
+    "breakthrough": 2,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 600
+  },
+  {
+    "id": 7003003,
+    "gearId": 7003,
+    "breakthrough": 3,
+    "hpCoef": 1.45,
+    "armorCoef": 1.45,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 800
+  },
+  {
+    "id": 7003004,
+    "gearId": 7003,
+    "breakthrough": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 1000
+  },
+  {
+    "id": 7003005,
+    "gearId": 7003,
+    "breakthrough": 5,
+    "hpCoef": 1.75,
+    "armorCoef": 1.75,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 0
+  },
+  {
+    "id": 8001000,
+    "gearId": 8001,
+    "breakthrough": 0,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 200
+  },
+  {
+    "id": 8001001,
+    "gearId": 8001,
+    "breakthrough": 1,
+    "hpCoef": 1.15,
+    "armorCoef": 1.15,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 400
+  },
+  {
+    "id": 8001002,
+    "gearId": 8001,
+    "breakthrough": 2,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 600
+  },
+  {
+    "id": 8001003,
+    "gearId": 8001,
+    "breakthrough": 3,
+    "hpCoef": 1.45,
+    "armorCoef": 1.45,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 800
+  },
+  {
+    "id": 8001004,
+    "gearId": 8001,
+    "breakthrough": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 1000
+  },
+  {
+    "id": 8001005,
+    "gearId": 8001,
+    "breakthrough": 5,
+    "hpCoef": 1.75,
+    "armorCoef": 1.75,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 0
+  },
+  {
+    "id": 8002000,
+    "gearId": 8002,
+    "breakthrough": 0,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 200
+  },
+  {
+    "id": 8002001,
+    "gearId": 8002,
+    "breakthrough": 1,
+    "hpCoef": 1.15,
+    "armorCoef": 1.15,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 400
+  },
+  {
+    "id": 8002002,
+    "gearId": 8002,
+    "breakthrough": 2,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 600
+  },
+  {
+    "id": 8002003,
+    "gearId": 8002,
+    "breakthrough": 3,
+    "hpCoef": 1.45,
+    "armorCoef": 1.45,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 800
+  },
+  {
+    "id": 8002004,
+    "gearId": 8002,
+    "breakthrough": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 1000
+  },
+  {
+    "id": 8002005,
+    "gearId": 8002,
+    "breakthrough": 5,
+    "hpCoef": 1.75,
+    "armorCoef": 1.75,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 0
+  },
+  {
+    "id": 8003000,
+    "gearId": 8003,
+    "breakthrough": 0,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 200
+  },
+  {
+    "id": 8003001,
+    "gearId": 8003,
+    "breakthrough": 1,
+    "hpCoef": 1.15,
+    "armorCoef": 1.15,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 400
+  },
+  {
+    "id": 8003002,
+    "gearId": 8003,
+    "breakthrough": 2,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 600
+  },
+  {
+    "id": 8003003,
+    "gearId": 8003,
+    "breakthrough": 3,
+    "hpCoef": 1.45,
+    "armorCoef": 1.45,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 800
+  },
+  {
+    "id": 8003004,
+    "gearId": 8003,
+    "breakthrough": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 1000
+  },
+  {
+    "id": 8003005,
+    "gearId": 8003,
+    "breakthrough": 5,
+    "hpCoef": 1.75,
+    "armorCoef": 1.75,
+    "breakthroughMaterial": 9,
+    "breakthroughUse": 0
+  }
+]

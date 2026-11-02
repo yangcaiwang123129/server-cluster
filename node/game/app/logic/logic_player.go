@@ -21,6 +21,7 @@ import (
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
 	"server-cluster/share/singleton"
+	"server-cluster/share/tpl"
 	"server-cluster/share/util"
 )
 
@@ -40,7 +41,7 @@ func init() {
 // moduleLogics 持有玩家数据的模块，按进入/离开的统一顺序驱动。
 // 延迟获取单例：各模块的 init 注册顺序不确定，不能在包初始化阶段调用。
 func moduleLogics() []global.ModuleLogic {
-	return []global.ModuleLogic{Item(), Hero(), Skill(), Weapon(), Equip()}
+	return []global.ModuleLogic{Item(), Hero(), Weapon(), Skill(), Equip(), Mail()}
 }
 
 // PlayerLogic 获取玩家模块业务单例。
@@ -72,7 +73,7 @@ func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.
 	}
 
 	// 各玩家数据模块预热/建档，并把各自需要下发的初始状态合并进响应；任一失败则不进入游戏
-	resp := &pb.EnterGameResp{PlayerMagicAttr: buildPlayerMagicAttr(core, player)}
+	resp := &pb.EnterGameResp{PlayerAttr: buildPlayerAttr(core, player)}
 	for _, mod := range moduleLogics() {
 		part, err := mod.EnterGame(ctx, playerID, req)
 		if err != nil {
@@ -104,18 +105,18 @@ func mergeEnterGameResp(dst, src *pb.EnterGameResp) {
 	}
 }
 
-// buildPlayerMagicAttr 组装下发给客户端的玩家属性表：
+// buildPlayerAttr 组装下发给客户端的玩家属性表：
 // 昵称/等级/经验/vip 取自 player_extra，币/金取自 player。
-// 键为 MagicAttr 枚举值，值按实际类型放入 ObjectValue。
-func buildPlayerMagicAttr(core *model.PlayerExtra, player *model.Player) *pb.MagicAttrMap {
-	return &pb.MagicAttrMap{Values: map[int32]*pb.ObjectValue{
-		int32(pb.MagicAttr_PLAYER_ATTR_NAME):      {Kind: &pb.ObjectValue_StringValue{StringValue: core.Nickname}},
-		int32(pb.MagicAttr_PLAYER_ATTR_LEVEL):     {Kind: &pb.ObjectValue_IntValue{IntValue: core.Level}},
-		int32(pb.MagicAttr_PLAYER_ATTR_EXP):       {Kind: &pb.ObjectValue_BigintValue{BigintValue: core.Exp}},
-		int32(pb.MagicAttr_PLAYER_ATTR_VIP_LEVEL): {Kind: &pb.ObjectValue_IntValue{IntValue: core.VipLevel}},
-		int32(pb.MagicAttr_PLAYER_ATTR_VIP_EXP):   {Kind: &pb.ObjectValue_BigintValue{BigintValue: core.VipExp}},
-		int32(pb.MagicAttr_PLAYER_ATTR_COIN):      {Kind: &pb.ObjectValue_BigintValue{BigintValue: player.Coin}},
-		int32(pb.MagicAttr_PLAYER_ATTR_GOLD):      {Kind: &pb.ObjectValue_BigintValue{BigintValue: player.Gold}},
+// 键为 Attr 枚举值，值按实际类型放入 ObjectValue。
+func buildPlayerAttr(core *model.PlayerExtra, player *model.Player) *pb.AttrMap {
+	return &pb.AttrMap{Values: map[int32]*pb.ObjectValue{
+		int32(pb.Attr_PLAYER_ATTR_NAME):      {Kind: &pb.ObjectValue_StringValue{StringValue: core.Nickname}},
+		int32(pb.Attr_PLAYER_ATTR_LEVEL):     {Kind: &pb.ObjectValue_IntValue{IntValue: core.Level}},
+		int32(pb.Attr_PLAYER_ATTR_EXP):       {Kind: &pb.ObjectValue_BigintValue{BigintValue: core.Exp}},
+		int32(pb.Attr_PLAYER_ATTR_VIP_LEVEL): {Kind: &pb.ObjectValue_IntValue{IntValue: core.VipLevel}},
+		int32(pb.Attr_PLAYER_ATTR_VIP_EXP):   {Kind: &pb.ObjectValue_BigintValue{BigintValue: core.VipExp}},
+		int32(pb.Attr_PLAYER_ATTR_COIN):      {Kind: &pb.ObjectValue_BigintValue{BigintValue: player.Coin}},
+		int32(pb.Attr_PLAYER_ATTR_GOLD):      {Kind: &pb.ObjectValue_BigintValue{BigintValue: player.Gold}},
 	}}
 }
 
@@ -144,6 +145,68 @@ func (this *playerLogic) LeaveGame(ctx context.Context, playerID int64, req *pb.
 
 	record("player_actor", this.PlayerDestroyActor(ctx, playerID))
 	return &pb.LeaveGameResp{}, firstErr
+}
+
+// ── 玩家资产消费：礼包购买 / 兑换 / 充值 ────────────────────────────
+
+// GiftBuy 购买礼包：按 GiftCfg 扣除 AssetCost 并发放 AssetRewards。
+// 配置不存在或资产不足返回错误，已扣减的部分不回滚（与现有资产逻辑一致）。
+func (this *playerLogic) GiftBuy(ctx context.Context, playerID int64, req *pb.GiftBuyReq) (*pb.GiftBuyResp, error) {
+	cfg := tpl.T().Gift.Get(req.GetCfgId())
+	if cfg == nil {
+		return nil, errs.CodeInvalidParams.WithMessage("礼包配置不存在").Err()
+	}
+
+	costs, err := deductAssets(ctx, playerID, []*tpl.Asset{cfg.AssetCost})
+	if err != nil {
+		return nil, err
+	}
+	rewards, err := grantAssets(ctx, playerID, cfg.AssetRewards)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.GiftBuyResp{Costs: costs, Rewards: rewards}, nil
+}
+
+// Exchange 兑换：按 ExchangeCfg 扣除 AssetCost 并发放 AssetRewards。
+// 配置不存在或资产不足返回错误，已扣减的部分不回滚（与现有资产逻辑一致）。
+func (this *playerLogic) Exchange(ctx context.Context, playerID int64, req *pb.ExchangeReq) (*pb.ExchangeResp, error) {
+	cfg := tpl.T().Exchange.Get(req.GetCfgId())
+	if cfg == nil {
+		return nil, errs.CodeInvalidParams.WithMessage("兑换配置不存在").Err()
+	}
+
+	costs, err := deductAssets(ctx, playerID, []*tpl.Asset{cfg.AssetCost})
+	if err != nil {
+		return nil, err
+	}
+	rewards, err := grantAssets(ctx, playerID, cfg.AssetRewards)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.ExchangeResp{Costs: costs, Rewards: rewards}, nil
+}
+
+// notifyRechargeOrder 预留：通知后台充值订单。
+// 接入支付 SDK 后，这里改为携带订单号回调支付平台/后台校验，校验通过再发放奖励；
+// 当前是假充值，只记录一条日志，便于后续替换。
+var notifyRechargeOrder = func(playerID int64, cfgID int32) {
+	log.Infof("logic: recharge order notify reserved, playerID=%d, cfgID=%d", playerID, cfgID)
+}
+
+// Recharge 充值（假充值）：校验配置后直接发放 AssetReward，不做订单校验。
+func (this *playerLogic) Recharge(ctx context.Context, playerID int64, req *pb.RechargeReq) (*pb.RechargeResp, error) {
+	cfg := tpl.T().Recharge.Get(req.GetCfgId())
+	if cfg == nil {
+		return nil, errs.CodeInvalidParams.WithMessage("充值配置不存在").Err()
+	}
+
+	notifyRechargeOrder(playerID, req.GetCfgId())
+	rewards, err := grantAssets(ctx, playerID, []*tpl.Asset{cfg.AssetReward})
+	if err != nil {
+		return nil, err
+	}
+	return &pb.RechargeResp{Rewards: rewards}, nil
 }
 
 // flushAndEvict 把该玩家的待写数据同步落库，并逐出内存缓存。

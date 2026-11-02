@@ -7,18 +7,20 @@ import (
 	"server-cluster/share/util"
 )
 
-// SkillInfo 单个技能的持有数据（player_skill.skills 的 map 元素，key=技能ID）。
+// SkillInfo 单个技能的持有数据（player_skill.skills 的 map 元素，key=技能配置ID）。
+// 技能由英雄配置固定绑定，配置ID 全局唯一，无需实例ID。
 type SkillInfo struct {
-	SkillID  int32 `json:"skill_id"` // 技能ID(skillconfig)
-	Level    int32 `json:"level"`    // 技能等级
-	Equipped bool  `json:"equipped"` // 是否装备
+	SkillID      int32 `json:"skill_id"`     // 技能配置ID
+	Level        int32 `json:"level"`        // 等级
+	Quality      int32 `json:"quality"`      // 品质
+	Breakthrough int32 `json:"breakthrough"` // 突破
 }
 
-// PlayerSkill 玩家技能持有（1:1 行，多技能以 JSON 对象存储，key=技能ID），对应 player_skill 表。
+// PlayerSkill 玩家技能持有（1:1 行，多技能以 JSON 对象存储，key=技能配置ID），对应 player_skill 表。
 // 注意：Skills 由 SafeMap 加锁保护，修改请走 Update/UpdateAll，勿直接改 Snapshot 返回值。
 type PlayerSkill struct {
 	PlayerID   int64                           `gorm:"column:player_id;type:bigint;not null;primaryKey;comment:玩家ID" json:"player_id"`
-	Skills     *util.SafeMap[int32, SkillInfo] `gorm:"column:skills;type:json;comment:技能列表(JSON对象,key=技能ID)" json:"skills"`
+	Skills     *util.SafeMap[int32, SkillInfo] `gorm:"column:skills;type:json;comment:技能列表(JSON对象,key=技能配置ID)" json:"skills"`
 	TableModel `gorm:"embedded"`
 }
 

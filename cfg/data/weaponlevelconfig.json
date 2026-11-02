@@ -1,0 +1,642 @@
+[
+  {
+    "id": 1001001,
+    "weaponId": 1001,
+    "level": 1,
+    "damageCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 1001002,
+    "weaponId": 1001,
+    "level": 2,
+    "damageCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 1001003,
+    "weaponId": 1001,
+    "level": 3,
+    "damageCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 1001004,
+    "weaponId": 1001,
+    "level": 4,
+    "damageCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 1001005,
+    "weaponId": 1001,
+    "level": 5,
+    "damageCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 1001006,
+    "weaponId": 1001,
+    "level": 6,
+    "damageCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 1001007,
+    "weaponId": 1001,
+    "level": 7,
+    "damageCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 1001008,
+    "weaponId": 1001,
+    "level": 8,
+    "damageCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 1001009,
+    "weaponId": 1001,
+    "level": 9,
+    "damageCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 1001010,
+    "weaponId": 1001,
+    "level": 10,
+    "damageCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 2001001,
+    "weaponId": 2001,
+    "level": 1,
+    "damageCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 2001002,
+    "weaponId": 2001,
+    "level": 2,
+    "damageCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 2001003,
+    "weaponId": 2001,
+    "level": 3,
+    "damageCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 2001004,
+    "weaponId": 2001,
+    "level": 4,
+    "damageCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 2001005,
+    "weaponId": 2001,
+    "level": 5,
+    "damageCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 2001006,
+    "weaponId": 2001,
+    "level": 6,
+    "damageCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 2001007,
+    "weaponId": 2001,
+    "level": 7,
+    "damageCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 2001008,
+    "weaponId": 2001,
+    "level": 8,
+    "damageCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 2001009,
+    "weaponId": 2001,
+    "level": 9,
+    "damageCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 2001010,
+    "weaponId": 2001,
+    "level": 10,
+    "damageCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 3001001,
+    "weaponId": 3001,
+    "level": 1,
+    "damageCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 3001002,
+    "weaponId": 3001,
+    "level": 2,
+    "damageCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 3001003,
+    "weaponId": 3001,
+    "level": 3,
+    "damageCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 3001004,
+    "weaponId": 3001,
+    "level": 4,
+    "damageCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 3001005,
+    "weaponId": 3001,
+    "level": 5,
+    "damageCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 3001006,
+    "weaponId": 3001,
+    "level": 6,
+    "damageCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 3001007,
+    "weaponId": 3001,
+    "level": 7,
+    "damageCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 3001008,
+    "weaponId": 3001,
+    "level": 8,
+    "damageCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 3001009,
+    "weaponId": 3001,
+    "level": 9,
+    "damageCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 3001010,
+    "weaponId": 3001,
+    "level": 10,
+    "damageCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 4001001,
+    "weaponId": 4001,
+    "level": 1,
+    "damageCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 4001002,
+    "weaponId": 4001,
+    "level": 2,
+    "damageCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 4001003,
+    "weaponId": 4001,
+    "level": 3,
+    "damageCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 4001004,
+    "weaponId": 4001,
+    "level": 4,
+    "damageCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 4001005,
+    "weaponId": 4001,
+    "level": 5,
+    "damageCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 4001006,
+    "weaponId": 4001,
+    "level": 6,
+    "damageCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 4001007,
+    "weaponId": 4001,
+    "level": 7,
+    "damageCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 4001008,
+    "weaponId": 4001,
+    "level": 8,
+    "damageCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 4001009,
+    "weaponId": 4001,
+    "level": 9,
+    "damageCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 4001010,
+    "weaponId": 4001,
+    "level": 10,
+    "damageCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 5001001,
+    "weaponId": 5001,
+    "level": 1,
+    "damageCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 5001002,
+    "weaponId": 5001,
+    "level": 2,
+    "damageCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 5001003,
+    "weaponId": 5001,
+    "level": 3,
+    "damageCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 5001004,
+    "weaponId": 5001,
+    "level": 4,
+    "damageCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 5001005,
+    "weaponId": 5001,
+    "level": 5,
+    "damageCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 5001006,
+    "weaponId": 5001,
+    "level": 6,
+    "damageCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 5001007,
+    "weaponId": 5001,
+    "level": 7,
+    "damageCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 5001008,
+    "weaponId": 5001,
+    "level": 8,
+    "damageCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 5001009,
+    "weaponId": 5001,
+    "level": 9,
+    "damageCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 5001010,
+    "weaponId": 5001,
+    "level": 10,
+    "damageCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 6001001,
+    "weaponId": 6001,
+    "level": 1,
+    "damageCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 6001002,
+    "weaponId": 6001,
+    "level": 2,
+    "damageCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 6001003,
+    "weaponId": 6001,
+    "level": 3,
+    "damageCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 6001004,
+    "weaponId": 6001,
+    "level": 4,
+    "damageCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 6001005,
+    "weaponId": 6001,
+    "level": 5,
+    "damageCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 6001006,
+    "weaponId": 6001,
+    "level": 6,
+    "damageCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 6001007,
+    "weaponId": 6001,
+    "level": 7,
+    "damageCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 6001008,
+    "weaponId": 6001,
+    "level": 8,
+    "damageCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 6001009,
+    "weaponId": 6001,
+    "level": 9,
+    "damageCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 6001010,
+    "weaponId": 6001,
+    "level": 10,
+    "damageCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 7001001,
+    "weaponId": 7001,
+    "level": 1,
+    "damageCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 7001002,
+    "weaponId": 7001,
+    "level": 2,
+    "damageCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 7001003,
+    "weaponId": 7001,
+    "level": 3,
+    "damageCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 7001004,
+    "weaponId": 7001,
+    "level": 4,
+    "damageCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 7001005,
+    "weaponId": 7001,
+    "level": 5,
+    "damageCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 7001006,
+    "weaponId": 7001,
+    "level": 6,
+    "damageCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 7001007,
+    "weaponId": 7001,
+    "level": 7,
+    "damageCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 7001008,
+    "weaponId": 7001,
+    "level": 8,
+    "damageCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 7001009,
+    "weaponId": 7001,
+    "level": 9,
+    "damageCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 7001010,
+    "weaponId": 7001,
+    "level": 10,
+    "damageCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 8001001,
+    "weaponId": 8001,
+    "level": 1,
+    "damageCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 8001002,
+    "weaponId": 8001,
+    "level": 2,
+    "damageCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 8001003,
+    "weaponId": 8001,
+    "level": 3,
+    "damageCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 8001004,
+    "weaponId": 8001,
+    "level": 4,
+    "damageCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 8001005,
+    "weaponId": 8001,
+    "level": 5,
+    "damageCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 8001006,
+    "weaponId": 8001,
+    "level": 6,
+    "damageCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 8001007,
+    "weaponId": 8001,
+    "level": 7,
+    "damageCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 8001008,
+    "weaponId": 8001,
+    "level": 8,
+    "damageCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 8001009,
+    "weaponId": 8001,
+    "level": 9,
+    "damageCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 8001010,
+    "weaponId": 8001,
+    "level": 10,
+    "damageCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  }
+]

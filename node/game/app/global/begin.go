@@ -31,8 +31,8 @@ func Init() error {
 			&model.Player{},
 			&model.PlayerExtra{},
 			&model.PlayerHero{},
-			&model.PlayerSkill{},
 			&model.PlayerWeapon{},
+			&model.PlayerSkill{},
 			&model.PlayerEquip{},
 			&model.PlayerItem{},
 		); err != nil {

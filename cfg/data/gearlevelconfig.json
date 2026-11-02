@@ -1,0 +1,2162 @@
+[
+  {
+    "id": 1001001,
+    "gearId": 1001,
+    "level": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 1001002,
+    "gearId": 1001,
+    "level": 2,
+    "hpCoef": 1.1,
+    "armorCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 1001003,
+    "gearId": 1001,
+    "level": 3,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 1001004,
+    "gearId": 1001,
+    "level": 4,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 1001005,
+    "gearId": 1001,
+    "level": 5,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 1001006,
+    "gearId": 1001,
+    "level": 6,
+    "hpCoef": 1.5,
+    "armorCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 1001007,
+    "gearId": 1001,
+    "level": 7,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 1001008,
+    "gearId": 1001,
+    "level": 8,
+    "hpCoef": 1.7,
+    "armorCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 1001009,
+    "gearId": 1001,
+    "level": 9,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 1001010,
+    "gearId": 1001,
+    "level": 10,
+    "hpCoef": 1.9,
+    "armorCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 1002001,
+    "gearId": 1002,
+    "level": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 1002002,
+    "gearId": 1002,
+    "level": 2,
+    "hpCoef": 1.1,
+    "armorCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 1002003,
+    "gearId": 1002,
+    "level": 3,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 1002004,
+    "gearId": 1002,
+    "level": 4,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 1002005,
+    "gearId": 1002,
+    "level": 5,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 1002006,
+    "gearId": 1002,
+    "level": 6,
+    "hpCoef": 1.5,
+    "armorCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 1002007,
+    "gearId": 1002,
+    "level": 7,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 1002008,
+    "gearId": 1002,
+    "level": 8,
+    "hpCoef": 1.7,
+    "armorCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 1002009,
+    "gearId": 1002,
+    "level": 9,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 1002010,
+    "gearId": 1002,
+    "level": 10,
+    "hpCoef": 1.9,
+    "armorCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 1003001,
+    "gearId": 1003,
+    "level": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 1003002,
+    "gearId": 1003,
+    "level": 2,
+    "hpCoef": 1.1,
+    "armorCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 1003003,
+    "gearId": 1003,
+    "level": 3,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 1003004,
+    "gearId": 1003,
+    "level": 4,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 1003005,
+    "gearId": 1003,
+    "level": 5,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 1003006,
+    "gearId": 1003,
+    "level": 6,
+    "hpCoef": 1.5,
+    "armorCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 1003007,
+    "gearId": 1003,
+    "level": 7,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 1003008,
+    "gearId": 1003,
+    "level": 8,
+    "hpCoef": 1.7,
+    "armorCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 1003009,
+    "gearId": 1003,
+    "level": 9,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 1003010,
+    "gearId": 1003,
+    "level": 10,
+    "hpCoef": 1.9,
+    "armorCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 2001001,
+    "gearId": 2001,
+    "level": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 2001002,
+    "gearId": 2001,
+    "level": 2,
+    "hpCoef": 1.1,
+    "armorCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 2001003,
+    "gearId": 2001,
+    "level": 3,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 2001004,
+    "gearId": 2001,
+    "level": 4,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 2001005,
+    "gearId": 2001,
+    "level": 5,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 2001006,
+    "gearId": 2001,
+    "level": 6,
+    "hpCoef": 1.5,
+    "armorCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 2001007,
+    "gearId": 2001,
+    "level": 7,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 2001008,
+    "gearId": 2001,
+    "level": 8,
+    "hpCoef": 1.7,
+    "armorCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 2001009,
+    "gearId": 2001,
+    "level": 9,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 2001010,
+    "gearId": 2001,
+    "level": 10,
+    "hpCoef": 1.9,
+    "armorCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 2002001,
+    "gearId": 2002,
+    "level": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 2002002,
+    "gearId": 2002,
+    "level": 2,
+    "hpCoef": 1.1,
+    "armorCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 2002003,
+    "gearId": 2002,
+    "level": 3,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 2002004,
+    "gearId": 2002,
+    "level": 4,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 2002005,
+    "gearId": 2002,
+    "level": 5,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 2002006,
+    "gearId": 2002,
+    "level": 6,
+    "hpCoef": 1.5,
+    "armorCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 2002007,
+    "gearId": 2002,
+    "level": 7,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 2002008,
+    "gearId": 2002,
+    "level": 8,
+    "hpCoef": 1.7,
+    "armorCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 2002009,
+    "gearId": 2002,
+    "level": 9,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 2002010,
+    "gearId": 2002,
+    "level": 10,
+    "hpCoef": 1.9,
+    "armorCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 2003001,
+    "gearId": 2003,
+    "level": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 2003002,
+    "gearId": 2003,
+    "level": 2,
+    "hpCoef": 1.1,
+    "armorCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 2003003,
+    "gearId": 2003,
+    "level": 3,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 2003004,
+    "gearId": 2003,
+    "level": 4,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 2003005,
+    "gearId": 2003,
+    "level": 5,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 2003006,
+    "gearId": 2003,
+    "level": 6,
+    "hpCoef": 1.5,
+    "armorCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 2003007,
+    "gearId": 2003,
+    "level": 7,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 2003008,
+    "gearId": 2003,
+    "level": 8,
+    "hpCoef": 1.7,
+    "armorCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 2003009,
+    "gearId": 2003,
+    "level": 9,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 2003010,
+    "gearId": 2003,
+    "level": 10,
+    "hpCoef": 1.9,
+    "armorCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 3001001,
+    "gearId": 3001,
+    "level": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 3001002,
+    "gearId": 3001,
+    "level": 2,
+    "hpCoef": 1.1,
+    "armorCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 3001003,
+    "gearId": 3001,
+    "level": 3,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 3001004,
+    "gearId": 3001,
+    "level": 4,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 3001005,
+    "gearId": 3001,
+    "level": 5,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 3001006,
+    "gearId": 3001,
+    "level": 6,
+    "hpCoef": 1.5,
+    "armorCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 3001007,
+    "gearId": 3001,
+    "level": 7,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 3001008,
+    "gearId": 3001,
+    "level": 8,
+    "hpCoef": 1.7,
+    "armorCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 3001009,
+    "gearId": 3001,
+    "level": 9,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 3001010,
+    "gearId": 3001,
+    "level": 10,
+    "hpCoef": 1.9,
+    "armorCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 3002001,
+    "gearId": 3002,
+    "level": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 3002002,
+    "gearId": 3002,
+    "level": 2,
+    "hpCoef": 1.1,
+    "armorCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 3002003,
+    "gearId": 3002,
+    "level": 3,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 3002004,
+    "gearId": 3002,
+    "level": 4,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 3002005,
+    "gearId": 3002,
+    "level": 5,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 3002006,
+    "gearId": 3002,
+    "level": 6,
+    "hpCoef": 1.5,
+    "armorCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 3002007,
+    "gearId": 3002,
+    "level": 7,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 3002008,
+    "gearId": 3002,
+    "level": 8,
+    "hpCoef": 1.7,
+    "armorCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 3002009,
+    "gearId": 3002,
+    "level": 9,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 3002010,
+    "gearId": 3002,
+    "level": 10,
+    "hpCoef": 1.9,
+    "armorCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 3003001,
+    "gearId": 3003,
+    "level": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 3003002,
+    "gearId": 3003,
+    "level": 2,
+    "hpCoef": 1.1,
+    "armorCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 3003003,
+    "gearId": 3003,
+    "level": 3,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 3003004,
+    "gearId": 3003,
+    "level": 4,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 3003005,
+    "gearId": 3003,
+    "level": 5,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 3003006,
+    "gearId": 3003,
+    "level": 6,
+    "hpCoef": 1.5,
+    "armorCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 3003007,
+    "gearId": 3003,
+    "level": 7,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 3003008,
+    "gearId": 3003,
+    "level": 8,
+    "hpCoef": 1.7,
+    "armorCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 3003009,
+    "gearId": 3003,
+    "level": 9,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 3003010,
+    "gearId": 3003,
+    "level": 10,
+    "hpCoef": 1.9,
+    "armorCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 4001001,
+    "gearId": 4001,
+    "level": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 4001002,
+    "gearId": 4001,
+    "level": 2,
+    "hpCoef": 1.1,
+    "armorCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 4001003,
+    "gearId": 4001,
+    "level": 3,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 4001004,
+    "gearId": 4001,
+    "level": 4,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 4001005,
+    "gearId": 4001,
+    "level": 5,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 4001006,
+    "gearId": 4001,
+    "level": 6,
+    "hpCoef": 1.5,
+    "armorCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 4001007,
+    "gearId": 4001,
+    "level": 7,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 4001008,
+    "gearId": 4001,
+    "level": 8,
+    "hpCoef": 1.7,
+    "armorCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 4001009,
+    "gearId": 4001,
+    "level": 9,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 4001010,
+    "gearId": 4001,
+    "level": 10,
+    "hpCoef": 1.9,
+    "armorCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 4002001,
+    "gearId": 4002,
+    "level": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 4002002,
+    "gearId": 4002,
+    "level": 2,
+    "hpCoef": 1.1,
+    "armorCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 4002003,
+    "gearId": 4002,
+    "level": 3,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 4002004,
+    "gearId": 4002,
+    "level": 4,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 4002005,
+    "gearId": 4002,
+    "level": 5,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 4002006,
+    "gearId": 4002,
+    "level": 6,
+    "hpCoef": 1.5,
+    "armorCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 4002007,
+    "gearId": 4002,
+    "level": 7,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 4002008,
+    "gearId": 4002,
+    "level": 8,
+    "hpCoef": 1.7,
+    "armorCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 4002009,
+    "gearId": 4002,
+    "level": 9,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 4002010,
+    "gearId": 4002,
+    "level": 10,
+    "hpCoef": 1.9,
+    "armorCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 4003001,
+    "gearId": 4003,
+    "level": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 4003002,
+    "gearId": 4003,
+    "level": 2,
+    "hpCoef": 1.1,
+    "armorCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 4003003,
+    "gearId": 4003,
+    "level": 3,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 4003004,
+    "gearId": 4003,
+    "level": 4,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 4003005,
+    "gearId": 4003,
+    "level": 5,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 4003006,
+    "gearId": 4003,
+    "level": 6,
+    "hpCoef": 1.5,
+    "armorCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 4003007,
+    "gearId": 4003,
+    "level": 7,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 4003008,
+    "gearId": 4003,
+    "level": 8,
+    "hpCoef": 1.7,
+    "armorCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 4003009,
+    "gearId": 4003,
+    "level": 9,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 4003010,
+    "gearId": 4003,
+    "level": 10,
+    "hpCoef": 1.9,
+    "armorCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 5001001,
+    "gearId": 5001,
+    "level": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 5001002,
+    "gearId": 5001,
+    "level": 2,
+    "hpCoef": 1.1,
+    "armorCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 5001003,
+    "gearId": 5001,
+    "level": 3,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 5001004,
+    "gearId": 5001,
+    "level": 4,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 5001005,
+    "gearId": 5001,
+    "level": 5,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 5001006,
+    "gearId": 5001,
+    "level": 6,
+    "hpCoef": 1.5,
+    "armorCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 5001007,
+    "gearId": 5001,
+    "level": 7,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 5001008,
+    "gearId": 5001,
+    "level": 8,
+    "hpCoef": 1.7,
+    "armorCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 5001009,
+    "gearId": 5001,
+    "level": 9,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 5001010,
+    "gearId": 5001,
+    "level": 10,
+    "hpCoef": 1.9,
+    "armorCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 5002001,
+    "gearId": 5002,
+    "level": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 5002002,
+    "gearId": 5002,
+    "level": 2,
+    "hpCoef": 1.1,
+    "armorCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 5002003,
+    "gearId": 5002,
+    "level": 3,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 5002004,
+    "gearId": 5002,
+    "level": 4,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 5002005,
+    "gearId": 5002,
+    "level": 5,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 5002006,
+    "gearId": 5002,
+    "level": 6,
+    "hpCoef": 1.5,
+    "armorCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 5002007,
+    "gearId": 5002,
+    "level": 7,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 5002008,
+    "gearId": 5002,
+    "level": 8,
+    "hpCoef": 1.7,
+    "armorCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 5002009,
+    "gearId": 5002,
+    "level": 9,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 5002010,
+    "gearId": 5002,
+    "level": 10,
+    "hpCoef": 1.9,
+    "armorCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 5003001,
+    "gearId": 5003,
+    "level": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 5003002,
+    "gearId": 5003,
+    "level": 2,
+    "hpCoef": 1.1,
+    "armorCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 5003003,
+    "gearId": 5003,
+    "level": 3,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 5003004,
+    "gearId": 5003,
+    "level": 4,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 5003005,
+    "gearId": 5003,
+    "level": 5,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 5003006,
+    "gearId": 5003,
+    "level": 6,
+    "hpCoef": 1.5,
+    "armorCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 5003007,
+    "gearId": 5003,
+    "level": 7,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 5003008,
+    "gearId": 5003,
+    "level": 8,
+    "hpCoef": 1.7,
+    "armorCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 5003009,
+    "gearId": 5003,
+    "level": 9,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 5003010,
+    "gearId": 5003,
+    "level": 10,
+    "hpCoef": 1.9,
+    "armorCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 6001001,
+    "gearId": 6001,
+    "level": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 6001002,
+    "gearId": 6001,
+    "level": 2,
+    "hpCoef": 1.1,
+    "armorCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 6001003,
+    "gearId": 6001,
+    "level": 3,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 6001004,
+    "gearId": 6001,
+    "level": 4,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 6001005,
+    "gearId": 6001,
+    "level": 5,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 6001006,
+    "gearId": 6001,
+    "level": 6,
+    "hpCoef": 1.5,
+    "armorCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 6001007,
+    "gearId": 6001,
+    "level": 7,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 6001008,
+    "gearId": 6001,
+    "level": 8,
+    "hpCoef": 1.7,
+    "armorCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 6001009,
+    "gearId": 6001,
+    "level": 9,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 6001010,
+    "gearId": 6001,
+    "level": 10,
+    "hpCoef": 1.9,
+    "armorCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 6002001,
+    "gearId": 6002,
+    "level": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 6002002,
+    "gearId": 6002,
+    "level": 2,
+    "hpCoef": 1.1,
+    "armorCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 6002003,
+    "gearId": 6002,
+    "level": 3,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 6002004,
+    "gearId": 6002,
+    "level": 4,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 6002005,
+    "gearId": 6002,
+    "level": 5,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 6002006,
+    "gearId": 6002,
+    "level": 6,
+    "hpCoef": 1.5,
+    "armorCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 6002007,
+    "gearId": 6002,
+    "level": 7,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 6002008,
+    "gearId": 6002,
+    "level": 8,
+    "hpCoef": 1.7,
+    "armorCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 6002009,
+    "gearId": 6002,
+    "level": 9,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 6002010,
+    "gearId": 6002,
+    "level": 10,
+    "hpCoef": 1.9,
+    "armorCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 6003001,
+    "gearId": 6003,
+    "level": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 6003002,
+    "gearId": 6003,
+    "level": 2,
+    "hpCoef": 1.1,
+    "armorCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 6003003,
+    "gearId": 6003,
+    "level": 3,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 6003004,
+    "gearId": 6003,
+    "level": 4,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 6003005,
+    "gearId": 6003,
+    "level": 5,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 6003006,
+    "gearId": 6003,
+    "level": 6,
+    "hpCoef": 1.5,
+    "armorCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 6003007,
+    "gearId": 6003,
+    "level": 7,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 6003008,
+    "gearId": 6003,
+    "level": 8,
+    "hpCoef": 1.7,
+    "armorCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 6003009,
+    "gearId": 6003,
+    "level": 9,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 6003010,
+    "gearId": 6003,
+    "level": 10,
+    "hpCoef": 1.9,
+    "armorCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 7001001,
+    "gearId": 7001,
+    "level": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 7001002,
+    "gearId": 7001,
+    "level": 2,
+    "hpCoef": 1.1,
+    "armorCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 7001003,
+    "gearId": 7001,
+    "level": 3,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 7001004,
+    "gearId": 7001,
+    "level": 4,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 7001005,
+    "gearId": 7001,
+    "level": 5,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 7001006,
+    "gearId": 7001,
+    "level": 6,
+    "hpCoef": 1.5,
+    "armorCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 7001007,
+    "gearId": 7001,
+    "level": 7,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 7001008,
+    "gearId": 7001,
+    "level": 8,
+    "hpCoef": 1.7,
+    "armorCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 7001009,
+    "gearId": 7001,
+    "level": 9,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 7001010,
+    "gearId": 7001,
+    "level": 10,
+    "hpCoef": 1.9,
+    "armorCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 7002001,
+    "gearId": 7002,
+    "level": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 7002002,
+    "gearId": 7002,
+    "level": 2,
+    "hpCoef": 1.1,
+    "armorCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 7002003,
+    "gearId": 7002,
+    "level": 3,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 7002004,
+    "gearId": 7002,
+    "level": 4,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 7002005,
+    "gearId": 7002,
+    "level": 5,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 7002006,
+    "gearId": 7002,
+    "level": 6,
+    "hpCoef": 1.5,
+    "armorCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 7002007,
+    "gearId": 7002,
+    "level": 7,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 7002008,
+    "gearId": 7002,
+    "level": 8,
+    "hpCoef": 1.7,
+    "armorCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 7002009,
+    "gearId": 7002,
+    "level": 9,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 7002010,
+    "gearId": 7002,
+    "level": 10,
+    "hpCoef": 1.9,
+    "armorCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 7003001,
+    "gearId": 7003,
+    "level": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 7003002,
+    "gearId": 7003,
+    "level": 2,
+    "hpCoef": 1.1,
+    "armorCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 7003003,
+    "gearId": 7003,
+    "level": 3,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 7003004,
+    "gearId": 7003,
+    "level": 4,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 7003005,
+    "gearId": 7003,
+    "level": 5,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 7003006,
+    "gearId": 7003,
+    "level": 6,
+    "hpCoef": 1.5,
+    "armorCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 7003007,
+    "gearId": 7003,
+    "level": 7,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 7003008,
+    "gearId": 7003,
+    "level": 8,
+    "hpCoef": 1.7,
+    "armorCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 7003009,
+    "gearId": 7003,
+    "level": 9,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 7003010,
+    "gearId": 7003,
+    "level": 10,
+    "hpCoef": 1.9,
+    "armorCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 8001001,
+    "gearId": 8001,
+    "level": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 8001002,
+    "gearId": 8001,
+    "level": 2,
+    "hpCoef": 1.1,
+    "armorCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 8001003,
+    "gearId": 8001,
+    "level": 3,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 8001004,
+    "gearId": 8001,
+    "level": 4,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 8001005,
+    "gearId": 8001,
+    "level": 5,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 8001006,
+    "gearId": 8001,
+    "level": 6,
+    "hpCoef": 1.5,
+    "armorCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 8001007,
+    "gearId": 8001,
+    "level": 7,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 8001008,
+    "gearId": 8001,
+    "level": 8,
+    "hpCoef": 1.7,
+    "armorCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 8001009,
+    "gearId": 8001,
+    "level": 9,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 8001010,
+    "gearId": 8001,
+    "level": 10,
+    "hpCoef": 1.9,
+    "armorCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 8002001,
+    "gearId": 8002,
+    "level": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 8002002,
+    "gearId": 8002,
+    "level": 2,
+    "hpCoef": 1.1,
+    "armorCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 8002003,
+    "gearId": 8002,
+    "level": 3,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 8002004,
+    "gearId": 8002,
+    "level": 4,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 8002005,
+    "gearId": 8002,
+    "level": 5,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 8002006,
+    "gearId": 8002,
+    "level": 6,
+    "hpCoef": 1.5,
+    "armorCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 8002007,
+    "gearId": 8002,
+    "level": 7,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 8002008,
+    "gearId": 8002,
+    "level": 8,
+    "hpCoef": 1.7,
+    "armorCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 8002009,
+    "gearId": 8002,
+    "level": 9,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 8002010,
+    "gearId": 8002,
+    "level": 10,
+    "hpCoef": 1.9,
+    "armorCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  },
+  {
+    "id": 8003001,
+    "gearId": 8003,
+    "level": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 100
+  },
+  {
+    "id": 8003002,
+    "gearId": 8003,
+    "level": 2,
+    "hpCoef": 1.1,
+    "armorCoef": 1.1,
+    "upgradeMaterial": 3,
+    "upgradeUse": 150
+  },
+  {
+    "id": 8003003,
+    "gearId": 8003,
+    "level": 3,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "upgradeMaterial": 3,
+    "upgradeUse": 200
+  },
+  {
+    "id": 8003004,
+    "gearId": 8003,
+    "level": 4,
+    "hpCoef": 1.3,
+    "armorCoef": 1.3,
+    "upgradeMaterial": 3,
+    "upgradeUse": 250
+  },
+  {
+    "id": 8003005,
+    "gearId": 8003,
+    "level": 5,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "upgradeMaterial": 3,
+    "upgradeUse": 300
+  },
+  {
+    "id": 8003006,
+    "gearId": 8003,
+    "level": 6,
+    "hpCoef": 1.5,
+    "armorCoef": 1.5,
+    "upgradeMaterial": 3,
+    "upgradeUse": 350
+  },
+  {
+    "id": 8003007,
+    "gearId": 8003,
+    "level": 7,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "upgradeMaterial": 3,
+    "upgradeUse": 400
+  },
+  {
+    "id": 8003008,
+    "gearId": 8003,
+    "level": 8,
+    "hpCoef": 1.7,
+    "armorCoef": 1.7,
+    "upgradeMaterial": 3,
+    "upgradeUse": 450
+  },
+  {
+    "id": 8003009,
+    "gearId": 8003,
+    "level": 9,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "upgradeMaterial": 3,
+    "upgradeUse": 500
+  },
+  {
+    "id": 8003010,
+    "gearId": 8003,
+    "level": 10,
+    "hpCoef": 1.9,
+    "armorCoef": 1.9,
+    "upgradeMaterial": 3,
+    "upgradeUse": 0
+  }
+]

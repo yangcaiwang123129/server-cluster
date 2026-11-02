@@ -21,4 +21,6 @@ type WeaponCfg struct {
 	ScatterMove    []int32 `json:"scatterMove"`    // 移动攻击散射
 	ScatterAim     []int32 `json:"scatterAim"`     // 瞄准攻击散射
 	TimeAim        []int32 `json:"timeAim"`        // 瞄准时间
+	WeaponType     int32   `json:"weaponType"`     // 武器类型
+	JobLimit       int32   `json:"jobLimit"`       // 职业限制(0=不限)
 }

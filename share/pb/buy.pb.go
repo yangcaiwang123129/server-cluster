@@ -21,7 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// 购买礼包请求（路由 10060）
+// 购买礼包请求（路由 10004）
 type GiftBuyReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 礼包配置ID（GiftCfg.Id）

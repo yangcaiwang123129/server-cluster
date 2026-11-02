@@ -21,7 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// 充值请求（路由 10080）
+// 充值请求（路由 10006）
 // 当前为假充值：服务端不做订单校验，直接按配置发放奖励。
 type RechargeReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`

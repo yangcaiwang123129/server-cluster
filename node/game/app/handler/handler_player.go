@@ -12,11 +12,15 @@ import (
 	"server-cluster/share/pb"
 )
 
-// init 注册玩家入口路由：仅 VERIFY 无状态，ENTER/LEAVE 为有状态且由节点直接处理。
+// init 注册玩家入口路由：仅 VERIFY 无状态，ENTER/LEAVE 为有状态且由节点直接处理；
+// 礼包购买/兑换/充值属于玩家资产消费，统一在玩家 actor 内串行执行。
 func init() {
 	router.OnStateless(pb.RouteCode_ROUTE_CODE_VERIFY, handleVerify)
 	router.OnNode(pb.RouteCode_ROUTE_CODE_ENTER_GAME, handleEnterGame)
 	router.OnNode(pb.RouteCode_ROUTE_CODE_LEAVE_GAME, handleLeaveGame)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_GIFT_BUY, handleGiftBuy)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_EXCHANGE, handleExchange)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_RECHARGE, handleRecharge)
 }
 
 // handleVerify 首包：校验 login 服签发的 JWT，绑定网关与节点（proto 注释明确这是绑定入口）。
@@ -73,4 +77,49 @@ func handleLeaveGame(ctx node.Context) {
 	}
 	_ = ctx.Response(resp)
 	ctx.Disconnect()
+}
+
+// handleGiftBuy 购买礼包：消耗礼包配置的资产并发放奖励。
+func handleGiftBuy(ctx node.Context) {
+	req := &pb.GiftBuyReq{}
+	if err := ctx.Parse(req); err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	resp, err := logic.PlayerLogic().GiftBuy(ctx.Context(), ctx.UID(), req)
+	if err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	_ = ctx.Response(resp)
+}
+
+// handleExchange 兑换：消耗兑换配置的资产并发放奖励。
+func handleExchange(ctx node.Context) {
+	req := &pb.ExchangeReq{}
+	if err := ctx.Parse(req); err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	resp, err := logic.PlayerLogic().Exchange(ctx.Context(), ctx.UID(), req)
+	if err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	_ = ctx.Response(resp)
+}
+
+// handleRecharge 充值（假充值，直接发放奖励）。
+func handleRecharge(ctx node.Context) {
+	req := &pb.RechargeReq{}
+	if err := ctx.Parse(req); err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	resp, err := logic.PlayerLogic().Recharge(ctx.Context(), ctx.UID(), req)
+	if err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	_ = ctx.Response(resp)
 }

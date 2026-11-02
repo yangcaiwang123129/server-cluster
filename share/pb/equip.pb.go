@@ -21,152 +21,18 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// 装备列表请求（路由 10050）
-type EquipListReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *EquipListReq) Reset() {
-	*x = EquipListReq{}
-	mi := &file_equip_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *EquipListReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*EquipListReq) ProtoMessage() {}
-
-func (x *EquipListReq) ProtoReflect() protoreflect.Message {
-	mi := &file_equip_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use EquipListReq.ProtoReflect.Descriptor instead.
-func (*EquipListReq) Descriptor() ([]byte, []int) {
-	return file_equip_proto_rawDescGZIP(), []int{0}
-}
-
-// 装备列表响应
-type EquipListResp struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
-	EquipEntries  []*EquipEntry          `protobuf:"bytes,2,rep,name=equip_entries,json=equipEntries,proto3" json:"equip_entries,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *EquipListResp) Reset() {
-	*x = EquipListResp{}
-	mi := &file_equip_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *EquipListResp) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*EquipListResp) ProtoMessage() {}
-
-func (x *EquipListResp) ProtoReflect() protoreflect.Message {
-	mi := &file_equip_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use EquipListResp.ProtoReflect.Descriptor instead.
-func (*EquipListResp) Descriptor() ([]byte, []int) {
-	return file_equip_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *EquipListResp) GetResult() *Result {
-	if x != nil {
-		return x.Result
-	}
-	return nil
-}
-
-func (x *EquipListResp) GetEquipEntries() []*EquipEntry {
-	if x != nil {
-		return x.EquipEntries
-	}
-	return nil
-}
-
-// 装备变化通知（路由 10051）
-type EquipNotify struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	EquipEntry    *EquipEntry            `protobuf:"bytes,1,opt,name=equip_entry,json=equipEntry,proto3" json:"equip_entry,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *EquipNotify) Reset() {
-	*x = EquipNotify{}
-	mi := &file_equip_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *EquipNotify) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*EquipNotify) ProtoMessage() {}
-
-func (x *EquipNotify) ProtoReflect() protoreflect.Message {
-	mi := &file_equip_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use EquipNotify.ProtoReflect.Descriptor instead.
-func (*EquipNotify) Descriptor() ([]byte, []int) {
-	return file_equip_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *EquipNotify) GetEquipEntry() *EquipEntry {
-	if x != nil {
-		return x.EquipEntry
-	}
-	return nil
-}
-
 // 新增装备请求（路由 10052）
 type EquipAddReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 装备配置ID
+	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"`    // 装备配置ID
+	HeroId        int32                  `protobuf:"varint,2,opt,name=hero_id,json=heroId,proto3" json:"hero_id,omitempty"` // 所属英雄ID，0 表示当前出战英雄
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *EquipAddReq) Reset() {
 	*x = EquipAddReq{}
-	mi := &file_equip_proto_msgTypes[3]
+	mi := &file_equip_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -178,7 +44,7 @@ func (x *EquipAddReq) String() string {
 func (*EquipAddReq) ProtoMessage() {}
 
 func (x *EquipAddReq) ProtoReflect() protoreflect.Message {
-	mi := &file_equip_proto_msgTypes[3]
+	mi := &file_equip_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -191,12 +57,19 @@ func (x *EquipAddReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EquipAddReq.ProtoReflect.Descriptor instead.
 func (*EquipAddReq) Descriptor() ([]byte, []int) {
-	return file_equip_proto_rawDescGZIP(), []int{3}
+	return file_equip_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *EquipAddReq) GetCfgId() int32 {
 	if x != nil {
 		return x.CfgId
+	}
+	return 0
+}
+
+func (x *EquipAddReq) GetHeroId() int32 {
+	if x != nil {
+		return x.HeroId
 	}
 	return 0
 }
@@ -212,7 +85,7 @@ type EquipAddResp struct {
 
 func (x *EquipAddResp) Reset() {
 	*x = EquipAddResp{}
-	mi := &file_equip_proto_msgTypes[4]
+	mi := &file_equip_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -224,7 +97,7 @@ func (x *EquipAddResp) String() string {
 func (*EquipAddResp) ProtoMessage() {}
 
 func (x *EquipAddResp) ProtoReflect() protoreflect.Message {
-	mi := &file_equip_proto_msgTypes[4]
+	mi := &file_equip_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -237,7 +110,7 @@ func (x *EquipAddResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EquipAddResp.ProtoReflect.Descriptor instead.
 func (*EquipAddResp) Descriptor() ([]byte, []int) {
-	return file_equip_proto_rawDescGZIP(), []int{4}
+	return file_equip_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *EquipAddResp) GetResult() *Result {
@@ -257,16 +130,19 @@ func (x *EquipAddResp) GetEquipEntry() *EquipEntry {
 // 更新装备请求（路由 10053）
 type EquipUpdateReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 装备配置ID
-	Level         int32                  `protobuf:"varint,2,opt,name=level,proto3" json:"level,omitempty"`              // 等级
-	Equipped      bool                   `protobuf:"varint,3,opt,name=equipped,proto3" json:"equipped,omitempty"`        // 是否穿戴
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                       // 装备实例ID
+	Level         int32                  `protobuf:"varint,2,opt,name=level,proto3" json:"level,omitempty"`                 // 等级
+	Equipped      bool                   `protobuf:"varint,3,opt,name=equipped,proto3" json:"equipped,omitempty"`           // 是否穿戴
+	HeroId        int32                  `protobuf:"varint,4,opt,name=hero_id,json=heroId,proto3" json:"hero_id,omitempty"` // 所属英雄ID，0 表示保持原归属
+	Quality       int32                  `protobuf:"varint,5,opt,name=quality,proto3" json:"quality,omitempty"`             // 品质
+	Breakthrough  int32                  `protobuf:"varint,6,opt,name=breakthrough,proto3" json:"breakthrough,omitempty"`   // 突破
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *EquipUpdateReq) Reset() {
 	*x = EquipUpdateReq{}
-	mi := &file_equip_proto_msgTypes[5]
+	mi := &file_equip_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -278,7 +154,7 @@ func (x *EquipUpdateReq) String() string {
 func (*EquipUpdateReq) ProtoMessage() {}
 
 func (x *EquipUpdateReq) ProtoReflect() protoreflect.Message {
-	mi := &file_equip_proto_msgTypes[5]
+	mi := &file_equip_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -291,12 +167,12 @@ func (x *EquipUpdateReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EquipUpdateReq.ProtoReflect.Descriptor instead.
 func (*EquipUpdateReq) Descriptor() ([]byte, []int) {
-	return file_equip_proto_rawDescGZIP(), []int{5}
+	return file_equip_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *EquipUpdateReq) GetCfgId() int32 {
+func (x *EquipUpdateReq) GetId() int64 {
 	if x != nil {
-		return x.CfgId
+		return x.Id
 	}
 	return 0
 }
@@ -315,6 +191,27 @@ func (x *EquipUpdateReq) GetEquipped() bool {
 	return false
 }
 
+func (x *EquipUpdateReq) GetHeroId() int32 {
+	if x != nil {
+		return x.HeroId
+	}
+	return 0
+}
+
+func (x *EquipUpdateReq) GetQuality() int32 {
+	if x != nil {
+		return x.Quality
+	}
+	return 0
+}
+
+func (x *EquipUpdateReq) GetBreakthrough() int32 {
+	if x != nil {
+		return x.Breakthrough
+	}
+	return 0
+}
+
 // 更新装备响应
 type EquipUpdateResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -326,7 +223,7 @@ type EquipUpdateResp struct {
 
 func (x *EquipUpdateResp) Reset() {
 	*x = EquipUpdateResp{}
-	mi := &file_equip_proto_msgTypes[6]
+	mi := &file_equip_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -338,7 +235,7 @@ func (x *EquipUpdateResp) String() string {
 func (*EquipUpdateResp) ProtoMessage() {}
 
 func (x *EquipUpdateResp) ProtoReflect() protoreflect.Message {
-	mi := &file_equip_proto_msgTypes[6]
+	mi := &file_equip_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -351,7 +248,7 @@ func (x *EquipUpdateResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EquipUpdateResp.ProtoReflect.Descriptor instead.
 func (*EquipUpdateResp) Descriptor() ([]byte, []int) {
-	return file_equip_proto_rawDescGZIP(), []int{6}
+	return file_equip_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *EquipUpdateResp) GetResult() *Result {
@@ -371,14 +268,14 @@ func (x *EquipUpdateResp) GetEquipEntry() *EquipEntry {
 // 装备升级请求（路由 10054，消耗升级素材）
 type EquipUpgradeReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 装备配置ID
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 装备实例ID
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *EquipUpgradeReq) Reset() {
 	*x = EquipUpgradeReq{}
-	mi := &file_equip_proto_msgTypes[7]
+	mi := &file_equip_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -390,7 +287,7 @@ func (x *EquipUpgradeReq) String() string {
 func (*EquipUpgradeReq) ProtoMessage() {}
 
 func (x *EquipUpgradeReq) ProtoReflect() protoreflect.Message {
-	mi := &file_equip_proto_msgTypes[7]
+	mi := &file_equip_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -403,12 +300,12 @@ func (x *EquipUpgradeReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EquipUpgradeReq.ProtoReflect.Descriptor instead.
 func (*EquipUpgradeReq) Descriptor() ([]byte, []int) {
-	return file_equip_proto_rawDescGZIP(), []int{7}
+	return file_equip_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *EquipUpgradeReq) GetCfgId() int32 {
+func (x *EquipUpgradeReq) GetId() int64 {
 	if x != nil {
-		return x.CfgId
+		return x.Id
 	}
 	return 0
 }
@@ -425,7 +322,7 @@ type EquipUpgradeResp struct {
 
 func (x *EquipUpgradeResp) Reset() {
 	*x = EquipUpgradeResp{}
-	mi := &file_equip_proto_msgTypes[8]
+	mi := &file_equip_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -437,7 +334,7 @@ func (x *EquipUpgradeResp) String() string {
 func (*EquipUpgradeResp) ProtoMessage() {}
 
 func (x *EquipUpgradeResp) ProtoReflect() protoreflect.Message {
-	mi := &file_equip_proto_msgTypes[8]
+	mi := &file_equip_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -450,7 +347,7 @@ func (x *EquipUpgradeResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EquipUpgradeResp.ProtoReflect.Descriptor instead.
 func (*EquipUpgradeResp) Descriptor() ([]byte, []int) {
-	return file_equip_proto_rawDescGZIP(), []int{8}
+	return file_equip_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *EquipUpgradeResp) GetResult() *Result {
@@ -474,38 +371,500 @@ func (x *EquipUpgradeResp) GetAttribute() *HeroAttribute {
 	return nil
 }
 
+// 装备升品请求（路由 10055，消耗升品素材）
+type EquipUpQualityReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 装备实例ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EquipUpQualityReq) Reset() {
+	*x = EquipUpQualityReq{}
+	mi := &file_equip_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EquipUpQualityReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EquipUpQualityReq) ProtoMessage() {}
+
+func (x *EquipUpQualityReq) ProtoReflect() protoreflect.Message {
+	mi := &file_equip_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EquipUpQualityReq.ProtoReflect.Descriptor instead.
+func (*EquipUpQualityReq) Descriptor() ([]byte, []int) {
+	return file_equip_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *EquipUpQualityReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+// 装备升品响应
+type EquipUpQualityResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	EquipEntry    *EquipEntry            `protobuf:"bytes,2,opt,name=equip_entry,json=equipEntry,proto3" json:"equip_entry,omitempty"` // 升品后的持有状态
+	Attribute     *HeroAttribute         `protobuf:"bytes,3,opt,name=attribute,proto3" json:"attribute,omitempty"`                     // 升品后的英雄累计属性
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EquipUpQualityResp) Reset() {
+	*x = EquipUpQualityResp{}
+	mi := &file_equip_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EquipUpQualityResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EquipUpQualityResp) ProtoMessage() {}
+
+func (x *EquipUpQualityResp) ProtoReflect() protoreflect.Message {
+	mi := &file_equip_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EquipUpQualityResp.ProtoReflect.Descriptor instead.
+func (*EquipUpQualityResp) Descriptor() ([]byte, []int) {
+	return file_equip_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *EquipUpQualityResp) GetResult() *Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
+func (x *EquipUpQualityResp) GetEquipEntry() *EquipEntry {
+	if x != nil {
+		return x.EquipEntry
+	}
+	return nil
+}
+
+func (x *EquipUpQualityResp) GetAttribute() *HeroAttribute {
+	if x != nil {
+		return x.Attribute
+	}
+	return nil
+}
+
+// 装备突破请求（路由 10056，消耗突破素材）
+type EquipBreakthroughReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 装备实例ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EquipBreakthroughReq) Reset() {
+	*x = EquipBreakthroughReq{}
+	mi := &file_equip_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EquipBreakthroughReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EquipBreakthroughReq) ProtoMessage() {}
+
+func (x *EquipBreakthroughReq) ProtoReflect() protoreflect.Message {
+	mi := &file_equip_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EquipBreakthroughReq.ProtoReflect.Descriptor instead.
+func (*EquipBreakthroughReq) Descriptor() ([]byte, []int) {
+	return file_equip_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *EquipBreakthroughReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+// 装备突破响应
+type EquipBreakthroughResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	EquipEntry    *EquipEntry            `protobuf:"bytes,2,opt,name=equip_entry,json=equipEntry,proto3" json:"equip_entry,omitempty"` // 突破后的持有状态
+	Attribute     *HeroAttribute         `protobuf:"bytes,3,opt,name=attribute,proto3" json:"attribute,omitempty"`                     // 突破后的英雄累计属性
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EquipBreakthroughResp) Reset() {
+	*x = EquipBreakthroughResp{}
+	mi := &file_equip_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EquipBreakthroughResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EquipBreakthroughResp) ProtoMessage() {}
+
+func (x *EquipBreakthroughResp) ProtoReflect() protoreflect.Message {
+	mi := &file_equip_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EquipBreakthroughResp.ProtoReflect.Descriptor instead.
+func (*EquipBreakthroughResp) Descriptor() ([]byte, []int) {
+	return file_equip_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *EquipBreakthroughResp) GetResult() *Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
+func (x *EquipBreakthroughResp) GetEquipEntry() *EquipEntry {
+	if x != nil {
+		return x.EquipEntry
+	}
+	return nil
+}
+
+func (x *EquipBreakthroughResp) GetAttribute() *HeroAttribute {
+	if x != nil {
+		return x.Attribute
+	}
+	return nil
+}
+
+// 穿戴装备请求（路由 10057）
+type EquipWearReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                       // 装备实例ID
+	HeroId        int32                  `protobuf:"varint,2,opt,name=hero_id,json=heroId,proto3" json:"hero_id,omitempty"` // 目标英雄ID，0 表示当前出战英雄
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EquipWearReq) Reset() {
+	*x = EquipWearReq{}
+	mi := &file_equip_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EquipWearReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EquipWearReq) ProtoMessage() {}
+
+func (x *EquipWearReq) ProtoReflect() protoreflect.Message {
+	mi := &file_equip_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EquipWearReq.ProtoReflect.Descriptor instead.
+func (*EquipWearReq) Descriptor() ([]byte, []int) {
+	return file_equip_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *EquipWearReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *EquipWearReq) GetHeroId() int32 {
+	if x != nil {
+		return x.HeroId
+	}
+	return 0
+}
+
+// 穿戴装备响应
+type EquipWearResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	EquipEntry    *EquipEntry            `protobuf:"bytes,2,opt,name=equip_entry,json=equipEntry,proto3" json:"equip_entry,omitempty"` // 穿戴后的持有状态
+	Attribute     *HeroAttribute         `protobuf:"bytes,3,opt,name=attribute,proto3" json:"attribute,omitempty"`                     // 操作后的英雄累计属性
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EquipWearResp) Reset() {
+	*x = EquipWearResp{}
+	mi := &file_equip_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EquipWearResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EquipWearResp) ProtoMessage() {}
+
+func (x *EquipWearResp) ProtoReflect() protoreflect.Message {
+	mi := &file_equip_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EquipWearResp.ProtoReflect.Descriptor instead.
+func (*EquipWearResp) Descriptor() ([]byte, []int) {
+	return file_equip_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *EquipWearResp) GetResult() *Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
+func (x *EquipWearResp) GetEquipEntry() *EquipEntry {
+	if x != nil {
+		return x.EquipEntry
+	}
+	return nil
+}
+
+func (x *EquipWearResp) GetAttribute() *HeroAttribute {
+	if x != nil {
+		return x.Attribute
+	}
+	return nil
+}
+
+// 卸载装备请求（路由 10058）
+type EquipUnwearReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 装备实例ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EquipUnwearReq) Reset() {
+	*x = EquipUnwearReq{}
+	mi := &file_equip_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EquipUnwearReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EquipUnwearReq) ProtoMessage() {}
+
+func (x *EquipUnwearReq) ProtoReflect() protoreflect.Message {
+	mi := &file_equip_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EquipUnwearReq.ProtoReflect.Descriptor instead.
+func (*EquipUnwearReq) Descriptor() ([]byte, []int) {
+	return file_equip_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *EquipUnwearReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+// 卸载装备响应
+type EquipUnwearResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	EquipEntry    *EquipEntry            `protobuf:"bytes,2,opt,name=equip_entry,json=equipEntry,proto3" json:"equip_entry,omitempty"` // 卸载后的持有状态
+	Attribute     *HeroAttribute         `protobuf:"bytes,3,opt,name=attribute,proto3" json:"attribute,omitempty"`                     // 操作后的英雄累计属性
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EquipUnwearResp) Reset() {
+	*x = EquipUnwearResp{}
+	mi := &file_equip_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EquipUnwearResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EquipUnwearResp) ProtoMessage() {}
+
+func (x *EquipUnwearResp) ProtoReflect() protoreflect.Message {
+	mi := &file_equip_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EquipUnwearResp.ProtoReflect.Descriptor instead.
+func (*EquipUnwearResp) Descriptor() ([]byte, []int) {
+	return file_equip_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *EquipUnwearResp) GetResult() *Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
+func (x *EquipUnwearResp) GetEquipEntry() *EquipEntry {
+	if x != nil {
+		return x.EquipEntry
+	}
+	return nil
+}
+
+func (x *EquipUnwearResp) GetAttribute() *HeroAttribute {
+	if x != nil {
+		return x.Attribute
+	}
+	return nil
+}
+
 var File_equip_proto protoreflect.FileDescriptor
 
 const file_equip_proto_rawDesc = "" +
 	"\n" +
-	"\vequip.proto\x12\x02pb\x1a\fcommon.proto\"\x0e\n" +
-	"\fEquipListReq\"h\n" +
-	"\rEquipListResp\x12\"\n" +
-	"\x06result\x18\x01 \x01(\v2\n" +
-	".pb.ResultR\x06result\x123\n" +
-	"\requip_entries\x18\x02 \x03(\v2\x0e.pb.EquipEntryR\fequipEntries\">\n" +
-	"\vEquipNotify\x12/\n" +
-	"\vequip_entry\x18\x01 \x01(\v2\x0e.pb.EquipEntryR\n" +
-	"equipEntry\"$\n" +
+	"\vequip.proto\x12\x02pb\x1a\fcommon.proto\x1a\n" +
+	"hero.proto\"=\n" +
 	"\vEquipAddReq\x12\x15\n" +
-	"\x06cfg_id\x18\x01 \x01(\x05R\x05cfgId\"c\n" +
+	"\x06cfg_id\x18\x01 \x01(\x05R\x05cfgId\x12\x17\n" +
+	"\ahero_id\x18\x02 \x01(\x05R\x06heroId\"c\n" +
 	"\fEquipAddResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\x12/\n" +
 	"\vequip_entry\x18\x02 \x01(\v2\x0e.pb.EquipEntryR\n" +
-	"equipEntry\"Y\n" +
-	"\x0eEquipUpdateReq\x12\x15\n" +
-	"\x06cfg_id\x18\x01 \x01(\x05R\x05cfgId\x12\x14\n" +
+	"equipEntry\"\xa9\x01\n" +
+	"\x0eEquipUpdateReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x14\n" +
 	"\x05level\x18\x02 \x01(\x05R\x05level\x12\x1a\n" +
-	"\bequipped\x18\x03 \x01(\bR\bequipped\"f\n" +
+	"\bequipped\x18\x03 \x01(\bR\bequipped\x12\x17\n" +
+	"\ahero_id\x18\x04 \x01(\x05R\x06heroId\x12\x18\n" +
+	"\aquality\x18\x05 \x01(\x05R\aquality\x12\"\n" +
+	"\fbreakthrough\x18\x06 \x01(\x05R\fbreakthrough\"f\n" +
 	"\x0fEquipUpdateResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\x12/\n" +
 	"\vequip_entry\x18\x02 \x01(\v2\x0e.pb.EquipEntryR\n" +
-	"equipEntry\"(\n" +
-	"\x0fEquipUpgradeReq\x12\x15\n" +
-	"\x06cfg_id\x18\x01 \x01(\x05R\x05cfgId\"\x98\x01\n" +
+	"equipEntry\"!\n" +
+	"\x0fEquipUpgradeReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\"\x98\x01\n" +
 	"\x10EquipUpgradeResp\x12\"\n" +
+	"\x06result\x18\x01 \x01(\v2\n" +
+	".pb.ResultR\x06result\x12/\n" +
+	"\vequip_entry\x18\x02 \x01(\v2\x0e.pb.EquipEntryR\n" +
+	"equipEntry\x12/\n" +
+	"\tattribute\x18\x03 \x01(\v2\x11.pb.HeroAttributeR\tattribute\"#\n" +
+	"\x11EquipUpQualityReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\"\x9a\x01\n" +
+	"\x12EquipUpQualityResp\x12\"\n" +
+	"\x06result\x18\x01 \x01(\v2\n" +
+	".pb.ResultR\x06result\x12/\n" +
+	"\vequip_entry\x18\x02 \x01(\v2\x0e.pb.EquipEntryR\n" +
+	"equipEntry\x12/\n" +
+	"\tattribute\x18\x03 \x01(\v2\x11.pb.HeroAttributeR\tattribute\"&\n" +
+	"\x14EquipBreakthroughReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\"\x9d\x01\n" +
+	"\x15EquipBreakthroughResp\x12\"\n" +
+	"\x06result\x18\x01 \x01(\v2\n" +
+	".pb.ResultR\x06result\x12/\n" +
+	"\vequip_entry\x18\x02 \x01(\v2\x0e.pb.EquipEntryR\n" +
+	"equipEntry\x12/\n" +
+	"\tattribute\x18\x03 \x01(\v2\x11.pb.HeroAttributeR\tattribute\"7\n" +
+	"\fEquipWearReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x17\n" +
+	"\ahero_id\x18\x02 \x01(\x05R\x06heroId\"\x95\x01\n" +
+	"\rEquipWearResp\x12\"\n" +
+	"\x06result\x18\x01 \x01(\v2\n" +
+	".pb.ResultR\x06result\x12/\n" +
+	"\vequip_entry\x18\x02 \x01(\v2\x0e.pb.EquipEntryR\n" +
+	"equipEntry\x12/\n" +
+	"\tattribute\x18\x03 \x01(\v2\x11.pb.HeroAttributeR\tattribute\" \n" +
+	"\x0eEquipUnwearReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\"\x97\x01\n" +
+	"\x0fEquipUnwearResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\x12/\n" +
 	"\vequip_entry\x18\x02 \x01(\v2\x0e.pb.EquipEntryR\n" +
@@ -524,37 +883,51 @@ func file_equip_proto_rawDescGZIP() []byte {
 	return file_equip_proto_rawDescData
 }
 
-var file_equip_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_equip_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_equip_proto_goTypes = []any{
-	(*EquipListReq)(nil),     // 0: pb.EquipListReq
-	(*EquipListResp)(nil),    // 1: pb.EquipListResp
-	(*EquipNotify)(nil),      // 2: pb.EquipNotify
-	(*EquipAddReq)(nil),      // 3: pb.EquipAddReq
-	(*EquipAddResp)(nil),     // 4: pb.EquipAddResp
-	(*EquipUpdateReq)(nil),   // 5: pb.EquipUpdateReq
-	(*EquipUpdateResp)(nil),  // 6: pb.EquipUpdateResp
-	(*EquipUpgradeReq)(nil),  // 7: pb.EquipUpgradeReq
-	(*EquipUpgradeResp)(nil), // 8: pb.EquipUpgradeResp
-	(*Result)(nil),           // 9: pb.Result
-	(*EquipEntry)(nil),       // 10: pb.EquipEntry
-	(*HeroAttribute)(nil),    // 11: pb.HeroAttribute
+	(*EquipAddReq)(nil),           // 0: pb.EquipAddReq
+	(*EquipAddResp)(nil),          // 1: pb.EquipAddResp
+	(*EquipUpdateReq)(nil),        // 2: pb.EquipUpdateReq
+	(*EquipUpdateResp)(nil),       // 3: pb.EquipUpdateResp
+	(*EquipUpgradeReq)(nil),       // 4: pb.EquipUpgradeReq
+	(*EquipUpgradeResp)(nil),      // 5: pb.EquipUpgradeResp
+	(*EquipUpQualityReq)(nil),     // 6: pb.EquipUpQualityReq
+	(*EquipUpQualityResp)(nil),    // 7: pb.EquipUpQualityResp
+	(*EquipBreakthroughReq)(nil),  // 8: pb.EquipBreakthroughReq
+	(*EquipBreakthroughResp)(nil), // 9: pb.EquipBreakthroughResp
+	(*EquipWearReq)(nil),          // 10: pb.EquipWearReq
+	(*EquipWearResp)(nil),         // 11: pb.EquipWearResp
+	(*EquipUnwearReq)(nil),        // 12: pb.EquipUnwearReq
+	(*EquipUnwearResp)(nil),       // 13: pb.EquipUnwearResp
+	(*Result)(nil),                // 14: pb.Result
+	(*EquipEntry)(nil),            // 15: pb.EquipEntry
+	(*HeroAttribute)(nil),         // 16: pb.HeroAttribute
 }
 var file_equip_proto_depIdxs = []int32{
-	9,  // 0: pb.EquipListResp.result:type_name -> pb.Result
-	10, // 1: pb.EquipListResp.equip_entries:type_name -> pb.EquipEntry
-	10, // 2: pb.EquipNotify.equip_entry:type_name -> pb.EquipEntry
-	9,  // 3: pb.EquipAddResp.result:type_name -> pb.Result
-	10, // 4: pb.EquipAddResp.equip_entry:type_name -> pb.EquipEntry
-	9,  // 5: pb.EquipUpdateResp.result:type_name -> pb.Result
-	10, // 6: pb.EquipUpdateResp.equip_entry:type_name -> pb.EquipEntry
-	9,  // 7: pb.EquipUpgradeResp.result:type_name -> pb.Result
-	10, // 8: pb.EquipUpgradeResp.equip_entry:type_name -> pb.EquipEntry
-	11, // 9: pb.EquipUpgradeResp.attribute:type_name -> pb.HeroAttribute
-	10, // [10:10] is the sub-list for method output_type
-	10, // [10:10] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	14, // 0: pb.EquipAddResp.result:type_name -> pb.Result
+	15, // 1: pb.EquipAddResp.equip_entry:type_name -> pb.EquipEntry
+	14, // 2: pb.EquipUpdateResp.result:type_name -> pb.Result
+	15, // 3: pb.EquipUpdateResp.equip_entry:type_name -> pb.EquipEntry
+	14, // 4: pb.EquipUpgradeResp.result:type_name -> pb.Result
+	15, // 5: pb.EquipUpgradeResp.equip_entry:type_name -> pb.EquipEntry
+	16, // 6: pb.EquipUpgradeResp.attribute:type_name -> pb.HeroAttribute
+	14, // 7: pb.EquipUpQualityResp.result:type_name -> pb.Result
+	15, // 8: pb.EquipUpQualityResp.equip_entry:type_name -> pb.EquipEntry
+	16, // 9: pb.EquipUpQualityResp.attribute:type_name -> pb.HeroAttribute
+	14, // 10: pb.EquipBreakthroughResp.result:type_name -> pb.Result
+	15, // 11: pb.EquipBreakthroughResp.equip_entry:type_name -> pb.EquipEntry
+	16, // 12: pb.EquipBreakthroughResp.attribute:type_name -> pb.HeroAttribute
+	14, // 13: pb.EquipWearResp.result:type_name -> pb.Result
+	15, // 14: pb.EquipWearResp.equip_entry:type_name -> pb.EquipEntry
+	16, // 15: pb.EquipWearResp.attribute:type_name -> pb.HeroAttribute
+	14, // 16: pb.EquipUnwearResp.result:type_name -> pb.Result
+	15, // 17: pb.EquipUnwearResp.equip_entry:type_name -> pb.EquipEntry
+	16, // 18: pb.EquipUnwearResp.attribute:type_name -> pb.HeroAttribute
+	19, // [19:19] is the sub-list for method output_type
+	19, // [19:19] is the sub-list for method input_type
+	19, // [19:19] is the sub-list for extension type_name
+	19, // [19:19] is the sub-list for extension extendee
+	0,  // [0:19] is the sub-list for field type_name
 }
 
 func init() { file_equip_proto_init() }
@@ -563,13 +936,14 @@ func file_equip_proto_init() {
 		return
 	}
 	file_common_proto_init()
+	file_hero_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_equip_proto_rawDesc), len(file_equip_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

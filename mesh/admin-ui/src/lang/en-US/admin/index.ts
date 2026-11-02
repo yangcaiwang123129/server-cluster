@@ -9,9 +9,8 @@ import sysLoginLog from './sys-login-log'
 import player from './player'
 import gameItem from './game-item'
 import gameHero from './game-hero'
-import gameWeapon from './game-weapon'
-import gameSkill from './game-skill'
 import gameEquip from './game-equip'
+import gameMail from './game-mail'
 import gameRecord from './game-record'
 import simulator from './simulator'
 import clientVersion from './client-version'
@@ -28,9 +27,8 @@ export default {
   player,
   gameItem,
   gameHero,
-  gameWeapon,
-  gameSkill,
   gameEquip,
+  gameMail,
   gameRecord,
   simulator,
   clientVersion

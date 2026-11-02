@@ -4,13 +4,14 @@ package enum
 type Table string
 
 const (
-	TablePlayer          Table = "player"           // 玩家表（1:1）
-	TablePlayerExtra     Table = "player_extra"     // 玩家拓展表（1:1）
-	TablePlayerItem      Table = "player_item"      // 玩家物品表 持有（1:1，物品容器 JSON）
-	TablePlayerEquip     Table = "player_equip"     // 玩家装备表 持有（1:1，装备 JSON）
-	TablePlayerHero      Table = "player_hero"      // 玩家英雄表 持有（1:1，英雄 JSON）
-	TablePlayerWeapon    Table = "player_weapon"    // 玩家武器表 持有（1:1，武器 JSON）
-	TablePlayerSkill     Table = "player_skill"     // 玩家技能表 持有（1:1，技能 JSON）
+	TablePlayer       Table = "player"        // 玩家表（1:1）
+	TablePlayerExtra  Table = "player_extra"  // 玩家拓展表（1:1）
+	TablePlayerItem   Table = "player_item"   // 玩家物品表 持有（1:1，物品容器 JSON）
+	TablePlayerEquip  Table = "player_equip"  // 玩家装备表 持有（1:1，装备 JSON，key=装备实例ID）
+	TablePlayerHero   Table = "player_hero"   // 玩家英雄表 持有（1:1，英雄 JSON，key=英雄配置ID）
+	TablePlayerWeapon Table = "player_weapon" // 玩家武器表 持有（1:1，武器 JSON，key=武器配置ID）
+	TablePlayerSkill  Table = "player_skill"  // 玩家技能表 持有（1:1，技能 JSON，key=技能配置ID）
+	TablePlayerMail   Table = "player_mail"   // 玩家邮件表 持有（1:1，邮件 JSON，key=邮件实例ID）
 )
 
 // 游戏打点记录表

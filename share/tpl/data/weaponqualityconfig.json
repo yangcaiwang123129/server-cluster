@@ -1,0 +1,434 @@
+[
+  {
+    "id": 1001001,
+    "weaponId": 1001,
+    "quality": 1,
+    "damageCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 1001002,
+    "weaponId": 1001,
+    "quality": 2,
+    "damageCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 1001003,
+    "weaponId": 1001,
+    "quality": 3,
+    "damageCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 1001004,
+    "weaponId": 1001,
+    "quality": 4,
+    "damageCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 1001005,
+    "weaponId": 1001,
+    "quality": 5,
+    "damageCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 1001006,
+    "weaponId": 1001,
+    "quality": 6,
+    "damageCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 2001001,
+    "weaponId": 2001,
+    "quality": 1,
+    "damageCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 2001002,
+    "weaponId": 2001,
+    "quality": 2,
+    "damageCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 2001003,
+    "weaponId": 2001,
+    "quality": 3,
+    "damageCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 2001004,
+    "weaponId": 2001,
+    "quality": 4,
+    "damageCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 2001005,
+    "weaponId": 2001,
+    "quality": 5,
+    "damageCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 2001006,
+    "weaponId": 2001,
+    "quality": 6,
+    "damageCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 3001001,
+    "weaponId": 3001,
+    "quality": 1,
+    "damageCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 3001002,
+    "weaponId": 3001,
+    "quality": 2,
+    "damageCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 3001003,
+    "weaponId": 3001,
+    "quality": 3,
+    "damageCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 3001004,
+    "weaponId": 3001,
+    "quality": 4,
+    "damageCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 3001005,
+    "weaponId": 3001,
+    "quality": 5,
+    "damageCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 3001006,
+    "weaponId": 3001,
+    "quality": 6,
+    "damageCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 4001001,
+    "weaponId": 4001,
+    "quality": 1,
+    "damageCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 4001002,
+    "weaponId": 4001,
+    "quality": 2,
+    "damageCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 4001003,
+    "weaponId": 4001,
+    "quality": 3,
+    "damageCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 4001004,
+    "weaponId": 4001,
+    "quality": 4,
+    "damageCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 4001005,
+    "weaponId": 4001,
+    "quality": 5,
+    "damageCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 4001006,
+    "weaponId": 4001,
+    "quality": 6,
+    "damageCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 5001001,
+    "weaponId": 5001,
+    "quality": 1,
+    "damageCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 5001002,
+    "weaponId": 5001,
+    "quality": 2,
+    "damageCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 5001003,
+    "weaponId": 5001,
+    "quality": 3,
+    "damageCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 5001004,
+    "weaponId": 5001,
+    "quality": 4,
+    "damageCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 5001005,
+    "weaponId": 5001,
+    "quality": 5,
+    "damageCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 5001006,
+    "weaponId": 5001,
+    "quality": 6,
+    "damageCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 6001001,
+    "weaponId": 6001,
+    "quality": 1,
+    "damageCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 6001002,
+    "weaponId": 6001,
+    "quality": 2,
+    "damageCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 6001003,
+    "weaponId": 6001,
+    "quality": 3,
+    "damageCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 6001004,
+    "weaponId": 6001,
+    "quality": 4,
+    "damageCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 6001005,
+    "weaponId": 6001,
+    "quality": 5,
+    "damageCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 6001006,
+    "weaponId": 6001,
+    "quality": 6,
+    "damageCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 7001001,
+    "weaponId": 7001,
+    "quality": 1,
+    "damageCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 7001002,
+    "weaponId": 7001,
+    "quality": 2,
+    "damageCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 7001003,
+    "weaponId": 7001,
+    "quality": 3,
+    "damageCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 7001004,
+    "weaponId": 7001,
+    "quality": 4,
+    "damageCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 7001005,
+    "weaponId": 7001,
+    "quality": 5,
+    "damageCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 7001006,
+    "weaponId": 7001,
+    "quality": 6,
+    "damageCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 8001001,
+    "weaponId": 8001,
+    "quality": 1,
+    "damageCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 8001002,
+    "weaponId": 8001,
+    "quality": 2,
+    "damageCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 8001003,
+    "weaponId": 8001,
+    "quality": 3,
+    "damageCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 8001004,
+    "weaponId": 8001,
+    "quality": 4,
+    "damageCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 8001005,
+    "weaponId": 8001,
+    "quality": 5,
+    "damageCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 8001006,
+    "weaponId": 8001,
+    "quality": 6,
+    "damageCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  }
+]

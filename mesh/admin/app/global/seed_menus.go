@@ -148,24 +148,8 @@ var defaultMenus = []seedMenu{
 					{"GM英雄列表", "/api/v1/gm/hero", "GET"},
 					{"GM新增英雄", "/api/v1/gm/hero", "POST"},
 					{"GM更新英雄", "/api/v1/gm/hero", "PUT"},
-				},
-			},
-			{
-				Menu: model.SysMenu{MenuName: "GameWeaponManage", Title: "武器管理", Path: "/game/weapon/index", Component: "/admin/game-weapon/index", MenuType: "C", Icon: "tool", Permission: "game:gm:weapon:list", Sort: 5, Visible: "0", IsFrame: "1"},
-				Apis: []seedAPI{
-					{"游戏配置目录", "/api/v1/gm/catalog", "GET"},
-					{"GM武器列表", "/api/v1/gm/weapon", "GET"},
-					{"GM新增武器", "/api/v1/gm/weapon", "POST"},
-					{"GM更新武器", "/api/v1/gm/weapon", "PUT"},
-				},
-			},
-			{
-				Menu: model.SysMenu{MenuName: "GameSkillManage", Title: "技能管理", Path: "/game/skill/index", Component: "/admin/game-skill/index", MenuType: "C", Icon: "skill", Permission: "game:gm:skill:list", Sort: 6, Visible: "0", IsFrame: "1"},
-				Apis: []seedAPI{
-					{"游戏配置目录", "/api/v1/gm/catalog", "GET"},
-					{"GM技能列表", "/api/v1/gm/skill", "GET"},
-					{"GM新增技能", "/api/v1/gm/skill", "POST"},
-					{"GM更新技能", "/api/v1/gm/skill", "PUT"},
+					{"GM英雄累计属性", "/api/v1/gm/hero/attribute", "GET"},
+					{"GM英雄升级", "/api/v1/gm/hero/upgrade", "POST"},
 				},
 			},
 			{
@@ -175,6 +159,18 @@ var defaultMenus = []seedMenu{
 					{"GM装备列表", "/api/v1/gm/equip", "GET"},
 					{"GM新增装备", "/api/v1/gm/equip", "POST"},
 					{"GM更新装备", "/api/v1/gm/equip", "PUT"},
+					{"GM装备升级", "/api/v1/gm/equip/upgrade", "POST"},
+					{"GM装备升品", "/api/v1/gm/equip/up-quality", "POST"},
+					{"GM装备突破", "/api/v1/gm/equip/breakthrough", "POST"},
+					{"GM装备穿戴", "/api/v1/gm/equip/wear", "POST"},
+					{"GM装备卸载", "/api/v1/gm/equip/unwear", "POST"},
+				},
+			},
+			{
+				Menu: model.SysMenu{MenuName: "GameMailManage", Title: "邮件管理", Path: "/game/mail/index", Component: "/admin/game-mail/index", MenuType: "C", Icon: "message", Permission: "game:gm:mail:list", Sort: 8, Visible: "0", IsFrame: "1"},
+				Apis: []seedAPI{
+					{"GM邮件列表", "/api/v1/gm/mail", "GET"},
+					{"GM发送邮件", "/api/v1/gm/mail", "POST"},
 				},
 			},
 		},

@@ -3,41 +3,17 @@ syntax = "proto3";
 package pb;
 
 import "common.proto";
+import "hero.proto";
 
 option go_package = "server-cluster/share/pb";
 
-// 武器列表请求（路由 10030）
-message WeaponListReq {
-}
-
-// 武器列表响应
-message WeaponListResp {
-  Result result = 1;
-  repeated WeaponEntry weapon_entries = 2;
-}
-
-// 武器变化通知（路由 10031）
-message WeaponNotify {
-  WeaponEntry weapon_entry = 1;
-}
-
-// 新增武器请求（路由 10032）
-message WeaponAddReq {
-  int32 cfg_id = 1; // 武器配置ID
-}
-
-// 新增武器响应
-message WeaponAddResp {
-  Result result = 1;
-  WeaponEntry weapon_entry = 2; // 新增后的持有状态
-}
-
 // 更新武器请求（路由 10033）
 message WeaponUpdateReq {
-  int32 cfg_id = 1;   // 武器配置ID
-  int32 level = 2;    // 等级
-  int32 durability = 3;  // 耐久度
-  bool equipped = 4;     // 是否装备
+  int32 cfg_id = 1;       // 武器配置ID
+  int32 level = 2;        // 等级
+  int32 durability = 3;   // 耐久度
+  int32 quality = 4;      // 品质
+  int32 breakthrough = 5; // 突破
 }
 
 // 更新武器响应
@@ -55,5 +31,29 @@ message WeaponUpgradeReq {
 message WeaponUpgradeResp {
   Result result = 1;
   WeaponEntry weapon_entry = 2; // 升级后的持有状态
-  HeroAttribute attribute = 3;  // 升级后的英雄累计属性
+  HeroAttribute attribute = 3; // 升级后的英雄累计属性
+}
+
+// 武器升品请求（路由 10035，消耗升品素材）
+message WeaponUpQualityReq {
+  int32 cfg_id = 1; // 武器配置ID
+}
+
+// 武器升品响应
+message WeaponUpQualityResp {
+  Result result = 1;
+  WeaponEntry weapon_entry = 2; // 升品后的持有状态
+  HeroAttribute attribute = 3; // 升品后的英雄累计属性
+}
+
+// 武器突破请求（路由 10036，消耗突破素材）
+message WeaponBreakthroughReq {
+  int32 cfg_id = 1; // 武器配置ID
+}
+
+// 武器突破响应
+message WeaponBreakthroughResp {
+  Result result = 1;
+  WeaponEntry weapon_entry = 2; // 突破后的持有状态
+  HeroAttribute attribute = 3; // 突破后的英雄累计属性
 }

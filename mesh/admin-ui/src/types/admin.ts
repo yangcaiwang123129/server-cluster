@@ -301,28 +301,14 @@ export interface GmHero {
   rarity?: number
 }
 
-export interface GmWeapon {
-  weaponId?: number
-  level?: number
-  durability?: number
-  equipped?: boolean
-  /** config-derived display info */
-  name?: string
-  iconKey?: string
-}
-
-export interface GmSkill {
-  skillId?: number
-  level?: number
-  equipped?: boolean
-  /** config-derived display info */
-  name?: string
-  desc?: string
-}
-
 export interface GmEquip {
+  /** 装备实例ID（雪花，字符串避免精度丢失） */
+  id?: string
   equipId?: number
+  heroId?: number
   level?: number
+  quality?: number
+  breakthrough?: number
   equipped?: boolean
   /** config-derived display info */
   name?: string
@@ -341,14 +327,34 @@ export interface GmHeroAttribute {
   damage?: number
 }
 
-/** 升级结果（英雄/武器/技能/装备通用，含升级后的英雄累计属性）。 */
+/** 升级/升品/突破结果（英雄/武器/技能/装备通用，含操作后的英雄累计属性）。 */
 export interface GmUpgradeResult {
   cfgId?: number
   level?: number
+  quality?: number
+  breakthrough?: number
   power?: number
   hp?: number
   armor?: number
   damage?: number
+}
+
+/** 邮件附件资产。 */
+export interface GmMailAttachment {
+  type?: number
+  cfgId?: number
+  count?: number
+}
+
+/** GM 邮件条目。id 为雪花实例ID，字符串避免精度丢失。 */
+export interface GmMail {
+  id?: string
+  title?: string
+  content?: string
+  attachments?: GmMailAttachment[]
+  /** 1 未读 2 已读 3 已领取 */
+  status?: number
+  createdAt?: number
 }
 
 /** A record row from game_record (item/equip/weapon/skill/hero gain or consume). */
@@ -365,7 +371,7 @@ export interface GmRecord {
   createdAt?: number
 }
 
-/** A row from the game config catalog (hero/weapon/skill/equip), for pickers. */
+/** A row from the game config catalog (hero/equip/item), for pickers. */
 export interface GameCatalogEntry {
   id?: number
   name?: string

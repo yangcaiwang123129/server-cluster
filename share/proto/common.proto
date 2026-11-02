@@ -10,11 +10,14 @@ enum RouteCode {
   // 游戏大厅服 10000~49999
   ROUTE_CODE_UNSPECIFIED = 0;
 
-  // 玩家 10000~10009
+  // 玩家 10000~10009（含礼包购买/兑换/充值的玩家资产消费入口）
   ROUTE_CODE_VERIFY = 10000; // 首包，验证账号令牌，用于绑定节点和网关
   ROUTE_CODE_ENTER_GAME = 10001; // 进入游戏
   ROUTE_CODE_LEAVE_GAME = 10002; // 离开游戏
   ROUTE_CODE_SEVER_NOTIFY = 10003; // 服务器通知
+  ROUTE_CODE_GIFT_BUY = 10004; // 购买礼包（消耗资产并发放奖励）
+  ROUTE_CODE_EXCHANGE = 10005; // 兑换（消耗资产并发放奖励）
+  ROUTE_CODE_RECHARGE = 10006; // 充值（当前为假充值，直接发放奖励）
 
   // 玩家物品 10010~10019
   ROUTE_CODE_ITEM_LIST = 10010;  // 物品容器列表
@@ -33,35 +36,35 @@ enum RouteCode {
   ROUTE_CODE_HERO_ATTRIBUTE = 10024; // 查看英雄累计属性
   ROUTE_CODE_HERO_UPGRADE = 10025; // 英雄升级（消耗物品）
 
-  // 武器 10030~10039
-  ROUTE_CODE_WEAPON_LIST = 10030; // 武器列表
-  ROUTE_CODE_WEAPON_NOTIFY = 10031; // 武器变化通知
-  ROUTE_CODE_WEAPON_ADD = 10032; // 新增武器(预发布和生成环境不开放)
+  // 武器 10030~10039（固定绑定英雄，随英雄初始化；数据随 HeroList 一起下发，不提供单独列表/通知）
   ROUTE_CODE_WEAPON_UPDATE = 10033; // 更新武器(预发布和生成环境不开放)
   ROUTE_CODE_WEAPON_UPGRADE = 10034; // 武器升级（消耗物品）
+  ROUTE_CODE_WEAPON_UP_QUALITY = 10035; // 武器升品（消耗物品）
+  ROUTE_CODE_WEAPON_BREAKTHROUGH = 10036; // 武器突破（消耗物品）
 
-  // 技能 10040~10049
-  ROUTE_CODE_SKILL_LIST = 10040; // 技能列表
-  ROUTE_CODE_SKILL_NOTIFY = 10041; // 技能变化通知
-  ROUTE_CODE_SKILL_ADD = 10042; // 新增技能(预发布和生成环境不开放)
+  // 技能 10040~10049（固定绑定英雄，随英雄初始化；数据随 HeroList 一起下发，不提供单独列表/通知）
   ROUTE_CODE_SKILL_UPDATE = 10043; // 更新技能(预发布和生成环境不开放)
   ROUTE_CODE_SKILL_UPGRADE = 10044; // 技能升级（消耗物品）
+  ROUTE_CODE_SKILL_UP_QUALITY = 10045; // 技能升品（消耗物品）
+  ROUTE_CODE_SKILL_BREAKTHROUGH = 10046; // 技能突破（消耗物品）
 
-  // 装备 10050~10059
-  ROUTE_CODE_EQUIP_LIST = 10050; // 装备列表
-  ROUTE_CODE_EQUIP_NOTIFY = 10051; // 装备变化通知
+  // 装备 10050~10059（数据随 HeroList 一起下发，不提供单独列表/通知）
   ROUTE_CODE_EQUIP_ADD = 10052; // 新增装备(预发布和生成环境不开放)
   ROUTE_CODE_EQUIP_UPDATE = 10053; // 更新装备(预发布和生成环境不开放)
   ROUTE_CODE_EQUIP_UPGRADE = 10054; // 装备升级（消耗物品）
+  ROUTE_CODE_EQUIP_UP_QUALITY = 10055; // 装备升品（消耗物品）
+  ROUTE_CODE_EQUIP_BREAKTHROUGH = 10056; // 装备突破（消耗物品）
+  ROUTE_CODE_EQUIP_WEAR = 10057;         // 穿戴装备（同英雄同配置自动顶替）
+  ROUTE_CODE_EQUIP_UNWEAR = 10058;       // 卸载装备
 
-  // 礼包购买 10060~10069
-  ROUTE_CODE_GIFT_BUY = 10060; // 购买礼包（消耗资产并发放奖励）
-
-  // 兑换 10070~10079
-  ROUTE_CODE_EXCHANGE = 10070; // 兑换（消耗资产并发放奖励）
-
-  // 充值 10080~10089
-  ROUTE_CODE_RECHARGE = 10080; // 充值（当前为假充值，直接发放奖励）
+  // 邮件 10090~10099（系统通知/奖励，带附件可领取）
+  ROUTE_CODE_MAIL_LIST = 10090;          // 邮件列表（含未读数）
+  ROUTE_CODE_MAIL_READ = 10091;          // 标记已读
+  ROUTE_CODE_MAIL_READ_ALL = 10092;      // 全部标记已读
+  ROUTE_CODE_MAIL_CLAIM = 10093;         // 领取附件
+  ROUTE_CODE_MAIL_CLAIM_ALL = 10094;     // 一键领取全部附件
+  ROUTE_CODE_MAIL_DELETE = 10095;        // 删除邮件
+  ROUTE_CODE_MAIL_DELETE_CLEAN = 10096;  // 清理可删除邮件
 
   // 战斗服 50000~59999
 
@@ -97,28 +100,28 @@ enum ContainerType {
 }
 
 //  ========== 属性枚举 ==========
-enum MagicAttr {
-  // 1~1000 玩家相关属性
+// 属性枚举（通用键值表）：键即 ObjectValue 的存放键，值类型见各行注释（服务器落库字段 / 配置来源 / 使用协议）。
+// 玩家状态、任务/活动标记、红点等也走这里，按区间分段。
+enum Attr {
+  // 1~999 玩家相关属性（服务器有落库，随 EnterGameResp.player_attr 下发）
   PLAYER_ATTR_UNSPECIFIED = 0;
-  PLAYER_ATTR_NAME = 1; // 昵称
-  PLAYER_ATTR_LEVEL = 2; // 等级
-  PLAYER_ATTR_EXP = 3; // 经验
-  PLAYER_ATTR_VIP_LEVEL = 4; // vip等级
-  PLAYER_ATTR_VIP_EXP = 5; // vip经验
-  PLAYER_ATTR_COIN = 6; // 币
-  PLAYER_ATTR_GOLD = 7; // 金
+  PLAYER_ATTR_NAME = 1;      // 昵称：string；player_extra.nickname
+  PLAYER_ATTR_LEVEL = 2;     // 等级：int32；player_extra.level
+  PLAYER_ATTR_EXP = 3;       // 经验：int64；player_extra.exp
+  PLAYER_ATTR_VIP_LEVEL = 4; // vip等级：int32；player_extra.vip_level
+  PLAYER_ATTR_VIP_EXP = 5;   // vip经验：int64；player_extra.vip_exp
+  PLAYER_ATTR_COIN = 6;      // 币：int64；player.diamond
+  PLAYER_ATTR_GOLD = 7;      // 金：int64；player.gold
 
-  // 10001~2000 英雄相关属性
-  HERO_POWER = 1000 ;// 战力（= 伤害 + 护甲 + 生命）
-  HERO_HP = 1001 ; // 生命值
-  HERO_ARMOR = 1002 ; // 护甲
-  HERO_DAMAGE = 1003 ;// 伤害
-
+  // 1000~1999 英雄相关属性：已独立为 hero.proto 的 HeroAttribute（固定字段，不在此枚举）
+  // 2000~4999 任务/成就进度与领奖标记（玩家维度；int32/int64，服务器落库）
+  // 5000~9999 活动状态标记（玩家维度；如参与/阶段/领奖，服务器落库）
   // 10001~20000 红点相关属性
 }
 
-// 属性表：键为 MagicAttr 枚举值，值为动态类型（字符串/整数/长整数）。
-message MagicAttrMap {
+// 属性表：键为 Attr 枚举值，值为动态类型；具体类型见 Attr 各行注释
+// （int32 → ObjectValue.int_value，int64 → ObjectValue.Bigint_value，string → ObjectValue.string_value）。
+message AttrMap {
   map<int32, ObjectValue> values = 1;
 }
 
@@ -178,46 +181,40 @@ message ItemContainer {
   repeated ItemEntry item_entries = 6; // 物品列表
 }
 
-// 英雄持有（仅状态，静态属性由 hero_id 关联英雄配置表）
+// 英雄持有（仅状态，静态属性由 cfg_id 关联英雄配置表；武器/技能/装备为独立模块）
 message HeroEntry {
-  int64 id = 1;     // 实例ID
-  int32 cfg_id = 2; // 配置ID
-  int32 level = 3;     // 等级
-  int64 exp = 4;       // 经验
-  int32 star = 5;      // 星级
-  int32 skin_id = 6;   // 皮肤ID
-  bool equipped = 7;   // 是否出战
+  int32 cfg_id = 1;    // 英雄配置ID（唯一标识）
+  int32 level = 2;     // 等级
+  int64 exp = 3;       // 经验
+  int32 star = 4;      // 星级
+  int32 skin_id = 5;   // 皮肤ID
+  bool equipped = 6;   // 是否出战
 }
 
-// 英雄累计属性：英雄基础属性 + 已穿戴武器/装备/技能加成后的最终值。
-message HeroAttribute {
-  int32 power = 1;  // 战力（= 伤害 + 护甲 + 生命）
-  int32 hp = 2;     // 生命值
-  int32 armor = 3;  // 护甲
-  int32 damage = 4; // 伤害
-}
-
-// 武器持有（仅状态，静态属性由 weapon_id 关联武器配置表）
+// 武器持有（固定绑定英雄，仅状态，静态属性由 cfg_id 关联武器配置表）
 message WeaponEntry {
-  int64 id = 1;     // 实例ID
-  int32 cfg_id = 2; // 配置ID
-  int32 level = 3;       // 等级
-  int32 durability = 4;  // 耐久度
-  bool equipped = 5;     // 是否装备
+  int32 cfg_id = 1;       // 武器配置ID
+  int32 level = 2;        // 等级
+  int32 durability = 3;   // 耐久度
+  int32 quality = 4;      // 品质
+  int32 breakthrough = 5; // 突破
 }
 
-// 技能持有（仅状态，静态属性由 skill_id 关联技能配置表）
+// 技能持有（固定绑定英雄，仅状态，静态属性由 cfg_id 关联技能配置表）
 message SkillEntry {
-  int64 id = 1;     // 实例ID
-  int32 cfg_id = 2; // 配置ID
-  int32 level = 3;    // 等级
-  bool equipped = 4;  // 是否装备
+  int32 cfg_id = 1;       // 技能配置ID
+  int32 level = 2;        // 等级
+  int32 quality = 3;      // 品质
+  int32 breakthrough = 4; // 突破
 }
 
 // 装备持有（仅状态，静态属性由 equip_id 关联装备配置表）
 message EquipEntry {
-  int64 id = 1;     // 实例ID
-  int32 cfg_id = 2; // 配置ID
-  int32 level = 3;    // 等级
-  bool equipped = 4;  // 是否穿戴
+  int64 id = 1;           // 实例ID
+  int32 cfg_id = 2;       // 配置ID
+  int32 level = 3;        // 等级
+  bool equipped = 4;      // 是否穿戴
+  int32 hero_id = 5;      // 所属英雄ID，0 表示未分配
+  int32 quality = 6;      // 品质
+  int32 breakthrough = 7; // 突破
 }

@@ -1,0 +1,1352 @@
+[
+  {
+    "id": 1001001,
+    "skillId": 1001,
+    "quality": 1,
+    "boostCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 1001002,
+    "skillId": 1001,
+    "quality": 2,
+    "boostCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 1001003,
+    "skillId": 1001,
+    "quality": 3,
+    "boostCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 1001004,
+    "skillId": 1001,
+    "quality": 4,
+    "boostCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 1001005,
+    "skillId": 1001,
+    "quality": 5,
+    "boostCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 1001006,
+    "skillId": 1001,
+    "quality": 6,
+    "boostCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 1002001,
+    "skillId": 1002,
+    "quality": 1,
+    "boostCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 1002002,
+    "skillId": 1002,
+    "quality": 2,
+    "boostCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 1002003,
+    "skillId": 1002,
+    "quality": 3,
+    "boostCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 1002004,
+    "skillId": 1002,
+    "quality": 4,
+    "boostCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 1002005,
+    "skillId": 1002,
+    "quality": 5,
+    "boostCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 1002006,
+    "skillId": 1002,
+    "quality": 6,
+    "boostCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 1003001,
+    "skillId": 1003,
+    "quality": 1,
+    "boostCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 1003002,
+    "skillId": 1003,
+    "quality": 2,
+    "boostCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 1003003,
+    "skillId": 1003,
+    "quality": 3,
+    "boostCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 1003004,
+    "skillId": 1003,
+    "quality": 4,
+    "boostCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 1003005,
+    "skillId": 1003,
+    "quality": 5,
+    "boostCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 1003006,
+    "skillId": 1003,
+    "quality": 6,
+    "boostCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 2001001,
+    "skillId": 2001,
+    "quality": 1,
+    "boostCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 2001002,
+    "skillId": 2001,
+    "quality": 2,
+    "boostCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 2001003,
+    "skillId": 2001,
+    "quality": 3,
+    "boostCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 2001004,
+    "skillId": 2001,
+    "quality": 4,
+    "boostCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 2001005,
+    "skillId": 2001,
+    "quality": 5,
+    "boostCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 2001006,
+    "skillId": 2001,
+    "quality": 6,
+    "boostCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 2002001,
+    "skillId": 2002,
+    "quality": 1,
+    "boostCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 2002002,
+    "skillId": 2002,
+    "quality": 2,
+    "boostCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 2002003,
+    "skillId": 2002,
+    "quality": 3,
+    "boostCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 2002004,
+    "skillId": 2002,
+    "quality": 4,
+    "boostCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 2002005,
+    "skillId": 2002,
+    "quality": 5,
+    "boostCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 2002006,
+    "skillId": 2002,
+    "quality": 6,
+    "boostCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 2003001,
+    "skillId": 2003,
+    "quality": 1,
+    "boostCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 2003002,
+    "skillId": 2003,
+    "quality": 2,
+    "boostCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 2003003,
+    "skillId": 2003,
+    "quality": 3,
+    "boostCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 2003004,
+    "skillId": 2003,
+    "quality": 4,
+    "boostCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 2003005,
+    "skillId": 2003,
+    "quality": 5,
+    "boostCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 2003006,
+    "skillId": 2003,
+    "quality": 6,
+    "boostCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 3001001,
+    "skillId": 3001,
+    "quality": 1,
+    "boostCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 3001002,
+    "skillId": 3001,
+    "quality": 2,
+    "boostCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 3001003,
+    "skillId": 3001,
+    "quality": 3,
+    "boostCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 3001004,
+    "skillId": 3001,
+    "quality": 4,
+    "boostCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 3001005,
+    "skillId": 3001,
+    "quality": 5,
+    "boostCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 3001006,
+    "skillId": 3001,
+    "quality": 6,
+    "boostCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 3002001,
+    "skillId": 3002,
+    "quality": 1,
+    "boostCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 3002002,
+    "skillId": 3002,
+    "quality": 2,
+    "boostCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 3002003,
+    "skillId": 3002,
+    "quality": 3,
+    "boostCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 3002004,
+    "skillId": 3002,
+    "quality": 4,
+    "boostCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 3002005,
+    "skillId": 3002,
+    "quality": 5,
+    "boostCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 3002006,
+    "skillId": 3002,
+    "quality": 6,
+    "boostCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 3003001,
+    "skillId": 3003,
+    "quality": 1,
+    "boostCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 3003002,
+    "skillId": 3003,
+    "quality": 2,
+    "boostCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 3003003,
+    "skillId": 3003,
+    "quality": 3,
+    "boostCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 3003004,
+    "skillId": 3003,
+    "quality": 4,
+    "boostCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 3003005,
+    "skillId": 3003,
+    "quality": 5,
+    "boostCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 3003006,
+    "skillId": 3003,
+    "quality": 6,
+    "boostCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 4001001,
+    "skillId": 4001,
+    "quality": 1,
+    "boostCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 4001002,
+    "skillId": 4001,
+    "quality": 2,
+    "boostCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 4001003,
+    "skillId": 4001,
+    "quality": 3,
+    "boostCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 4001004,
+    "skillId": 4001,
+    "quality": 4,
+    "boostCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 4001005,
+    "skillId": 4001,
+    "quality": 5,
+    "boostCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 4001006,
+    "skillId": 4001,
+    "quality": 6,
+    "boostCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 4002001,
+    "skillId": 4002,
+    "quality": 1,
+    "boostCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 4002002,
+    "skillId": 4002,
+    "quality": 2,
+    "boostCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 4002003,
+    "skillId": 4002,
+    "quality": 3,
+    "boostCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 4002004,
+    "skillId": 4002,
+    "quality": 4,
+    "boostCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 4002005,
+    "skillId": 4002,
+    "quality": 5,
+    "boostCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 4002006,
+    "skillId": 4002,
+    "quality": 6,
+    "boostCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 4003001,
+    "skillId": 4003,
+    "quality": 1,
+    "boostCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 4003002,
+    "skillId": 4003,
+    "quality": 2,
+    "boostCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 4003003,
+    "skillId": 4003,
+    "quality": 3,
+    "boostCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 4003004,
+    "skillId": 4003,
+    "quality": 4,
+    "boostCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 4003005,
+    "skillId": 4003,
+    "quality": 5,
+    "boostCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 4003006,
+    "skillId": 4003,
+    "quality": 6,
+    "boostCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 5001001,
+    "skillId": 5001,
+    "quality": 1,
+    "boostCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 5001002,
+    "skillId": 5001,
+    "quality": 2,
+    "boostCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 5001003,
+    "skillId": 5001,
+    "quality": 3,
+    "boostCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 5001004,
+    "skillId": 5001,
+    "quality": 4,
+    "boostCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 5001005,
+    "skillId": 5001,
+    "quality": 5,
+    "boostCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 5001006,
+    "skillId": 5001,
+    "quality": 6,
+    "boostCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 5002001,
+    "skillId": 5002,
+    "quality": 1,
+    "boostCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 5002002,
+    "skillId": 5002,
+    "quality": 2,
+    "boostCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 5002003,
+    "skillId": 5002,
+    "quality": 3,
+    "boostCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 5002004,
+    "skillId": 5002,
+    "quality": 4,
+    "boostCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 5002005,
+    "skillId": 5002,
+    "quality": 5,
+    "boostCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 5002006,
+    "skillId": 5002,
+    "quality": 6,
+    "boostCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 5003001,
+    "skillId": 5003,
+    "quality": 1,
+    "boostCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 5003002,
+    "skillId": 5003,
+    "quality": 2,
+    "boostCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 5003003,
+    "skillId": 5003,
+    "quality": 3,
+    "boostCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 5003004,
+    "skillId": 5003,
+    "quality": 4,
+    "boostCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 5003005,
+    "skillId": 5003,
+    "quality": 5,
+    "boostCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 5003006,
+    "skillId": 5003,
+    "quality": 6,
+    "boostCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 6001001,
+    "skillId": 6001,
+    "quality": 1,
+    "boostCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 6001002,
+    "skillId": 6001,
+    "quality": 2,
+    "boostCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 6001003,
+    "skillId": 6001,
+    "quality": 3,
+    "boostCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 6001004,
+    "skillId": 6001,
+    "quality": 4,
+    "boostCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 6001005,
+    "skillId": 6001,
+    "quality": 5,
+    "boostCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 6001006,
+    "skillId": 6001,
+    "quality": 6,
+    "boostCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 6002001,
+    "skillId": 6002,
+    "quality": 1,
+    "boostCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 6002002,
+    "skillId": 6002,
+    "quality": 2,
+    "boostCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 6002003,
+    "skillId": 6002,
+    "quality": 3,
+    "boostCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 6002004,
+    "skillId": 6002,
+    "quality": 4,
+    "boostCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 6002005,
+    "skillId": 6002,
+    "quality": 5,
+    "boostCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 6002006,
+    "skillId": 6002,
+    "quality": 6,
+    "boostCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 6003001,
+    "skillId": 6003,
+    "quality": 1,
+    "boostCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 6003002,
+    "skillId": 6003,
+    "quality": 2,
+    "boostCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 6003003,
+    "skillId": 6003,
+    "quality": 3,
+    "boostCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 6003004,
+    "skillId": 6003,
+    "quality": 4,
+    "boostCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 6003005,
+    "skillId": 6003,
+    "quality": 5,
+    "boostCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 6003006,
+    "skillId": 6003,
+    "quality": 6,
+    "boostCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 7001001,
+    "skillId": 7001,
+    "quality": 1,
+    "boostCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 7001002,
+    "skillId": 7001,
+    "quality": 2,
+    "boostCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 7001003,
+    "skillId": 7001,
+    "quality": 3,
+    "boostCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 7001004,
+    "skillId": 7001,
+    "quality": 4,
+    "boostCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 7001005,
+    "skillId": 7001,
+    "quality": 5,
+    "boostCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 7001006,
+    "skillId": 7001,
+    "quality": 6,
+    "boostCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 7002001,
+    "skillId": 7002,
+    "quality": 1,
+    "boostCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 7002002,
+    "skillId": 7002,
+    "quality": 2,
+    "boostCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 7002003,
+    "skillId": 7002,
+    "quality": 3,
+    "boostCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 7002004,
+    "skillId": 7002,
+    "quality": 4,
+    "boostCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 7002005,
+    "skillId": 7002,
+    "quality": 5,
+    "boostCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 7002006,
+    "skillId": 7002,
+    "quality": 6,
+    "boostCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 7003001,
+    "skillId": 7003,
+    "quality": 1,
+    "boostCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 7003002,
+    "skillId": 7003,
+    "quality": 2,
+    "boostCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 7003003,
+    "skillId": 7003,
+    "quality": 3,
+    "boostCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 7003004,
+    "skillId": 7003,
+    "quality": 4,
+    "boostCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 7003005,
+    "skillId": 7003,
+    "quality": 5,
+    "boostCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 7003006,
+    "skillId": 7003,
+    "quality": 6,
+    "boostCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 8001001,
+    "skillId": 8001,
+    "quality": 1,
+    "boostCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 8001002,
+    "skillId": 8001,
+    "quality": 2,
+    "boostCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 8001003,
+    "skillId": 8001,
+    "quality": 3,
+    "boostCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 8001004,
+    "skillId": 8001,
+    "quality": 4,
+    "boostCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 8001005,
+    "skillId": 8001,
+    "quality": 5,
+    "boostCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 8001006,
+    "skillId": 8001,
+    "quality": 6,
+    "boostCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 8002001,
+    "skillId": 8002,
+    "quality": 1,
+    "boostCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 8002002,
+    "skillId": 8002,
+    "quality": 2,
+    "boostCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 8002003,
+    "skillId": 8002,
+    "quality": 3,
+    "boostCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 8002004,
+    "skillId": 8002,
+    "quality": 4,
+    "boostCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 8002005,
+    "skillId": 8002,
+    "quality": 5,
+    "boostCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 8002006,
+    "skillId": 8002,
+    "quality": 6,
+    "boostCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 8003001,
+    "skillId": 8003,
+    "quality": 1,
+    "boostCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 8003002,
+    "skillId": 8003,
+    "quality": 2,
+    "boostCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 8003003,
+    "skillId": 8003,
+    "quality": 3,
+    "boostCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 8003004,
+    "skillId": 8003,
+    "quality": 4,
+    "boostCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 8003005,
+    "skillId": 8003,
+    "quality": 5,
+    "boostCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 8003006,
+    "skillId": 8003,
+    "quality": 6,
+    "boostCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  },
+  {
+    "id": 1004001,
+    "skillId": 1004,
+    "quality": 1,
+    "boostCoef": 1,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 100
+  },
+  {
+    "id": 1004002,
+    "skillId": 1004,
+    "quality": 2,
+    "boostCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 200
+  },
+  {
+    "id": 1004003,
+    "skillId": 1004,
+    "quality": 3,
+    "boostCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 300
+  },
+  {
+    "id": 1004004,
+    "skillId": 1004,
+    "quality": 4,
+    "boostCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 400
+  },
+  {
+    "id": 1004005,
+    "skillId": 1004,
+    "quality": 5,
+    "boostCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 500
+  },
+  {
+    "id": 1004006,
+    "skillId": 1004,
+    "quality": 6,
+    "boostCoef": 2,
+    "effect": "",
+    "qualityMaterial": 8,
+    "qualityUse": 0
+  }
+]

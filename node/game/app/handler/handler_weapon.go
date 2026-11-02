@@ -10,45 +10,15 @@ import (
 	"server-cluster/share/pb"
 )
 
-// init 注册武器路由（业务在玩家 actor 内串行执行）。
+// init 注册武器路由（武器固定绑定英雄，独立模块）。
 func init() {
-	router.OnActor(pb.RouteCode_ROUTE_CODE_WEAPON_LIST, handleWeaponList)
-	router.OnActor(pb.RouteCode_ROUTE_CODE_WEAPON_ADD, handleWeaponAdd)
 	router.OnActor(pb.RouteCode_ROUTE_CODE_WEAPON_UPDATE, handleWeaponUpdate)
 	router.OnActor(pb.RouteCode_ROUTE_CODE_WEAPON_UPGRADE, handleWeaponUpgrade)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_WEAPON_UP_QUALITY, handleWeaponUpQuality)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_WEAPON_BREAKTHROUGH, handleWeaponBreakthrough)
 }
 
-// handleWeaponList 武器列表。
-func handleWeaponList(ctx node.Context) {
-	req := &pb.WeaponListReq{}
-	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
-		return
-	}
-	resp, err := logic.Weapon().WeaponList(ctx.Context(), ctx.UID())
-	if err != nil {
-		_ = ctx.Response(err)
-		return
-	}
-	_ = ctx.Response(resp)
-}
-
-// handleWeaponAdd 新增武器。
-func handleWeaponAdd(ctx node.Context) {
-	req := &pb.WeaponAddReq{}
-	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
-		return
-	}
-	resp, err := logic.Weapon().WeaponAdd(ctx.Context(), ctx.UID(), req)
-	if err != nil {
-		_ = ctx.Response(err)
-		return
-	}
-	_ = ctx.Response(resp)
-}
-
-// handleWeaponUpdate 更新武器。
+// handleWeaponUpdate 更新武器（GM）。
 func handleWeaponUpdate(ctx node.Context) {
 	req := &pb.WeaponUpdateReq{}
 	if err := ctx.Parse(req); err != nil {
@@ -63,7 +33,7 @@ func handleWeaponUpdate(ctx node.Context) {
 	_ = ctx.Response(resp)
 }
 
-// handleWeaponUpgrade 武器升级（消耗物品）。
+// handleWeaponUpgrade 武器升级（消耗升级素材）。
 func handleWeaponUpgrade(ctx node.Context) {
 	req := &pb.WeaponUpgradeReq{}
 	if err := ctx.Parse(req); err != nil {
@@ -71,6 +41,36 @@ func handleWeaponUpgrade(ctx node.Context) {
 		return
 	}
 	resp, err := logic.Weapon().WeaponUpgrade(ctx.Context(), ctx.UID(), req)
+	if err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	_ = ctx.Response(resp)
+}
+
+// handleWeaponUpQuality 武器升品（消耗升品素材）。
+func handleWeaponUpQuality(ctx node.Context) {
+	req := &pb.WeaponUpQualityReq{}
+	if err := ctx.Parse(req); err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	resp, err := logic.Weapon().WeaponUpQuality(ctx.Context(), ctx.UID(), req)
+	if err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	_ = ctx.Response(resp)
+}
+
+// handleWeaponBreakthrough 武器突破（消耗突破素材）。
+func handleWeaponBreakthrough(ctx node.Context) {
+	req := &pb.WeaponBreakthroughReq{}
+	if err := ctx.Parse(req); err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	resp, err := logic.Weapon().WeaponBreakthrough(ctx.Context(), ctx.UID(), req)
 	if err != nil {
 		_ = ctx.Response(err)
 		return

@@ -144,7 +144,13 @@ import GameItemIcon from '@/components/GameItemIcon/index.vue'
 import GameCatalogList from '@/components/GameCatalogList/index.vue'
 import { msgInfo, msgSuccess } from '@/utils/message'
 
-import { addGmHero, getGmHeroAttribute, listGmHero, updateGmHero, upgradeGmHero } from '@/api/admin/gm'
+import {
+  addGmHero,
+  getGmHeroAttribute,
+  listGmHero,
+  updateGmHero,
+  upgradeGmHero
+} from '@/api/admin/gm'
 import type { GameCatalogEntry, GmHero } from '@/types/admin'
 
 // Must match the menu_name the backend serves, or keep-alive silently misses

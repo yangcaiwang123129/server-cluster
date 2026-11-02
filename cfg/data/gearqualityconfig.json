@@ -1,0 +1,1442 @@
+[
+  {
+    "id": 1001001,
+    "gearId": 1001,
+    "quality": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 100
+  },
+  {
+    "id": 1001002,
+    "gearId": 1001,
+    "quality": 2,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 200
+  },
+  {
+    "id": 1001003,
+    "gearId": 1001,
+    "quality": 3,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 300
+  },
+  {
+    "id": 1001004,
+    "gearId": 1001,
+    "quality": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 400
+  },
+  {
+    "id": 1001005,
+    "gearId": 1001,
+    "quality": 5,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 500
+  },
+  {
+    "id": 1001006,
+    "gearId": 1001,
+    "quality": 6,
+    "hpCoef": 2,
+    "armorCoef": 2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 0
+  },
+  {
+    "id": 1002001,
+    "gearId": 1002,
+    "quality": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 100
+  },
+  {
+    "id": 1002002,
+    "gearId": 1002,
+    "quality": 2,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 200
+  },
+  {
+    "id": 1002003,
+    "gearId": 1002,
+    "quality": 3,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 300
+  },
+  {
+    "id": 1002004,
+    "gearId": 1002,
+    "quality": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 400
+  },
+  {
+    "id": 1002005,
+    "gearId": 1002,
+    "quality": 5,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 500
+  },
+  {
+    "id": 1002006,
+    "gearId": 1002,
+    "quality": 6,
+    "hpCoef": 2,
+    "armorCoef": 2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 0
+  },
+  {
+    "id": 1003001,
+    "gearId": 1003,
+    "quality": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 100
+  },
+  {
+    "id": 1003002,
+    "gearId": 1003,
+    "quality": 2,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 200
+  },
+  {
+    "id": 1003003,
+    "gearId": 1003,
+    "quality": 3,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 300
+  },
+  {
+    "id": 1003004,
+    "gearId": 1003,
+    "quality": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 400
+  },
+  {
+    "id": 1003005,
+    "gearId": 1003,
+    "quality": 5,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 500
+  },
+  {
+    "id": 1003006,
+    "gearId": 1003,
+    "quality": 6,
+    "hpCoef": 2,
+    "armorCoef": 2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 0
+  },
+  {
+    "id": 2001001,
+    "gearId": 2001,
+    "quality": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 100
+  },
+  {
+    "id": 2001002,
+    "gearId": 2001,
+    "quality": 2,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 200
+  },
+  {
+    "id": 2001003,
+    "gearId": 2001,
+    "quality": 3,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 300
+  },
+  {
+    "id": 2001004,
+    "gearId": 2001,
+    "quality": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 400
+  },
+  {
+    "id": 2001005,
+    "gearId": 2001,
+    "quality": 5,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 500
+  },
+  {
+    "id": 2001006,
+    "gearId": 2001,
+    "quality": 6,
+    "hpCoef": 2,
+    "armorCoef": 2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 0
+  },
+  {
+    "id": 2002001,
+    "gearId": 2002,
+    "quality": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 100
+  },
+  {
+    "id": 2002002,
+    "gearId": 2002,
+    "quality": 2,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 200
+  },
+  {
+    "id": 2002003,
+    "gearId": 2002,
+    "quality": 3,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 300
+  },
+  {
+    "id": 2002004,
+    "gearId": 2002,
+    "quality": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 400
+  },
+  {
+    "id": 2002005,
+    "gearId": 2002,
+    "quality": 5,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 500
+  },
+  {
+    "id": 2002006,
+    "gearId": 2002,
+    "quality": 6,
+    "hpCoef": 2,
+    "armorCoef": 2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 0
+  },
+  {
+    "id": 2003001,
+    "gearId": 2003,
+    "quality": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 100
+  },
+  {
+    "id": 2003002,
+    "gearId": 2003,
+    "quality": 2,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 200
+  },
+  {
+    "id": 2003003,
+    "gearId": 2003,
+    "quality": 3,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 300
+  },
+  {
+    "id": 2003004,
+    "gearId": 2003,
+    "quality": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 400
+  },
+  {
+    "id": 2003005,
+    "gearId": 2003,
+    "quality": 5,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 500
+  },
+  {
+    "id": 2003006,
+    "gearId": 2003,
+    "quality": 6,
+    "hpCoef": 2,
+    "armorCoef": 2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 0
+  },
+  {
+    "id": 3001001,
+    "gearId": 3001,
+    "quality": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 100
+  },
+  {
+    "id": 3001002,
+    "gearId": 3001,
+    "quality": 2,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 200
+  },
+  {
+    "id": 3001003,
+    "gearId": 3001,
+    "quality": 3,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 300
+  },
+  {
+    "id": 3001004,
+    "gearId": 3001,
+    "quality": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 400
+  },
+  {
+    "id": 3001005,
+    "gearId": 3001,
+    "quality": 5,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 500
+  },
+  {
+    "id": 3001006,
+    "gearId": 3001,
+    "quality": 6,
+    "hpCoef": 2,
+    "armorCoef": 2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 0
+  },
+  {
+    "id": 3002001,
+    "gearId": 3002,
+    "quality": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 100
+  },
+  {
+    "id": 3002002,
+    "gearId": 3002,
+    "quality": 2,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 200
+  },
+  {
+    "id": 3002003,
+    "gearId": 3002,
+    "quality": 3,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 300
+  },
+  {
+    "id": 3002004,
+    "gearId": 3002,
+    "quality": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 400
+  },
+  {
+    "id": 3002005,
+    "gearId": 3002,
+    "quality": 5,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 500
+  },
+  {
+    "id": 3002006,
+    "gearId": 3002,
+    "quality": 6,
+    "hpCoef": 2,
+    "armorCoef": 2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 0
+  },
+  {
+    "id": 3003001,
+    "gearId": 3003,
+    "quality": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 100
+  },
+  {
+    "id": 3003002,
+    "gearId": 3003,
+    "quality": 2,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 200
+  },
+  {
+    "id": 3003003,
+    "gearId": 3003,
+    "quality": 3,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 300
+  },
+  {
+    "id": 3003004,
+    "gearId": 3003,
+    "quality": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 400
+  },
+  {
+    "id": 3003005,
+    "gearId": 3003,
+    "quality": 5,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 500
+  },
+  {
+    "id": 3003006,
+    "gearId": 3003,
+    "quality": 6,
+    "hpCoef": 2,
+    "armorCoef": 2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 0
+  },
+  {
+    "id": 4001001,
+    "gearId": 4001,
+    "quality": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 100
+  },
+  {
+    "id": 4001002,
+    "gearId": 4001,
+    "quality": 2,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 200
+  },
+  {
+    "id": 4001003,
+    "gearId": 4001,
+    "quality": 3,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 300
+  },
+  {
+    "id": 4001004,
+    "gearId": 4001,
+    "quality": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 400
+  },
+  {
+    "id": 4001005,
+    "gearId": 4001,
+    "quality": 5,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 500
+  },
+  {
+    "id": 4001006,
+    "gearId": 4001,
+    "quality": 6,
+    "hpCoef": 2,
+    "armorCoef": 2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 0
+  },
+  {
+    "id": 4002001,
+    "gearId": 4002,
+    "quality": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 100
+  },
+  {
+    "id": 4002002,
+    "gearId": 4002,
+    "quality": 2,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 200
+  },
+  {
+    "id": 4002003,
+    "gearId": 4002,
+    "quality": 3,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 300
+  },
+  {
+    "id": 4002004,
+    "gearId": 4002,
+    "quality": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 400
+  },
+  {
+    "id": 4002005,
+    "gearId": 4002,
+    "quality": 5,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 500
+  },
+  {
+    "id": 4002006,
+    "gearId": 4002,
+    "quality": 6,
+    "hpCoef": 2,
+    "armorCoef": 2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 0
+  },
+  {
+    "id": 4003001,
+    "gearId": 4003,
+    "quality": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 100
+  },
+  {
+    "id": 4003002,
+    "gearId": 4003,
+    "quality": 2,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 200
+  },
+  {
+    "id": 4003003,
+    "gearId": 4003,
+    "quality": 3,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 300
+  },
+  {
+    "id": 4003004,
+    "gearId": 4003,
+    "quality": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 400
+  },
+  {
+    "id": 4003005,
+    "gearId": 4003,
+    "quality": 5,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 500
+  },
+  {
+    "id": 4003006,
+    "gearId": 4003,
+    "quality": 6,
+    "hpCoef": 2,
+    "armorCoef": 2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 0
+  },
+  {
+    "id": 5001001,
+    "gearId": 5001,
+    "quality": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 100
+  },
+  {
+    "id": 5001002,
+    "gearId": 5001,
+    "quality": 2,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 200
+  },
+  {
+    "id": 5001003,
+    "gearId": 5001,
+    "quality": 3,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 300
+  },
+  {
+    "id": 5001004,
+    "gearId": 5001,
+    "quality": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 400
+  },
+  {
+    "id": 5001005,
+    "gearId": 5001,
+    "quality": 5,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 500
+  },
+  {
+    "id": 5001006,
+    "gearId": 5001,
+    "quality": 6,
+    "hpCoef": 2,
+    "armorCoef": 2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 0
+  },
+  {
+    "id": 5002001,
+    "gearId": 5002,
+    "quality": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 100
+  },
+  {
+    "id": 5002002,
+    "gearId": 5002,
+    "quality": 2,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 200
+  },
+  {
+    "id": 5002003,
+    "gearId": 5002,
+    "quality": 3,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 300
+  },
+  {
+    "id": 5002004,
+    "gearId": 5002,
+    "quality": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 400
+  },
+  {
+    "id": 5002005,
+    "gearId": 5002,
+    "quality": 5,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 500
+  },
+  {
+    "id": 5002006,
+    "gearId": 5002,
+    "quality": 6,
+    "hpCoef": 2,
+    "armorCoef": 2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 0
+  },
+  {
+    "id": 5003001,
+    "gearId": 5003,
+    "quality": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 100
+  },
+  {
+    "id": 5003002,
+    "gearId": 5003,
+    "quality": 2,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 200
+  },
+  {
+    "id": 5003003,
+    "gearId": 5003,
+    "quality": 3,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 300
+  },
+  {
+    "id": 5003004,
+    "gearId": 5003,
+    "quality": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 400
+  },
+  {
+    "id": 5003005,
+    "gearId": 5003,
+    "quality": 5,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 500
+  },
+  {
+    "id": 5003006,
+    "gearId": 5003,
+    "quality": 6,
+    "hpCoef": 2,
+    "armorCoef": 2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 0
+  },
+  {
+    "id": 6001001,
+    "gearId": 6001,
+    "quality": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 100
+  },
+  {
+    "id": 6001002,
+    "gearId": 6001,
+    "quality": 2,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 200
+  },
+  {
+    "id": 6001003,
+    "gearId": 6001,
+    "quality": 3,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 300
+  },
+  {
+    "id": 6001004,
+    "gearId": 6001,
+    "quality": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 400
+  },
+  {
+    "id": 6001005,
+    "gearId": 6001,
+    "quality": 5,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 500
+  },
+  {
+    "id": 6001006,
+    "gearId": 6001,
+    "quality": 6,
+    "hpCoef": 2,
+    "armorCoef": 2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 0
+  },
+  {
+    "id": 6002001,
+    "gearId": 6002,
+    "quality": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 100
+  },
+  {
+    "id": 6002002,
+    "gearId": 6002,
+    "quality": 2,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 200
+  },
+  {
+    "id": 6002003,
+    "gearId": 6002,
+    "quality": 3,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 300
+  },
+  {
+    "id": 6002004,
+    "gearId": 6002,
+    "quality": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 400
+  },
+  {
+    "id": 6002005,
+    "gearId": 6002,
+    "quality": 5,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 500
+  },
+  {
+    "id": 6002006,
+    "gearId": 6002,
+    "quality": 6,
+    "hpCoef": 2,
+    "armorCoef": 2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 0
+  },
+  {
+    "id": 6003001,
+    "gearId": 6003,
+    "quality": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 100
+  },
+  {
+    "id": 6003002,
+    "gearId": 6003,
+    "quality": 2,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 200
+  },
+  {
+    "id": 6003003,
+    "gearId": 6003,
+    "quality": 3,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 300
+  },
+  {
+    "id": 6003004,
+    "gearId": 6003,
+    "quality": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 400
+  },
+  {
+    "id": 6003005,
+    "gearId": 6003,
+    "quality": 5,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 500
+  },
+  {
+    "id": 6003006,
+    "gearId": 6003,
+    "quality": 6,
+    "hpCoef": 2,
+    "armorCoef": 2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 0
+  },
+  {
+    "id": 7001001,
+    "gearId": 7001,
+    "quality": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 100
+  },
+  {
+    "id": 7001002,
+    "gearId": 7001,
+    "quality": 2,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 200
+  },
+  {
+    "id": 7001003,
+    "gearId": 7001,
+    "quality": 3,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 300
+  },
+  {
+    "id": 7001004,
+    "gearId": 7001,
+    "quality": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 400
+  },
+  {
+    "id": 7001005,
+    "gearId": 7001,
+    "quality": 5,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 500
+  },
+  {
+    "id": 7001006,
+    "gearId": 7001,
+    "quality": 6,
+    "hpCoef": 2,
+    "armorCoef": 2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 0
+  },
+  {
+    "id": 7002001,
+    "gearId": 7002,
+    "quality": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 100
+  },
+  {
+    "id": 7002002,
+    "gearId": 7002,
+    "quality": 2,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 200
+  },
+  {
+    "id": 7002003,
+    "gearId": 7002,
+    "quality": 3,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 300
+  },
+  {
+    "id": 7002004,
+    "gearId": 7002,
+    "quality": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 400
+  },
+  {
+    "id": 7002005,
+    "gearId": 7002,
+    "quality": 5,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 500
+  },
+  {
+    "id": 7002006,
+    "gearId": 7002,
+    "quality": 6,
+    "hpCoef": 2,
+    "armorCoef": 2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 0
+  },
+  {
+    "id": 7003001,
+    "gearId": 7003,
+    "quality": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 100
+  },
+  {
+    "id": 7003002,
+    "gearId": 7003,
+    "quality": 2,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 200
+  },
+  {
+    "id": 7003003,
+    "gearId": 7003,
+    "quality": 3,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 300
+  },
+  {
+    "id": 7003004,
+    "gearId": 7003,
+    "quality": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 400
+  },
+  {
+    "id": 7003005,
+    "gearId": 7003,
+    "quality": 5,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 500
+  },
+  {
+    "id": 7003006,
+    "gearId": 7003,
+    "quality": 6,
+    "hpCoef": 2,
+    "armorCoef": 2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 0
+  },
+  {
+    "id": 8001001,
+    "gearId": 8001,
+    "quality": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 100
+  },
+  {
+    "id": 8001002,
+    "gearId": 8001,
+    "quality": 2,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 200
+  },
+  {
+    "id": 8001003,
+    "gearId": 8001,
+    "quality": 3,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 300
+  },
+  {
+    "id": 8001004,
+    "gearId": 8001,
+    "quality": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 400
+  },
+  {
+    "id": 8001005,
+    "gearId": 8001,
+    "quality": 5,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 500
+  },
+  {
+    "id": 8001006,
+    "gearId": 8001,
+    "quality": 6,
+    "hpCoef": 2,
+    "armorCoef": 2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 0
+  },
+  {
+    "id": 8002001,
+    "gearId": 8002,
+    "quality": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 100
+  },
+  {
+    "id": 8002002,
+    "gearId": 8002,
+    "quality": 2,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 200
+  },
+  {
+    "id": 8002003,
+    "gearId": 8002,
+    "quality": 3,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 300
+  },
+  {
+    "id": 8002004,
+    "gearId": 8002,
+    "quality": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 400
+  },
+  {
+    "id": 8002005,
+    "gearId": 8002,
+    "quality": 5,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 500
+  },
+  {
+    "id": 8002006,
+    "gearId": 8002,
+    "quality": 6,
+    "hpCoef": 2,
+    "armorCoef": 2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 0
+  },
+  {
+    "id": 8003001,
+    "gearId": 8003,
+    "quality": 1,
+    "hpCoef": 1,
+    "armorCoef": 1,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 100
+  },
+  {
+    "id": 8003002,
+    "gearId": 8003,
+    "quality": 2,
+    "hpCoef": 1.2,
+    "armorCoef": 1.2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 200
+  },
+  {
+    "id": 8003003,
+    "gearId": 8003,
+    "quality": 3,
+    "hpCoef": 1.4,
+    "armorCoef": 1.4,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 300
+  },
+  {
+    "id": 8003004,
+    "gearId": 8003,
+    "quality": 4,
+    "hpCoef": 1.6,
+    "armorCoef": 1.6,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 400
+  },
+  {
+    "id": 8003005,
+    "gearId": 8003,
+    "quality": 5,
+    "hpCoef": 1.8,
+    "armorCoef": 1.8,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 500
+  },
+  {
+    "id": 8003006,
+    "gearId": 8003,
+    "quality": 6,
+    "hpCoef": 2,
+    "armorCoef": 2,
+    "effect": "",
+    "qualityMaterial": 9,
+    "qualityUse": 0
+  }
+]

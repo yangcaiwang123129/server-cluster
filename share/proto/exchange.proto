@@ -6,7 +6,7 @@ import "common.proto";
 
 option go_package = "server-cluster/share/pb";
 
-// 兑换请求（路由 10070）
+// 兑换请求（路由 10005）
 message ExchangeReq {
   int32 cfg_id = 1; // 兑换配置ID（ExchangeCfg.Id）
 }

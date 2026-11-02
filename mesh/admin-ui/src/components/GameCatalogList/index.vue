@@ -74,8 +74,8 @@ import type { GameCatalogEntry } from '@/types/admin'
 defineOptions({ name: 'GameCatalogList' })
 
 const props = withDefaults(defineProps<{
-  /** Luban table to read: hero/weapon/skill/equip/item. */
-  type: 'hero' | 'weapon' | 'skill' | 'equip' | 'item'
+  /** Luban table to read: hero/equip/item. */
+  type: 'hero' | 'equip' | 'item'
   /** Icon accent for tables without a rarity concept. */
   tone?: string
   /** Permission required to add a row to the player. */
@@ -95,9 +95,9 @@ const total = ref(0)
 const page = ref(1)
 const limit = ref(20)
 
-/** Rarity exists for heroes and items; skills/equips carry descriptions; items carry grid size. */
+/** Rarity exists for heroes and items; equips carry descriptions; items carry grid size. */
 const showRarity = computed(() => props.type === 'hero' || props.type === 'item')
-const showDesc = computed(() => props.type === 'skill' || props.type === 'equip')
+const showDesc = computed(() => props.type === 'equip')
 const showSize = computed(() => props.type === 'item')
 
 const load = async() => {

@@ -23,13 +23,14 @@ var heroLogicInst = singleton.NewContainer[global.HeroLogic]("HeroLogic")
 
 func init() {
 	heroLogicInst.Register(&heroLogic{})
-	registerAssetHandler(&heroAssetHandler{})
+	registerAsset(&heroAssetHandler{})
 }
 
 // Hero 获取英雄业务单例。
 func Hero() global.HeroLogic { return heroLogicInst.MustGet() }
 
-// HeroList 英雄列表：只下发持有状态，静态属性由客户端按 hero_id 关联英雄配置表。
+// HeroList 英雄列表：服务器按模块分表，但客户端一次拿全（英雄 + 武器 + 技能 + 装备）。
+// 静态属性仍由客户端按各自的配置ID关联配置表。
 func (this *heroLogic) HeroList(ctx context.Context, playerID int64) (*pb.HeroListResp, error) {
 	row, err := loadPlayerHero(ctx, playerID)
 	if err != nil {
@@ -43,10 +44,29 @@ func (this *heroLogic) HeroList(ctx context.Context, playerID int64) (*pb.HeroLi
 	})
 	// map 遍历无序，按配置ID排序保证客户端展示稳定
 	sort.Slice(entries, func(i, j int) bool { return entries[i].CfgId < entries[j].CfgId })
-	return &pb.HeroListResp{HeroEntries: entries}, nil
+
+	weapons, err := Weapon().WeaponList(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+	skills, err := Skill().SkillList(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+	equips, err := Equip().EquipList(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.HeroListResp{
+		HeroEntries:   entries,
+		WeaponEntries: weapons,
+		SkillEntries:  skills,
+		EquipEntries:  equips,
+	}, nil
 }
 
-// toHeroEntry 持有数据 → wire 条目（仅状态）。
+// toHeroEntry 持有数据 → wire 条目（仅英雄状态；武器/技能/装备随 HeroList 一并下发）。
 func toHeroEntry(h model.HeroInfo) *pb.HeroEntry {
 	return &pb.HeroEntry{
 		CfgId:    h.HeroID,
@@ -58,24 +78,54 @@ func toHeroEntry(h model.HeroInfo) *pb.HeroEntry {
 	}
 }
 
-// HeroAdd 新增英雄：配置ID必须存在，已拥有返回错误。
-func (this *heroLogic) HeroAdd(ctx context.Context, playerID int64, req *pb.HeroAddReq) (*pb.HeroAddResp, error) {
-	if !tpl.T().RoleInfo.Has(req.GetCfgId()) {
-		return nil, errs.CodeInvalidParams.Err()
+// newHeroInfo 按英雄配置初始化持有状态。
+func newHeroInfo(cfgID int32) model.HeroInfo {
+	return model.HeroInfo{HeroID: cfgID}
+}
+
+// grantHeroBound 获得英雄后按配置初始化固定绑定的武器/技能（独立模块）。
+func grantHeroBound(ctx context.Context, playerID, heroCfgID int64) error {
+	if err := Weapon().WeaponEnsureForHero(ctx, playerID, int32(heroCfgID)); err != nil {
+		return err
+	}
+	return Skill().SkillEnsureForHero(ctx, playerID, int32(heroCfgID))
+}
+
+// addHeroWithBound 新增英雄并初始化其固定绑定的武器/技能。
+// 先建武器/技能、再写入英雄，避免初始化失败后英雄已落进内存缓存造成脏数据。
+func addHeroWithBound(ctx context.Context, playerID int64, cfgID int32) (model.HeroInfo, error) {
+	row, err := loadPlayerHero(ctx, playerID)
+	if err != nil {
+		return model.HeroInfo{}, err
+	}
+	if _, ok := row.Heroes.Get(cfgID); ok {
+		return model.HeroInfo{}, errs.CodeInvalidParams.WithMessage("英雄已拥有").Err()
 	}
 
-	row, err := loadPlayerHero(ctx, playerID)
+	if err := grantHeroBound(ctx, playerID, int64(cfgID)); err != nil {
+		return model.HeroInfo{}, err
+	}
+
+	h := newHeroInfo(cfgID)
+	if !row.AddHero(h) {
+		return model.HeroInfo{}, errs.CodeInvalidParams.WithMessage("英雄已拥有").Err()
+	}
+	global.PlayerHeroCache.Set(playerID, row)
+	record.Record(ctx, model.RecordModuleHero, playerID, model.RecordActionGain, cfgID, 1)
+	return h, nil
+}
+
+// HeroAdd 新增英雄：配置ID必须存在，已拥有返回错误。
+func (this *heroLogic) HeroAdd(ctx context.Context, playerID int64, req *pb.HeroAddReq) (*pb.HeroAddResp, error) {
+	cfgID := req.GetCfgId()
+	if !tpl.T().RoleInfo.Has(cfgID) {
+		return nil, errs.CodeInvalidParams.WithMessage("英雄配置不存在").Err()
+	}
+
+	h, err := addHeroWithBound(ctx, playerID, cfgID)
 	if err != nil {
 		return nil, err
 	}
-
-	h := model.HeroInfo{HeroID: req.GetCfgId()}
-	if !row.AddHero(h) {
-		return nil, errs.CodeInvalidParams.WithMessage("英雄已拥有").Err()
-	}
-
-	global.PlayerHeroCache.Set(playerID, row)
-	record.Record(ctx, model.RecordModuleHero, playerID, model.RecordActionGain, req.GetCfgId(), 1)
 	return &pb.HeroAddResp{HeroEntry: toHeroEntry(h)}, nil
 }
 
@@ -86,15 +136,29 @@ func (this *heroLogic) HeroUpdate(ctx context.Context, playerID int64, req *pb.H
 		return nil, err
 	}
 
-	h := model.HeroInfo{
-		HeroID:   req.GetCfgId(),
-		Level:    req.GetLevel(),
-		Exp:      req.GetExp(),
-		Star:     req.GetStar(),
-		SkinID:   req.GetSkinId(),
-		Equipped: req.GetEquipped(),
+	old, ok := row.Heroes.Get(req.GetCfgId())
+	if !ok {
+		return nil, errs.CodeInvalidParams.WithMessage("英雄未拥有").Err()
 	}
-	if !row.UpdateHero(h) {
+	h := old
+	h.Level = req.GetLevel()
+	h.Exp = req.GetExp()
+	h.Star = req.GetStar()
+	h.SkinID = req.GetSkinId()
+	h.Equipped = req.GetEquipped()
+	// 出战英雄全局唯一：设置出战时先取消其它英雄的出战状态
+	if h.Equipped {
+		_ = row.Heroes.UpdateAll(func(m map[int32]model.HeroInfo) error {
+			for id, other := range m {
+				if id != h.HeroID && other.Equipped {
+					other.Equipped = false
+					m[id] = other
+				}
+			}
+			m[h.HeroID] = h
+			return nil
+		})
+	} else if !row.UpdateHero(h) {
 		return nil, errs.CodeInvalidParams.WithMessage("英雄未拥有").Err()
 	}
 
@@ -179,14 +243,7 @@ func equippedHeroEntry(row *model.PlayerHero) *pb.HeroEntry {
 		if !h.Equipped {
 			return true
 		}
-		entry = &pb.HeroEntry{
-			CfgId:    h.HeroID,
-			Level:    h.Level,
-			Exp:      h.Exp,
-			Star:     h.Star,
-			SkinId:   h.SkinID,
-			Equipped: true,
-		}
+		entry = toHeroEntry(h)
 		return false
 	})
 	return entry
@@ -231,18 +288,8 @@ func (this *heroAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _ 
 	if !tpl.T().RoleInfo.Has(cfgID) {
 		return errs.CodeInvalidParams.WithMessage("英雄配置不存在").Err()
 	}
-
-	row, err := loadPlayerHero(ctx, playerID)
-	if err != nil {
-		return err
-	}
-	if !row.AddHero(model.HeroInfo{HeroID: cfgID}) {
-		return errs.CodeInvalidParams.WithMessage("英雄已拥有").Err()
-	}
-
-	global.PlayerHeroCache.Set(playerID, row)
-	record.Record(ctx, model.RecordModuleHero, playerID, model.RecordActionGain, cfgID, 1)
-	return nil
+	_, err := addHeroWithBound(ctx, playerID, cfgID)
+	return err
 }
 
 // Remove 扣除英雄；未拥有返回错误。
@@ -302,4 +349,35 @@ func (this *heroAssetHandler) List(ctx context.Context, playerID int64) ([]*tpl.
 	})
 	sort.Slice(assets, func(i, j int) bool { return assets[i].Id < assets[j].Id })
 	return assets, nil
+}
+
+// heroBaseAttribute 英雄本体属性：星级档位决定 AttributeRole 行，等级走加法成长。
+func heroBaseAttribute(h model.HeroInfo) (*pb.HeroAttribute, error) {
+	cfg := tpl.T().AttributeRole.Get(h.HeroID + clampTier(h.Star))
+	if cfg == nil {
+		return nil, errs.CodeInvalidParams.WithMessage("英雄属性配置不存在").Err()
+	}
+	lo, hi := levelBounds(0, 0, false)
+	if cfg.Level != nil {
+		lo, hi = levelBounds(cfg.Level.X, cfg.Level.Y, true)
+	}
+	lvl := clampLevel(h.Level, lo, hi)
+	return &pb.HeroAttribute{
+		Hp:     statAt(cfg.Hp, cfg.GrowHp, lvl, lo),
+		Armor:  statAt(cfg.Armor, cfg.GrowArmor, lvl, lo),
+		Damage: statAt(cfg.Damage, cfg.GrowDamage, lvl, lo),
+	}, nil
+}
+
+// AttributeBonus 英雄本体属性贡献（未持有返回零值）。
+func (this *heroLogic) AttributeBonus(ctx context.Context, playerID int64, heroID int32) (*pb.HeroAttribute, error) {
+	row, err := loadPlayerHero(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+	h, ok := row.Heroes.Get(heroID)
+	if !ok {
+		return &pb.HeroAttribute{}, nil
+	}
+	return heroBaseAttribute(h)
 }

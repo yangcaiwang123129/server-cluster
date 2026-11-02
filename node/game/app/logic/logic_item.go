@@ -25,7 +25,7 @@ var itemLogicInst = singleton.NewContainer[global.ItemLogic]("ItemLogic")
 
 func init() {
 	itemLogicInst.Register(&itemLogic{})
-	registerAssetHandler(&itemAssetHandler{})
+	registerAsset(&itemAssetHandler{})
 }
 
 // Item 获取玩家物品容器业务单例。

@@ -10,15 +10,30 @@ import (
 	"server-cluster/share/pb"
 )
 
-// init 注册技能路由（业务在玩家 actor 内串行执行）。
+// init 注册技能路由（技能固定绑定英雄，独立模块）。
 func init() {
-	router.OnActor(pb.RouteCode_ROUTE_CODE_SKILL_LIST, handleSkillList)
-	router.OnActor(pb.RouteCode_ROUTE_CODE_SKILL_ADD, handleSkillAdd)
 	router.OnActor(pb.RouteCode_ROUTE_CODE_SKILL_UPDATE, handleSkillUpdate)
 	router.OnActor(pb.RouteCode_ROUTE_CODE_SKILL_UPGRADE, handleSkillUpgrade)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_SKILL_UP_QUALITY, handleSkillUpQuality)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_SKILL_BREAKTHROUGH, handleSkillBreakthrough)
 }
 
-// handleSkillUpgrade 技能升级（消耗物品）。
+// handleSkillUpdate 更新技能（GM）。
+func handleSkillUpdate(ctx node.Context) {
+	req := &pb.SkillUpdateReq{}
+	if err := ctx.Parse(req); err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	resp, err := logic.Skill().SkillUpdate(ctx.Context(), ctx.UID(), req)
+	if err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	_ = ctx.Response(resp)
+}
+
+// handleSkillUpgrade 技能升级（消耗升级素材）。
 func handleSkillUpgrade(ctx node.Context) {
 	req := &pb.SkillUpgradeReq{}
 	if err := ctx.Parse(req); err != nil {
@@ -33,14 +48,14 @@ func handleSkillUpgrade(ctx node.Context) {
 	_ = ctx.Response(resp)
 }
 
-// handleSkillList 技能列表。
-func handleSkillList(ctx node.Context) {
-	req := &pb.SkillListReq{}
+// handleSkillUpQuality 技能升品（消耗升品素材）。
+func handleSkillUpQuality(ctx node.Context) {
+	req := &pb.SkillUpQualityReq{}
 	if err := ctx.Parse(req); err != nil {
 		_ = ctx.Response(err)
 		return
 	}
-	resp, err := logic.Skill().SkillList(ctx.Context(), ctx.UID())
+	resp, err := logic.Skill().SkillUpQuality(ctx.Context(), ctx.UID(), req)
 	if err != nil {
 		_ = ctx.Response(err)
 		return
@@ -48,29 +63,14 @@ func handleSkillList(ctx node.Context) {
 	_ = ctx.Response(resp)
 }
 
-// handleSkillAdd 新增技能。
-func handleSkillAdd(ctx node.Context) {
-	req := &pb.SkillAddReq{}
+// handleSkillBreakthrough 技能突破（消耗突破素材）。
+func handleSkillBreakthrough(ctx node.Context) {
+	req := &pb.SkillBreakthroughReq{}
 	if err := ctx.Parse(req); err != nil {
 		_ = ctx.Response(err)
 		return
 	}
-	resp, err := logic.Skill().SkillAdd(ctx.Context(), ctx.UID(), req)
-	if err != nil {
-		_ = ctx.Response(err)
-		return
-	}
-	_ = ctx.Response(resp)
-}
-
-// handleSkillUpdate 更新技能。
-func handleSkillUpdate(ctx node.Context) {
-	req := &pb.SkillUpdateReq{}
-	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
-		return
-	}
-	resp, err := logic.Skill().SkillUpdate(ctx.Context(), ctx.UID(), req)
+	resp, err := logic.Skill().SkillBreakthrough(ctx.Context(), ctx.UID(), req)
 	if err != nil {
 		_ = ctx.Response(err)
 		return

@@ -1179,6 +1179,96 @@
                 }
             }
         },
+        "/api/v1/gm/equip/breakthrough": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 装备突破",
+                "parameters": [
+                    {
+                        "description": "突破参数（equipId 装备实例ID）",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmUpgradeReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/equip/unwear": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 装备卸载",
+                "parameters": [
+                    {
+                        "description": "卸载参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmEquipUnwearReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/equip/up-quality": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 装备升品",
+                "parameters": [
+                    {
+                        "description": "升品参数（equipId 装备实例ID）",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmUpgradeReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/gm/equip/upgrade": {
             "post": {
                 "produces": [
@@ -1190,12 +1280,42 @@
                 "summary": "GM 装备升级",
                 "parameters": [
                     {
-                        "description": "升级参数",
+                        "description": "升级参数（equipId 装备实例ID）",
                         "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/dto.GmUpgradeReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/equip/wear": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 装备穿戴",
+                "parameters": [
+                    {
+                        "description": "穿戴参数（heroId 为 0 时取当前出战英雄）",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmEquipWearReq"
                         }
                     }
                 ],
@@ -1541,6 +1661,62 @@
                 }
             }
         },
+        "/api/v1/gm/mail": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 邮件列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "玩家ID",
+                        "name": "playerId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gm"
+                ],
+                "summary": "GM 发送邮件",
+                "parameters": [
+                    {
+                        "description": "发送参数（attachments 为空则为纯通知）",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmMailSendReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/gm/player": {
             "get": {
                 "produces": [
@@ -1692,234 +1868,6 @@
                         "description": "每页条数",
                         "name": "pageSize",
                         "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "响应包在 {code, message, data} 中",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Resp"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/gm/skill": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "gm"
-                ],
-                "summary": "GM 技能列表",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "玩家ID",
-                        "name": "playerId",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "响应包在 {code, message, data} 中",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Resp"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "gm"
-                ],
-                "summary": "GM 更新技能",
-                "parameters": [
-                    {
-                        "description": "更新参数",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.GmSkillUpdateReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "响应包在 {code, message, data} 中",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Resp"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "gm"
-                ],
-                "summary": "GM 新增技能",
-                "parameters": [
-                    {
-                        "description": "新增参数",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.GmSkillAddReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "响应包在 {code, message, data} 中",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Resp"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/gm/skill/upgrade": {
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "gm"
-                ],
-                "summary": "GM 技能升级",
-                "parameters": [
-                    {
-                        "description": "升级参数",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.GmUpgradeReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "响应包在 {code, message, data} 中",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Resp"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/gm/weapon": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "gm"
-                ],
-                "summary": "GM 武器列表",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "玩家ID",
-                        "name": "playerId",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "响应包在 {code, message, data} 中",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Resp"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "gm"
-                ],
-                "summary": "GM 更新武器",
-                "parameters": [
-                    {
-                        "description": "更新参数",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.GmWeaponUpdateReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "响应包在 {code, message, data} 中",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Resp"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "gm"
-                ],
-                "summary": "GM 新增武器",
-                "parameters": [
-                    {
-                        "description": "新增参数",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.GmWeaponAddReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "响应包在 {code, message, data} 中",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Resp"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/gm/weapon/upgrade": {
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "gm"
-                ],
-                "summary": "GM 武器升级",
-                "parameters": [
-                    {
-                        "description": "升级参数",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.GmUpgradeReq"
-                        }
                     }
                 ],
                 "responses": {
@@ -3402,6 +3350,24 @@
                     "description": "装备配置ID",
                     "type": "integer"
                 },
+                "heroId": {
+                    "description": "所属英雄ID，0 表示出战英雄",
+                    "type": "integer"
+                },
+                "playerId": {
+                    "description": "玩家ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GmEquipUnwearReq": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "装备实例ID",
+                    "type": "string",
+                    "example": "0"
+                },
                 "playerId": {
                     "description": "玩家ID",
                     "type": "integer"
@@ -3411,17 +3377,48 @@
         "dto.GmEquipUpdateReq": {
             "type": "object",
             "properties": {
-                "equipId": {
-                    "description": "装备配置ID",
+                "breakthrough": {
+                    "description": "突破",
                     "type": "integer"
                 },
                 "equipped": {
                     "description": "是否穿戴",
                     "type": "boolean"
                 },
+                "heroId": {
+                    "description": "所属英雄ID，0 表示保持原归属",
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "装备实例ID",
+                    "type": "string",
+                    "example": "0"
+                },
                 "level": {
                     "description": "等级",
                     "type": "integer"
+                },
+                "playerId": {
+                    "description": "玩家ID",
+                    "type": "integer"
+                },
+                "quality": {
+                    "description": "品质",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GmEquipWearReq": {
+            "type": "object",
+            "properties": {
+                "heroId": {
+                    "description": "目标英雄ID，0 表示出战英雄",
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "装备实例ID",
+                    "type": "string",
+                    "example": "0"
                 },
                 "playerId": {
                     "description": "玩家ID",
@@ -3603,37 +3600,44 @@
                 }
             }
         },
-        "dto.GmSkillAddReq": {
+        "dto.GmMailAttachment": {
             "type": "object",
             "properties": {
-                "playerId": {
-                    "description": "玩家ID",
+                "cfgId": {
+                    "description": "配置ID",
                     "type": "integer"
                 },
-                "skillId": {
-                    "description": "技能配置ID",
+                "count": {
+                    "description": "数量",
+                    "type": "integer"
+                },
+                "type": {
+                    "description": "资产类型（对应 tpl.AssetType）",
                     "type": "integer"
                 }
             }
         },
-        "dto.GmSkillUpdateReq": {
+        "dto.GmMailSendReq": {
             "type": "object",
             "properties": {
-                "equipped": {
-                    "description": "是否装备",
-                    "type": "boolean"
+                "attachments": {
+                    "description": "附件列表（可空，空则为纯通知）",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.GmMailAttachment"
+                    }
                 },
-                "level": {
-                    "description": "等级",
-                    "type": "integer"
+                "content": {
+                    "description": "正文",
+                    "type": "string"
                 },
                 "playerId": {
                     "description": "玩家ID",
                     "type": "integer"
                 },
-                "skillId": {
-                    "description": "技能配置ID",
-                    "type": "integer"
+                "title": {
+                    "description": "标题",
+                    "type": "string"
                 }
             }
         },
@@ -3641,49 +3645,16 @@
             "type": "object",
             "properties": {
                 "cfgId": {
-                    "description": "配置ID",
+                    "description": "配置ID（装备场景不使用）",
                     "type": "integer"
+                },
+                "equipId": {
+                    "description": "装备实例ID（装备升级专用）",
+                    "type": "string",
+                    "example": "0"
                 },
                 "playerId": {
                     "description": "玩家ID",
-                    "type": "integer"
-                }
-            }
-        },
-        "dto.GmWeaponAddReq": {
-            "type": "object",
-            "properties": {
-                "playerId": {
-                    "description": "玩家ID",
-                    "type": "integer"
-                },
-                "weaponId": {
-                    "description": "武器配置ID",
-                    "type": "integer"
-                }
-            }
-        },
-        "dto.GmWeaponUpdateReq": {
-            "type": "object",
-            "properties": {
-                "durability": {
-                    "description": "耐久度",
-                    "type": "integer"
-                },
-                "equipped": {
-                    "description": "是否装备",
-                    "type": "boolean"
-                },
-                "level": {
-                    "description": "等级",
-                    "type": "integer"
-                },
-                "playerId": {
-                    "description": "玩家ID",
-                    "type": "integer"
-                },
-                "weaponId": {
-                    "description": "武器配置ID",
                     "type": "integer"
                 }
             }

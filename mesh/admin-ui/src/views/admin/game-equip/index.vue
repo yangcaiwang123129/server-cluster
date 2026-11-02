@@ -17,6 +17,14 @@
             style="width: 200px"
           />
         </el-form-item>
+        <el-form-item :label="$t('admin.gameEquip.heroId')">
+          <el-input
+            v-model="heroId"
+            :placeholder="$t('admin.gameEquip.heroIdPlaceholder')"
+            clearable
+            style="width: 200px"
+          />
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" :loading="loading" @click="loadList">
             {{ $t('admin.gameEquip.list') }}
@@ -24,7 +32,7 @@
         </el-form-item>
       </el-form>
 
-      <el-table v-loading="loading" :data="rows" border>
+      <el-table v-loading="loading" :data="rows" row-key="id" border>
         <el-table-column prop="name" :label="$t('admin.gameEquip.name')" min-width="180">
           <template #default="{ row }">
             <div class="item-cell">
@@ -34,7 +42,13 @@
             </div>
           </template>
         </el-table-column>
+        <el-table-column prop="id" :label="$t('admin.gameEquip.instanceId')" min-width="180" show-overflow-tooltip />
+        <el-table-column :label="$t('admin.gameEquip.heroId')" min-width="110">
+          <template #default="{ row }">{{ row.heroId || '-' }}</template>
+        </el-table-column>
         <el-table-column prop="level" :label="$t('admin.gameEquip.level')" min-width="90" />
+        <el-table-column prop="quality" :label="$t('admin.gameEquip.quality')" min-width="90" />
+        <el-table-column prop="breakthrough" :label="$t('admin.gameEquip.breakthrough')" min-width="90" />
         <el-table-column
           prop="desc"
           :label="$t('admin.gameEquip.desc')"
@@ -44,7 +58,7 @@
         <el-table-column :label="$t('admin.gameEquip.equipped')" min-width="90">
           <template #default="{ row }">{{ row.equipped ? '✓' : '-' }}</template>
         </el-table-column>
-        <el-table-column :label="$t('common.actions')" width="150" fixed="right">
+        <el-table-column :label="$t('common.actions')" width="200" fixed="right">
           <template #default="{ row }">
             <el-button
               v-permisaction="['game:gm:equip:list']"
@@ -53,11 +67,35 @@
               @click="openEdit(row)"
             >{{ $t('common.edit') }}</el-button>
             <el-button
+              v-if="row.equipped"
               v-permisaction="['game:gm:equip:list']"
               link
               type="warning"
-              @click="upgrade(row)"
-            >{{ $t('admin.gameEquip.upgrade') }}</el-button>
+              @click="unwear(row)"
+            >{{ $t('admin.gameEquip.unwear') }}</el-button>
+            <el-button
+              v-else
+              v-permisaction="['game:gm:equip:list']"
+              link
+              type="success"
+              @click="wear(row)"
+            >{{ $t('admin.gameEquip.wear') }}</el-button>
+            <el-dropdown
+              v-permisaction="['game:gm:equip:list']"
+              trigger="click"
+              @command="(cmd: string) => grow(row, cmd as GrowKind)"
+            >
+              <el-button link type="primary">{{ $t('admin.gameEquip.more') }}</el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="upgrade">{{ $t('admin.gameEquip.upgrade') }}</el-dropdown-item>
+                  <el-dropdown-item command="upQuality">{{ $t('admin.gameEquip.upQuality') }}</el-dropdown-item>
+                  <el-dropdown-item command="breakthrough">
+                    {{ $t('admin.gameEquip.breakthrough') }}
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </template>
         </el-table-column>
       </el-table>
@@ -81,8 +119,22 @@
             <span class="item-id">#{{ editDialog.equipId }}</span>
           </div>
         </el-form-item>
+        <el-form-item :label="$t('admin.gameEquip.instanceId')">
+          <div class="item-cell">
+            <span class="item-id">{{ editDialog.id }}</span>
+          </div>
+        </el-form-item>
         <el-form-item :label="$t('admin.gameEquip.level')">
           <el-input-number v-model="editDialog.level" :min="1" />
+        </el-form-item>
+        <el-form-item :label="$t('admin.gameEquip.quality')">
+          <el-input-number v-model="editDialog.quality" :min="1" />
+        </el-form-item>
+        <el-form-item :label="$t('admin.gameEquip.breakthrough')">
+          <el-input-number v-model="editDialog.breakthrough" :min="0" />
+        </el-form-item>
+        <el-form-item :label="$t('admin.gameEquip.heroId')">
+          <el-input-number v-model="editDialog.heroId" :min="0" />
         </el-form-item>
         <el-form-item :label="$t('admin.gameEquip.equipped')">
           <el-switch v-model="editDialog.equipped" />
@@ -107,7 +159,16 @@ import GameItemIcon from '@/components/GameItemIcon/index.vue'
 import GameCatalogList from '@/components/GameCatalogList/index.vue'
 import { msgInfo, msgSuccess } from '@/utils/message'
 
-import { addGmEquip, listGmEquip, updateGmEquip, upgradeGmEquip } from '@/api/admin/gm'
+import {
+  addGmEquip,
+  breakthroughGmEquip,
+  listGmEquip,
+  unwearGmEquip,
+  updateGmEquip,
+  upQualityGmEquip,
+  upgradeGmEquip,
+  wearGmEquip
+} from '@/api/admin/gm'
 import type { GameCatalogEntry, GmEquip } from '@/types/admin'
 
 // Must match the menu_name the backend serves, or keep-alive silently misses
@@ -116,20 +177,31 @@ defineOptions({ name: 'GameEquipManage' })
 const { t } = useI18n()
 
 const playerId = ref('')
+const heroId = ref('')
 const loading = ref(false)
 const rows = ref<GmEquip[]>([])
 
 const editDialog = reactive({
   visible: false,
   loading: false,
+  id: '',
   equipId: 0,
+  heroId: 0,
   name: '',
   level: 1,
+  quality: 1,
+  breakthrough: 0,
   equipped: false
 })
 
 const playerIdOrZero = () => {
   const id = Number(playerId.value)
+  return Number.isInteger(id) && id > 0 ? id : 0
+}
+
+// 0 表示由服务端挂到当前出战英雄
+const heroIdOrZero = () => {
+  const id = Number(heroId.value)
   return Number.isInteger(id) && id > 0 ? id : 0
 }
 
@@ -153,16 +225,24 @@ const addFromCatalog = async(entry: GameCatalogEntry) => {
     msgInfo(t('admin.gameEquip.playerIdInvalid'))
     return
   }
-  const res = await addGmEquip({ playerId: id, equipId: entry.id! }).catch(() => null)
+  const res = await addGmEquip({
+    playerId: id,
+    equipId: entry.id!,
+    heroId: heroIdOrZero()
+  }).catch(() => null)
   if (!res) return
   msgSuccess(t('admin.gameEquip.addOk'))
   await loadList()
 }
 
 const openEdit = (row: GmEquip) => {
+  editDialog.id = row.id ?? ''
   editDialog.equipId = row.equipId ?? 0
+  editDialog.heroId = row.heroId ?? 0
   editDialog.name = row.name ?? ''
   editDialog.level = row.level ?? 1
+  editDialog.quality = row.quality ?? 1
+  editDialog.breakthrough = row.breakthrough ?? 0
   editDialog.equipped = row.equipped ?? false
   editDialog.visible = true
 }
@@ -173,8 +253,11 @@ const submitEdit = async() => {
   editDialog.loading = true
   const res = await updateGmEquip({
     playerId: id,
-    equipId: editDialog.equipId,
+    id: editDialog.id,
+    heroId: editDialog.heroId,
     level: editDialog.level,
+    quality: editDialog.quality,
+    breakthrough: editDialog.breakthrough,
     equipped: editDialog.equipped
   }).catch(() => null)
   editDialog.loading = false
@@ -184,13 +267,45 @@ const submitEdit = async() => {
   await loadList()
 }
 
-// Upgrade consumes upgrade materials from the backpack; the interceptor reports failures.
-const upgrade = async(row: GmEquip) => {
+// 维度成长：升级/升品/突破都消耗背包素材，拦截器已统一报错。
+const growApi = {
+  upgrade: upgradeGmEquip,
+  upQuality: upQualityGmEquip,
+  breakthrough: breakthroughGmEquip
+} as const
+
+type GrowKind = keyof typeof growApi
+
+const grow = async(row: GmEquip, kind: GrowKind) => {
   const id = playerIdOrZero()
   if (!id) return
-  const res = await upgradeGmEquip({ playerId: id, cfgId: row.equipId ?? 0 }).catch(() => null)
+  const res = await growApi[kind]({ playerId: id, equipId: row.id ?? '' }).catch(() => null)
   if (!res) return
-  msgSuccess(t('admin.gameEquip.upgradeOk'))
+  msgSuccess(t('admin.gameEquip.growOk'))
+  await loadList()
+}
+
+// 穿戴到顶部英雄输入指定的英雄（0 = 出战英雄），同英雄同配置自动顶替。
+const wear = async(row: GmEquip) => {
+  const id = playerIdOrZero()
+  if (!id) return
+  const res = await wearGmEquip({
+    playerId: id,
+    id: row.id ?? '',
+    heroId: heroIdOrZero()
+  }).catch(() => null)
+  if (!res) return
+  msgSuccess(t('admin.gameEquip.wearOk'))
+  await loadList()
+}
+
+// 卸载只清穿戴状态，装备归属英雄保留。
+const unwear = async(row: GmEquip) => {
+  const id = playerIdOrZero()
+  if (!id) return
+  const res = await unwearGmEquip({ playerId: id, id: row.id ?? '' }).catch(() => null)
+  if (!res) return
+  msgSuccess(t('admin.gameEquip.unwearOk'))
   await loadList()
 }
 </script>

@@ -145,7 +145,7 @@ func toGmUpgradeResp(cfgID, level int32, attr *pb.HeroAttribute) *dto.GmUpgradeR
 	}
 }
 
-// toGmHeroEntry 英雄条目转响应（补齐名称/稀有度等展示信息）。
+// toGmHeroEntry 英雄条目转响应（补齐名称/稀有度等展示信息；武器/技能由独立模块下发）。
 func toGmHeroEntry(e *pb.HeroEntry) dto.GmHeroEntry {
 	row := dto.GmHeroEntry{
 		HeroID:   e.GetCfgId(),

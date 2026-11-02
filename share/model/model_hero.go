@@ -7,7 +7,8 @@ import (
 	"server-cluster/share/util"
 )
 
-// HeroInfo 单个英雄的持有数据（player_hero.heroes 的 map 元素，key=英雄ID）。
+// HeroInfo 单个英雄的持有数据（player_hero.heroes 的 map 元素，key=英雄配置ID）。
+// 武器/技能/装备为独立模块（player_weapon/player_skill/player_equip），由英雄配置表关联。
 type HeroInfo struct {
 	HeroID   int32 `json:"hero_id"`  // 英雄ID(roleinfoconfig)
 	Level    int32 `json:"level"`    // 英雄等级

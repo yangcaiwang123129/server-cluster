@@ -3,11 +3,11 @@ syntax = "proto3";
 
 package internal;
 
+import "common.proto";
 import "item.proto";
 import "equip.proto";
+import "mail.proto";
 import "hero.proto";
-import "skill.proto";
-import "weapon.proto";
 
 option go_package = "server-cluster/share/pb";
 
@@ -108,55 +108,14 @@ message GmHeroUpgradeReq {
   int32 hero_id = 2;   // 英雄配置ID
 }
 
-// GmWeaponListReq 武器列表请求。
-message GmWeaponListReq {
-  int64 player_id = 1; // 玩家ID
-}
-
-// GmWeaponAddReq 新增武器请求。
-message GmWeaponAddReq {
-  int64 player_id = 1; // 玩家ID
-  pb.WeaponAddReq req = 2; // 业务参数
-}
-
-// GmWeaponUpdateReq 更新武器请求。
-message GmWeaponUpdateReq {
-  int64 player_id = 1; // 玩家ID
-  pb.WeaponUpdateReq req = 2; // 业务参数
-}
-
-// GmWeaponUpgradeReq 武器升级请求。
-message GmWeaponUpgradeReq {
-  int64 player_id = 1; // 玩家ID
-  int32 weapon_id = 2; // 武器配置ID
-}
-
-// GmSkillListReq 技能列表请求。
-message GmSkillListReq {
-  int64 player_id = 1; // 玩家ID
-}
-
-// GmSkillAddReq 新增技能请求。
-message GmSkillAddReq {
-  int64 player_id = 1; // 玩家ID
-  pb.SkillAddReq req = 2; // 业务参数
-}
-
-// GmSkillUpdateReq 更新技能请求。
-message GmSkillUpdateReq {
-  int64 player_id = 1; // 玩家ID
-  pb.SkillUpdateReq req = 2; // 业务参数
-}
-
-// GmSkillUpgradeReq 技能升级请求。
-message GmSkillUpgradeReq {
-  int64 player_id = 1; // 玩家ID
-  int32 skill_id = 2;  // 技能配置ID
-}
-
 // GmEquipListReq 装备列表请求。
 message GmEquipListReq {
   int64 player_id = 1; // 玩家ID
+}
+
+// GmEquipListResp 装备列表响应（GM 专用，玩家协议不再单独下发列表）。
+message GmEquipListResp {
+  repeated pb.EquipEntry entries = 1;
 }
 
 // GmEquipAddReq 新增装备请求。
@@ -174,7 +133,50 @@ message GmEquipUpdateReq {
 // GmEquipUpgradeReq 装备升级请求。
 message GmEquipUpgradeReq {
   int64 player_id = 1; // 玩家ID
-  int32 equip_id = 2;  // 装备配置ID
+  int64 equip_id = 2;  // 装备实例ID
+}
+
+// GmEquipUpQualityReq 装备升品请求。
+message GmEquipUpQualityReq {
+  int64 player_id = 1; // 玩家ID
+  int64 equip_id = 2;  // 装备实例ID
+}
+
+// GmEquipBreakthroughReq 装备突破请求。
+message GmEquipBreakthroughReq {
+  int64 player_id = 1; // 玩家ID
+  int64 equip_id = 2;  // 装备实例ID
+}
+
+// GmEquipWearReq 装备穿戴请求。
+message GmEquipWearReq {
+  int64 player_id = 1; // 玩家ID
+  int64 equip_id = 2;  // 装备实例ID
+  int32 hero_id = 3;   // 目标英雄ID，0 表示出战英雄
+}
+
+// GmEquipUnwearReq 装备卸载请求。
+message GmEquipUnwearReq {
+  int64 player_id = 1; // 玩家ID
+  int64 equip_id = 2;  // 装备实例ID
+}
+
+// GmMailListReq 邮件列表请求（GM 后台查看玩家邮件）。
+message GmMailListReq {
+  int64 player_id = 1; // 玩家ID
+}
+
+// GmMailListResp 邮件列表响应（GM 专用）。
+message GmMailListResp {
+  repeated pb.MailEntry entries = 1;
+}
+
+// GmMailSendReq 后台发送邮件请求。
+message GmMailSendReq {
+  int64 player_id = 1;               // 玩家ID
+  string title = 2;                  // 标题
+  string content = 3;                // 正文
+  repeated pb.AssetEntry attachments = 4; // 附件资产（可空，空则为纯通知）
 }
 
 // GameAdminService 后台 GM 服务（game 服提供，admin 服调用）。
@@ -208,30 +210,25 @@ service GameAdminService {
   // HeroUpgrade 英雄升级（消耗物品）
   rpc HeroUpgrade (GmHeroUpgradeReq) returns (pb.HeroUpgradeResp);
 
-  // WeaponList 武器列表
-  rpc WeaponList (GmWeaponListReq) returns (pb.WeaponListResp);
-  // WeaponAdd 新增武器
-  rpc WeaponAdd (GmWeaponAddReq) returns (pb.WeaponAddResp);
-  // WeaponUpdate 更新武器
-  rpc WeaponUpdate (GmWeaponUpdateReq) returns (pb.WeaponUpdateResp);
-  // WeaponUpgrade 武器升级（消耗物品）
-  rpc WeaponUpgrade (GmWeaponUpgradeReq) returns (pb.WeaponUpgradeResp);
-
-  // SkillList 技能列表
-  rpc SkillList (GmSkillListReq) returns (pb.SkillListResp);
-  // SkillAdd 新增技能
-  rpc SkillAdd (GmSkillAddReq) returns (pb.SkillAddResp);
-  // SkillUpdate 更新技能
-  rpc SkillUpdate (GmSkillUpdateReq) returns (pb.SkillUpdateResp);
-  // SkillUpgrade 技能升级（消耗物品）
-  rpc SkillUpgrade (GmSkillUpgradeReq) returns (pb.SkillUpgradeResp);
-
   // EquipList 装备列表
-  rpc EquipList (GmEquipListReq) returns (pb.EquipListResp);
+  rpc EquipList (GmEquipListReq) returns (GmEquipListResp);
   // EquipAdd 新增装备
   rpc EquipAdd (GmEquipAddReq) returns (pb.EquipAddResp);
   // EquipUpdate 更新装备
   rpc EquipUpdate (GmEquipUpdateReq) returns (pb.EquipUpdateResp);
   // EquipUpgrade 装备升级（消耗物品）
   rpc EquipUpgrade (GmEquipUpgradeReq) returns (pb.EquipUpgradeResp);
+  // EquipUpQuality 装备升品（消耗物品）
+  rpc EquipUpQuality (GmEquipUpQualityReq) returns (pb.EquipUpQualityResp);
+  // EquipBreakthrough 装备突破（消耗物品）
+  rpc EquipBreakthrough (GmEquipBreakthroughReq) returns (pb.EquipBreakthroughResp);
+  // EquipWear 装备穿戴（同英雄同配置自动顶替）
+  rpc EquipWear (GmEquipWearReq) returns (pb.EquipWearResp);
+  // EquipUnwear 装备卸载
+  rpc EquipUnwear (GmEquipUnwearReq) returns (pb.EquipUnwearResp);
+
+  // MailList 玩家邮件列表
+  rpc MailList (GmMailListReq) returns (GmMailListResp);
+  // MailSend 后台发送邮件（可带附件）
+  rpc MailSend (GmMailSendReq) returns (pb.MailEntry);
 }

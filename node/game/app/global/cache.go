@@ -15,14 +15,16 @@ var (
 	PlayerExtraCache = cache.NewPlayerTableCache[model.PlayerExtra](cache.CacherConfig{Name: "player_extra"})
 	// PlayerHeroCache 玩家英雄持有（player_hero，一玩家一行，英雄 map JSON）
 	PlayerHeroCache = cache.NewPlayerTableCache[model.PlayerHero](cache.CacherConfig{Name: "player_hero"})
-	// PlayerSkillCache 玩家技能持有（player_skill，一玩家一行，技能 map JSON）
-	PlayerSkillCache = cache.NewPlayerTableCache[model.PlayerSkill](cache.CacherConfig{Name: "player_skill"})
 	// PlayerWeaponCache 玩家武器持有（player_weapon，一玩家一行，武器 map JSON）
 	PlayerWeaponCache = cache.NewPlayerTableCache[model.PlayerWeapon](cache.CacherConfig{Name: "player_weapon"})
+	// PlayerSkillCache 玩家技能持有（player_skill，一玩家一行，技能 map JSON）
+	PlayerSkillCache = cache.NewPlayerTableCache[model.PlayerSkill](cache.CacherConfig{Name: "player_skill"})
 	// PlayerEquipCache 玩家装备持有（player_equip，一玩家一行，装备 map JSON）
 	PlayerEquipCache = cache.NewPlayerTableCache[model.PlayerEquip](cache.CacherConfig{Name: "player_equip"})
 	// PlayerItemCache 玩家物品容器（player_item，一玩家一行）
 	PlayerItemCache = cache.NewPlayerTableCache[model.PlayerItem](cache.CacherConfig{Name: "player_item"})
+	// PlayerMailCache 玩家邮件（player_mail，一玩家一行，邮件 map JSON）
+	PlayerMailCache = cache.NewPlayerTableCache[model.PlayerMail](cache.CacherConfig{Name: "player_mail"})
 )
 
 // CacheCloseStat 单个玩家数据缓存在停服刷盘时的统计，用于停服日志展示。
@@ -51,9 +53,10 @@ func CloseCaches() []CacheCloseStat {
 		closeOne(PlayerCache),
 		closeOne(PlayerExtraCache),
 		closeOne(PlayerHeroCache),
-		closeOne(PlayerSkillCache),
 		closeOne(PlayerWeaponCache),
+		closeOne(PlayerSkillCache),
 		closeOne(PlayerEquipCache),
 		closeOne(PlayerItemCache),
+		closeOne(PlayerMailCache),
 	}
 }

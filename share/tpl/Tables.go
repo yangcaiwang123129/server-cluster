@@ -96,33 +96,42 @@ func LoadTable[T any](file string, keyFn func(*T) int32) (*Table[T], error) {
 
 // Tables 持有全部配置表实例，由 Load 初始化。
 type Tables struct {
-	Effect          *Table[EffectCfg]          //
-	Level           *Table[LevelCfg]           //
-	Scene           *Table[SceneCfg]           //
-	SkillTemplate   *Table[SkillTemplateCfg]   //
-	Item            *Table[ItemCfg]            //
-	BuildingItem    *Table[BuildingItemCfg]    //
-	Mouse           *Table[MouseCfg]           //
-	Language        *Table[LanguageCfg]        //
-	Dialogue        *Table[DialogueCfg]        //
-	Character       *Table[CharacterCfg]       //
-	Input           *Table[InputCfg]           //
-	Global          *Table[GlobalCfg]          //
-	Skill           *Table[SkillCfg]           //
-	Activity        *Table[ActivityCfg]        //
-	Function        *Table[FunctionCfg]        //
-	Collection      *Table[CollectionCfg]      //
-	RoleInfo        *Table[RoleInfoCfg]        //
-	AttributeRole   *Table[AttributeRoleCfg]   //
-	AttributeWeapon *Table[AttributeWeaponCfg] //
-	AttributeGear   *Table[AttributeGearCfg]   //
-	AttributeSkill  *Table[AttributeSkillCfg]  //
-	Weapon          *Table[WeaponCfg]          //
-	Equip           *Table[EquipCfg]           //
-	Damage          *Table[DamageCfg]          //
-	Recharge        *Table[RechargeCfg]        //
-	Gift            *Table[GiftCfg]            //
-	Exchange        *Table[ExchangeCfg]        //
+	Effect             *Table[EffectCfg]             //
+	Level              *Table[LevelCfg]              //
+	Scene              *Table[SceneCfg]              //
+	SkillTemplate      *Table[SkillTemplateCfg]      //
+	Item               *Table[ItemCfg]               //
+	BuildingItem       *Table[BuildingItemCfg]       //
+	Mouse              *Table[MouseCfg]              //
+	Language           *Table[LanguageCfg]           //
+	Dialogue           *Table[DialogueCfg]           //
+	Character          *Table[CharacterCfg]          //
+	Input              *Table[InputCfg]              //
+	Global             *Table[GlobalCfg]             //
+	Skill              *Table[SkillCfg]              //
+	Activity           *Table[ActivityCfg]           //
+	Function           *Table[FunctionCfg]           //
+	Collection         *Table[CollectionCfg]         //
+	RoleInfo           *Table[RoleInfoCfg]           //
+	AttributeRole      *Table[AttributeRoleCfg]      //
+	AttributeWeapon    *Table[AttributeWeaponCfg]    //
+	AttributeGear      *Table[AttributeGearCfg]      //
+	AttributeSkill     *Table[AttributeSkillCfg]     //
+	Weapon             *Table[WeaponCfg]             //
+	Equip              *Table[EquipCfg]              //
+	Damage             *Table[DamageCfg]             //
+	Recharge           *Table[RechargeCfg]           //
+	Gift               *Table[GiftCfg]               //
+	Exchange           *Table[ExchangeCfg]           //
+	WeaponLevel        *Table[WeaponLevelCfg]        //
+	WeaponQuality      *Table[WeaponQualityCfg]      //
+	WeaponBreakthrough *Table[WeaponBreakthroughCfg] //
+	GearLevel          *Table[GearLevelCfg]          //
+	GearQuality        *Table[GearQualityCfg]        //
+	GearBreakthrough   *Table[GearBreakthroughCfg]   //
+	SkillLevel         *Table[SkillLevelCfg]         //
+	SkillQuality       *Table[SkillQualityCfg]       //
+	SkillBreakthrough  *Table[SkillBreakthroughCfg]  //
 }
 
 var (
@@ -219,6 +228,33 @@ func Load() error {
 		return err
 	}
 	if t.Exchange, err = LoadTable("exchangeconfig", func(r *ExchangeCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.WeaponLevel, err = LoadTable("weaponlevelconfig", func(r *WeaponLevelCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.WeaponQuality, err = LoadTable("weaponqualityconfig", func(r *WeaponQualityCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.WeaponBreakthrough, err = LoadTable("weaponbreakthroughconfig", func(r *WeaponBreakthroughCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.GearLevel, err = LoadTable("gearlevelconfig", func(r *GearLevelCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.GearQuality, err = LoadTable("gearqualityconfig", func(r *GearQualityCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.GearBreakthrough, err = LoadTable("gearbreakthroughconfig", func(r *GearBreakthroughCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.SkillLevel, err = LoadTable("skilllevelconfig", func(r *SkillLevelCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.SkillQuality, err = LoadTable("skillqualityconfig", func(r *SkillQualityCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.SkillBreakthrough, err = LoadTable("skillbreakthroughconfig", func(r *SkillBreakthroughCfg) int32 { return r.Id }); err != nil {
 		return err
 	}
 	tables = t

@@ -10,10 +10,13 @@ option go_package = "server-cluster/share/pb";
 message HeroListReq {
 }
 
-// 英雄列表响应
+// 英雄列表响应（服务器按模块分表，客户端一次拿全：英雄 + 武器 + 技能 + 装备）
 message HeroListResp {
   Result result = 1;
   repeated HeroEntry hero_entries = 2;
+  repeated WeaponEntry weapon_entries = 3; // 武器持有（固定绑定英雄）
+  repeated SkillEntry skill_entries = 4;   // 技能持有（固定绑定英雄）
+  repeated EquipEntry equip_entries = 5;   // 装备持有（含未穿戴）
 }
 
 // 英雄变化通知（路由 10021）
@@ -51,6 +54,14 @@ message HeroUpdateResp {
 // 查看英雄累计属性请求（路由 10024）
 message HeroAttributeReq {
   int32 cfg_id = 1; // 英雄配置ID（0 表示当前出战英雄）
+}
+
+// 英雄累计属性（固定字段；由英雄本体 + 武器 + 技能 + 装备 + 未来天赋/buff 汇总计算）
+message HeroAttribute {
+  int32 power = 1;  // 战力 = hp + armor + damage
+  int32 hp = 2;     // 生命值
+  int32 armor = 3;  // 护甲
+  int32 damage = 4; // 伤害
 }
 
 // 查看英雄累计属性响应

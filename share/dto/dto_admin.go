@@ -139,82 +139,51 @@ type GmHeroUpdateReq struct {
 	Equipped bool  `json:"equipped"` // 是否出战
 }
 
-// ========== 武器（GM） ==========
-
-// GmWeaponEntry GM 武器持有状态（含配置展示信息）。
-type GmWeaponEntry struct {
-	WeaponID   int32  `json:"weaponId"`   // 武器配置ID
-	Level      int32  `json:"level"`      // 等级
-	Durability int32  `json:"durability"` // 耐久度
-	Equipped   bool   `json:"equipped"`   // 是否装备
-	Name       string `json:"name"`       // 武器名称
-	IconKey    string `json:"iconKey"`    // 图标
-}
-
-// GmWeaponAddReq 新增武器请求。
-type GmWeaponAddReq struct {
-	PlayerID int64 `json:"playerId"` // 玩家ID
-	WeaponID int32 `json:"weaponId"` // 武器配置ID
-}
-
-// GmWeaponUpdateReq 更新武器请求。
-type GmWeaponUpdateReq struct {
-	PlayerID   int64 `json:"playerId"`   // 玩家ID
-	WeaponID   int32 `json:"weaponId"`   // 武器配置ID
-	Level      int32 `json:"level"`      // 等级
-	Durability int32 `json:"durability"` // 耐久度
-	Equipped   bool  `json:"equipped"`   // 是否装备
-}
-
-// ========== 技能（GM） ==========
-
-// GmSkillEntry GM 技能持有状态（含配置展示信息）。
-type GmSkillEntry struct {
-	SkillID  int32  `json:"skillId"`  // 技能配置ID
-	Level    int32  `json:"level"`    // 等级
-	Equipped bool   `json:"equipped"` // 是否装备
-	Name     string `json:"name"`     // 技能名称
-	Desc     string `json:"desc"`     // 技能简述
-}
-
-// GmSkillAddReq 新增技能请求。
-type GmSkillAddReq struct {
-	PlayerID int64 `json:"playerId"` // 玩家ID
-	SkillID  int32 `json:"skillId"`  // 技能配置ID
-}
-
-// GmSkillUpdateReq 更新技能请求。
-type GmSkillUpdateReq struct {
-	PlayerID int64 `json:"playerId"` // 玩家ID
-	SkillID  int32 `json:"skillId"`  // 技能配置ID
-	Level    int32 `json:"level"`    // 等级
-	Equipped bool  `json:"equipped"` // 是否装备
-}
-
 // ========== 装备（GM） ==========
 
-// GmEquipEntry GM 装备持有状态（含配置展示信息）。
+// GmEquipEntry GM 装备持有状态（含配置展示信息）。ID 为雪花实例ID，JSON 按字符串收发避免前端精度丢失。
 type GmEquipEntry struct {
-	EquipID  int32  `json:"equipId"`  // 装备配置ID
-	Level    int32  `json:"level"`    // 等级
-	Equipped bool   `json:"equipped"` // 是否穿戴
-	Name     string `json:"name"`     // 装备名称
-	IconKey  string `json:"iconKey"`  // 图标
-	Desc     string `json:"desc"`     // 描述
+	ID           int64  `json:"id,string"`    // 装备实例ID
+	EquipID      int32  `json:"equipId"`      // 装备配置ID
+	HeroID       int32  `json:"heroId"`       // 所属英雄ID，0 表示未分配
+	Level        int32  `json:"level"`        // 等级
+	Quality      int32  `json:"quality"`      // 品质
+	Breakthrough int32  `json:"breakthrough"` // 突破
+	Equipped     bool   `json:"equipped"`     // 是否穿戴
+	Name         string `json:"name"`         // 装备名称
+	IconKey      string `json:"iconKey"`      // 图标
+	Desc         string `json:"desc"`         // 描述
 }
 
 // GmEquipAddReq 新增装备请求。
 type GmEquipAddReq struct {
 	PlayerID int64 `json:"playerId"` // 玩家ID
 	EquipID  int32 `json:"equipId"`  // 装备配置ID
+	HeroID   int32 `json:"heroId"`   // 所属英雄ID，0 表示出战英雄
 }
 
 // GmEquipUpdateReq 更新装备请求。
 type GmEquipUpdateReq struct {
-	PlayerID int64 `json:"playerId"` // 玩家ID
-	EquipID  int32 `json:"equipId"`  // 装备配置ID
-	Level    int32 `json:"level"`    // 等级
-	Equipped bool  `json:"equipped"` // 是否穿戴
+	PlayerID     int64 `json:"playerId"`     // 玩家ID
+	ID           int64 `json:"id,string"`    // 装备实例ID
+	HeroID       int32 `json:"heroId"`       // 所属英雄ID，0 表示保持原归属
+	Level        int32 `json:"level"`        // 等级
+	Quality      int32 `json:"quality"`      // 品质
+	Breakthrough int32 `json:"breakthrough"` // 突破
+	Equipped     bool  `json:"equipped"`     // 是否穿戴
+}
+
+// GmEquipWearReq 装备穿戴请求。
+type GmEquipWearReq struct {
+	PlayerID int64 `json:"playerId"`  // 玩家ID
+	ID       int64 `json:"id,string"` // 装备实例ID
+	HeroID   int32 `json:"heroId"`    // 目标英雄ID，0 表示出战英雄
+}
+
+// GmEquipUnwearReq 装备卸载请求。
+type GmEquipUnwearReq struct {
+	PlayerID int64 `json:"playerId"`  // 玩家ID
+	ID       int64 `json:"id,string"` // 装备实例ID
 }
 
 // ========== 英雄累计属性 / 升级（GM） ==========
@@ -227,29 +196,33 @@ type GmHeroAttributeReq struct {
 
 // GmHeroAttribute 英雄累计属性（基础属性 + 已装备武器/装备加成）。
 type GmHeroAttribute struct {
-	HeroID  int32 `json:"heroId"`  // 英雄配置ID
-	Level   int32 `json:"level"`   // 等级
-	Star    int32 `json:"star"`    // 星级
-	Power   int32 `json:"power"`   // 战力（= 伤害 + 护甲 + 生命）
-	Hp      int32 `json:"hp"`      // 生命值
-	Armor   int32 `json:"armor"`   // 护甲
-	Damage  int32 `json:"damage"`  // 伤害
-}
-
-// GmUpgradeReq 升级请求（英雄/武器/技能/装备通用）。
-type GmUpgradeReq struct {
-	PlayerID int64 `json:"playerId"` // 玩家ID
-	CfgID    int32 `json:"cfgId"`    // 配置ID
-}
-
-// GmUpgradeResp 升级结果（含升级后的英雄累计属性）。
-type GmUpgradeResp struct {
-	CfgID  int32 `json:"cfgId"`  // 配置ID
-	Level  int32 `json:"level"`  // 升级后等级
-	Power  int32 `json:"power"`  // 战力
+	HeroID int32 `json:"heroId"` // 英雄配置ID
+	Level  int32 `json:"level"`  // 等级
+	Star   int32 `json:"star"`   // 星级
+	Power  int32 `json:"power"`  // 战力（= 伤害 + 护甲 + 生命）
 	Hp     int32 `json:"hp"`     // 生命值
 	Armor  int32 `json:"armor"`  // 护甲
 	Damage int32 `json:"damage"` // 伤害
+}
+
+// GmUpgradeReq 升级/升品/突破请求（英雄/武器/技能/装备通用）。
+// 英雄/武器/技能以 CfgID 定位（配置ID）；装备以 EquipID（实例ID）定位。
+type GmUpgradeReq struct {
+	PlayerID int64 `json:"playerId"`       // 玩家ID
+	CfgID    int32 `json:"cfgId"`          // 配置ID（装备场景不使用）
+	EquipID  int64 `json:"equipId,string"` // 装备实例ID（装备升级专用）
+}
+
+// GmUpgradeResp 升级/升品/突破结果（含操作后的英雄累计属性）。
+type GmUpgradeResp struct {
+	CfgID        int32 `json:"cfgId"`        // 配置ID
+	Level        int32 `json:"level"`        // 操作后等级
+	Quality      int32 `json:"quality"`      // 操作后品质（无品质维度时为 0）
+	Breakthrough int32 `json:"breakthrough"` // 操作后突破（无突破维度时为 0）
+	Power        int32 `json:"power"`        // 战力
+	Hp           int32 `json:"hp"`           // 生命值
+	Armor        int32 `json:"armor"`        // 护甲
+	Damage       int32 `json:"damage"`       // 伤害
 }
 
 // ========== 配置目录（GM，读 Luban 配置） ==========
@@ -263,6 +236,33 @@ type GameCatalogEntry struct {
 	Rarity  int32  `json:"rarity"`  // 稀有度（无该概念的配置为 0）
 	Width   int32  `json:"width"`   // 占格宽（仅 item 有意义）
 	Height  int32  `json:"height"`  // 占格高（仅 item 有意义）
+}
+
+// ========== 邮件（GM） ==========
+
+// GmMailAttachment 邮件附件资产。
+type GmMailAttachment struct {
+	Type  int32 `json:"type"`  // 资产类型（对应 tpl.AssetType）
+	CfgID int32 `json:"cfgId"` // 配置ID
+	Count int32 `json:"count"` // 数量
+}
+
+// GmMailEntry GM 邮件条目（含附件与状态）。ID 为雪花实例ID，JSON 按字符串收发避免前端精度丢失。
+type GmMailEntry struct {
+	ID          int64              `json:"id,string"`   // 邮件实例ID
+	Title       string             `json:"title"`       // 标题
+	Content     string             `json:"content"`     // 正文
+	Attachments []GmMailAttachment `json:"attachments"` // 附件列表
+	Status      int32              `json:"status"`      // 状态：1 未读 2 已读 3 已领取
+	CreatedAt   int64              `json:"createdAt"`   // 发送时间（毫秒）
+}
+
+// GmMailSendReq 后台发送邮件请求。
+type GmMailSendReq struct {
+	PlayerID    int64              `json:"playerId"`    // 玩家ID
+	Title       string             `json:"title"`       // 标题
+	Content     string             `json:"content"`     // 正文
+	Attachments []GmMailAttachment `json:"attachments"` // 附件列表（可空，空则为纯通知）
 }
 
 // ========== 打点记录（GM，读 game_record 库） ==========

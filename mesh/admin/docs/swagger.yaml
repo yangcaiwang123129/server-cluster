@@ -119,21 +119,57 @@ definitions:
       equipId:
         description: 装备配置ID
         type: integer
+      heroId:
+        description: 所属英雄ID，0 表示出战英雄
+        type: integer
+      playerId:
+        description: 玩家ID
+        type: integer
+    type: object
+  dto.GmEquipUnwearReq:
+    properties:
+      id:
+        description: 装备实例ID
+        example: "0"
+        type: string
       playerId:
         description: 玩家ID
         type: integer
     type: object
   dto.GmEquipUpdateReq:
     properties:
-      equipId:
-        description: 装备配置ID
+      breakthrough:
+        description: 突破
         type: integer
       equipped:
         description: 是否穿戴
         type: boolean
+      heroId:
+        description: 所属英雄ID，0 表示保持原归属
+        type: integer
+      id:
+        description: 装备实例ID
+        example: "0"
+        type: string
       level:
         description: 等级
         type: integer
+      playerId:
+        description: 玩家ID
+        type: integer
+      quality:
+        description: 品质
+        type: integer
+    type: object
+  dto.GmEquipWearReq:
+    properties:
+      heroId:
+        description: 目标英雄ID，0 表示出战英雄
+        type: integer
+      id:
+        description: 装备实例ID
+        example: "0"
+        type: string
       playerId:
         description: 玩家ID
         type: integer
@@ -264,64 +300,46 @@ definitions:
         description: 目标Y
         type: integer
     type: object
-  dto.GmSkillAddReq:
-    properties:
-      playerId:
-        description: 玩家ID
-        type: integer
-      skillId:
-        description: 技能配置ID
-        type: integer
-    type: object
-  dto.GmSkillUpdateReq:
-    properties:
-      equipped:
-        description: 是否装备
-        type: boolean
-      level:
-        description: 等级
-        type: integer
-      playerId:
-        description: 玩家ID
-        type: integer
-      skillId:
-        description: 技能配置ID
-        type: integer
-    type: object
-  dto.GmUpgradeReq:
+  dto.GmMailAttachment:
     properties:
       cfgId:
         description: 配置ID
         type: integer
-      playerId:
-        description: 玩家ID
+      count:
+        description: 数量
+        type: integer
+      type:
+        description: 资产类型（对应 tpl.AssetType）
         type: integer
     type: object
-  dto.GmWeaponAddReq:
+  dto.GmMailSendReq:
     properties:
+      attachments:
+        description: 附件列表（可空，空则为纯通知）
+        items:
+          $ref: '#/definitions/dto.GmMailAttachment'
+        type: array
+      content:
+        description: 正文
+        type: string
       playerId:
         description: 玩家ID
         type: integer
-      weaponId:
-        description: 武器配置ID
-        type: integer
+      title:
+        description: 标题
+        type: string
     type: object
-  dto.GmWeaponUpdateReq:
+  dto.GmUpgradeReq:
     properties:
-      durability:
-        description: 耐久度
+      cfgId:
+        description: 配置ID（装备场景不使用）
         type: integer
-      equipped:
-        description: 是否装备
-        type: boolean
-      level:
-        description: 等级
-        type: integer
+      equipId:
+        description: 装备实例ID（装备升级专用）
+        example: "0"
+        type: string
       playerId:
         description: 玩家ID
-        type: integer
-      weaponId:
-        description: 武器配置ID
         type: integer
     type: object
   dto.IdsReq:
@@ -1276,10 +1294,67 @@ paths:
       summary: GM 更新装备
       tags:
       - gm
+  /api/v1/gm/equip/breakthrough:
+    post:
+      parameters:
+      - description: 突破参数（equipId 装备实例ID）
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GmUpgradeReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 响应包在 {code, message, data} 中
+          schema:
+            $ref: '#/definitions/dto.Resp'
+      summary: GM 装备突破
+      tags:
+      - gm
+  /api/v1/gm/equip/unwear:
+    post:
+      parameters:
+      - description: 卸载参数
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GmEquipUnwearReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 响应包在 {code, message, data} 中
+          schema:
+            $ref: '#/definitions/dto.Resp'
+      summary: GM 装备卸载
+      tags:
+      - gm
+  /api/v1/gm/equip/up-quality:
+    post:
+      parameters:
+      - description: 升品参数（equipId 装备实例ID）
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GmUpgradeReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 响应包在 {code, message, data} 中
+          schema:
+            $ref: '#/definitions/dto.Resp'
+      summary: GM 装备升品
+      tags:
+      - gm
   /api/v1/gm/equip/upgrade:
     post:
       parameters:
-      - description: 升级参数
+      - description: 升级参数（equipId 装备实例ID）
         in: body
         name: body
         required: true
@@ -1293,6 +1368,25 @@ paths:
           schema:
             $ref: '#/definitions/dto.Resp'
       summary: GM 装备升级
+      tags:
+      - gm
+  /api/v1/gm/equip/wear:
+    post:
+      parameters:
+      - description: 穿戴参数（heroId 为 0 时取当前出战英雄）
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GmEquipWearReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 响应包在 {code, message, data} 中
+          schema:
+            $ref: '#/definitions/dto.Resp'
+      summary: GM 装备穿戴
       tags:
       - gm
   /api/v1/gm/hero:
@@ -1507,6 +1601,42 @@ paths:
       summary: GM 物品容器间移动物品
       tags:
       - gm
+  /api/v1/gm/mail:
+    get:
+      parameters:
+      - description: 玩家ID
+        in: query
+        name: playerId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 响应包在 {code, message, data} 中
+          schema:
+            $ref: '#/definitions/dto.Resp'
+      summary: GM 邮件列表
+      tags:
+      - gm
+    post:
+      parameters:
+      - description: 发送参数（attachments 为空则为纯通知）
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GmMailSendReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 响应包在 {code, message, data} 中
+          schema:
+            $ref: '#/definitions/dto.Resp'
+      summary: GM 发送邮件
+      tags:
+      - gm
   /api/v1/gm/player:
     get:
       parameters:
@@ -1612,152 +1742,6 @@ paths:
           schema:
             $ref: '#/definitions/dto.Resp'
       summary: GM 打点记录列表
-      tags:
-      - gm
-  /api/v1/gm/skill:
-    get:
-      parameters:
-      - description: 玩家ID
-        in: query
-        name: playerId
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 响应包在 {code, message, data} 中
-          schema:
-            $ref: '#/definitions/dto.Resp'
-      summary: GM 技能列表
-      tags:
-      - gm
-    post:
-      parameters:
-      - description: 新增参数
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/dto.GmSkillAddReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 响应包在 {code, message, data} 中
-          schema:
-            $ref: '#/definitions/dto.Resp'
-      summary: GM 新增技能
-      tags:
-      - gm
-    put:
-      parameters:
-      - description: 更新参数
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/dto.GmSkillUpdateReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 响应包在 {code, message, data} 中
-          schema:
-            $ref: '#/definitions/dto.Resp'
-      summary: GM 更新技能
-      tags:
-      - gm
-  /api/v1/gm/skill/upgrade:
-    post:
-      parameters:
-      - description: 升级参数
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/dto.GmUpgradeReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 响应包在 {code, message, data} 中
-          schema:
-            $ref: '#/definitions/dto.Resp'
-      summary: GM 技能升级
-      tags:
-      - gm
-  /api/v1/gm/weapon:
-    get:
-      parameters:
-      - description: 玩家ID
-        in: query
-        name: playerId
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 响应包在 {code, message, data} 中
-          schema:
-            $ref: '#/definitions/dto.Resp'
-      summary: GM 武器列表
-      tags:
-      - gm
-    post:
-      parameters:
-      - description: 新增参数
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/dto.GmWeaponAddReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 响应包在 {code, message, data} 中
-          schema:
-            $ref: '#/definitions/dto.Resp'
-      summary: GM 新增武器
-      tags:
-      - gm
-    put:
-      parameters:
-      - description: 更新参数
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/dto.GmWeaponUpdateReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 响应包在 {code, message, data} 中
-          schema:
-            $ref: '#/definitions/dto.Resp'
-      summary: GM 更新武器
-      tags:
-      - gm
-  /api/v1/gm/weapon/upgrade:
-    post:
-      parameters:
-      - description: 升级参数
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/dto.GmUpgradeReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 响应包在 {code, message, data} 中
-          schema:
-            $ref: '#/definitions/dto.Resp'
-      summary: GM 武器升级
       tags:
       - gm
   /api/v1/login:

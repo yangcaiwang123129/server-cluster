@@ -6,7 +6,7 @@ import "common.proto";
 
 option go_package = "server-cluster/share/pb";
 
-// 购买礼包请求（路由 10060）
+// 购买礼包请求（路由 10004）
 message GiftBuyReq {
   int32 cfg_id = 1; // 礼包配置ID（GiftCfg.Id）
 }

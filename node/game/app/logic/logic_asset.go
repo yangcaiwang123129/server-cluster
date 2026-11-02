@@ -12,7 +12,7 @@ import (
 )
 
 // AssetTypeSkill 技能资产类型。
-// tpl.AssetType 生成自 cfg/excel/__enums__.xlsx，目前只到 Weapon(4)；技能先占用 5，
+// tpl.AssetType 生成自 cfg/excel/__enums__.xlsx，目前只到 Weapon(4)；技能暂占用 5，
 // 待枚举表补上“技能”并重新生成配置后，把这里换成 tpl.AssetType_Skill 即可。
 const AssetTypeSkill tpl.AssetType = 5
 
@@ -30,8 +30,8 @@ func init() {
 // Asset 获取资产业务单例。
 func Asset() global.AssetLogic { return assetLogicInst.MustGet() }
 
-// registerAssetHandler 注册单类资产实现；重复注册直接 panic，启动期暴露配置错误。
-func registerAssetHandler(h global.AssetHandler) {
+// registerAsset 注册单类资产实现。重复注册直接 panic，启动期暴露配置错误。
+func registerAsset(h global.AssetHandler) {
 	t := h.AssetType()
 	if _, dup := assetHandlers[t]; dup {
 		panic(fmt.Sprintf("logic: duplicate asset handler for type %d", t))
@@ -48,8 +48,9 @@ func assetHandler(t tpl.AssetType) (global.AssetHandler, error) {
 	return h, nil
 }
 
-// AssetAdd 发放资产。
-func (this *assetLogic) AssetAdd(ctx context.Context, playerID int64, asset *tpl.Asset) error {
+// apply 分发增删改：校验资产非空、按类型取实现后交给具体操作。
+func (this *assetLogic) apply(ctx context.Context, playerID int64, asset *tpl.Asset,
+	op func(h global.AssetHandler, ctx context.Context, playerID int64, cfgID, count int32) error) error {
 	if asset == nil {
 		return errs.CodeInvalidParams.WithMessage("资产为空").Err()
 	}
@@ -57,49 +58,46 @@ func (this *assetLogic) AssetAdd(ctx context.Context, playerID int64, asset *tpl
 	if err != nil {
 		return err
 	}
-	return h.Add(ctx, playerID, asset.Id, asset.Count)
+	return op(h, ctx, playerID, asset.Id, asset.Count)
+}
+
+// applyAsset 分发带返回值的查询：按类型取实现后交给具体操作。
+func applyAsset[R any](t tpl.AssetType, op func(h global.AssetHandler) (R, error)) (R, error) {
+	var zero R
+	h, err := assetHandler(t)
+	if err != nil {
+		return zero, err
+	}
+	return op(h)
+}
+
+// AssetAdd 发放资产。
+func (this *assetLogic) AssetAdd(ctx context.Context, playerID int64, asset *tpl.Asset) error {
+	return this.apply(ctx, playerID, asset, global.AssetHandler.Add)
 }
 
 // AssetRemove 扣除资产。
 func (this *assetLogic) AssetRemove(ctx context.Context, playerID int64, asset *tpl.Asset) error {
-	if asset == nil {
-		return errs.CodeInvalidParams.WithMessage("资产为空").Err()
-	}
-	h, err := assetHandler(asset.Type)
-	if err != nil {
-		return err
-	}
-	return h.Remove(ctx, playerID, asset.Id, asset.Count)
+	return this.apply(ctx, playerID, asset, global.AssetHandler.Remove)
 }
 
 // AssetUpdate 覆盖持有状态。
 func (this *assetLogic) AssetUpdate(ctx context.Context, playerID int64, asset *tpl.Asset) error {
-	if asset == nil {
-		return errs.CodeInvalidParams.WithMessage("资产为空").Err()
-	}
-	h, err := assetHandler(asset.Type)
-	if err != nil {
-		return err
-	}
-	return h.Update(ctx, playerID, asset.Id, asset.Count)
+	return this.apply(ctx, playerID, asset, global.AssetHandler.Update)
 }
 
 // AssetQuery 查询持有数量。
 func (this *assetLogic) AssetQuery(ctx context.Context, playerID int64, assetType tpl.AssetType, cfgID int32) (int32, error) {
-	h, err := assetHandler(assetType)
-	if err != nil {
-		return 0, err
-	}
-	return h.Query(ctx, playerID, cfgID)
+	return applyAsset(assetType, func(h global.AssetHandler) (int32, error) {
+		return h.Query(ctx, playerID, cfgID)
+	})
 }
 
 // AssetList 列出某类资产全部持有。
 func (this *assetLogic) AssetList(ctx context.Context, playerID int64, assetType tpl.AssetType) ([]*tpl.Asset, error) {
-	h, err := assetHandler(assetType)
-	if err != nil {
-		return nil, err
-	}
-	return h.List(ctx, playerID)
+	return applyAsset(assetType, func(h global.AssetHandler) ([]*tpl.Asset, error) {
+		return h.List(ctx, playerID)
+	})
 }
 
 // deductAssets 依次扣除资产并汇总 wire 条目；nil 条目跳过，任一失败即返回错误（不继续后续扣减）。
