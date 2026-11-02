@@ -41,11 +41,12 @@ cd node/game && go run .    # 其余服务同：在各自目录下执行
 
 ```bash
 deploy/scripts/gen-proto.bat     # Windows 原生：share/proto/*.proto → share/pb
-deploy/scripts/gen-config.sh     # Excel → share/cfg + cfg/data（需 Git Bash / WSL）
+deploy/scripts/gen-config.bat    # Windows 原生：Excel → share/tpl + cfg/data（需 .NET 8）
+deploy/scripts/gen-config.sh     # 同上，用于 Linux/macOS/Git Bash/WSL
 deploy/scripts/gen-swagger.sh    # login/admin 的 swagger 文档（需 Git Bash / WSL）
 ```
 
-Windows 原生仅提供 `gen-proto.bat`；`gen-config` 与 `gen-swagger` 依赖 bash，请在 Git Bash 或 WSL 中执行。
+Windows 原生可用 `gen-proto.bat` 与 `gen-config.bat`；`gen-swagger` 依赖 bash，请在 Git Bash 或 WSL 中执行。
 
 校验：`go build ./... && go vet ./...`。
 

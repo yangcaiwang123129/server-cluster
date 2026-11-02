@@ -21,7 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// 邮件状态：未读 → 已读 → 已领取；已领取后可删除，用于红点与一键领取。
+// 邮件状态：未读 → 已读 → 已领取；删除为逻辑删除，等待玩家上线或定期清理。
 type MailStatus int32
 
 const (
@@ -29,6 +29,7 @@ const (
 	MailStatus_MAIL_STATUS_UNREAD      MailStatus = 1 // 未读
 	MailStatus_MAIL_STATUS_READ        MailStatus = 2 // 已读
 	MailStatus_MAIL_STATUS_CLAIMED     MailStatus = 3 // 已领取（附件已发放，可删除）
+	MailStatus_MAIL_STATUS_DELETED     MailStatus = 4 // 已删除（逻辑删除，不再下发，等待清理）
 )
 
 // Enum value maps for MailStatus.
@@ -38,12 +39,14 @@ var (
 		1: "MAIL_STATUS_UNREAD",
 		2: "MAIL_STATUS_READ",
 		3: "MAIL_STATUS_CLAIMED",
+		4: "MAIL_STATUS_DELETED",
 	}
 	MailStatus_value = map[string]int32{
 		"MAIL_STATUS_UNSPECIFIED": 0,
 		"MAIL_STATUS_UNREAD":      1,
 		"MAIL_STATUS_READ":        2,
 		"MAIL_STATUS_CLAIMED":     3,
+		"MAIL_STATUS_DELETED":     4,
 	}
 )
 
@@ -649,7 +652,7 @@ func (x *MailClaimAllResp) GetEntries() []*MailEntry {
 	return nil
 }
 
-// 删除邮件请求（路由 11005）。
+// 删除邮件请求（路由 11005）：仅标记为已删除，不物理删除。
 // 奖励邮件未领取时禁止删除；纯通知邮件任意状态可删；已领取邮件可删。
 type MailDeleteReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -740,7 +743,7 @@ func (x *MailDeleteResp) GetResult() *Result {
 	return nil
 }
 
-// 清理可删除邮件请求（路由 11006）：删除所有可删邮件（已读/已领取，或无附件）。
+// 清理可删除邮件请求（路由 11006）：把所有可删邮件标记为已删除（已读/已领取，或无附件）。
 type MailDeleteCleanReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -781,7 +784,7 @@ func (*MailDeleteCleanReq) Descriptor() ([]byte, []int) {
 type MailDeleteCleanResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
-	Count         int32                  `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"` // 实际删除数量
+	Count         int32                  `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"` // 实际标记删除数量
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -884,13 +887,14 @@ const file_mail_proto_rawDesc = "" +
 	"\x13MailDeleteCleanResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\x12\x14\n" +
-	"\x05count\x18\x02 \x01(\x05R\x05count*p\n" +
+	"\x05count\x18\x02 \x01(\x05R\x05count*\x89\x01\n" +
 	"\n" +
 	"MailStatus\x12\x1b\n" +
 	"\x17MAIL_STATUS_UNSPECIFIED\x10\x00\x12\x16\n" +
 	"\x12MAIL_STATUS_UNREAD\x10\x01\x12\x14\n" +
 	"\x10MAIL_STATUS_READ\x10\x02\x12\x17\n" +
-	"\x13MAIL_STATUS_CLAIMED\x10\x03B\x19Z\x17server-cluster/share/pbb\x06proto3"
+	"\x13MAIL_STATUS_CLAIMED\x10\x03\x12\x17\n" +
+	"\x13MAIL_STATUS_DELETED\x10\x04B\x19Z\x17server-cluster/share/pbb\x06proto3"
 
 var (
 	file_mail_proto_rawDescOnce sync.Once

@@ -55,6 +55,9 @@ func (this *mailLogic) MailList(ctx context.Context, playerID int64) (*pb.MailLi
 	entries := make([]*pb.MailEntry, 0, row.Mails.Len())
 	unread := int32(0)
 	row.Mails.Range(func(_ int64, m model.MailInfo) bool {
+		if m.Status == model.MailStatusDeleted {
+			return true
+		}
 		entries = append(entries, toMailEntry(m))
 		if m.Status == model.MailStatusUnread {
 			unread++
@@ -78,7 +81,7 @@ func (this *mailLogic) MailRead(ctx context.Context, playerID int64, req *pb.Mai
 		return nil, err
 	}
 	m, ok := row.Mails.Get(req.GetId())
-	if !ok {
+	if !ok || m.Status == model.MailStatusDeleted {
 		return nil, errs.CodeInvalidParams.WithMessage("邮件不存在").Err()
 	}
 	if m.Status == model.MailStatusUnread {
@@ -123,7 +126,7 @@ func (this *mailLogic) MailClaim(ctx context.Context, playerID int64, req *pb.Ma
 		return nil, err
 	}
 	m, ok := row.Mails.Get(req.GetId())
-	if !ok {
+	if !ok || m.Status == model.MailStatusDeleted {
 		return nil, errs.CodeInvalidParams.WithMessage("邮件不存在").Err()
 	}
 	if m.Status == model.MailStatusClaimed || !m.HasAttachments() {
@@ -180,7 +183,7 @@ func (this *mailLogic) MailClaimAll(ctx context.Context, playerID int64, _ *pb.M
 	pending := make([]pendingClaim, 0, row.Mails.Len())
 	if err := row.Mails.UpdateAll(func(m map[int64]model.MailInfo) error {
 		for id, mail := range m {
-			if mail.Status == model.MailStatusClaimed || !mail.HasAttachments() {
+			if mail.Status == model.MailStatusDeleted || mail.Status == model.MailStatusClaimed || !mail.HasAttachments() {
 				continue
 			}
 			originStatus, originClaimedAt := mail.Status, mail.ClaimedAt
@@ -224,7 +227,8 @@ func (this *mailLogic) MailClaimAll(ctx context.Context, playerID int64, _ *pb.M
 	return &pb.MailClaimAllResp{Entries: claimed}, nil
 }
 
-// MailDelete 删除单封邮件：奖励邮件未领取时禁止删除。
+// MailDelete 删除单封邮件：仅置为已删除（逻辑删除），物理清理由玩家上线/定期任务处理。
+// 奖励邮件未领取时禁止删除；重复删除幂等。
 func (this *mailLogic) MailDelete(ctx context.Context, playerID int64, req *pb.MailDeleteReq) (*pb.MailDeleteResp, error) {
 	row, err := loadPlayerMail(ctx, playerID)
 	if err != nil {
@@ -234,17 +238,21 @@ func (this *mailLogic) MailDelete(ctx context.Context, playerID int64, req *pb.M
 	if !ok {
 		return nil, errs.CodeInvalidParams.WithMessage("邮件不存在").Err()
 	}
+	if m.Status == model.MailStatusDeleted {
+		return &pb.MailDeleteResp{}, nil
+	}
 	if !m.CanDelete() {
 		return nil, errs.CodeInvalidParams.WithMessage("奖励邮件领取后才能删除").Err()
 	}
-	if !row.DeleteMail(m.MailID) {
+	m.Status = model.MailStatusDeleted
+	if !row.UpdateMail(m) {
 		return nil, errs.CodeInvalidParams.WithMessage("邮件不存在").Err()
 	}
 	global.PlayerMailCache.Set(playerID, row)
 	return &pb.MailDeleteResp{}, nil
 }
 
-// MailDeleteClean 清理全部可删除邮件（无附件或已领取），返回删除数量。
+// MailDeleteClean 清理全部可删除邮件（无附件或已领取），返回本次标记删除数量。
 func (this *mailLogic) MailDeleteClean(ctx context.Context, playerID int64, _ *pb.MailDeleteCleanReq) (*pb.MailDeleteCleanResp, error) {
 	row, err := loadPlayerMail(ctx, playerID)
 	if err != nil {
@@ -253,10 +261,12 @@ func (this *mailLogic) MailDeleteClean(ctx context.Context, playerID int64, _ *p
 	count := int32(0)
 	if err := row.Mails.UpdateAll(func(m map[int64]model.MailInfo) error {
 		for id, mail := range m {
-			if mail.CanDelete() {
-				delete(m, id)
-				count++
+			if !mail.CanDelete() {
+				continue
 			}
+			mail.Status = model.MailStatusDeleted
+			m[id] = mail
+			count++
 		}
 		return nil
 	}); err != nil {

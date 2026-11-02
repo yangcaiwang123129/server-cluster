@@ -7,11 +7,12 @@ import (
 	"server-cluster/share/util"
 )
 
-// 邮件状态：未读 → 已读 → 已领取。
+// 邮件状态：未读 → 已读 → 已领取；删除为逻辑删除（仅置状态，等待玩家上线或定期清理）。
 const (
 	MailStatusUnread  int32 = 1 // 未读
 	MailStatusRead    int32 = 2 // 已读
 	MailStatusClaimed int32 = 3 // 已领取（附件已发放，可删除）
+	MailStatusDeleted int32 = 4 // 已删除（逻辑删除，不再下发）
 )
 
 // MailAttachment 邮件附件资产。
@@ -22,7 +23,7 @@ type MailAttachment struct {
 }
 
 // MailInfo 单封邮件的持有数据（player_mail.mails 的 map 元素，key=邮件实例ID）。
-// 状态流转：未读 → 已读 → 已领取；已领取或无附件的邮件可删除。
+// 状态流转：未读 → 已读 → 已领取；删除只置为已删除，物理清理由玩家上线/定期任务负责。
 type MailInfo struct {
 	MailID      int64            `json:"mail_id"`     // 邮件实例ID（雪花）
 	Title       string           `json:"title"`       // 标题
@@ -37,8 +38,11 @@ type MailInfo struct {
 // HasAttachments 是否携带附件。
 func (m MailInfo) HasAttachments() bool { return len(m.Attachments) > 0 }
 
-// CanDelete 是否可删除：无附件的邮件任意状态可删；带附件的邮件需先领取。
+// CanDelete 是否可删除：已删除的邮件不可重复删除；无附件的邮件任意状态可删；带附件的邮件需先领取。
 func (m MailInfo) CanDelete() bool {
+	if m.Status == MailStatusDeleted {
+		return false
+	}
 	if !m.HasAttachments() {
 		return true
 	}
@@ -76,7 +80,8 @@ func (p *PlayerMail) UpdateMail(m MailInfo) bool {
 	return ok
 }
 
-// DeleteMail 删除邮件；不存在返回 false。
+// DeleteMail 物理删除邮件；仅供应玩家上线/定期清理任务使用，业务删除请置为 MailStatusDeleted。
+// 不存在返回 false。
 func (p *PlayerMail) DeleteMail(mailID int64) bool { return p.Mails.Delete(mailID) }
 
 // ScanJSON/ValueJSON 由 model 包提供，这里实现 Serializable 以兼容 cache 序列化。

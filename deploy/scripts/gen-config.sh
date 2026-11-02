@@ -26,6 +26,21 @@ fi
 
 cd "$ROOT"
 
+# MSYS/Cygwin 下 ROOT 形如 /c/Users/...，原生 Windows 版 Luban（dotnet）无法识别；
+# 传给 Luban 的路径统一转成 Windows 形式。Linux/macOS 上原样返回。
+win_path() {
+    if command -v cygpath >/dev/null 2>&1; then
+        cygpath -w "$1"
+    else
+        printf '%s' "$1"
+    fi
+}
+
+CONF_WIN="$(win_path "$CONF")"
+CODE_OUT_WIN="$(win_path "$CODE_OUT")"
+DATA_OUT_WIN="$(win_path "$DATA_OUT")"
+TPL_DIR_WIN="$(win_path "$TPL_DIR")"
+
 echo "[gen-config] === Luban config generator ==="
 echo "[gen-config] conf     : $CONF"
 echo "[gen-config] code out : $CODE_OUT"
@@ -44,11 +59,11 @@ mkdir -p "$DATA_OUT"
 # --- 2. Run Luban: code + data in one shot ---
 echo "[gen-config] running Luban..."
 "$LUBAN_BIN" -t server -c go-json -d json \
-    --conf "$CONF" \
-    -x "outputCodeDir=$CODE_OUT" \
-    -x "outputDataDir=$DATA_OUT" \
+    --conf "$CONF_WIN" \
+    -x "outputCodeDir=$CODE_OUT_WIN" \
+    -x "outputDataDir=$DATA_OUT_WIN" \
     -x "lubanGoModule=$MODULE" \
-    --customTemplateDir "$TPL_DIR"
+    --customTemplateDir "$TPL_DIR_WIN"
 
 # --- 2.5 Restore hand-written files removed by Luban's output-dir cleanup ---
 if [[ -f "$EMBED_BAK" ]]; then

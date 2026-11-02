@@ -14,6 +14,17 @@ LUBAN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BIN="$LUBAN_DIR/Luban/Luban"
 DLL="$LUBAN_DIR/Luban/Luban.dll"
 
+# Windows 包内的可执行文件是 Luban.exe，不是 Linux 的 Luban。
+if [[ ! -x "$BIN" && -x "$BIN.exe" ]]; then
+    BIN="$BIN.exe"
+fi
+
+# MSYS/Cygwin 下 POSIX 路径不能直接交给原生 dotnet，需转换为 Windows 路径。
+DLL_RUN="$DLL"
+if command -v cygpath >/dev/null 2>&1; then
+    DLL_RUN="$(cygpath -w "$DLL")"
+fi
+
 if [[ ! -f "$DLL" ]]; then
     echo "[luban] ERROR: Luban.dll not found: $DLL" >&2
     exit 1
@@ -30,4 +41,4 @@ if ! command -v dotnet >/dev/null 2>&1; then
     echo "[luban] ERROR: dotnet not found. Install .NET 8 Runtime: https://dotnet.microsoft.com/download" >&2
     exit 1
 fi
-exec dotnet "$DLL" "$@"
+exec dotnet "$DLL_RUN" "$@"
