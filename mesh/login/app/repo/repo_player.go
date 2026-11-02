@@ -38,7 +38,9 @@ func (this *playerRepoImpl) Save(ctx context.Context, m *model.Player) error {
 	if err != nil {
 		return gorm.ErrInvalidDB
 	}
-	return db.WithContext(ctx).Save(m).Error
+	// 注册永远是新玩家，用 Create 保证 BeforeCreate hook 正确设置 CreatedAt/UpdatedAt。
+	// GORM 的 Save 对带主键的 struct 会先查后存，新行也可能跳过 BeforeCreate。
+	return db.WithContext(ctx).Create(m).Error
 }
 
 func (this *playerRepoImpl) FindByUsername(ctx context.Context, username string) (*model.Player, error) {

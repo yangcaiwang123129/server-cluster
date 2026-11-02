@@ -21,7 +21,7 @@ type PlayerRegisterResp struct {
 
 // PlayerLoginReq 登录请求。
 type PlayerLoginReq struct {
-	LoginType int32 `json:"loginType"` // 登录类型 0账号登录 1手机号登录 2微信授权登录
+	LoginType int32 `json:"loginType"` // 登录类型 0账号登录 1游客登录 2手机号登录 3微信授权登录
 
 	Username string `json:"username"`
 	Password string `json:"password"`

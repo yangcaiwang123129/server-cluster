@@ -2,12 +2,17 @@
 package handler
 
 import (
+	"context"
+
 	"server-cluster/mesh/login/app/logic"
 	"server-cluster/share/dto"
 	"server-cluster/share/errs"
 
 	"github.com/dobyte/due/component/http/v2"
 )
+
+// clientIPKey 用于在 context 中传递客户端 IP 的 key（logic 侧以同一个 key 读取）。
+const clientIPKey = "client_ip"
 
 // RegisterPlayer 向 due http 组件注册业务路由。
 func RegisterPlayer(router http.Router) {
@@ -29,6 +34,9 @@ func register(ctx http.Context) error {
 	if err := ctx.Bind().Body(req); err != nil {
 		return ctx.Failure(errs.CodeInvalidParams.Err())
 	}
+	// 把客户端 IP 注入 context，让下游 logic 写入玩家表。
+	// due 的 http.Context.IP() 已内置代理链处理（X-Forwarded-For / X-Real-IP / RemoteAddr）。
+	ctx.SetContext(context.WithValue(ctx.Context(), clientIPKey, ctx.IP()))
 	data, err := logic.Player().PlayerRegister(ctx.Context(), req)
 	if err != nil {
 		return ctx.Failure(err)

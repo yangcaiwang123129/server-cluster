@@ -8,9 +8,13 @@ import (
 
 // PlayerQuery 玩家列表过滤条件。
 type PlayerQuery struct {
-	PlayerID int64
-	Username string
-	Order    string
+	PlayerID       int64
+	Username       string
+	PhoneNumber    string // 手机号，字符串支持前缀/模糊
+	Status         int32  // 0 全部 1 正常 2 封号
+	CreatedAtStart int64  // 毫秒
+	CreatedAtEnd   int64  // 毫秒
+	Order          string
 }
 
 // ListPlayers 玩家分页列表（直查 player）。
@@ -25,6 +29,19 @@ func (r *Repo) ListPlayers(q PlayerQuery, pageIndex, pageSize int) ([]dto.Player
 	}
 	if q.Username != "" {
 		tx = tx.Where("username LIKE ?", util.Like(q.Username))
+	}
+	if q.PhoneNumber != "" {
+		// phone_number 是 int，用 CAST 到字符串做 LIKE 前缀匹配
+		tx = tx.Where("CAST(phone_number AS CHAR) LIKE ?", util.Like(q.PhoneNumber))
+	}
+	if q.Status > 0 {
+		tx = tx.Where("status = ?", q.Status)
+	}
+	if q.CreatedAtStart > 0 {
+		tx = tx.Where("created_at >= ?", q.CreatedAtStart)
+	}
+	if q.CreatedAtEnd > 0 {
+		tx = tx.Where("created_at <= ?", q.CreatedAtEnd)
 	}
 	rows, total, err := util.PageQuery[model.Player](tx, pageIndex, pageSize, q.Order, "player_id desc")
 	if err != nil {
@@ -58,12 +75,54 @@ func (r *Repo) ListPlayers(q PlayerQuery, pageIndex, pageSize int) ([]dto.Player
 			Coupon:      m.Coupon,
 			Gold:        m.Gold,
 			Coin:        m.Coin,
+			RegisterIP:  m.RegisterIP,
 			CreatedAt:   m.CreatedAt,
+			Status:      m.Status,
+			BanUntil:    m.BanUntil,
+			BanReason:   m.BanReason,
 		}
 		if extra, ok := extras[m.PlayerID]; ok {
 			row.Nickname = extra.Nickname
+			row.AvatarID = extra.AvatarID
+			row.Level = extra.Level
+			row.VipLevel = extra.VipLevel
 		}
 		list = append(list, row)
 	}
 	return list, total, nil
+}
+
+// BanPlayer 封号：更新状态+封号到期时间+原因。
+func (r *Repo) BanPlayer(playerID int64, banUntil int64, reason string) error {
+	d, err := r.db()
+	if err != nil {
+		return err
+	}
+	return d.Model(&model.Player{}).Where("player_id = ?", playerID).Updates(map[string]any{
+		"status":     model.PlayerStatusBanned,
+		"ban_until":  banUntil,
+		"ban_reason": reason,
+	}).Error
+}
+
+// UnbanPlayer 解封：恢复状态，清空封号字段。
+func (r *Repo) UnbanPlayer(playerID int64) error {
+	d, err := r.db()
+	if err != nil {
+		return err
+	}
+	return d.Model(&model.Player{}).Where("player_id = ?", playerID).Updates(map[string]any{
+		"status":     model.PlayerStatusNormal,
+		"ban_until":  0,
+		"ban_reason": "",
+	}).Error
+}
+
+// ResetPlayerPassword 重置玩家密码：参数为明文哈希值，直接写表。
+func (r *Repo) ResetPlayerPassword(playerID int64, passwordHash string) error {
+	d, err := r.db()
+	if err != nil {
+		return err
+	}
+	return d.Model(&model.Player{}).Where("player_id = ?", playerID).Update("password", passwordHash).Error
 }

@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"strconv"
+
 	"github.com/dobyte/due/component/http/v2"
 
 	"server-cluster/mesh/admin/app/logic"
@@ -8,12 +10,15 @@ import (
 	"server-cluster/share/errs"
 )
 
-// RegisterPlayer 注册玩家管理路由（列表/在线/踢下线）。
+// RegisterPlayer 注册玩家管理路由（列表/在线/踢下线/封号/解封/改密）。
 func RegisterPlayer(router http.Router) {
 	g := gmGroup(router)
 	g.Get("/player", handlePlayerList)
 	g.Get("/player/online", handlePlayerOnline)
 	g.Post("/player/kick", handlePlayerKick)
+	g.Post("/player/ban", handlePlayerBan)
+	g.Post("/player/unban", handlePlayerUnban)
+	g.Post("/player/reset-password", handlePlayerResetPassword)
 }
 
 // handlePlayerList 玩家分页列表（player）。
@@ -31,6 +36,17 @@ func handlePlayerList(ctx http.Context) error {
 	req.PageIndex, req.PageSize = pageParams(ctx)
 	req.PlayerID = queryPlayerID(ctx)
 	req.Username = ctx.Query("username")
+	req.PhoneNumber = ctx.Query("phoneNumber")
+	if v := ctx.Query("status"); v != "" {
+		i, _ := strconv.ParseInt(v, 10, 32)
+		req.Status = int32(i)
+	}
+	if v := ctx.Query("createdAtStart"); v != "" {
+		req.CreatedAtStart, _ = strconv.ParseInt(v, 10, 64)
+	}
+	if v := ctx.Query("createdAtEnd"); v != "" {
+		req.CreatedAtEnd, _ = strconv.ParseInt(v, 10, 64)
+	}
 	req.Order = orderBy(ctx, map[string]string{
 		"playerId":  "player_id",
 		"createdAt": "created_at",
@@ -69,6 +85,60 @@ func handlePlayerKick(ctx http.Context) error {
 		return errs.Fail(ctx, 400, "请求参数错误")
 	}
 	if err := logic.Player().PlayerKick(req); err != nil {
+		return errs.FailErr(ctx, err)
+	}
+	return errs.OK(ctx, nil)
+}
+
+// handlePlayerBan 封号。
+// @Summary 封号
+// @Tags system
+// @Produce json
+// @Param body body dto.PlayerBanReq true "封号参数"
+// @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
+// @Router /api/v1/gm/player/ban [post]
+func handlePlayerBan(ctx http.Context) error {
+	var req dto.PlayerBanReq
+	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.Reason == "" {
+		return errs.Fail(ctx, 400, "请求参数错误")
+	}
+	if err := logic.Player().PlayerBan(req); err != nil {
+		return errs.FailErr(ctx, err)
+	}
+	return errs.OK(ctx, nil)
+}
+
+// handlePlayerUnban 解封。
+// @Summary 解封
+// @Tags system
+// @Produce json
+// @Param body body dto.PlayerUnbanReq true "解封参数"
+// @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
+// @Router /api/v1/gm/player/unban [post]
+func handlePlayerUnban(ctx http.Context) error {
+	var req dto.PlayerUnbanReq
+	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 {
+		return errs.Fail(ctx, 400, "请求参数错误")
+	}
+	if err := logic.Player().PlayerUnban(req); err != nil {
+		return errs.FailErr(ctx, err)
+	}
+	return errs.OK(ctx, nil)
+}
+
+// handlePlayerResetPassword 重置密码。
+// @Summary 重置密码
+// @Tags system
+// @Produce json
+// @Param body body dto.PlayerResetPasswordReq true "改密参数"
+// @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
+// @Router /api/v1/gm/player/reset-password [post]
+func handlePlayerResetPassword(ctx http.Context) error {
+	var req dto.PlayerResetPasswordReq
+	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.NewPassword == "" {
+		return errs.Fail(ctx, 400, "请求参数错误")
+	}
+	if err := logic.Player().PlayerResetPassword(req); err != nil {
 		return errs.FailErr(ctx, err)
 	}
 	return errs.OK(ctx, nil)

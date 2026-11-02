@@ -1,1 +1,139 @@
 package handler
+
+import (
+	"strconv"
+	"strings"
+
+	"server-cluster/mesh/admin/app/logic"
+	"server-cluster/share/dto"
+	"server-cluster/share/errs"
+	"server-cluster/share/model"
+
+	"github.com/dobyte/due/component/http/v2"
+)
+
+// RegisterCluster 注册集群管理路由（列表/详情/SSH配置更新/远程运维）。
+func RegisterCluster(router http.Router) {
+	g := gmGroup(router)
+	g.Get("/cluster", handleClusterList)
+	g.Get("/cluster/:nodeId", handleClusterDetail)
+	g.Put("/cluster/:nodeId", handleClusterUpdate)
+	g.Post("/cluster/:nodeId/exec", handleClusterExec)
+}
+
+// handleClusterList 集群节点分页列表（自动触发 etcd → DB 同步）。
+// @Summary 集群节点列表
+// @Tags cluster
+// @Produce json
+// @Param nodeName query string false "服务名(gate/node/mesh)"
+// @Param nodeKind query string false "服务类型(gate/node/mesh)"
+// @Param online query int false "在线筛选(1在线 0离线)"
+// @Param pageIndex query int false "页码" default(1)
+// @Param pageSize query int false "每页条数" default(10)
+// @Router /api/v1/gm/cluster [get]
+func handleClusterList(ctx http.Context) error {
+	var req dto.ClusterNodeQuery
+	req.NodeName = ctx.Query("nodeName")
+	req.NodeKind = ctx.Query("nodeKind")
+	if v := ctx.Query("online"); v != "" {
+		if i, err := strconv.Atoi(v); err == nil && (i == 0 || i == 1) {
+			vv := i
+			req.Online = &vv
+		}
+	}
+	req.PageIndex, req.PageSize = pageParams(ctx)
+	req.Order = orderBy(ctx, map[string]string{
+		"nodeId":   "node_id",
+		"nodeName": "node_name",
+		"nodeKind": "node_kind",
+		"online":   "online",
+	})
+	list, total, err := logic.Cluster().List(ctx.Context(), req, req.PageIndex, req.PageSize)
+	if err != nil {
+		return errs.FailErr(ctx, err)
+	}
+	return errs.OK(ctx, errs.Page(list, total, req.PageIndex, req.PageSize))
+}
+
+// handleClusterDetail 单个集群节点详情（带完整 SSH 配置）。
+// @Summary 集群节点详情
+// @Tags cluster
+// @Produce json
+// @Param nodeId path string true "实例ID(etcd key最后一段)"
+// @Router /api/v1/gm/cluster/{nodeId} [get]
+func handleClusterDetail(ctx http.Context) error {
+	nodeID := ctx.Params("nodeId")
+	if nodeID == "" {
+		return errs.Fail(ctx, 400, "nodeId required")
+	}
+	resp, err := logic.Cluster().Get(ctx.Context(), nodeID)
+	if err != nil {
+		return errs.FailErr(ctx, err)
+	}
+	return errs.OK(ctx, resp)
+}
+
+// handleClusterUpdate 更新运维侧 SSH 配置。
+// @Summary 更新节点 SSH 配置
+// @Tags cluster
+// @Produce json
+// @Param nodeId path string true "实例ID"
+// @Param body body dto.ClusterNodeUpdateReq true "SSH 配置"
+// @Router /api/v1/gm/cluster/{nodeId} [put]
+func handleClusterUpdate(ctx http.Context) error {
+	nodeID := ctx.Params("nodeId")
+	if nodeID == "" {
+		return errs.Fail(ctx, 400, "nodeId required")
+	}
+	var req dto.ClusterNodeUpdateReq
+	if err := bindBody(ctx, &req); err != nil {
+		return errs.Fail(ctx, 400, "invalid body")
+	}
+	m := &model.ClusterNode{
+		NodeID:     nodeID,
+		SSHHost:    strings.TrimSpace(req.SSHHost),
+		SSHPort:    req.SSHPort,
+		SSHUser:    strings.TrimSpace(req.SSHUser),
+		SSHKeyPath: strings.TrimSpace(req.SSHKeyPath),
+		DeployDir:  strings.TrimSpace(req.DeployDir),
+		Remark:     strings.TrimSpace(req.Remark),
+	}
+	if m.SSHHost == "" || m.SSHUser == "" {
+		return errs.Fail(ctx, 400, "sshHost and sshUser required")
+	}
+	if err := logic.Cluster().UpdateSSH(ctx.Context(), m); err != nil {
+		return errs.FailErr(ctx, err)
+	}
+	return errs.OK(ctx, nil)
+}
+
+// handleClusterExec 远程执行运维脚本并回显完整输出。
+// @Summary 远程运维脚本执行
+// @Tags cluster
+// @Produce json
+// @Param nodeId path string true "实例ID"
+// @Param body body dto.ClusterExecReq true "{action:start|stop|restart|deploy}"
+// @Router /api/v1/gm/cluster/{nodeId}/exec [post]
+func handleClusterExec(ctx http.Context) error {
+	nodeID := ctx.Params("nodeId")
+	if nodeID == "" {
+		return errs.Fail(ctx, 400, "nodeId required")
+	}
+	var req dto.ClusterExecReq
+	if err := bindBody(ctx, &req); err != nil {
+		return errs.Fail(ctx, 400, "invalid body")
+	}
+	action := strings.ToLower(strings.TrimSpace(req.Action))
+	switch action {
+	case "start", "stop", "restart", "deploy":
+	default:
+		return errs.Fail(ctx, 400, "action must be start/stop/restart/deploy")
+	}
+	resp, err := logic.Cluster().Exec(ctx.Context(), nodeID, action)
+	if err != nil {
+		return errs.FailErr(ctx, err)
+	}
+	return errs.OK(ctx, resp)
+}
+
+

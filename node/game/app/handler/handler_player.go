@@ -2,15 +2,30 @@
 package handler
 
 import (
+	"context"
+
 	"server-cluster/internal/router"
+	"server-cluster/node/game/app/logic"
 
 	"github.com/dobyte/due/v2/cluster/node"
 
 	"server-cluster/internal/svc"
-	"server-cluster/node/game/app/logic"
 	"server-cluster/share/errs"
 	"server-cluster/share/pb"
 )
+
+// loginIPKey context 中 loginIP 的 key（字符串 key，logic 侧用同样的字符串取值即可跨包）。
+const loginIPKey = "player_login_ip"
+
+// injectLoginIP 从 node.Context.GetIP() 取客户端 IP，塞入标准 context 供下游 logic 读取。
+// 取不到时注入空字符串让 logic 侧兜底。
+func injectLoginIP(ctx context.Context, nc node.Context) context.Context {
+	ip, err := nc.GetIP()
+	if err != nil || ip == "" {
+		return context.WithValue(ctx, loginIPKey, "")
+	}
+	return context.WithValue(ctx, loginIPKey, ip)
+}
 
 // init 注册玩家入口路由：仅 VERIFY 无状态，ENTER/LEAVE 为有状态且由节点直接处理；
 // 礼包购买/兑换/充值属于玩家资产消费，统一在玩家 actor 内串行执行。
@@ -55,7 +70,9 @@ func handleEnterGame(ctx node.Context) {
 		_ = ctx.Response(err)
 		return
 	}
-	resp, err := logic.PlayerLogic().EnterGame(ctx.Context(), ctx.UID(), req)
+	// 把客户端 IP 注入 context 供下游 logic 存入 PlayerActor
+	stdCtx := injectLoginIP(ctx.Context(), ctx)
+	resp, err := logic.PlayerLogic().EnterGame(stdCtx, ctx.UID(), req)
 	if err != nil {
 		_ = ctx.Response(err)
 		return

@@ -119,7 +119,7 @@ var defaultMenus = []seedMenu{
 		},
 	},
 	{
-		Menu: model.SysMenu{MenuName: "Game", Title: "游戏管理", Path: "/game", MenuType: "M", Component: "Layout", Icon: "star", Sort: 4, Visible: "0", IsFrame: "1"},
+		Menu: model.SysMenu{MenuName: "Game", Title: "游戏管理", Path: "/game", MenuType: "M", Component: "Layout", Icon: "star", Sort: 5, Visible: "0", IsFrame: "1"},
 		Children: []seedMenu{
 			{
 				Menu: model.SysMenu{MenuName: "PlayerManage", Title: "玩家列表", Path: "/game/player/index", Component: "/admin/player/index", MenuType: "C", Icon: "user-info", Permission: "game:player:list", Sort: 1, Visible: "0", IsFrame: "1"},
@@ -202,7 +202,21 @@ var defaultMenus = []seedMenu{
 		},
 	},
 	{
-		Menu: model.SysMenu{MenuName: "GameRecord", Title: "游戏记录", Path: "/record", MenuType: "M", Component: "Layout", Icon: "form", Sort: 5, Visible: "0", IsFrame: "1"},
+		Menu: model.SysMenu{MenuName: "Cluster", Title: "集群管理", Path: "/cluster", MenuType: "M", Component: "Layout", Icon: "server", Sort: 4, Visible: "0", IsFrame: "1"},
+		Children: []seedMenu{
+			{
+				Menu: model.SysMenu{MenuName: "ClusterManage", Title: "集群节点", Path: "/cluster/index", Component: "/admin/cluster/index", Icon: "server", MenuType: "C", Permission: "game:cluster:list", Sort: 1, Visible: "0", IsFrame: "1"},
+				Apis: []seedAPI{
+					{"集群节点列表", "/api/v1/gm/cluster", "GET"},
+					{"集群节点详情", "/api/v1/gm/cluster/:nodeId", "GET"},
+					{"更新节点SSH配置", "/api/v1/gm/cluster/:nodeId", "PUT"},
+					{"远程运维脚本执行", "/api/v1/gm/cluster/:nodeId/exec", "POST"},
+				},
+			},
+		},
+	},
+	{
+		Menu: model.SysMenu{MenuName: "GameRecord", Title: "游戏记录", Path: "/record", MenuType: "M", Component: "Layout", Icon: "form", Sort: 6, Visible: "0", IsFrame: "1"},
 		Children: []seedMenu{
 			{
 				Menu: model.SysMenu{MenuName: "GameRecordGain", Title: "获得记录", Path: "/record/gain", Component: "/admin/game-record/gain", MenuType: "C", Icon: "list", Permission: "game:gm:record:gain", Sort: 1, Visible: "0", IsFrame: "1"},

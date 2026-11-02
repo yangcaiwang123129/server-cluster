@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 import type { ApiResponse, PageQuery, PageResult } from '@/types/api'
-import type { Player, PlayerQuery, OnlinePlayer } from '@/types/admin'
+import type { Player, PlayerQuery, OnlinePlayer, PlayerBanReq, PlayerUnbanReq, PlayerResetPasswordReq } from '@/types/admin'
 
 /** Player management: read-only views over player and game-node presence. */
 
@@ -24,6 +24,33 @@ export function listOnlinePlayer() {
 export function kickPlayer(data: { playerId: number; nodeId: string; kickType: number }) {
   return request<ApiResponse<null>>({
     url: '/api/v1/gm/player/kick',
+    method: 'post',
+    data
+  })
+}
+
+/** Ban a player: write ban fields + kick if online. duration in seconds, 0 = permanent. */
+export function banPlayer(data: PlayerBanReq) {
+  return request<ApiResponse<null>>({
+    url: '/api/v1/gm/player/ban',
+    method: 'post',
+    data
+  })
+}
+
+/** Unban a player. */
+export function unbanPlayer(data: PlayerUnbanReq) {
+  return request<ApiResponse<null>>({
+    url: '/api/v1/gm/player/unban',
+    method: 'post',
+    data
+  })
+}
+
+/** Reset player password (admin-side, MD5-hashed server-side). */
+export function resetPlayerPassword(data: PlayerResetPasswordReq) {
+  return request<ApiResponse<null>>({
+    url: '/api/v1/gm/player/reset-password',
     method: 'post',
     data
   })

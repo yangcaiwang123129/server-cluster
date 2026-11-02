@@ -49,7 +49,11 @@ func PlayerLogic() global.PlayerLogic { return playerLogicInst.MustGet() }
 
 // EnterGame 进入游戏：playerID 由 handler 层从 ctx.UID() 取得（首包 verify 已完成绑定）。
 // 先加载核心数据并驱动各玩家模块预热/建档，全部成功后才创建在线 actor。
+// loginIP 由 handler 通过 context value 注入（key 见 loginIPKey）。
 func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.EnterGameReq) (*pb.EnterGameResp, error) {
+	// 从 context 取 handler 注入的登录 IP（key 与 handler_player.go 中 injectLoginIP 一致）
+	loginIP, _ := ctx.Value("player_login_ip").(string)
+
 	core, err := global.PlayerExtraCache.Get(ctx, playerID)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		// 首次进入，建档并异步落库
@@ -83,7 +87,7 @@ func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.
 	}
 
 	// 创建玩家 actor（已在线则复用），在线登记由 actor 生命周期驱动。
-	if err := this.PlayerCreateActor(ctx, playerID); err != nil {
+	if err := this.PlayerCreateActor(ctx, playerID, loginIP); err != nil {
 		return nil, err
 	}
 
@@ -91,6 +95,9 @@ func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.
 	resp.ServerTime = xtime.Now().UnixMilli()
 	return resp, nil
 }
+
+// loginIPKey context 中 loginIP 的 key（handler 注入，EnterGame 读取）。
+// 注意：用字符串 key 避免跨包 type 不匹配。
 
 // mergeEnterGameResp 合并模块返回的初始状态（只取模块实际填充的字段）。
 func mergeEnterGameResp(dst, src *pb.EnterGameResp) {
@@ -237,16 +244,21 @@ func (this *playerLogic) PlayerGetActors(ctx context.Context) ([]*global.PlayerA
 }
 
 // PlayerCreateActor 创建玩家 actor（已在线则幂等复用）。
+// loginIP 从 node.Context.GetIP() 取，存入内存，不落库。
 // 在线登记由 playerProcessor 的 Start/Destroy 生命周期维护。
-func (this *playerLogic) PlayerCreateActor(ctx context.Context, playerID int64) error {
+func (this *playerLogic) PlayerCreateActor(ctx context.Context, playerID int64, loginIP string) error {
 	if this.PlayerActors.Has(playerID) {
+		// 已在线：幂等更新登录 IP（断线重连可能换 IP）
+		if pa, ok := this.PlayerActors.Get(playerID); ok {
+			pa.LoginIP = loginIP
+		}
 		return nil
 	}
 
 	_, err := svc.NodeProxy().Spawn(newPlayerProcessor,
 		node.WithActorKind(actorKindPlayer),
 		node.WithActorID(playerActorID(playerID)),
-		node.WithActorArgs(playerID))
+		node.WithActorArgs(playerID, loginIP))
 	if err == nil {
 		return nil
 	}
@@ -263,6 +275,7 @@ func (this *playerLogic) PlayerCreateActor(ctx context.Context, playerID int64) 
 		Actor:     pa,
 		PlayerID:  playerID,
 		EnterTime: xtime.Now().Unix(),
+		LoginIP:   loginIP,
 	})
 	return nil
 }
@@ -320,15 +333,20 @@ type playerProcessor struct {
 	node.BaseProcessor
 	actor    *node.Actor
 	playerID int64
+	loginIP  string
 }
 
 // newPlayerProcessor due actor Creator。
 func newPlayerProcessor(act *node.Actor, args ...any) node.Processor {
 	var playerID int64
+	var loginIP string
 	if len(args) > 0 {
 		playerID, _ = args[0].(int64)
 	}
-	return &playerProcessor{actor: act, playerID: playerID}
+	if len(args) > 1 {
+		loginIP, _ = args[1].(string)
+	}
+	return &playerProcessor{actor: act, playerID: playerID, loginIP: loginIP}
 }
 
 // Start 玩家 actor 启动：写在线登记、绑定 uid 与 actor，并把业务路由注册到 actor。
@@ -337,6 +355,7 @@ func (p *playerProcessor) Start() {
 		Actor:     p.actor,
 		PlayerID:  p.playerID,
 		EnterTime: xtime.Now().Unix(),
+		LoginIP:   p.loginIP,
 	})
 
 	// uid 与 actor 绑定：stateful 消息由 scheduler 定位到本 actor

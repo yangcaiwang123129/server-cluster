@@ -13,9 +13,10 @@ option go_package = "server-cluster/share/pb";
 
 // OnlinePlayer 在线玩家信息。
 message OnlinePlayer {
-  int64 player_id = 1;  // 玩家ID
-  int64 enter_time = 2; // 进入游戏时间（秒级时间戳）
-  string node_id = 3;   // 所在 game 服实例 ID
+  int64 player_id = 1;   // 玩家ID
+  int64 enter_time = 2;  // 进入游戏时间（秒级时间戳）
+  string node_id = 3;    // 所在 game 服实例 ID
+  string login_ip = 4;   // 登录 IP（网关从连接获取，内存中维护，不落库）
 }
 
 // GetOnlinePlayersReq 查看在线玩家请求。

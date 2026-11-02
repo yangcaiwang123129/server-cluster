@@ -1,0 +1,61 @@
+export default {
+  title: 'Cluster Management',
+  hint: 'Nodes are auto-synced from etcd; SSH configs are entered manually by ops',
+
+  nodeName: 'Service',
+  nodeNamePlaceholder: 'gate/node/mesh',
+  nodeKind: 'Kind',
+  kindGate: 'Gateway',
+  kindNode: 'Node',
+  kindMesh: 'Mesh',
+  kindMaster: 'Master',
+  online: 'Online',
+  onlineYes: 'Online',
+  onlineNo: 'Offline',
+
+  nodeId: 'Node ID',
+  services: 'Services',
+  endpoint: 'Endpoint',
+  sshHost: 'SSH Host',
+  sshPort: 'Port',
+  sshUser: 'SSH User',
+  sshKeyPath: 'Key Path',
+  deployDir: 'Deploy Dir',
+  remark: 'Remark',
+  updatedAt: 'Updated At',
+
+  sshUnconfigured: 'SSH not configured',
+
+  syncHint: '{n} nodes total',
+  refreshSync: 'Sync Now',
+  emptyTip: 'No cluster nodes in etcd',
+
+  copyNodeId: 'Copy node ID',
+  copyOk: 'Copied',
+  copyFailed: 'Copy failed, please copy manually',
+
+  editSSH: 'SSH Config',
+  actionStart: 'Start',
+  actionStop: 'Stop',
+  actionRestart: 'Restart',
+  actionDeploy: 'Deploy',
+  hotReload: 'Hot Reload',
+
+  sshTitle: 'SSH / Deploy Config',
+  sshKeyPathTip: 'Leave empty to use local SSH agent ($SSH_AUTH_SOCK)',
+  deployDirTip: 'Directory on server containing start.sh / stop.sh, e.g. /opt/server/gate-1',
+  sshRequired: 'SSH host, user and deploy dir are required',
+  sshSaved: 'Config saved',
+
+  execTitle: 'Remote Ops: {action}',
+  execConfirm: 'Run "{action}" on {node}?',
+  execConfirmOk: 'Run Now',
+  sshConfigMissing: 'Configure SSH connection first',
+  execEmpty: '(no output)',
+  execNetworkError: 'SSH connection failed. Check network and credentials',
+  copyExec: 'Copy Output',
+  exitCode: 'Exit',
+  stdout: 'STDOUT',
+  stderr: 'STDERR',
+  action: 'Action'
+}

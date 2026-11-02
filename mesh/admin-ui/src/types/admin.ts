@@ -215,6 +215,12 @@ export interface SysOperaLog {
 export interface PlayerQuery {
   playerId?: number
   username?: string
+  phoneNumber?: string
+  /** 0 全部 1 正常 2 封号 */
+  status?: number
+  /** unix ms */
+  createdAtStart?: number
+  createdAtEnd?: number
 }
 
 /** A player account row from the player table. Timestamps are unix milliseconds. */
@@ -223,21 +229,49 @@ export interface Player {
   username?: string
   /** nickname from player_extra */
   nickname?: string
+  /** avatar id from player_extra */
+  avatarId?: string
+  /** level from player_extra */
+  level?: number
+  /** vip level from player_extra */
+  vipLevel?: number
   zone?: number
   phoneNumber?: number
   /** currencies from player */
   coupon?: number
   gold?: number
   coin?: number
+  /** ip captured at first registration time */
+  registerIp?: string
   createdAt?: number
+  /** 1 正常 2 封号 */
+  status?: number
+  /** ban expiry unix seconds, 0 = permanent */
+  banUntil?: number
+  banReason?: string
 }
 
 /** A player currently online, as reported by the game node. */
 export interface OnlinePlayer {
   playerId?: number
   enterTime?: number
-  /** game node instance the player resides on */
-  nodeId?: string
+  /** lobby (game) node instance id the player resides on */
+  lobbyNodeId?: string
+  loginIp?: string
+}
+
+/** GM 封号请求：duration 单位秒，0 = 永久 */
+export interface PlayerBanReq {
+  playerId: number
+  duration: number
+  reason: string
+}
+
+export interface PlayerUnbanReq { playerId: number }
+
+export interface PlayerResetPasswordReq {
+  playerId: number
+  newPassword: string
 }
 
 /** Filters the Luban item catalog accepts. */
@@ -479,4 +513,32 @@ export interface ClientVersionQuery {
   version?: string
   platform?: string
   status?: string
+}
+
+/** 集群节点：gm_cluster_node 表 + etcd 同步后的运维视图。 */
+export interface ClusterNode {
+  nodeId?: string
+  nodeName?: string
+  nodeKind?: string
+  alias?: string
+  endpoint?: string
+  services?: string[]
+  online?: number
+  sshHost?: string
+  sshPort?: number
+  sshUser?: string
+  sshKeyPath?: string
+  deployDir?: string
+  remark?: string
+  createdAt?: string
+  updatedAt?: string
+}
+
+/** 远程运维脚本执行回显。exitCode=-1 表示 SSH/网络层错误。 */
+export interface ClusterExecResp {
+  nodeId?: string
+  action?: string
+  exitCode?: number
+  stdout?: string
+  stderr?: string
 }

@@ -12,12 +12,15 @@ export default {
   playerSearchPlaceholder: 'Search by player ID or account',
   playersRequired: 'Please select at least one player',
   titleRequired: 'Please enter a mail title',
+  titlePlaceholder: 'Mail title (up to 64 chars)',
+  contentPlaceholder: 'Mail body (up to 2000 chars)',
   list: 'Mail List',
   send: 'Send Mail',
   sendOk: 'Sent',
   sendFailed: 'Send failed',
   sendPartial: 'Partially sent ({ok}/{total} succeeded)',
   sendTitle: 'Send Mail',
+  sendAction: 'Send Now',
   titleLabel: 'Title',
   contentLabel: 'Content',
   attachments: 'Attachments',
@@ -36,5 +39,14 @@ export default {
   statusUnread: 'Unread',
   statusRead: 'Read',
   statusClaimed: 'Claimed',
-  noAttachments: 'No attachments (notice)'
+  noAttachments: 'No attachments (notice)',
+
+  previewTitle: 'Preview',
+  previewTo: 'To',
+  previewNoRecipient: 'No recipients',
+  previewMore: '+{n} more',
+  previewNoSubject: '(no subject)',
+  previewEmptyContent: '(empty body)',
+  summaryPlayers: '{n} recipient(s)',
+  summaryAttachments: '{n} attachment(s)'
 }

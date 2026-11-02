@@ -58,74 +58,205 @@
       </el-table>
     </el-card>
 
-    <el-dialog v-model="sendDialog.visible" :title="$t('admin.gameMail.sendTitle')" width="560px">
-      <el-form label-width="100px">
-        <el-form-item :label="$t('admin.gameMail.playerSelect')" required>
-          <el-select
-            v-model="sendDialog.playerIds"
-            multiple
-            filterable
-            remote
-            reserve-keyword
-            :remote-method="searchPlayers"
-            :loading="playerLoading"
-            :placeholder="$t('admin.gameMail.playerSearchPlaceholder')"
-            style="width: 100%"
-          >
-            <el-option
-              v-for="p in playerOptions"
-              :key="p.playerId"
-              :label="`${p.nickname || p.username} #${p.playerId}`"
-              :value="p.playerId"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('admin.gameMail.titleLabel')" required>
-          <el-input v-model="sendDialog.title" />
-        </el-form-item>
-        <el-form-item :label="$t('admin.gameMail.contentLabel')">
-          <el-input v-model="sendDialog.content" type="textarea" :rows="4" />
-        </el-form-item>
-        <el-form-item :label="$t('admin.gameMail.attachments')">
-          <div class="attachments">
-            <div v-for="(a, i) in sendDialog.attachments" :key="i" class="attach-row">
-              <el-select v-model="a.type" style="width: 110px" @change="onTypeChange(a)">
-                <el-option
-                  v-for="opt in attachmentTypes"
-                  :key="opt.value"
-                  :label="opt.label"
-                  :value="opt.value"
-                />
-              </el-select>
+    <el-dialog
+      v-model="sendDialog.visible"
+      :title="$t('admin.gameMail.sendTitle')"
+      width="820px"
+      class="mail-dialog"
+      destroy-on-close
+    >
+      <div class="mail-send">
+        <!-- 左侧编辑区 -->
+        <section class="mail-edit">
+          <el-form label-position="top">
+            <el-form-item :label="$t('admin.gameMail.playerSelect')" required>
               <el-select
-                v-model="a.cfgId"
+                v-model="sendDialog.playerIds"
+                multiple
                 filterable
                 remote
                 reserve-keyword
-                :remote-method="(kw: string) => searchAsset(a, kw)"
-                :loading="a.loading"
-                :placeholder="$t('admin.gameMail.assetSearchPlaceholder')"
-                style="width: 220px"
+                :remote-method="searchPlayers"
+                :loading="playerLoading"
+                :placeholder="$t('admin.gameMail.playerSearchPlaceholder')"
+                style="width: 100%"
               >
                 <el-option
-                  v-for="c in a.options"
-                  :key="c.id"
-                  :label="`${c.name} #${c.id}`"
-                  :value="c.id"
+                  v-for="p in playerOptions"
+                  :key="p.playerId"
+                  :label="`${p.nickname || p.username} #${p.playerId}`"
+                  :value="p.playerId"
                 />
               </el-select>
-              <el-input-number v-model="a.count" :min="1" :controls="false" :placeholder="$t('admin.gameMail.attachmentCount')" style="width: 100px" />
-              <el-button link type="danger" @click="removeAttachment(i)">{{ $t('admin.gameMail.removeAttachment') }}</el-button>
-            </div>
-            <el-button link type="primary" @click="addAttachment">+ {{ $t('admin.gameMail.addAttachment') }}</el-button>
+            </el-form-item>
+            <el-form-item :label="$t('admin.gameMail.titleLabel')" required>
+              <el-input
+                v-model="sendDialog.title"
+                :placeholder="$t('admin.gameMail.titlePlaceholder')"
+                maxlength="64"
+                show-word-limit
+              />
+            </el-form-item>
+            <el-form-item :label="$t('admin.gameMail.contentLabel')">
+              <el-input
+                v-model="sendDialog.content"
+                type="textarea"
+                :rows="6"
+                :placeholder="$t('admin.gameMail.contentPlaceholder')"
+                maxlength="2000"
+                show-word-limit
+                resize="vertical"
+              />
+            </el-form-item>
+
+            <el-form-item :label="$t('admin.gameMail.attachments')">
+              <div class="attach-list">
+                <div
+                  v-for="(a, i) in sendDialog.attachments"
+                  :key="i"
+                  class="attach-card"
+                >
+                  <div class="attach-card__body">
+                    <el-select
+                      v-model="a.type"
+                      style="width: 110px"
+                      @change="onTypeChange(a)"
+                    >
+                      <el-option
+                        v-for="opt in attachmentTypes"
+                        :key="opt.value"
+                        :label="opt.label"
+                        :value="opt.value"
+                      />
+                    </el-select>
+                    <el-select
+                      v-model="a.cfgId"
+                      filterable
+                      remote
+                      reserve-keyword
+                      :remote-method="(kw: string) => searchAsset(a, kw)"
+                      :loading="a.loading"
+                      :placeholder="$t('admin.gameMail.assetSearchPlaceholder')"
+                      style="flex: 1; min-width: 160px"
+                    >
+                      <el-option
+                        v-for="c in a.options"
+                        :key="c.id"
+                        :label="`${c.name} #${c.id}`"
+                        :value="c.id"
+                      />
+                    </el-select>
+                    <el-input-number
+                      v-model="a.count"
+                      :min="1"
+                      :controls="false"
+                      :placeholder="$t('admin.gameMail.attachmentCount')"
+                      style="width: 90px"
+                    />
+                  </div>
+                  <el-button
+                    link
+                    type="danger"
+                    class="attach-card__del"
+                    :disabled="sendDialog.attachments.length === 1"
+                    @click="removeAttachment(i)"
+                  >
+                    <el-icon><Close /></el-icon>
+                  </el-button>
+                </div>
+
+                <el-button
+                  class="attach-add"
+                  link
+                  type="primary"
+                  @click="addAttachment"
+                >
+                  <el-icon><Plus /></el-icon>
+                  {{ $t('admin.gameMail.addAttachment') }}
+                </el-button>
+              </div>
+            </el-form-item>
+          </el-form>
+        </section>
+
+        <!-- 右侧预览区 -->
+        <aside class="mail-preview">
+          <div class="mail-preview__header">
+            <span>{{ $t('admin.gameMail.previewTitle') }}</span>
           </div>
-        </el-form-item>
-      </el-form>
+
+          <div class="mail-preview__meta">
+            <div class="meta-row">
+              <span class="meta-label">{{ $t('admin.gameMail.previewTo') }}</span>
+              <div class="meta-value">
+                <el-tag
+                  v-if="sendDialog.playerIds.length === 0"
+                  type="info"
+                  effect="plain"
+                >{{ $t('admin.gameMail.previewNoRecipient') }}</el-tag>
+                <template v-else>
+                  <el-tag
+                    v-for="pid in sendDialog.playerIds"
+                    :key="pid"
+                    size="small"
+                    class="recipient-tag"
+                  >#{{ pid }}</el-tag>
+                  <span v-if="sendDialog.playerIds.length > 3" class="recipient-more">
+                    {{ $t('admin.gameMail.previewMore', { n: sendDialog.playerIds.length - 3 }) }}
+                  </span>
+                </template>
+              </div>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">{{ $t('admin.gameMail.titleLabel') }}</span>
+              <div class="meta-value mail-preview__subject">
+                {{ sendDialog.title || $t('admin.gameMail.previewNoSubject') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="mail-preview__body">
+            <div class="preview-content">
+              {{ sendDialog.content || $t('admin.gameMail.previewEmptyContent') }}
+            </div>
+          </div>
+
+          <div class="mail-preview__attach">
+            <div v-if="attachmentPreviewList.length === 0" class="attach-empty">
+              {{ $t('admin.gameMail.noAttachments') }}
+            </div>
+            <div v-else class="attach-preview-list">
+              <div
+                v-for="(a, i) in attachmentPreviewList"
+                :key="i"
+                class="attach-preview-item"
+              >
+                <el-tag type="warning" effect="light">
+                  {{ typeLabel(a.type) }}
+                </el-tag>
+                <span class="attach-preview-name">#{{ a.cfgId }}</span>
+                <span class="attach-preview-count">x{{ a.count }}</span>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+
       <template #footer>
-        <el-button @click="sendDialog.visible = false">{{ $t('common.dialogCancel') }}</el-button>
-        <el-button type="primary" :loading="sendDialog.loading" @click="submitSend">
-          {{ $t('common.dialogConfirm') }}
-        </el-button>
+        <div class="mail-footer">
+          <div class="mail-footer__summary">
+            <span>{{ $t('admin.gameMail.summaryPlayers', { n: sendDialog.playerIds.length }) }}</span>
+            <span class="dot" />
+            <span>{{ $t('admin.gameMail.summaryAttachments', { n: attachmentPreviewList.length }) }}</span>
+          </div>
+          <div>
+            <el-button @click="sendDialog.visible = false">{{ $t('common.dialogCancel') }}</el-button>
+            <el-button type="primary" :loading="sendDialog.loading" @click="submitSend">
+              <el-icon class="el-icon--left"><Promotion /></el-icon>
+              {{ $t('admin.gameMail.sendAction') }}
+            </el-button>
+          </div>
+        </div>
       </template>
     </el-dialog>
   </PageContainer>
@@ -134,6 +265,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { Close, Plus, Promotion } from '@element-plus/icons-vue'
 
 import PageContainer from '@/components/PageContainer/index.vue'
 import { msgInfo, msgSuccess } from '@/utils/message'
@@ -165,16 +297,12 @@ const sendDialog = reactive({
   playerIds: [] as number[],
   title: '',
   content: '',
-  attachments: [] as AttachmentRow[]
+  attachments: [newAttachmentRow()] as AttachmentRow[]
 })
 
-const newAttachmentRow = (): AttachmentRow => ({
-  type: 1,
-  cfgId: undefined,
-  count: 1,
-  options: [],
-  loading: false
-})
+function newAttachmentRow(): AttachmentRow {
+  return { type: 1, cfgId: undefined, count: 1, options: [], loading: false }
+}
 
 const playerIdOrZero = () => {
   const id = Number(playerId.value)
@@ -244,6 +372,10 @@ const addAttachment = () => {
   sendDialog.attachments.push(newAttachmentRow())
 }
 
+const removeAttachment = (i: number) => {
+  sendDialog.attachments.splice(i, 1)
+}
+
 // 附件类型下拉：只开放可发放的资产类型（1 物品 / 2 装备 / 3 英雄）。
 const attachmentTypes = computed(() => [
   { value: 1, label: t('admin.gameMail.attachmentTypeItem') },
@@ -261,9 +393,10 @@ const attachmentTypeLabels = computed(() => [
 const typeLabel = (type?: number) =>
   attachmentTypeLabels.value.find(o => o.value === type)?.label ?? `#${type}`
 
-const removeAttachment = (i: number) => {
-  sendDialog.attachments.splice(i, 1)
-}
+/** 预览区与汇总计数只算填了 cfgId 的有效附件。 */
+const attachmentPreviewList = computed(() =>
+  sendDialog.attachments.filter(a => (a.cfgId ?? 0) > 0)
+)
 
 const submitSend = async() => {
   if (!sendDialog.playerIds.length) {
@@ -274,9 +407,11 @@ const submitSend = async() => {
     msgInfo(t('admin.gameMail.titleRequired'))
     return
   }
-  const attachments: GmMailAttachment[] = sendDialog.attachments
-    .filter(a => (a.cfgId ?? 0) > 0)
-    .map(a => ({ type: a.type, cfgId: a.cfgId, count: a.count }))
+  const attachments: GmMailAttachment[] = attachmentPreviewList.value.map(a => ({
+    type: a.type,
+    cfgId: a.cfgId,
+    count: a.count
+  }))
 
   sendDialog.loading = true
   let ok = 0
@@ -353,14 +488,197 @@ const formatTime = (ms?: number) => {
   margin-right: 4px;
 }
 
-.attachments {
-  width: 100%;
+/* ------- 发送弹窗 ------- */
+.mail-dialog :deep(.el-dialog__body) {
+  padding-top: 8px;
+  padding-bottom: 4px;
 }
 
-.attach-row {
+.mail-send {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 20px;
+  min-height: 420px;
+}
+
+/* 左侧编辑区 */
+.mail-edit {
+  min-width: 0;
+}
+.mail-edit :deep(.el-form-item__label) {
+  font-weight: 500;
+  color: var(--el-text-color-primary);
+}
+
+/* 附件卡片化 */
+.attach-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.attach-card {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 8px;
+  background: var(--el-fill-color-lighter);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.attach-card:hover {
+  border-color: var(--el-color-primary-light-5);
+}
+.attach-card__body {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+.attach-card__del {
+  flex-shrink: 0;
+}
+
+.attach-add {
+  align-self: flex-start;
+  gap: 4px;
+}
+
+/* 右侧预览区 */
+.mail-preview {
+  display: flex;
+  flex-direction: column;
+  border: 1px dashed var(--el-border-color);
+  border-radius: 10px;
+  background: var(--el-bg-color);
+  min-height: 420px;
+  overflow: hidden;
+}
+.mail-preview__header {
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--el-text-color-primary);
+  background: var(--el-fill-color-light);
+  border-bottom: 1px dashed var(--el-border-color);
+}
+.mail-preview__meta {
+  padding: 12px 16px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-bottom: 1px dashed var(--el-border-color-lighter);
+}
+.meta-row {
+  display: flex;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.meta-label {
+  flex-shrink: 0;
+  width: 46px;
+  color: var(--el-text-color-secondary);
+}
+.meta-value {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  color: var(--el-text-color-primary);
+}
+.mail-preview__subject {
+  font-weight: 500;
+  word-break: break-all;
+}
+.recipient-tag {
+  max-width: 72px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.recipient-more {
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+}
+
+.mail-preview__body {
+  flex: 1;
+  padding: 14px 16px;
+  overflow: auto;
+  background:
+    linear-gradient(var(--el-mask-color-extra-light), var(--el-mask-color-extra-light)),
+    var(--el-bg-color);
+}
+.preview-content {
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--el-text-color-regular);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.mail-preview__attach {
+  padding: 10px 16px 12px;
+  border-top: 1px dashed var(--el-border-color-lighter);
+  min-height: 48px;
+}
+.attach-empty {
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+}
+.attach-preview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.attach-preview-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.attach-preview-name {
+  color: var(--el-text-color-primary);
+}
+.attach-preview-count {
+  margin-left: auto;
+  color: var(--el-text-color-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* footer */
+.mail-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.mail-footer__summary {
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+}
+.mail-footer__summary .dot {
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  margin: 0 8px;
+  border-radius: 50%;
+  background: var(--el-text-color-placeholder);
+  vertical-align: middle;
+}
+
+/* 窄屏：两栏改单栏 */
+@media (max-width: 900px) {
+  .mail-send {
+    grid-template-columns: 1fr;
+  }
+  .mail-preview {
+    order: -1;
+  }
 }
 </style>

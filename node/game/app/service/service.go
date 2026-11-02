@@ -21,6 +21,7 @@ func (p *GmProvider) GetOnlinePlayers(ctx context.Context, req *pb.GetOnlinePlay
 			PlayerId:  a.PlayerID,
 			EnterTime: a.EnterTime,
 			NodeId:    nodeID,
+			LoginIp:   a.LoginIP,
 		})
 	}
 	return resp, nil

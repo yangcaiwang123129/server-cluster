@@ -11,13 +11,24 @@ type Player struct {
 	PlayerID    int64  `gorm:"column:player_id;type:bigint;not null;primaryKey;comment:玩家ID" json:"playerID"`
 	Username    string `gorm:"column:username;type:varchar(64);not null;default:'';uniqueIndex:uk_zone_username,priority:2;comment:登录账号" json:"username"`
 	Password    string `gorm:"column:password;type:varchar(256);not null;default:'';comment:密码哈希" json:"password"`
-	Zone        int32  `gorm:"column:zone;type:int;not null;default:0;uniqueIndex:uk_zone_username,priority:1;comment:区号" json:"zone"`
+	Zone        int32  `gorm:"column:zone;type:int;not null;default:86;uniqueIndex:uk_zone_username,priority:1;comment:区号" json:"zone"`
 	PhoneNumber int32  `gorm:"column:phone_number;type:int;not null;default:0;comment:手机号" json:"phoneNumber"`
 	Coupon      int64  `gorm:"column:coupon;type:bigint;not null;default:0;comment:点券" json:"coupon"`
 	Gold        int64  `gorm:"column:gold;type:bigint;not null;default:0;comment:金" json:"gold"`
 	Coin        int64  `gorm:"column:diamond;type:bigint;not null;default:0;comment:币" json:"diamond"`
-	TableModel  `gorm:"embedded"`
+	RegisterIP  string `gorm:"column:register_ip;type:varchar(64);not null;default:'';comment:注册IP" json:"registerIP"`
+	// 状态 & 封号
+	Status     int32  `gorm:"column:status;type:tinyint;not null;default:1;comment:1 正常 2 封号" json:"status"`
+	BanUntil   int64  `gorm:"column:ban_until;type:bigint;not null;default:0;comment:封号到期时间戳（秒），0 表示永久" json:"banUntil"`
+	BanReason  string `gorm:"column:ban_reason;type:varchar(500);not null;default:'';comment:封号原因" json:"banReason"`
+	TableModel `gorm:"embedded"`
 }
+
+// PlayerStatus 玩家状态
+const (
+	PlayerStatusNormal int32 = 1 // 正常
+	PlayerStatusBanned int32 = 2 // 封号
+)
 
 // TableName 指定表名。
 func (Player) TableName() string { return enum.TablePlayer.String() }

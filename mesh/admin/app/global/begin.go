@@ -35,6 +35,7 @@ func Init() error {
 			&model.SysOperaLog{},
 			&model.SysCasbinRule{},
 			&model.ClientVersion{},
+			&model.ClusterNode{},
 		); err != nil {
 			return err
 		}

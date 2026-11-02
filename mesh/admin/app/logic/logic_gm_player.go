@@ -2,6 +2,8 @@ package logic
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/hex"
 	"slices"
 	"sync"
 	"time"
@@ -30,6 +32,12 @@ type PlayerLogic interface {
 	PlayerOnline() ([]dto.OnlinePlayerResp, error)
 	// PlayerKick 踢玩家下线（经 mesh 调 game 服内部 RPC）
 	PlayerKick(req dto.PlayerKickReq) error
+	// PlayerBan 封号（更新 DB，同时如果在线则踢下线）
+	PlayerBan(req dto.PlayerBanReq) error
+	// PlayerUnban 解封（恢复状态）
+	PlayerUnban(req dto.PlayerUnbanReq) error
+	// PlayerResetPassword 重置密码（明文 MD5 哈希后存库）
+	PlayerResetPassword(req dto.PlayerResetPasswordReq) error
 }
 
 // playerLogicInst 玩家业务单例容器。
@@ -51,9 +59,13 @@ func init() {
 // PlayerList 玩家分页列表（直查 player）。
 func (this *playerLogic) PlayerList(req dto.PlayerListReq) ([]dto.PlayerResp, int64, error) {
 	return repo.R().ListPlayers(repo.PlayerQuery{
-		PlayerID: req.PlayerID,
-		Username: req.Username,
-		Order:    req.Order,
+		PlayerID:       req.PlayerID,
+		Username:       req.Username,
+		PhoneNumber:    req.PhoneNumber,
+		Status:         req.Status,
+		CreatedAtStart: req.CreatedAtStart,
+		CreatedAtEnd:   req.CreatedAtEnd,
+		Order:          req.Order,
 	}, req.PageIndex, req.PageSize)
 }
 
@@ -86,7 +98,12 @@ func (this *playerLogic) PlayerOnline() ([]dto.OnlinePlayerResp, error) {
 			}
 			mu.Lock()
 			for _, p := range resp.Players {
-				list = append(list, dto.OnlinePlayerResp{PlayerID: p.PlayerId, EnterTime: p.EnterTime, NodeID: p.NodeId})
+				list = append(list, dto.OnlinePlayerResp{
+					PlayerID:    p.PlayerId,
+					EnterTime:   p.EnterTime,
+					LobbyNodeID: p.NodeId,
+					LoginIP:     p.LoginIp,
+				})
 			}
 			mu.Unlock()
 		}(ins)
@@ -127,4 +144,43 @@ func (this *playerLogic) PlayerKick(req dto.PlayerKickReq) error {
 		return codes.NewCode(int(pb.ErrCode_ERR_CODE_PLAYER_NOT_FOUND), "player is not online").Err()
 	}
 	return nil
+}
+
+// PlayerBan 封号：写 DB + 如果该玩家在线则同时踢下线（KickType=2 封号踢）。
+func (this *playerLogic) PlayerBan(req dto.PlayerBanReq) error {
+	// 计算到期时间：0 表示永久
+	var banUntil int64
+	if req.Duration > 0 {
+		banUntil = time.Now().Unix() + int64(req.Duration)
+	}
+	if err := repo.R().BanPlayer(req.PlayerID, banUntil, req.Reason); err != nil {
+		return err
+	}
+	// 在线则按服踢下线：枚举 mesh 实例找玩家（简化版，逐实例尝试，失败忽略）
+	ctx, cancel := context.WithTimeout(context.Background(), rpcTimeout)
+	defer cancel()
+	instances, _ := gameInstances(ctx, pb.GameAdminService_ServiceDesc.ServiceName)
+	for _, ins := range instances {
+		client, err := rpc.NewDirectClient(ins.ID)
+		if err != nil {
+			continue
+		}
+		resp := &pb.KickPlayerResp{}
+		_ = client.Call(ctx, pb.GameAdminService_ServiceDesc.ServiceName,
+			methodName(pb.GameAdminService_KickPlayer_FullMethodName),
+			&pb.KickPlayerReq{PlayerIds: []int64{req.PlayerID}}, resp)
+	}
+	return nil
+}
+
+// PlayerUnban 解封。
+func (this *playerLogic) PlayerUnban(req dto.PlayerUnbanReq) error {
+	return repo.R().UnbanPlayer(req.PlayerID)
+}
+
+// PlayerResetPassword 重置密码：明文 MD5 哈希后写库（与 login 服保持一致）。
+func (this *playerLogic) PlayerResetPassword(req dto.PlayerResetPasswordReq) error {
+	h := md5.Sum([]byte(req.NewPassword))
+	hash := hex.EncodeToString(h[:])
+	return repo.R().ResetPlayerPassword(req.PlayerID, hash)
 }

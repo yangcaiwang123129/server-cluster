@@ -29,6 +29,7 @@ type OnlinePlayer struct {
 	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"`    // 玩家ID
 	EnterTime     int64                  `protobuf:"varint,2,opt,name=enter_time,json=enterTime,proto3" json:"enter_time,omitempty"` // 进入游戏时间（秒级时间戳）
 	NodeId        string                 `protobuf:"bytes,3,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`           // 所在 game 服实例 ID
+	LoginIp       string                 `protobuf:"bytes,4,opt,name=login_ip,json=loginIp,proto3" json:"login_ip,omitempty"`        // 登录 IP（网关从连接获取，内存中维护，不落库）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -80,6 +81,13 @@ func (x *OnlinePlayer) GetEnterTime() int64 {
 func (x *OnlinePlayer) GetNodeId() string {
 	if x != nil {
 		return x.NodeId
+	}
+	return ""
+}
+
+func (x *OnlinePlayer) GetLoginIp() string {
+	if x != nil {
+		return x.LoginIp
 	}
 	return ""
 }
@@ -1506,12 +1514,13 @@ const file_internal_proto_rawDesc = "" +
 	"\x0einternal.proto\x12\binternal\x1a\fcommon.proto\x1a\n" +
 	"item.proto\x1a\vequip.proto\x1a\n" +
 	"mail.proto\x1a\n" +
-	"hero.proto\"c\n" +
+	"hero.proto\"~\n" +
 	"\fOnlinePlayer\x12\x1b\n" +
 	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12\x1d\n" +
 	"\n" +
 	"enter_time\x18\x02 \x01(\x03R\tenterTime\x12\x17\n" +
-	"\anode_id\x18\x03 \x01(\tR\x06nodeId\"\x15\n" +
+	"\anode_id\x18\x03 \x01(\tR\x06nodeId\x12\x19\n" +
+	"\blogin_ip\x18\x04 \x01(\tR\aloginIp\"\x15\n" +
 	"\x13GetOnlinePlayersReq\"H\n" +
 	"\x14GetOnlinePlayersResp\x120\n" +
 	"\aplayers\x18\x01 \x03(\v2\x16.internal.OnlinePlayerR\aplayers\".\n" +

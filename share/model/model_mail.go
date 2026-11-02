@@ -12,7 +12,7 @@ const (
 	MailStatusUnread  int32 = 1 // 未读
 	MailStatusRead    int32 = 2 // 已读
 	MailStatusClaimed int32 = 3 // 已领取（附件已发放，可删除）
-	MailStatusDeleted int32 = 4 // 已删除（逻辑删除，不再下发）
+	MailStatusDeleted int32 = 4 // 已删除
 )
 
 // MailAttachment 邮件附件资产。

@@ -8,10 +8,13 @@ export default {
   search: 'Search',
   refresh: 'Refresh',
   actions: 'Actions',
+  operation: 'Operation',
   close: 'Close',
   empty: 'No data',
   selectPlaceholder: 'Please select',
   loading: 'Loading',
+  all: 'All',
+  sure: 'OK',
 
   add: 'Add',
   edit: 'Edit',

@@ -54,10 +54,16 @@ func (this *playerLogic) PlayerRegister(ctx context.Context, req *dto.PlayerRegi
 	if err != nil {
 		return nil, err
 	}
+	// 从 context 取客户端 IP（由 handler 注入），取不到时为空串。
+	var registerIP string
+	if v := ctx.Value("client_ip"); v != nil {
+		registerIP, _ = v.(string)
+	}
 	m := &model.Player{
-		PlayerID: svc.NextID(),
-		Username: req.Username,
-		Password: string(hash),
+		PlayerID:   svc.NextID(),
+		Username:   req.Username,
+		Password:   string(hash),
+		RegisterIP: registerIP,
 	}
 	if err := repo.Repo().Save(ctx, m); err != nil {
 		return nil, err

@@ -12,12 +12,15 @@ export default {
   playerSearchPlaceholder: '输入玩家ID或账号搜索',
   playersRequired: '请选择玩家',
   titleRequired: '请输入邮件标题',
+  titlePlaceholder: '请输入邮件标题（最多 64 字）',
+  contentPlaceholder: '请输入邮件正文（最多 2000 字）',
   list: '邮件列表',
   send: '发送邮件',
   sendOk: '已发送',
   sendFailed: '发送失败',
   sendPartial: '部分发送失败（成功 {ok}/{total}）',
   sendTitle: '发送邮件',
+  sendAction: '立即发送',
   titleLabel: '标题',
   contentLabel: '正文',
   attachments: '附件',
@@ -36,5 +39,14 @@ export default {
   statusUnread: '未读',
   statusRead: '已读',
   statusClaimed: '已领取',
-  noAttachments: '无附件（纯通知）'
+  noAttachments: '无附件（纯通知）',
+
+  previewTitle: '预览',
+  previewTo: '收件人',
+  previewNoRecipient: '未选择收件人',
+  previewMore: '等 {n} 人',
+  previewNoSubject: '未填写标题',
+  previewEmptyContent: '（空正文）',
+  summaryPlayers: '收件 {n} 人',
+  summaryAttachments: '附件 {n} 个'
 }

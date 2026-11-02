@@ -18,10 +18,13 @@ export default {
   search: '搜索',
   refresh: '刷新',
   actions: '操作',
+  operation: '操作',
   close: '关闭',
   empty: '暂无数据',
   selectPlaceholder: '请选择',
   loading: '加载中',
+  all: '全部',
+  sure: '确定',
 
   // The toolbar and row actions every list page repeats, and the column every
   // one of them ends with. All five admin pages migrated so far carry each of
