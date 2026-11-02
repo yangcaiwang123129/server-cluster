@@ -25,9 +25,8 @@ message EnterGameReq {
 message EnterGameResp {
   Result result = 1;               // 业务结果
   AttrMap player_attr = 2;         // 玩家属性（键为 Attr 枚举值）
-  HeroEntry hero_entry = 3;        // 当前英雄
-  WeaponEntry weapon_entry = 4;    // 当前武器
-  int64 server_time = 5;           // 服务器毫秒时间戳
+  HeroEntry hero_entry = 3;        // 当前英雄（已含绑定武器）
+  int64 server_time = 4;           // 服务器毫秒时间戳
 }
 
 // 离开游戏请求（路由 10002）

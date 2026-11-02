@@ -1101,6 +1101,131 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/gm/cluster": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cluster"
+                ],
+                "summary": "集群节点列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "服务名(gate/node/mesh)",
+                        "name": "nodeName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "服务类型(gate/node/mesh)",
+                        "name": "nodeKind",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "在线筛选(1在线 0离线)",
+                        "name": "online",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "页码",
+                        "name": "pageIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "每页条数",
+                        "name": "pageSize",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/api/v1/gm/cluster/{nodeId}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cluster"
+                ],
+                "summary": "集群节点详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "实例ID(etcd key最后一段)",
+                        "name": "nodeId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            },
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cluster"
+                ],
+                "summary": "更新节点 SSH 配置",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "实例ID",
+                        "name": "nodeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "SSH 配置",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ClusterNodeUpdateReq"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/api/v1/gm/cluster/{nodeId}/exec": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cluster"
+                ],
+                "summary": "远程运维脚本执行",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "实例ID",
+                        "name": "nodeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "{action:start|stop|restart|deploy}",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ClusterExecReq"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/api/v1/gm/equip": {
             "get": {
                 "produces": [
@@ -1770,6 +1895,36 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/gm/player/ban": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "封号",
+                "parameters": [
+                    {
+                        "description": "封号参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PlayerBanReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/gm/player/kick": {
             "post": {
                 "produces": [
@@ -1809,6 +1964,66 @@ const docTemplate = `{
                     "system"
                 ],
                 "summary": "在线玩家",
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/player/reset-password": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "重置密码",
+                "parameters": [
+                    {
+                        "description": "改密参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PlayerResetPasswordReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "响应包在 {code, message, data} 中",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gm/player/unban": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "解封",
+                "parameters": [
+                    {
+                        "description": "解封参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PlayerUnbanReq"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "响应包在 {code, message, data} 中",
@@ -3274,6 +3489,37 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.ClusterExecReq": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ClusterNodeUpdateReq": {
+            "type": "object",
+            "properties": {
+                "deployDir": {
+                    "type": "string"
+                },
+                "remark": {
+                    "type": "string"
+                },
+                "sshHost": {
+                    "type": "string"
+                },
+                "sshKeyPath": {
+                    "type": "string"
+                },
+                "sshPort": {
+                    "type": "integer"
+                },
+                "sshUser": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.ConfigSaveReq": {
             "type": "object",
             "properties": {
@@ -3735,6 +3981,23 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.PlayerBanReq": {
+            "type": "object",
+            "properties": {
+                "duration": {
+                    "description": "封号时长（秒），0 表示永久",
+                    "type": "integer"
+                },
+                "playerId": {
+                    "description": "玩家ID",
+                    "type": "integer"
+                },
+                "reason": {
+                    "description": "封号原因",
+                    "type": "string"
+                }
+            }
+        },
         "dto.PlayerKickReq": {
             "type": "object",
             "properties": {
@@ -3746,6 +4009,28 @@ const docTemplate = `{
                     "description": "玩家所在 game 服实例 ID（定向调用）",
                     "type": "string"
                 },
+                "playerId": {
+                    "description": "玩家ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.PlayerResetPasswordReq": {
+            "type": "object",
+            "properties": {
+                "newPassword": {
+                    "description": "新密码（明文，服务端哈希后存储）",
+                    "type": "string"
+                },
+                "playerId": {
+                    "description": "玩家ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.PlayerUnbanReq": {
+            "type": "object",
+            "properties": {
                 "playerId": {
                     "description": "玩家ID",
                     "type": "integer"

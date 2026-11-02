@@ -16,7 +16,7 @@ func Init() error {
 	}
 	// 自动建表：Player / PlayerExtra（只增不删，已存在的表做增量补列）。
 	if gdb, err := svc.Ctx().DB(); err == nil {
-		if err := svc.AutoMigrate(gdb, &model.Player{}, &model.PlayerExtra{}); err != nil {
+		if err := svc.AutoMigrate(gdb, &model.Player{}, &model.PlayerExtra{}, &model.PlayerAuth{}); err != nil {
 			return err
 		}
 	} else {

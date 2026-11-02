@@ -223,15 +223,10 @@ func SimOptions() dto.SimOptionsResp {
 	}
 }
 
-// SimLogin 走登录服的注册/登录接口，拿到 token 与网关地址并建立会话。
+// SimLogin 调 login 服 /api/v1/player/login (loginType=1 账号密码)。
+// login 服 accountLogin 自动处理"账号不存在→注册 + 账号存在→校验"，
+// 所以 admin 侧不需要区分 login/register。
 func SimLogin(req dto.SimLoginReq) (*dto.SimLoginResp, error) {
-	mode := req.Mode
-	if mode == "" {
-		mode = "login"
-	}
-	if mode != "login" && mode != "register" {
-		return nil, codes.NewCode(400, "mode 只能是 login 或 register").Err()
-	}
 	if strings.TrimSpace(req.Username) == "" || req.Password == "" {
 		return nil, codes.NewCode(400, "账号和密码不能为空").Err()
 	}
@@ -246,19 +241,16 @@ func SimLogin(req dto.SimLoginReq) (*dto.SimLoginResp, error) {
 
 	path := "/api/v1/player/login"
 	body := map[string]any{
-		"loginType": dto.LoginTypePassword,
+		"loginType": consts.LoginTypeAccount,
 		"username":  req.Username,
 		"password":  req.Password,
+		"deviceId":  "admin-simulator-" + req.Username,
 	}
 	displayBody := map[string]any{
-		"loginType": dto.LoginTypePassword,
+		"loginType": consts.LoginTypeAccount,
 		"username":  req.Username,
 		"password":  "******",
-	}
-	if mode == "register" {
-		path = "/api/v1/player/register"
-		body = map[string]any{"username": req.Username, "password": req.Password}
-		displayBody = map[string]any{"username": req.Username, "password": "******"}
+		"deviceId":  "admin-simulator-***",
 	}
 
 	payload, err := json.Marshal(body)

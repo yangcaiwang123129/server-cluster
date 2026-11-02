@@ -1,4 +1,4 @@
-// Package handler HTTP 层：向 due http 组件注册业务路由（swagger 由 etc.http.swagger 配置驱动）。
+// Package handler HTTP 层：向 due http 组件注册业务路由。
 package handler
 
 import (
@@ -11,42 +11,20 @@ import (
 	"github.com/dobyte/due/component/http/v2"
 )
 
-// clientIPKey 用于在 context 中传递客户端 IP 的 key（logic 侧以同一个 key 读取）。
+// clientIPKey context 中传递客户端 IP 的 key。
 const clientIPKey = "client_ip"
 
 // RegisterPlayer 向 due http 组件注册业务路由。
 func RegisterPlayer(router http.Router) {
 	api := router.Group("/api/v1")
-	api.Post("/player/register", register)
 	api.Post("/player/login", login)
+	api.Post("/player/phone/send-code", sendPhoneCode)
+	api.Post("/player/bind", bind)
 }
 
-// register 注册
-// @Summary 注册
-// @Tags account
-// @Accept json
-// @Produce json
-// @Param body body dto.PlayerRegisterReq true "注册参数"
-// @Success 200 {object} dto.PlayerRegisterResp "响应包在 {code, message, data} 中"
-// @Router /api/v1/player/register [post]
-func register(ctx http.Context) error {
-	req := &dto.PlayerRegisterReq{}
-	if err := ctx.Bind().Body(req); err != nil {
-		return ctx.Failure(errs.CodeInvalidParams.Err())
-	}
-	// 把客户端 IP 注入 context，让下游 logic 写入玩家表。
-	// due 的 http.Context.IP() 已内置代理链处理（X-Forwarded-For / X-Real-IP / RemoteAddr）。
-	ctx.SetContext(context.WithValue(ctx.Context(), clientIPKey, ctx.IP()))
-	data, err := logic.Player().PlayerRegister(ctx.Context(), req)
-	if err != nil {
-		return ctx.Failure(err)
-	}
-	return ctx.Success(data)
-}
-
-// Login 登录
+// Login 统一登录入口。
 // @Summary 登录
-// @Tags account
+// @Tags player
 // @Accept json
 // @Produce json
 // @Param body body dto.PlayerLoginReq true "登录参数"
@@ -57,9 +35,50 @@ func login(ctx http.Context) error {
 	if err := ctx.Bind().Body(req); err != nil {
 		return ctx.Failure(errs.CodeInvalidParams.Err())
 	}
+	// 把客户端 IP 注入 context，供 logic 写入 register_ip。
+	// due 的 http.Context.IP() 已内置代理链处理（X-Forwarded-For / X-Real-IP / RemoteAddr）。
+	ctx.SetContext(context.WithValue(ctx.Context(), clientIPKey, ctx.IP()))
 	data, err := logic.Player().PlayerLogin(ctx.Context(), req)
 	if err != nil {
 		return ctx.Failure(err)
 	}
 	return ctx.Success(data)
+}
+
+// SendPhoneCode 发送短信验证码。
+// @Summary 发送短信验证码
+// @Tags player
+// @Accept json
+// @Produce json
+// @Param body body dto.PlayerPhoneSendCodeReq true "参数"
+// @Success 200 {object} any "ok"
+// @Router /api/v1/player/phone/send-code [post]
+func sendPhoneCode(ctx http.Context) error {
+	req := &dto.PlayerPhoneSendCodeReq{}
+	if err := ctx.Bind().Body(req); err != nil {
+		return ctx.Failure(errs.CodeInvalidParams.Err())
+	}
+	if err := logic.Player().SendPhoneCode(ctx.Context(), req); err != nil {
+		return ctx.Failure(err)
+	}
+	return ctx.Success(nil)
+}
+
+// Bind 绑定新凭据（游客升级 / 已登录玩家加绑）。
+// @Summary 绑定凭据
+// @Tags player
+// @Accept json
+// @Produce json
+// @Param body body dto.PlayerBindReq true "参数"
+// @Success 200 {object} any "ok"
+// @Router /api/v1/player/bind [post]
+func bind(ctx http.Context) error {
+	req := &dto.PlayerBindReq{}
+	if err := ctx.Bind().Body(req); err != nil {
+		return ctx.Failure(errs.CodeInvalidParams.Err())
+	}
+	if err := logic.Player().PlayerBind(ctx.Context(), req); err != nil {
+		return ctx.Failure(err)
+	}
+	return ctx.Success(nil)
 }

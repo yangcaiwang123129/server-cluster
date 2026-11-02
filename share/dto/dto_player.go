@@ -21,7 +21,7 @@ type PlayerResp struct {
 	Level       int32  `json:"level"`
 	VipLevel    int32  `json:"vipLevel"`
 	Zone        int32  `json:"zone"`
-	PhoneNumber int32  `json:"phoneNumber"`
+	PhoneNumber string `json:"phoneNumber"` // 带区号，如 "+8613800138000"（来自 player_auth）
 	Coupon      int64  `json:"coupon"` // 点券
 	Gold        int64  `json:"gold"`   // 金
 	Coin        int64  `json:"coin"`   // 币

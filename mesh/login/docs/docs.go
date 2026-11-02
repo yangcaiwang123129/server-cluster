@@ -15,6 +15,37 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/player/bind": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "player"
+                ],
+                "summary": "绑定凭据",
+                "parameters": [
+                    {
+                        "description": "参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PlayerBindReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {}
+                    }
+                }
+            }
+        },
         "/api/v1/player/login": {
             "post": {
                 "consumes": [
@@ -24,7 +55,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "account"
+                    "player"
                 ],
                 "summary": "登录",
                 "parameters": [
@@ -48,7 +79,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/player/register": {
+        "/api/v1/player/phone/send-code": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -57,37 +88,41 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "account"
+                    "player"
                 ],
-                "summary": "注册",
+                "summary": "发送短信验证码",
                 "parameters": [
                     {
-                        "description": "注册参数",
+                        "description": "参数",
                         "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.PlayerRegisterReq"
+                            "$ref": "#/definitions/dto.PlayerPhoneSendCodeReq"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "响应包在 {code, message, data} 中",
-                        "schema": {
-                            "$ref": "#/definitions/dto.PlayerRegisterResp"
-                        }
+                        "description": "ok",
+                        "schema": {}
                     }
                 }
             }
         }
     },
     "definitions": {
-        "dto.PlayerLoginReq": {
+        "dto.PlayerBindReq": {
             "type": "object",
             "properties": {
-                "loginType": {
-                    "description": "登录类型 0账号登录 1手机号登录 2微信授权登录",
+                "appleIdentityToken": {
+                    "type": "string"
+                },
+                "appleNonce": {
+                    "type": "string"
+                },
+                "authType": {
+                    "description": "1账号 2手机 3微信 4Apple",
                     "type": "integer"
                 },
                 "password": {
@@ -96,11 +131,61 @@ const docTemplate = `{
                 "phoneNumber": {
                     "type": "string"
                 },
+                "playerId": {
+                    "type": "integer"
+                },
+                "smsCode": {
+                    "type": "string"
+                },
                 "username": {
                     "type": "string"
                 },
-                "zone": {
+                "wechatCode": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.PlayerLoginReq": {
+            "type": "object",
+            "properties": {
+                "appleIdentityToken": {
+                    "description": "APPLE(4)",
+                    "type": "string"
+                },
+                "appleNonce": {
+                    "description": "登录时传给 Apple 的原始 nonce，防止重放",
+                    "type": "string"
+                },
+                "deviceId": {
+                    "description": "GUEST(0)\n所有类型通用：客户端生成的 UUIDv4 设备 ID",
+                    "type": "string"
+                },
+                "loginType": {
+                    "description": "必填，0~4",
+                    "type": "integer"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "phoneNumber": {
+                    "description": "手机号",
+                    "type": "string"
+                },
+                "smsCode": {
+                    "description": "6 位验证码",
+                    "type": "string"
+                },
+                "username": {
+                    "description": "ACCOUNT(1)",
+                    "type": "string"
+                },
+                "wechatCode": {
+                    "description": "WECHAT(3)",
+                    "type": "string"
+                },
+                "zone": {
+                    "description": "PHONE_SMS(2)",
+                    "type": "integer"
                 }
             }
         },
@@ -108,31 +193,24 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "gateAddr": {
+                    "description": "网关连接地址，如 \"drpc://xxx:yyy\"",
                     "type": "string"
                 },
+                "isNewPlayer": {
+                    "description": "是否本次新建（客户端决定是否弹新手引导）",
+                    "type": "boolean"
+                },
                 "token": {
+                    "description": "JWT，payload 只有 player_id 字符串",
                     "type": "string"
                 }
             }
         },
-        "dto.PlayerRegisterReq": {
+        "dto.PlayerPhoneSendCodeReq": {
             "type": "object",
             "properties": {
-                "password": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.PlayerRegisterResp": {
-            "type": "object",
-            "properties": {
-                "gateAddr": {
-                    "type": "string"
-                },
-                "token": {
+                "phoneNumber": {
+                    "description": "带区号，如 \"+8613800138000\"",
                     "type": "string"
                 }
             }

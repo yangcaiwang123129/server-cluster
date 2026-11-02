@@ -18,10 +18,14 @@ var (
 	CodeInternalError  = codes.NewCode(int(pb.ErrCode_ERR_CODE_INTERNAL_ERROR), "internal error")
 	CodeInvalidParams  = codes.NewCode(int(pb.ErrCode_ERR_CODE_INVALID_PARAMS), "invalid params")
 	CodeUnauthorized   = codes.NewCode(int(pb.ErrCode_ERR_CODE_UNAUTHORIZED), "unauthorized")
-	CodePlayerNotFound = codes.NewCode(int(pb.ErrCode_ERR_CODE_PLAYER_NOT_FOUND), "player not found")
-	CodePlayerExists   = codes.NewCode(int(pb.ErrCode_ERR_CODE_PLAYER_EXISTS), "player already exists")
-	CodePasswordWrong  = codes.NewCode(int(pb.ErrCode_ERR_CODE_PASSWORD_WRONG), "password wrong")
-	CodeTokenInvalid   = codes.NewCode(int(pb.ErrCode_ERR_CODE_TOKEN_INVALID), "token invalid")
+	CodePlayerNotFound  = codes.NewCode(int(pb.ErrCode_ERR_CODE_PLAYER_NOT_FOUND), "player not found")
+	CodePlayerExists    = codes.NewCode(int(pb.ErrCode_ERR_CODE_PLAYER_EXISTS), "player already exists")
+	CodePasswordWrong   = codes.NewCode(int(pb.ErrCode_ERR_CODE_PASSWORD_WRONG), "password wrong")
+	CodeTokenInvalid    = codes.NewCode(int(pb.ErrCode_ERR_CODE_TOKEN_INVALID), "token invalid")
+	CodePlayerBanned    = codes.NewCode(3001, "player is banned")
+	CodeSmsCodeInvalid  = codes.NewCode(3002, "sms code invalid or expired")
+	CodeSmsCooldown     = codes.NewCode(3003, "please wait before requesting another sms code")
+	CodeAuthTypeUnknown = codes.NewCode(3004, "unknown auth type")
 )
 
 // ErrXxx 便捷入口：直接拿到 error（CodeXxx.Err()）。

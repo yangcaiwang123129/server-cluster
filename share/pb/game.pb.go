@@ -159,11 +159,10 @@ func (x *EnterGameReq) GetToken() string {
 // 进入游戏响应（登录成功后返回给客户端的结构体）
 type EnterGameResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`                              // 业务结果
-	PlayerAttr    *AttrMap               `protobuf:"bytes,2,opt,name=player_attr,json=playerAttr,proto3" json:"player_attr,omitempty"`    // 玩家属性（键为 Attr 枚举值）
-	HeroEntry     *HeroEntry             `protobuf:"bytes,3,opt,name=hero_entry,json=heroEntry,proto3" json:"hero_entry,omitempty"`       // 当前英雄
-	WeaponEntry   *WeaponEntry           `protobuf:"bytes,4,opt,name=weapon_entry,json=weaponEntry,proto3" json:"weapon_entry,omitempty"` // 当前武器
-	ServerTime    int64                  `protobuf:"varint,5,opt,name=server_time,json=serverTime,proto3" json:"server_time,omitempty"`   // 服务器毫秒时间戳
+	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`                            // 业务结果
+	PlayerAttr    *AttrMap               `protobuf:"bytes,2,opt,name=player_attr,json=playerAttr,proto3" json:"player_attr,omitempty"`  // 玩家属性（键为 Attr 枚举值）
+	HeroEntry     *HeroEntry             `protobuf:"bytes,3,opt,name=hero_entry,json=heroEntry,proto3" json:"hero_entry,omitempty"`     // 当前英雄（已含绑定武器）
+	ServerTime    int64                  `protobuf:"varint,4,opt,name=server_time,json=serverTime,proto3" json:"server_time,omitempty"` // 服务器毫秒时间戳
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -215,13 +214,6 @@ func (x *EnterGameResp) GetPlayerAttr() *AttrMap {
 func (x *EnterGameResp) GetHeroEntry() *HeroEntry {
 	if x != nil {
 		return x.HeroEntry
-	}
-	return nil
-}
-
-func (x *EnterGameResp) GetWeaponEntry() *WeaponEntry {
-	if x != nil {
-		return x.WeaponEntry
 	}
 	return nil
 }
@@ -692,16 +684,15 @@ const file_game_proto_rawDesc = "" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\"$\n" +
 	"\fEnterGameReq\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\"\xe4\x01\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\"\xb0\x01\n" +
 	"\rEnterGameResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\x12,\n" +
 	"\vplayer_attr\x18\x02 \x01(\v2\v.pb.AttrMapR\n" +
 	"playerAttr\x12,\n" +
 	"\n" +
-	"hero_entry\x18\x03 \x01(\v2\r.pb.HeroEntryR\theroEntry\x122\n" +
-	"\fweapon_entry\x18\x04 \x01(\v2\x0f.pb.WeaponEntryR\vweaponEntry\x12\x1f\n" +
-	"\vserver_time\x18\x05 \x01(\x03R\n" +
+	"hero_entry\x18\x03 \x01(\v2\r.pb.HeroEntryR\theroEntry\x12\x1f\n" +
+	"\vserver_time\x18\x04 \x01(\x03R\n" +
 	"serverTime\"\x0e\n" +
 	"\fLeaveGameReq\"3\n" +
 	"\rLeaveGameResp\x12\"\n" +
@@ -763,31 +754,29 @@ var file_game_proto_goTypes = []any{
 	(*Result)(nil),        // 13: pb.Result
 	(*AttrMap)(nil),       // 14: pb.AttrMap
 	(*HeroEntry)(nil),     // 15: pb.HeroEntry
-	(*WeaponEntry)(nil),   // 16: pb.WeaponEntry
-	(NOTIFY_TYPE)(0),      // 17: pb.NOTIFY_TYPE
-	(*AssetEntry)(nil),    // 18: pb.AssetEntry
+	(NOTIFY_TYPE)(0),      // 16: pb.NOTIFY_TYPE
+	(*AssetEntry)(nil),    // 17: pb.AssetEntry
 }
 var file_game_proto_depIdxs = []int32{
 	13, // 0: pb.VerifyResp.result:type_name -> pb.Result
 	13, // 1: pb.EnterGameResp.result:type_name -> pb.Result
 	14, // 2: pb.EnterGameResp.player_attr:type_name -> pb.AttrMap
 	15, // 3: pb.EnterGameResp.hero_entry:type_name -> pb.HeroEntry
-	16, // 4: pb.EnterGameResp.weapon_entry:type_name -> pb.WeaponEntry
-	13, // 5: pb.LeaveGameResp.result:type_name -> pb.Result
-	17, // 6: pb.ServerNotify.notify_type:type_name -> pb.NOTIFY_TYPE
-	13, // 7: pb.GiftBuyResp.result:type_name -> pb.Result
-	18, // 8: pb.GiftBuyResp.costs:type_name -> pb.AssetEntry
-	18, // 9: pb.GiftBuyResp.rewards:type_name -> pb.AssetEntry
-	13, // 10: pb.ExchangeResp.result:type_name -> pb.Result
-	18, // 11: pb.ExchangeResp.costs:type_name -> pb.AssetEntry
-	18, // 12: pb.ExchangeResp.rewards:type_name -> pb.AssetEntry
-	13, // 13: pb.RechargeResp.result:type_name -> pb.Result
-	18, // 14: pb.RechargeResp.rewards:type_name -> pb.AssetEntry
-	15, // [15:15] is the sub-list for method output_type
-	15, // [15:15] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	13, // 4: pb.LeaveGameResp.result:type_name -> pb.Result
+	16, // 5: pb.ServerNotify.notify_type:type_name -> pb.NOTIFY_TYPE
+	13, // 6: pb.GiftBuyResp.result:type_name -> pb.Result
+	17, // 7: pb.GiftBuyResp.costs:type_name -> pb.AssetEntry
+	17, // 8: pb.GiftBuyResp.rewards:type_name -> pb.AssetEntry
+	13, // 9: pb.ExchangeResp.result:type_name -> pb.Result
+	17, // 10: pb.ExchangeResp.costs:type_name -> pb.AssetEntry
+	17, // 11: pb.ExchangeResp.rewards:type_name -> pb.AssetEntry
+	13, // 12: pb.RechargeResp.result:type_name -> pb.Result
+	17, // 13: pb.RechargeResp.rewards:type_name -> pb.AssetEntry
+	14, // [14:14] is the sub-list for method output_type
+	14, // [14:14] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_game_proto_init() }

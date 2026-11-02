@@ -3,66 +3,120 @@ package repo
 
 import (
 	"context"
+	"server-cluster/internal/svc"
+	"server-cluster/share/model"
 	"server-cluster/share/singleton"
 
 	"gorm.io/gorm"
-
-	"server-cluster/internal/svc"
-	"server-cluster/share/model"
 )
 
-// PlayerRepo 账号数据访问接口。
+// PlayerRepo 玩家基础表数据访问（只管 player 表，不管凭据）。
 type PlayerRepo interface {
-	// Save 创建账号
-	Save(ctx context.Context, m *model.Player) error
-	// FindByUsername 按用户名查询
-	FindByUsername(ctx context.Context, username string) (*model.Player, error)
+	Create(ctx context.Context, m *model.Player) error
+	GetByID(ctx context.Context, playerID int64) (*model.Player, error)
+	GetByDeviceID(ctx context.Context, deviceID string) (*model.Player, error)
+	UpdateStatus(ctx context.Context, playerID int64, status int32) error
 }
 
 var playerRepo = singleton.NewContainer[PlayerRepo]("PlayerRepo")
 
-func init() {
-	playerRepo.Register(NewAccountRepo())
-}
+func init() { playerRepo.Register(newPlayerRepo()) }
 
-// Repo 获取账号数据访问单例。
 func Repo() PlayerRepo { return playerRepo.MustGet() }
 
 type playerRepoImpl struct{}
 
-// NewAccountRepo 构造 gorm 实现。
-func NewAccountRepo() PlayerRepo { return &playerRepoImpl{} }
+func newPlayerRepo() PlayerRepo { return &playerRepoImpl{} }
 
-func (this *playerRepoImpl) Save(ctx context.Context, m *model.Player) error {
+func (this *playerRepoImpl) Create(ctx context.Context, m *model.Player) error {
 	db, err := svc.Ctx().DB()
 	if err != nil {
 		return gorm.ErrInvalidDB
 	}
-	// 注册永远是新玩家，用 Create 保证 BeforeCreate hook 正确设置 CreatedAt/UpdatedAt。
-	// GORM 的 Save 对带主键的 struct 会先查后存，新行也可能跳过 BeforeCreate。
 	return db.WithContext(ctx).Create(m).Error
 }
 
-func (this *playerRepoImpl) FindByUsername(ctx context.Context, username string) (*model.Player, error) {
+func (this *playerRepoImpl) GetByID(ctx context.Context, playerID int64) (*model.Player, error) {
 	db, err := svc.Ctx().DB()
 	if err != nil {
 		return nil, gorm.ErrInvalidDB
 	}
-	var m *model.Player
-	if err := db.WithContext(ctx).Where("username = ?", username).First(&m).Error; err != nil {
+	var m model.Player
+	if err := db.WithContext(ctx).Where("player_id = ?", playerID).First(&m).Error; err != nil {
 		return nil, err
 	}
-	return m, nil
+	return &m, nil
 }
 
-func (this *playerRepoImpl) FindByPhoneNumber(ctx context.Context, username string) (*model.Player, error) {
+func (this *playerRepoImpl) GetByDeviceID(ctx context.Context, deviceID string) (*model.Player, error) {
 	db, err := svc.Ctx().DB()
 	if err != nil {
 		return nil, gorm.ErrInvalidDB
 	}
-	var m *model.Player
-	if err := db.WithContext(ctx).Where("phone_number = ?", username).First(&m).Error; err != nil {
+	var m model.Player
+	if err := db.WithContext(ctx).Where("device_id = ?", deviceID).First(&m).Error; err != nil {
 		return nil, err
 	}
-	return m, nil
+	return &m, nil
+}
+
+func (this *playerRepoImpl) UpdateStatus(ctx context.Context, playerID int64, status int32) error {
+	db, err := svc.Ctx().DB()
+	if err != nil {
+		return gorm.ErrInvalidDB
+	}
+	return db.WithContext(ctx).Model(&model.Player{}).
+		Where("player_id = ?", playerID).
+		Update("status", status).Error
+}
+
+// PlayerAuthRepo 玩家凭据表数据访问（只管 player_auth 表）。
+type PlayerAuthRepo interface {
+	Create(ctx context.Context, m *model.PlayerAuth) error
+	FindByTypeAndIdentifier(ctx context.Context, authType int32, identifier string) (*model.PlayerAuth, error)
+	FindByPlayerID(ctx context.Context, playerID int64) ([]*model.PlayerAuth, error)
+}
+
+var playerAuthRepo = singleton.NewContainer[PlayerAuthRepo]("PlayerAuthRepo")
+
+func init() { playerAuthRepo.Register(newPlayerAuthRepo()) }
+
+func AuthRepo() PlayerAuthRepo { return playerAuthRepo.MustGet() }
+
+type playerAuthRepoImpl struct{}
+
+func newPlayerAuthRepo() PlayerAuthRepo { return &playerAuthRepoImpl{} }
+
+func (this *playerAuthRepoImpl) Create(ctx context.Context, m *model.PlayerAuth) error {
+	db, err := svc.Ctx().DB()
+	if err != nil {
+		return gorm.ErrInvalidDB
+	}
+	return db.WithContext(ctx).Create(m).Error
+}
+
+func (this *playerAuthRepoImpl) FindByTypeAndIdentifier(ctx context.Context, authType int32, identifier string) (*model.PlayerAuth, error) {
+	db, err := svc.Ctx().DB()
+	if err != nil {
+		return nil, gorm.ErrInvalidDB
+	}
+	var m model.PlayerAuth
+	if err := db.WithContext(ctx).
+		Where("auth_type = ? AND auth_identifier = ?", authType, identifier).
+		First(&m).Error; err != nil {
+		return nil, err
+	}
+	return &m, nil
+}
+
+func (this *playerAuthRepoImpl) FindByPlayerID(ctx context.Context, playerID int64) ([]*model.PlayerAuth, error) {
+	db, err := svc.Ctx().DB()
+	if err != nil {
+		return nil, gorm.ErrInvalidDB
+	}
+	var list []*model.PlayerAuth
+	if err := db.WithContext(ctx).Where("player_id = ?", playerID).Find(&list).Error; err != nil {
+		return nil, err
+	}
+	return list, nil
 }

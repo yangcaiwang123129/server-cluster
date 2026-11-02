@@ -11,8 +11,10 @@ import (
 
 // PlayerLogic 玩家模块业务接口。
 type PlayerLogic interface {
-	// PlayerRegister 玩家注册账号
-	PlayerRegister(ctx context.Context, req *dto.PlayerRegisterReq) (*dto.PlayerRegisterResp, error)
-	// PlayerLogin 登录登录并签发 token
+	// PlayerLogin 统一登录入口，按 loginType 分发到各分支。
 	PlayerLogin(ctx context.Context, req *dto.PlayerLoginReq) (*dto.PlayerLoginResp, error)
+	// PlayerBind 绑定新凭据（游客升级 / 已登录玩家加绑）。
+	PlayerBind(ctx context.Context, req *dto.PlayerBindReq) error
+	// SendPhoneCode 发送短信验证码。
+	SendPhoneCode(ctx context.Context, req *dto.PlayerPhoneSendCodeReq) error
 }

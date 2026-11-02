@@ -107,9 +107,6 @@ func mergeEnterGameResp(dst, src *pb.EnterGameResp) {
 	if src.HeroEntry != nil {
 		dst.HeroEntry = src.HeroEntry
 	}
-	if src.WeaponEntry != nil {
-		dst.WeaponEntry = src.WeaponEntry
-	}
 }
 
 // buildPlayerAttr 组装下发给客户端的玩家属性表：

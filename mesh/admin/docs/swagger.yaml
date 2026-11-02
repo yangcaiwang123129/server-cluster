@@ -61,6 +61,26 @@ definitions:
       versionId:
         type: integer
     type: object
+  dto.ClusterExecReq:
+    properties:
+      action:
+        type: string
+    type: object
+  dto.ClusterNodeUpdateReq:
+    properties:
+      deployDir:
+        type: string
+      remark:
+        type: string
+      sshHost:
+        type: string
+      sshKeyPath:
+        type: string
+      sshPort:
+        type: integer
+      sshUser:
+        type: string
+    type: object
   dto.ConfigSaveReq:
     properties:
       configKey:
@@ -384,6 +404,18 @@ definitions:
       visible:
         type: string
     type: object
+  dto.PlayerBanReq:
+    properties:
+      duration:
+        description: 封号时长（秒），0 表示永久
+        type: integer
+      playerId:
+        description: 玩家ID
+        type: integer
+      reason:
+        description: 封号原因
+        type: string
+    type: object
   dto.PlayerKickReq:
     properties:
       kickType:
@@ -392,6 +424,21 @@ definitions:
       nodeId:
         description: 玩家所在 game 服实例 ID（定向调用）
         type: string
+      playerId:
+        description: 玩家ID
+        type: integer
+    type: object
+  dto.PlayerResetPasswordReq:
+    properties:
+      newPassword:
+        description: 新密码（明文，服务端哈希后存储）
+        type: string
+      playerId:
+        description: 玩家ID
+        type: integer
+    type: object
+  dto.PlayerUnbanReq:
+    properties:
       playerId:
         description: 玩家ID
         type: integer
@@ -1240,6 +1287,90 @@ paths:
       summary: 修改客户端版本
       tags:
       - client
+  /api/v1/gm/cluster:
+    get:
+      parameters:
+      - description: 服务名(gate/node/mesh)
+        in: query
+        name: nodeName
+        type: string
+      - description: 服务类型(gate/node/mesh)
+        in: query
+        name: nodeKind
+        type: string
+      - description: 在线筛选(1在线 0离线)
+        in: query
+        name: online
+        type: integer
+      - default: 1
+        description: 页码
+        in: query
+        name: pageIndex
+        type: integer
+      - default: 10
+        description: 每页条数
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      summary: 集群节点列表
+      tags:
+      - cluster
+  /api/v1/gm/cluster/{nodeId}:
+    get:
+      parameters:
+      - description: 实例ID(etcd key最后一段)
+        in: path
+        name: nodeId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: 集群节点详情
+      tags:
+      - cluster
+    put:
+      parameters:
+      - description: 实例ID
+        in: path
+        name: nodeId
+        required: true
+        type: string
+      - description: SSH 配置
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ClusterNodeUpdateReq'
+      produces:
+      - application/json
+      responses: {}
+      summary: 更新节点 SSH 配置
+      tags:
+      - cluster
+  /api/v1/gm/cluster/{nodeId}/exec:
+    post:
+      parameters:
+      - description: 实例ID
+        in: path
+        name: nodeId
+        required: true
+        type: string
+      - description: '{action:start|stop|restart|deploy}'
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ClusterExecReq'
+      produces:
+      - application/json
+      responses: {}
+      summary: 远程运维脚本执行
+      tags:
+      - cluster
   /api/v1/gm/equip:
     get:
       parameters:
@@ -1668,6 +1799,25 @@ paths:
       summary: 玩家列表
       tags:
       - system
+  /api/v1/gm/player/ban:
+    post:
+      parameters:
+      - description: 封号参数
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PlayerBanReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 响应包在 {code, message, data} 中
+          schema:
+            $ref: '#/definitions/dto.Resp'
+      summary: 封号
+      tags:
+      - system
   /api/v1/gm/player/kick:
     post:
       parameters:
@@ -1697,6 +1847,44 @@ paths:
           schema:
             $ref: '#/definitions/dto.Resp'
       summary: 在线玩家
+      tags:
+      - system
+  /api/v1/gm/player/reset-password:
+    post:
+      parameters:
+      - description: 改密参数
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PlayerResetPasswordReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 响应包在 {code, message, data} 中
+          schema:
+            $ref: '#/definitions/dto.Resp'
+      summary: 重置密码
+      tags:
+      - system
+  /api/v1/gm/player/unban:
+    post:
+      parameters:
+      - description: 解封参数
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PlayerUnbanReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 响应包在 {code, message, data} 中
+          schema:
+            $ref: '#/definitions/dto.Resp'
+      summary: 解封
       tags:
       - system
   /api/v1/gm/record:

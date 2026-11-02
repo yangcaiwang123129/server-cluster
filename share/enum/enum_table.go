@@ -6,6 +6,7 @@ type Table string
 const (
 	TablePlayer       Table = "player"        // 玩家表（1:1）
 	TablePlayerExtra  Table = "player_extra"  // 玩家拓展表（1:1）
+	TablePlayerAuth   Table = "player_auth"   // 玩家登录凭据表
 	TablePlayerItem   Table = "player_item"   // 玩家物品表 持有（1:1，物品容器 JSON）
 	TablePlayerEquip  Table = "player_equip"  // 玩家装备表 持有（1:1，装备 JSON，key=装备实例ID）
 	TablePlayerHero   Table = "player_hero"   // 玩家英雄表 持有（1:1，英雄 JSON，key=英雄配置ID）
