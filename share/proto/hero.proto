@@ -6,7 +6,7 @@ import "common.proto";
 
 option go_package = "server-cluster/share/pb";
 
-// 英雄列表请求（路由 10020）
+// 英雄列表请求（路由 10600）
 message HeroListReq {
 }
 
@@ -16,12 +16,12 @@ message HeroListResp {
   repeated HeroEntry hero_entries = 2; // 英雄及其绑定的武器/技能/装备
 }
 
-// 英雄变化通知（路由 10021，结构即完整持有，客户端收到后整体刷新该英雄）
+// 英雄变化通知（路由 10601，结构即完整持有，客户端收到后整体刷新该英雄）
 message HeroNotify {
   HeroEntry hero_entry = 1;
 }
 
-// 新增英雄请求（路由 10022）
+// 新增英雄请求（路由 10602）
 message HeroAddReq {
   int32 cfg_id = 1; // 英雄配置ID
 }
@@ -32,7 +32,7 @@ message HeroAddResp {
   HeroEntry hero_entry = 2; // 新增后的持有状态
 }
 
-// 更新英雄请求（路由 10023）
+// 更新英雄请求（路由 10603）
 message HeroUpdateReq {
   int32 cfg_id = 1;   // 英雄配置ID
   int32 level = 2;    // 等级
@@ -48,7 +48,7 @@ message HeroUpdateResp {
   HeroEntry hero_entry = 2; // 更新后的持有状态
 }
 
-// 查看英雄累计属性请求（路由 10024）
+// 查看英雄累计属性请求（路由 10604）
 message HeroAttributeReq {
   int32 cfg_id = 1; // 英雄配置ID（0 表示当前出战英雄）
 }
@@ -68,7 +68,7 @@ message HeroAttributeResp {
   HeroAttribute attribute = 3; // 累计属性
 }
 
-// 英雄升级请求（路由 10025，消耗升级素材）
+// 英雄升级请求（路由 10605，消耗升级素材）
 message HeroUpgradeReq {
   int32 cfg_id = 1; // 英雄配置ID
 }

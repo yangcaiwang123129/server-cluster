@@ -21,7 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// 更新武器请求（路由 10033）
+// 更新武器请求（路由 10703）
 type WeaponUpdateReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"`  // 武器配置ID
@@ -151,7 +151,7 @@ func (x *WeaponUpdateResp) GetWeaponEntry() *WeaponEntry {
 	return nil
 }
 
-// 武器升级请求（路由 10034，消耗升级素材）
+// 武器升级请求（路由 10704，消耗升级素材）
 type WeaponUpgradeReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 武器配置ID
@@ -257,7 +257,7 @@ func (x *WeaponUpgradeResp) GetAttribute() *HeroAttribute {
 	return nil
 }
 
-// 武器升品请求（路由 10035，消耗升品素材）
+// 武器升品请求（路由 10705，消耗升品素材）
 type WeaponUpQualityReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 武器配置ID
@@ -363,7 +363,7 @@ func (x *WeaponUpQualityResp) GetAttribute() *HeroAttribute {
 	return nil
 }
 
-// 武器突破请求（路由 10036，消耗突破素材）
+// 武器突破请求（路由 10706，消耗突破素材）
 type WeaponBreakthroughReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 武器配置ID

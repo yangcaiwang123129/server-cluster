@@ -18,7 +18,7 @@ func init() {
 	router.OnActor(pb.RouteCode_ROUTE_CODE_EQUIP_UP_QUALITY, handleEquipUpQuality)
 	router.OnActor(pb.RouteCode_ROUTE_CODE_EQUIP_BREAKTHROUGH, handleEquipBreakthrough)
 	router.OnActor(pb.RouteCode_ROUTE_CODE_EQUIP_WEAR, handleEquipWear)
-	router.OnActor(pb.RouteCode_ROUTE_CODE_EQUIP_UNWEAR, handleEquipUnwear)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_EQUIP_UN_WEAR, handleEquipUnWear)
 }
 
 // handleEquipWear 穿戴装备（同英雄同配置自动顶替）。
@@ -36,8 +36,8 @@ func handleEquipWear(ctx node.Context) {
 	_ = ctx.Response(resp)
 }
 
-// handleEquipUnwear 卸载装备。
-func handleEquipUnwear(ctx node.Context) {
+// handleEquipUnWear 卸载装备。
+func handleEquipUnWear(ctx node.Context) {
 	req := &pb.EquipUnwearReq{}
 	if err := ctx.Parse(req); err != nil {
 		_ = ctx.Response(err)

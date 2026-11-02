@@ -285,7 +285,7 @@ func loadPlayerSkill(ctx context.Context, playerID int64) (*model.PlayerSkill, e
 type skillAssetHandler struct{}
 
 // AssetType 资产类型：技能。
-func (this *skillAssetHandler) AssetType() tpl.AssetType { return AssetTypeSkill }
+func (this *skillAssetHandler) AssetType() tpl.AssetType { return tpl.AssetType_Skill }
 
 // Add 发放技能：已拥有视为成功（技能随英雄自动补建，避免奖励重复发放失败）。
 func (this *skillAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _ int32) error {
@@ -362,7 +362,7 @@ func (this *skillAssetHandler) List(ctx context.Context, playerID int64) ([]*tpl
 
 	assets := make([]*tpl.Asset, 0, row.Skills.Len())
 	row.Skills.Range(func(cfgID int32, _ model.SkillInfo) bool {
-		assets = append(assets, &tpl.Asset{Type: AssetTypeSkill, Id: cfgID, Count: 1})
+		assets = append(assets, &tpl.Asset{Type: tpl.AssetType_Skill, Id: cfgID, Count: 1})
 		return true
 	})
 	sort.Slice(assets, func(i, j int) bool { return assets[i].Id < assets[j].Id })

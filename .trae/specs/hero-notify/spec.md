@@ -2,7 +2,7 @@
 
 ## 1. 目标
 
-把已定义但未使用的 `HeroNotify`（路由 `10021`）接入为真实的服务器主动推送通道：
+把已定义但未使用的 `HeroNotify`（路由 `10601`）接入为真实的服务器主动推送通道：
 
 - 英雄、武器、技能、装备任一持有状态变更后，向在线玩家推送**该英雄的完整持有结构**（`HeroEntry`，内含 weapon / skills / equips）。
 - 客户端收到 `HeroNotify` 后整体替换本地该英雄数据，不再依赖请求响应增量。
@@ -19,7 +19,7 @@
 | 一次操作影响多个英雄 | 每个受影响英雄各推一条（如装备换绑、英雄出战切换） |
 | 已拥有关系被删除（英雄/武器/技能/装备被扣除） | 英雄被删除→不推送；武器/技能/装备被扣除→仍推送该英雄（结构变空即客户端可识别） |
 | 只读接口 | `HeroList` / `HeroAttribute` 不推送 |
-| 协议改动 | 无。`HeroNotify` 与 `ROUTE_CODE_HERO_NOTIFY=10021` 已在 `share/proto/hero.proto`、`common.proto` 中定义并已生成 |
+| 协议改动 | 无。`HeroNotify` 与 `ROUTE_CODE_HERO_NOTIFY=10601` 已在 `share/proto/hero.proto`、`common.proto` 中定义并已生成 |
 
 ## 3. 新增推送助手
 
@@ -102,8 +102,87 @@ svc.NodeProxy().Push(ctx, &cluster.PushArgs{
 
 ## 7. 验收
 
-- 英雄新增/更新/升级后，在线客户端收到路由 `10021` 的 `HeroNotify`，内容为含武器/技能/装备的完整 `HeroEntry`。
+- 英雄新增/更新/升级后，在线客户端收到路由 `10601` 的 `HeroNotify`，内容为含武器/技能/装备的完整 `HeroEntry`。
 - 武器/技能的更新与三种成长操作，均推到其绑定英雄。
 - 装备新增、改归属、穿戴、卸载、升级、升品、突破，均推到所属英雄；换绑时新旧英雄各收到一条。
 - 奖励/邮件发放英雄、武器、技能、装备时同样触发推送。
 - 玩家离线时业务成功、日志出现 Warn，不产生错误响应。
+
+## 8. 修复轮次：推送通道接入问题（2026-11-02）
+
+> 说明：`ROUTE_CODE_HERO_NOTIFY` 的历史号依次为 `10021`（初版）→ `10201`（按模块预留 100 重排）→ `10601`（玩家扩容 500 后重排）；本节以 `10601` 为基线。
+
+### 8.1 核对结论（现状无接线错误）
+
+| 环节 | 结论 |
+| --- | --- |
+| 推送入口 | 全仓仅 `node/game/app/logic/logic_hero_notify.go` 一处 `svc.NodeProxy().Push` |
+| 代理注入 | `node/game/main.go` 在 `container.Serve()` 前 `svc.SetNodeProxy(component.Proxy())` |
+| 目标会话 | `Kind=session.User`、`Target=playerID`，`GID` 省略走间接定位 |
+| 位置数据 | `handleVerify` 的 `ctx.BindGate` → node `gateLinker.BindGate` → gate `provider.Bind` → `gate.proxy.bindGate` → `locator.BindGate`，node 侧 `LocateGate` 可读到 |
+| 环境配置 | audit/test/release/prod 的 game 与 gate 的 `[locate.redis]` db、prefix 一致 |
+| 路由号 | `pb.RouteCode_ROUTE_CODE_HERO_NOTIFY = 10601`，代码取自枚举，无硬编码 |
+
+### 8.2 确认的缺陷与修复决策
+
+| 编号 | 缺陷 | 修复 |
+| --- | --- | --- |
+| D1 | `PushArgs.Ack` 未开启：due 只有在 `Ack=true` 时才会在 gate 返回 `ErrNotFoundSession` 后删除本地 `sources` 缓存并用定位器重新定位重试一次；玩家换网关或跨 game 实例重连后，本节点缓存仍指向旧网关，推送失败且不重试，表现为“偶发收不到” | `Ack: true` |
+| D2 | 错误日志一律 `Warn`，无法区分“玩家离线/未绑定”（正常）与“定位器缺失、gate 不可达”（真实故障），线上无法排查 | 按错误分类：`ErrNotFoundUserLocation`、`ErrNotFoundSession` 记 `Debugf`；其余记 `Warnf` 并带上 route |
+| D3 | `notifyHeroEntry` 未拦截 `playerID <= 0`，会以 uid 0 去定位，产生无意义 Redis/gRPC 调用 | 入口 `playerID <= 0 || entry == nil` 直接返回 |
+
+### 8.3 精确改动
+
+仅改 `node/game/app/logic/logic_hero_notify.go`：
+
+```go
+// 新增 import
+"github.com/dobyte/due/v2/errors"
+
+func notifyHeroEntry(ctx context.Context, playerID int64, entry *pb.HeroEntry) {
+	if playerID <= 0 || entry == nil {
+		return
+	}
+	// Ack=true：gate 上找不到会话时，due 会清除本地定位缓存并重新定位后重试一次，
+	// 避免玩家换网关/跨节点重连后仍向旧网关推送导致静默丢失。
+	if err := svc.NodeProxy().Push(ctx, &cluster.PushArgs{
+		Kind:   session.User,
+		Target: playerID,
+		Ack:    true,
+		Message: &cluster.Message{
+			Route: int32(pb.RouteCode_ROUTE_CODE_HERO_NOTIFY),
+			Data:  &pb.HeroNotify{HeroEntry: entry},
+		},
+	}); err != nil {
+		// 玩家离线不是故障：定位不到 gate 或 gate 上无会话时降级为 Debug，避免线上告警噪声。
+		if errors.Is(err, errors.ErrNotFoundUserLocation) || errors.Is(err, errors.ErrNotFoundSession) {
+			log.Debugf("game: hero notify skipped, player offline, player=%d hero=%d: %v",
+				playerID, entry.GetCfgId(), err)
+			return
+		}
+		log.Warnf("game: push hero notify failed, player=%d hero=%d route=%d: %v",
+			playerID, entry.GetCfgId(), pb.RouteCode_ROUTE_CODE_HERO_NOTIFY, err)
+	}
+}
+```
+
+其余函数（`notifyHero` / `notifyHeroByWeapon` / `notifyHeroBySkill`）与所有触发点不变。
+
+### 8.4 不改动范围
+
+- 不改 proto / pb，不改触发点，不改 gate / node 组件配置。
+- 不新增离线补推或通知队列：推送仍是尽力而为。
+
+### 8.5 修复后校验
+
+1. `gofmt -w node/game/app/logic/logic_hero_notify.go`。
+2. `go build ./...`。
+3. `go vet ./node/... ./share/...`。
+4. 静态核对：`svc.NodeProxy().Push` 仍为唯一推送入口；route 仍取自 `pb.RouteCode_ROUTE_CODE_HERO_NOTIFY`。
+
+### 8.6 修复后验收
+
+- 在线玩家触发英雄/武器/技能/装备变更，仍能收到 `10601` 的 `HeroNotify`。
+- 玩家切网关重连后再触发变更，推送不丢（`Ack=true` 的重试生效）。
+- 离线玩家触发资产发放：日志为 `Debug`，无 `Warn` 噪声，业务返回成功。
+- 定位器缺失（未配置 `[locate.redis]`）时日志为 `Warn`，可直接暴露配置问题。

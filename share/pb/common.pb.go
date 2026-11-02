@@ -21,62 +21,61 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// 客户端路由号枚举
-// 按业务分号段：每个业务 10 个号，便于后续在同段内扩展。
+// 客户端路由号枚举：按业务分模块，玩家预留 500 个号，其余模块预留 100 个号（玩家 10000~10499、物品 10500~10599）。
 type RouteCode int32
 
 const (
 	// 游戏大厅服 10000~49999
 	RouteCode_ROUTE_CODE_UNSPECIFIED RouteCode = 0
-	// 玩家 10000~10009（含礼包购买/兑换/充值的玩家资产消费入口）
-	RouteCode_ROUTE_CODE_VERIFY       RouteCode = 10000 // 首包，验证账号令牌，用于绑定节点和网关
-	RouteCode_ROUTE_CODE_ENTER_GAME   RouteCode = 10001 // 进入游戏
-	RouteCode_ROUTE_CODE_LEAVE_GAME   RouteCode = 10002 // 离开游戏
-	RouteCode_ROUTE_CODE_SEVER_NOTIFY RouteCode = 10003 // 服务器通知
-	RouteCode_ROUTE_CODE_GIFT_BUY     RouteCode = 10004 // 购买礼包（消耗资产并发放奖励）
-	RouteCode_ROUTE_CODE_EXCHANGE     RouteCode = 10005 // 兑换（消耗资产并发放奖励）
-	RouteCode_ROUTE_CODE_RECHARGE     RouteCode = 10006 // 充值（当前为假充值，直接发放奖励）
-	// 玩家物品 10010~10019
-	RouteCode_ROUTE_CODE_ITEM_LIST     RouteCode = 10010 // 物品容器列表
-	RouteCode_ROUTE_CODE_ITEM_NOTIFY   RouteCode = 10011 // 物品容器内变化通知
-	RouteCode_ROUTE_CODE_ITEM_ADD      RouteCode = 10012 // 物品容器内对象添加(预发布和生成环境不开放)
-	RouteCode_ROUTE_CODE_ITEM_MOVE     RouteCode = 10013 // 物品容器内对象移动
-	RouteCode_ROUTE_CODE_ITEM_ROTATE   RouteCode = 10014 // 物品容器内对象旋转
-	RouteCode_ROUTE_CODE_ITEM_SORT     RouteCode = 10015 // 物品容器一键整理对象
-	RouteCode_ROUTE_CODE_ITEM_TRANSFER RouteCode = 10016 // 物品容器间对象移动
-	// 英雄 10020~10029
-	RouteCode_ROUTE_CODE_HERO_LIST      RouteCode = 10020 // 英雄列表
-	RouteCode_ROUTE_CODE_HERO_NOTIFY    RouteCode = 10021 // 英雄变化通知
-	RouteCode_ROUTE_CODE_HERO_ADD       RouteCode = 10022 // 新增英雄(预发布和生成环境不开放)
-	RouteCode_ROUTE_CODE_HERO_UPDATE    RouteCode = 10023 // 更新英雄(预发布和生成环境不开放)
-	RouteCode_ROUTE_CODE_HERO_ATTRIBUTE RouteCode = 10024 // 查看英雄累计属性
-	RouteCode_ROUTE_CODE_HERO_UPGRADE   RouteCode = 10025 // 英雄升级（消耗物品）
-	// 武器 10030~10039（固定绑定英雄，随英雄初始化；数据随 HeroList 一起下发，不提供单独列表/通知）
-	RouteCode_ROUTE_CODE_WEAPON_UPDATE       RouteCode = 10033 // 更新武器(预发布和生成环境不开放)
-	RouteCode_ROUTE_CODE_WEAPON_UPGRADE      RouteCode = 10034 // 武器升级（消耗物品）
-	RouteCode_ROUTE_CODE_WEAPON_UP_QUALITY   RouteCode = 10035 // 武器升品（消耗物品）
-	RouteCode_ROUTE_CODE_WEAPON_BREAKTHROUGH RouteCode = 10036 // 武器突破（消耗物品）
-	// 技能 10040~10049（固定绑定英雄，随英雄初始化；数据随 HeroList 一起下发，不提供单独列表/通知）
-	RouteCode_ROUTE_CODE_SKILL_UPDATE       RouteCode = 10043 // 更新技能(预发布和生成环境不开放)
-	RouteCode_ROUTE_CODE_SKILL_UPGRADE      RouteCode = 10044 // 技能升级（消耗物品）
-	RouteCode_ROUTE_CODE_SKILL_UP_QUALITY   RouteCode = 10045 // 技能升品（消耗物品）
-	RouteCode_ROUTE_CODE_SKILL_BREAKTHROUGH RouteCode = 10046 // 技能突破（消耗物品）
-	// 装备 10050~10059（数据随 HeroList 一起下发，不提供单独列表/通知）
-	RouteCode_ROUTE_CODE_EQUIP_ADD          RouteCode = 10052 // 新增装备(预发布和生成环境不开放)
-	RouteCode_ROUTE_CODE_EQUIP_UPDATE       RouteCode = 10053 // 更新装备(预发布和生成环境不开放)
-	RouteCode_ROUTE_CODE_EQUIP_UPGRADE      RouteCode = 10054 // 装备升级（消耗物品）
-	RouteCode_ROUTE_CODE_EQUIP_UP_QUALITY   RouteCode = 10055 // 装备升品（消耗物品）
-	RouteCode_ROUTE_CODE_EQUIP_BREAKTHROUGH RouteCode = 10056 // 装备突破（消耗物品）
-	RouteCode_ROUTE_CODE_EQUIP_WEAR         RouteCode = 10057 // 穿戴装备（同英雄同配置自动顶替）
-	RouteCode_ROUTE_CODE_EQUIP_UNWEAR       RouteCode = 10058 // 卸载装备
-	// 邮件 10090~10099（系统通知/奖励，带附件可领取）
-	RouteCode_ROUTE_CODE_MAIL_LIST         RouteCode = 10090 // 邮件列表（含未读数）
-	RouteCode_ROUTE_CODE_MAIL_READ         RouteCode = 10091 // 标记已读
-	RouteCode_ROUTE_CODE_MAIL_READ_ALL     RouteCode = 10092 // 全部标记已读
-	RouteCode_ROUTE_CODE_MAIL_CLAIM        RouteCode = 10093 // 领取附件
-	RouteCode_ROUTE_CODE_MAIL_CLAIM_ALL    RouteCode = 10094 // 一键领取全部附件
-	RouteCode_ROUTE_CODE_MAIL_DELETE       RouteCode = 10095 // 删除邮件
-	RouteCode_ROUTE_CODE_MAIL_DELETE_CLEAN RouteCode = 10096 // 清理可删除邮件
+	// 玩家 10000~10499（预留 500 个号）
+	RouteCode_ROUTE_CODE_VERIFY        RouteCode = 10000 // 首包，验证账号令牌，用于绑定节点和网关
+	RouteCode_ROUTE_CODE_ENTER_GAME    RouteCode = 10001 // 进入游戏
+	RouteCode_ROUTE_CODE_LEAVE_GAME    RouteCode = 10002 // 离开游戏
+	RouteCode_ROUTE_CODE_SERVER_NOTIFY RouteCode = 10003 // 服务器通知
+	RouteCode_ROUTE_CODE_GIFT_BUY      RouteCode = 10004 // 购买礼包
+	RouteCode_ROUTE_CODE_EXCHANGE      RouteCode = 10005 // 兑换
+	RouteCode_ROUTE_CODE_RECHARGE      RouteCode = 10006 // 充值（当前为假充值，直接发放奖励）
+	// 玩家物品 10500~10599
+	RouteCode_ROUTE_CODE_ITEM_LIST     RouteCode = 10500 // 物品容器列表
+	RouteCode_ROUTE_CODE_ITEM_NOTIFY   RouteCode = 10501 // 物品容器内变化通知
+	RouteCode_ROUTE_CODE_ITEM_ADD      RouteCode = 10502 // 物品容器内对象添加(预发布和生产环境不开放)
+	RouteCode_ROUTE_CODE_ITEM_MOVE     RouteCode = 10503 // 物品容器内对象移动
+	RouteCode_ROUTE_CODE_ITEM_ROTATE   RouteCode = 10504 // 物品容器内对象旋转
+	RouteCode_ROUTE_CODE_ITEM_SORT     RouteCode = 10505 // 物品容器一键整理对象
+	RouteCode_ROUTE_CODE_ITEM_TRANSFER RouteCode = 10506 // 物品容器间对象移动
+	// 英雄 10600~10699
+	RouteCode_ROUTE_CODE_HERO_LIST      RouteCode = 10600 // 英雄列表
+	RouteCode_ROUTE_CODE_HERO_NOTIFY    RouteCode = 10601 // 英雄变化通知
+	RouteCode_ROUTE_CODE_HERO_ADD       RouteCode = 10602 // 新增英雄(预发布和生产环境不开放)
+	RouteCode_ROUTE_CODE_HERO_UPDATE    RouteCode = 10603 // 更新英雄(预发布和生产环境不开放)
+	RouteCode_ROUTE_CODE_HERO_ATTRIBUTE RouteCode = 10604 // 查看英雄累计属性
+	RouteCode_ROUTE_CODE_HERO_UPGRADE   RouteCode = 10605 // 英雄升级（消耗物品）
+	// 武器 10700~10799
+	RouteCode_ROUTE_CODE_WEAPON_UPDATE       RouteCode = 10703 // 更新武器(预发布和生产环境不开放)
+	RouteCode_ROUTE_CODE_WEAPON_UPGRADE      RouteCode = 10704 // 武器升级（消耗物品）
+	RouteCode_ROUTE_CODE_WEAPON_UP_QUALITY   RouteCode = 10705 // 武器升品（消耗物品）
+	RouteCode_ROUTE_CODE_WEAPON_BREAKTHROUGH RouteCode = 10706 // 武器突破（消耗物品）
+	// 技能 10800~10899
+	RouteCode_ROUTE_CODE_SKILL_UPDATE       RouteCode = 10803 // 更新技能(预发布和生产环境不开放)
+	RouteCode_ROUTE_CODE_SKILL_UPGRADE      RouteCode = 10804 // 技能升级（消耗物品）
+	RouteCode_ROUTE_CODE_SKILL_UP_QUALITY   RouteCode = 10805 // 技能升品（消耗物品）
+	RouteCode_ROUTE_CODE_SKILL_BREAKTHROUGH RouteCode = 10806 // 技能突破（消耗物品）
+	// 装备 10900~10999
+	RouteCode_ROUTE_CODE_EQUIP_ADD          RouteCode = 10902 // 新增装备(预发布和生产环境不开放)
+	RouteCode_ROUTE_CODE_EQUIP_UPDATE       RouteCode = 10903 // 更新装备(预发布和生产环境不开放)
+	RouteCode_ROUTE_CODE_EQUIP_UPGRADE      RouteCode = 10904 // 装备升级（消耗物品）
+	RouteCode_ROUTE_CODE_EQUIP_UP_QUALITY   RouteCode = 10905 // 装备升品（消耗物品）
+	RouteCode_ROUTE_CODE_EQUIP_BREAKTHROUGH RouteCode = 10906 // 装备突破（消耗物品）
+	RouteCode_ROUTE_CODE_EQUIP_WEAR         RouteCode = 10907 // 穿戴装备（同英雄同配置自动顶替）
+	RouteCode_ROUTE_CODE_EQUIP_UN_WEAR      RouteCode = 10908 // 卸载装备
+	// 邮件 11000~11099
+	RouteCode_ROUTE_CODE_MAIL_LIST         RouteCode = 11000 // 邮件列表（含未读数）
+	RouteCode_ROUTE_CODE_MAIL_READ         RouteCode = 11001 // 标记已读
+	RouteCode_ROUTE_CODE_MAIL_READ_ALL     RouteCode = 11002 // 全部标记已读
+	RouteCode_ROUTE_CODE_MAIL_CLAIM        RouteCode = 11003 // 领取附件
+	RouteCode_ROUTE_CODE_MAIL_CLAIM_ALL    RouteCode = 11004 // 一键领取全部附件
+	RouteCode_ROUTE_CODE_MAIL_DELETE       RouteCode = 11005 // 删除邮件
+	RouteCode_ROUTE_CODE_MAIL_DELETE_CLEAN RouteCode = 11006 // 清理可删除邮件
 )
 
 // Enum value maps for RouteCode.
@@ -86,90 +85,90 @@ var (
 		10000: "ROUTE_CODE_VERIFY",
 		10001: "ROUTE_CODE_ENTER_GAME",
 		10002: "ROUTE_CODE_LEAVE_GAME",
-		10003: "ROUTE_CODE_SEVER_NOTIFY",
+		10003: "ROUTE_CODE_SERVER_NOTIFY",
 		10004: "ROUTE_CODE_GIFT_BUY",
 		10005: "ROUTE_CODE_EXCHANGE",
 		10006: "ROUTE_CODE_RECHARGE",
-		10010: "ROUTE_CODE_ITEM_LIST",
-		10011: "ROUTE_CODE_ITEM_NOTIFY",
-		10012: "ROUTE_CODE_ITEM_ADD",
-		10013: "ROUTE_CODE_ITEM_MOVE",
-		10014: "ROUTE_CODE_ITEM_ROTATE",
-		10015: "ROUTE_CODE_ITEM_SORT",
-		10016: "ROUTE_CODE_ITEM_TRANSFER",
-		10020: "ROUTE_CODE_HERO_LIST",
-		10021: "ROUTE_CODE_HERO_NOTIFY",
-		10022: "ROUTE_CODE_HERO_ADD",
-		10023: "ROUTE_CODE_HERO_UPDATE",
-		10024: "ROUTE_CODE_HERO_ATTRIBUTE",
-		10025: "ROUTE_CODE_HERO_UPGRADE",
-		10033: "ROUTE_CODE_WEAPON_UPDATE",
-		10034: "ROUTE_CODE_WEAPON_UPGRADE",
-		10035: "ROUTE_CODE_WEAPON_UP_QUALITY",
-		10036: "ROUTE_CODE_WEAPON_BREAKTHROUGH",
-		10043: "ROUTE_CODE_SKILL_UPDATE",
-		10044: "ROUTE_CODE_SKILL_UPGRADE",
-		10045: "ROUTE_CODE_SKILL_UP_QUALITY",
-		10046: "ROUTE_CODE_SKILL_BREAKTHROUGH",
-		10052: "ROUTE_CODE_EQUIP_ADD",
-		10053: "ROUTE_CODE_EQUIP_UPDATE",
-		10054: "ROUTE_CODE_EQUIP_UPGRADE",
-		10055: "ROUTE_CODE_EQUIP_UP_QUALITY",
-		10056: "ROUTE_CODE_EQUIP_BREAKTHROUGH",
-		10057: "ROUTE_CODE_EQUIP_WEAR",
-		10058: "ROUTE_CODE_EQUIP_UNWEAR",
-		10090: "ROUTE_CODE_MAIL_LIST",
-		10091: "ROUTE_CODE_MAIL_READ",
-		10092: "ROUTE_CODE_MAIL_READ_ALL",
-		10093: "ROUTE_CODE_MAIL_CLAIM",
-		10094: "ROUTE_CODE_MAIL_CLAIM_ALL",
-		10095: "ROUTE_CODE_MAIL_DELETE",
-		10096: "ROUTE_CODE_MAIL_DELETE_CLEAN",
+		10500: "ROUTE_CODE_ITEM_LIST",
+		10501: "ROUTE_CODE_ITEM_NOTIFY",
+		10502: "ROUTE_CODE_ITEM_ADD",
+		10503: "ROUTE_CODE_ITEM_MOVE",
+		10504: "ROUTE_CODE_ITEM_ROTATE",
+		10505: "ROUTE_CODE_ITEM_SORT",
+		10506: "ROUTE_CODE_ITEM_TRANSFER",
+		10600: "ROUTE_CODE_HERO_LIST",
+		10601: "ROUTE_CODE_HERO_NOTIFY",
+		10602: "ROUTE_CODE_HERO_ADD",
+		10603: "ROUTE_CODE_HERO_UPDATE",
+		10604: "ROUTE_CODE_HERO_ATTRIBUTE",
+		10605: "ROUTE_CODE_HERO_UPGRADE",
+		10703: "ROUTE_CODE_WEAPON_UPDATE",
+		10704: "ROUTE_CODE_WEAPON_UPGRADE",
+		10705: "ROUTE_CODE_WEAPON_UP_QUALITY",
+		10706: "ROUTE_CODE_WEAPON_BREAKTHROUGH",
+		10803: "ROUTE_CODE_SKILL_UPDATE",
+		10804: "ROUTE_CODE_SKILL_UPGRADE",
+		10805: "ROUTE_CODE_SKILL_UP_QUALITY",
+		10806: "ROUTE_CODE_SKILL_BREAKTHROUGH",
+		10902: "ROUTE_CODE_EQUIP_ADD",
+		10903: "ROUTE_CODE_EQUIP_UPDATE",
+		10904: "ROUTE_CODE_EQUIP_UPGRADE",
+		10905: "ROUTE_CODE_EQUIP_UP_QUALITY",
+		10906: "ROUTE_CODE_EQUIP_BREAKTHROUGH",
+		10907: "ROUTE_CODE_EQUIP_WEAR",
+		10908: "ROUTE_CODE_EQUIP_UN_WEAR",
+		11000: "ROUTE_CODE_MAIL_LIST",
+		11001: "ROUTE_CODE_MAIL_READ",
+		11002: "ROUTE_CODE_MAIL_READ_ALL",
+		11003: "ROUTE_CODE_MAIL_CLAIM",
+		11004: "ROUTE_CODE_MAIL_CLAIM_ALL",
+		11005: "ROUTE_CODE_MAIL_DELETE",
+		11006: "ROUTE_CODE_MAIL_DELETE_CLEAN",
 	}
 	RouteCode_value = map[string]int32{
 		"ROUTE_CODE_UNSPECIFIED":         0,
 		"ROUTE_CODE_VERIFY":              10000,
 		"ROUTE_CODE_ENTER_GAME":          10001,
 		"ROUTE_CODE_LEAVE_GAME":          10002,
-		"ROUTE_CODE_SEVER_NOTIFY":        10003,
+		"ROUTE_CODE_SERVER_NOTIFY":       10003,
 		"ROUTE_CODE_GIFT_BUY":            10004,
 		"ROUTE_CODE_EXCHANGE":            10005,
 		"ROUTE_CODE_RECHARGE":            10006,
-		"ROUTE_CODE_ITEM_LIST":           10010,
-		"ROUTE_CODE_ITEM_NOTIFY":         10011,
-		"ROUTE_CODE_ITEM_ADD":            10012,
-		"ROUTE_CODE_ITEM_MOVE":           10013,
-		"ROUTE_CODE_ITEM_ROTATE":         10014,
-		"ROUTE_CODE_ITEM_SORT":           10015,
-		"ROUTE_CODE_ITEM_TRANSFER":       10016,
-		"ROUTE_CODE_HERO_LIST":           10020,
-		"ROUTE_CODE_HERO_NOTIFY":         10021,
-		"ROUTE_CODE_HERO_ADD":            10022,
-		"ROUTE_CODE_HERO_UPDATE":         10023,
-		"ROUTE_CODE_HERO_ATTRIBUTE":      10024,
-		"ROUTE_CODE_HERO_UPGRADE":        10025,
-		"ROUTE_CODE_WEAPON_UPDATE":       10033,
-		"ROUTE_CODE_WEAPON_UPGRADE":      10034,
-		"ROUTE_CODE_WEAPON_UP_QUALITY":   10035,
-		"ROUTE_CODE_WEAPON_BREAKTHROUGH": 10036,
-		"ROUTE_CODE_SKILL_UPDATE":        10043,
-		"ROUTE_CODE_SKILL_UPGRADE":       10044,
-		"ROUTE_CODE_SKILL_UP_QUALITY":    10045,
-		"ROUTE_CODE_SKILL_BREAKTHROUGH":  10046,
-		"ROUTE_CODE_EQUIP_ADD":           10052,
-		"ROUTE_CODE_EQUIP_UPDATE":        10053,
-		"ROUTE_CODE_EQUIP_UPGRADE":       10054,
-		"ROUTE_CODE_EQUIP_UP_QUALITY":    10055,
-		"ROUTE_CODE_EQUIP_BREAKTHROUGH":  10056,
-		"ROUTE_CODE_EQUIP_WEAR":          10057,
-		"ROUTE_CODE_EQUIP_UNWEAR":        10058,
-		"ROUTE_CODE_MAIL_LIST":           10090,
-		"ROUTE_CODE_MAIL_READ":           10091,
-		"ROUTE_CODE_MAIL_READ_ALL":       10092,
-		"ROUTE_CODE_MAIL_CLAIM":          10093,
-		"ROUTE_CODE_MAIL_CLAIM_ALL":      10094,
-		"ROUTE_CODE_MAIL_DELETE":         10095,
-		"ROUTE_CODE_MAIL_DELETE_CLEAN":   10096,
+		"ROUTE_CODE_ITEM_LIST":           10500,
+		"ROUTE_CODE_ITEM_NOTIFY":         10501,
+		"ROUTE_CODE_ITEM_ADD":            10502,
+		"ROUTE_CODE_ITEM_MOVE":           10503,
+		"ROUTE_CODE_ITEM_ROTATE":         10504,
+		"ROUTE_CODE_ITEM_SORT":           10505,
+		"ROUTE_CODE_ITEM_TRANSFER":       10506,
+		"ROUTE_CODE_HERO_LIST":           10600,
+		"ROUTE_CODE_HERO_NOTIFY":         10601,
+		"ROUTE_CODE_HERO_ADD":            10602,
+		"ROUTE_CODE_HERO_UPDATE":         10603,
+		"ROUTE_CODE_HERO_ATTRIBUTE":      10604,
+		"ROUTE_CODE_HERO_UPGRADE":        10605,
+		"ROUTE_CODE_WEAPON_UPDATE":       10703,
+		"ROUTE_CODE_WEAPON_UPGRADE":      10704,
+		"ROUTE_CODE_WEAPON_UP_QUALITY":   10705,
+		"ROUTE_CODE_WEAPON_BREAKTHROUGH": 10706,
+		"ROUTE_CODE_SKILL_UPDATE":        10803,
+		"ROUTE_CODE_SKILL_UPGRADE":       10804,
+		"ROUTE_CODE_SKILL_UP_QUALITY":    10805,
+		"ROUTE_CODE_SKILL_BREAKTHROUGH":  10806,
+		"ROUTE_CODE_EQUIP_ADD":           10902,
+		"ROUTE_CODE_EQUIP_UPDATE":        10903,
+		"ROUTE_CODE_EQUIP_UPGRADE":       10904,
+		"ROUTE_CODE_EQUIP_UP_QUALITY":    10905,
+		"ROUTE_CODE_EQUIP_BREAKTHROUGH":  10906,
+		"ROUTE_CODE_EQUIP_WEAR":          10907,
+		"ROUTE_CODE_EQUIP_UN_WEAR":       10908,
+		"ROUTE_CODE_MAIL_LIST":           11000,
+		"ROUTE_CODE_MAIL_READ":           11001,
+		"ROUTE_CODE_MAIL_READ_ALL":       11002,
+		"ROUTE_CODE_MAIL_CLAIM":          11003,
+		"ROUTE_CODE_MAIL_CLAIM_ALL":      11004,
+		"ROUTE_CODE_MAIL_DELETE":         11005,
+		"ROUTE_CODE_MAIL_DELETE_CLEAN":   11006,
 	}
 )
 
@@ -367,22 +366,19 @@ func (ContainerType) EnumDescriptor() ([]byte, []int) {
 	return file_common_proto_rawDescGZIP(), []int{3}
 }
 
-//	========== 属性枚举 ==========
-//
-// 属性枚举（通用键值表）：键即 ObjectValue 的存放键，值类型见各行注释（服务器落库字段 / 配置来源 / 使用协议）。
-// 玩家状态、任务/活动标记、红点等也走这里，按区间分段。
+// ========== 属性枚举 ==========
 type Attr int32
 
 const (
-	// 1~999 玩家相关属性（服务器有落库，随 EnterGameResp.player_attr 下发）
+	// 1~999 玩家相关属性
 	Attr_PLAYER_ATTR_UNSPECIFIED Attr = 0
-	Attr_PLAYER_ATTR_NAME        Attr = 1 // 昵称：string；player_extra.nickname
-	Attr_PLAYER_ATTR_LEVEL       Attr = 2 // 等级：int32；player_extra.level
-	Attr_PLAYER_ATTR_EXP         Attr = 3 // 经验：int64；player_extra.exp
-	Attr_PLAYER_ATTR_VIP_LEVEL   Attr = 4 // vip等级：int32；player_extra.vip_level
-	Attr_PLAYER_ATTR_VIP_EXP     Attr = 5 // vip经验：int64；player_extra.vip_exp
-	Attr_PLAYER_ATTR_COIN        Attr = 6 // 币：int64；player.diamond
-	Attr_PLAYER_ATTR_GOLD        Attr = 7 // 金：int64；player.gold
+	Attr_PLAYER_ATTR_NAME        Attr = 1 // 昵称：string
+	Attr_PLAYER_ATTR_LEVEL       Attr = 2 // 等级：int32
+	Attr_PLAYER_ATTR_EXP         Attr = 3 // 经验：int64
+	Attr_PLAYER_ATTR_VIP_LEVEL   Attr = 4 // vip等级：int32
+	Attr_PLAYER_ATTR_VIP_EXP     Attr = 5 // vip经验：int64
+	Attr_PLAYER_ATTR_COIN        Attr = 6 // 币：int64
+	Attr_PLAYER_ATTR_GOLD        Attr = 7 // 金：int64
 )
 
 // Enum value maps for Attr.
@@ -436,8 +432,7 @@ func (Attr) EnumDescriptor() ([]byte, []int) {
 	return file_common_proto_rawDescGZIP(), []int{4}
 }
 
-// 属性表：键为 Attr 枚举值，值为动态类型；具体类型见 Attr 各行注释
-// （int32 → ObjectValue.int_value，int64 → ObjectValue.Bigint_value，string → ObjectValue.string_value）。
+// 属性表：键为 Attr 枚举值，值为动态类型
 type AttrMap struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Values        map[int32]*ObjectValue `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty" protobuf_key:"varint,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
@@ -483,7 +478,6 @@ func (x *AttrMap) GetValues() map[int32]*ObjectValue {
 }
 
 // 通用业务结果：每个响应包统一携带。
-// code 用于客户端逻辑分支；msg 为空时按 code 取默认文案；args 为可变参数，
 type Result struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Code          ErrCode                `protobuf:"varint,1,opt,name=code,proto3,enum=pb.ErrCode" json:"code,omitempty"` // 业务错误码，ERR_CODE_OK 表示成功
@@ -1425,52 +1419,52 @@ const file_common_proto_rawDesc = "" +
 	"\bequipped\x18\x04 \x01(\bR\bequipped\x12\x17\n" +
 	"\ahero_id\x18\x05 \x01(\x05R\x06heroId\x12\x18\n" +
 	"\aquality\x18\x06 \x01(\x05R\aquality\x12\"\n" +
-	"\fbreakthrough\x18\a \x01(\x05R\fbreakthrough*\x87\n" +
+	"\fbreakthrough\x18\a \x01(\x05R\fbreakthrough*\x89\n" +
 	"\n" +
 	"\tRouteCode\x12\x1a\n" +
 	"\x16ROUTE_CODE_UNSPECIFIED\x10\x00\x12\x16\n" +
 	"\x11ROUTE_CODE_VERIFY\x10\x90N\x12\x1a\n" +
 	"\x15ROUTE_CODE_ENTER_GAME\x10\x91N\x12\x1a\n" +
-	"\x15ROUTE_CODE_LEAVE_GAME\x10\x92N\x12\x1c\n" +
-	"\x17ROUTE_CODE_SEVER_NOTIFY\x10\x93N\x12\x18\n" +
+	"\x15ROUTE_CODE_LEAVE_GAME\x10\x92N\x12\x1d\n" +
+	"\x18ROUTE_CODE_SERVER_NOTIFY\x10\x93N\x12\x18\n" +
 	"\x13ROUTE_CODE_GIFT_BUY\x10\x94N\x12\x18\n" +
 	"\x13ROUTE_CODE_EXCHANGE\x10\x95N\x12\x18\n" +
 	"\x13ROUTE_CODE_RECHARGE\x10\x96N\x12\x19\n" +
-	"\x14ROUTE_CODE_ITEM_LIST\x10\x9aN\x12\x1b\n" +
-	"\x16ROUTE_CODE_ITEM_NOTIFY\x10\x9bN\x12\x18\n" +
-	"\x13ROUTE_CODE_ITEM_ADD\x10\x9cN\x12\x19\n" +
-	"\x14ROUTE_CODE_ITEM_MOVE\x10\x9dN\x12\x1b\n" +
-	"\x16ROUTE_CODE_ITEM_ROTATE\x10\x9eN\x12\x19\n" +
-	"\x14ROUTE_CODE_ITEM_SORT\x10\x9fN\x12\x1d\n" +
-	"\x18ROUTE_CODE_ITEM_TRANSFER\x10\xa0N\x12\x19\n" +
-	"\x14ROUTE_CODE_HERO_LIST\x10\xa4N\x12\x1b\n" +
-	"\x16ROUTE_CODE_HERO_NOTIFY\x10\xa5N\x12\x18\n" +
-	"\x13ROUTE_CODE_HERO_ADD\x10\xa6N\x12\x1b\n" +
-	"\x16ROUTE_CODE_HERO_UPDATE\x10\xa7N\x12\x1e\n" +
-	"\x19ROUTE_CODE_HERO_ATTRIBUTE\x10\xa8N\x12\x1c\n" +
-	"\x17ROUTE_CODE_HERO_UPGRADE\x10\xa9N\x12\x1d\n" +
-	"\x18ROUTE_CODE_WEAPON_UPDATE\x10\xb1N\x12\x1e\n" +
-	"\x19ROUTE_CODE_WEAPON_UPGRADE\x10\xb2N\x12!\n" +
-	"\x1cROUTE_CODE_WEAPON_UP_QUALITY\x10\xb3N\x12#\n" +
-	"\x1eROUTE_CODE_WEAPON_BREAKTHROUGH\x10\xb4N\x12\x1c\n" +
-	"\x17ROUTE_CODE_SKILL_UPDATE\x10\xbbN\x12\x1d\n" +
-	"\x18ROUTE_CODE_SKILL_UPGRADE\x10\xbcN\x12 \n" +
-	"\x1bROUTE_CODE_SKILL_UP_QUALITY\x10\xbdN\x12\"\n" +
-	"\x1dROUTE_CODE_SKILL_BREAKTHROUGH\x10\xbeN\x12\x19\n" +
-	"\x14ROUTE_CODE_EQUIP_ADD\x10\xc4N\x12\x1c\n" +
-	"\x17ROUTE_CODE_EQUIP_UPDATE\x10\xc5N\x12\x1d\n" +
-	"\x18ROUTE_CODE_EQUIP_UPGRADE\x10\xc6N\x12 \n" +
-	"\x1bROUTE_CODE_EQUIP_UP_QUALITY\x10\xc7N\x12\"\n" +
-	"\x1dROUTE_CODE_EQUIP_BREAKTHROUGH\x10\xc8N\x12\x1a\n" +
-	"\x15ROUTE_CODE_EQUIP_WEAR\x10\xc9N\x12\x1c\n" +
-	"\x17ROUTE_CODE_EQUIP_UNWEAR\x10\xcaN\x12\x19\n" +
-	"\x14ROUTE_CODE_MAIL_LIST\x10\xeaN\x12\x19\n" +
-	"\x14ROUTE_CODE_MAIL_READ\x10\xebN\x12\x1d\n" +
-	"\x18ROUTE_CODE_MAIL_READ_ALL\x10\xecN\x12\x1a\n" +
-	"\x15ROUTE_CODE_MAIL_CLAIM\x10\xedN\x12\x1e\n" +
-	"\x19ROUTE_CODE_MAIL_CLAIM_ALL\x10\xeeN\x12\x1b\n" +
-	"\x16ROUTE_CODE_MAIL_DELETE\x10\xefN\x12!\n" +
-	"\x1cROUTE_CODE_MAIL_DELETE_CLEAN\x10\xf0N*\xea\x01\n" +
+	"\x14ROUTE_CODE_ITEM_LIST\x10\x84R\x12\x1b\n" +
+	"\x16ROUTE_CODE_ITEM_NOTIFY\x10\x85R\x12\x18\n" +
+	"\x13ROUTE_CODE_ITEM_ADD\x10\x86R\x12\x19\n" +
+	"\x14ROUTE_CODE_ITEM_MOVE\x10\x87R\x12\x1b\n" +
+	"\x16ROUTE_CODE_ITEM_ROTATE\x10\x88R\x12\x19\n" +
+	"\x14ROUTE_CODE_ITEM_SORT\x10\x89R\x12\x1d\n" +
+	"\x18ROUTE_CODE_ITEM_TRANSFER\x10\x8aR\x12\x19\n" +
+	"\x14ROUTE_CODE_HERO_LIST\x10\xe8R\x12\x1b\n" +
+	"\x16ROUTE_CODE_HERO_NOTIFY\x10\xe9R\x12\x18\n" +
+	"\x13ROUTE_CODE_HERO_ADD\x10\xeaR\x12\x1b\n" +
+	"\x16ROUTE_CODE_HERO_UPDATE\x10\xebR\x12\x1e\n" +
+	"\x19ROUTE_CODE_HERO_ATTRIBUTE\x10\xecR\x12\x1c\n" +
+	"\x17ROUTE_CODE_HERO_UPGRADE\x10\xedR\x12\x1d\n" +
+	"\x18ROUTE_CODE_WEAPON_UPDATE\x10\xcfS\x12\x1e\n" +
+	"\x19ROUTE_CODE_WEAPON_UPGRADE\x10\xd0S\x12!\n" +
+	"\x1cROUTE_CODE_WEAPON_UP_QUALITY\x10\xd1S\x12#\n" +
+	"\x1eROUTE_CODE_WEAPON_BREAKTHROUGH\x10\xd2S\x12\x1c\n" +
+	"\x17ROUTE_CODE_SKILL_UPDATE\x10\xb3T\x12\x1d\n" +
+	"\x18ROUTE_CODE_SKILL_UPGRADE\x10\xb4T\x12 \n" +
+	"\x1bROUTE_CODE_SKILL_UP_QUALITY\x10\xb5T\x12\"\n" +
+	"\x1dROUTE_CODE_SKILL_BREAKTHROUGH\x10\xb6T\x12\x19\n" +
+	"\x14ROUTE_CODE_EQUIP_ADD\x10\x96U\x12\x1c\n" +
+	"\x17ROUTE_CODE_EQUIP_UPDATE\x10\x97U\x12\x1d\n" +
+	"\x18ROUTE_CODE_EQUIP_UPGRADE\x10\x98U\x12 \n" +
+	"\x1bROUTE_CODE_EQUIP_UP_QUALITY\x10\x99U\x12\"\n" +
+	"\x1dROUTE_CODE_EQUIP_BREAKTHROUGH\x10\x9aU\x12\x1a\n" +
+	"\x15ROUTE_CODE_EQUIP_WEAR\x10\x9bU\x12\x1d\n" +
+	"\x18ROUTE_CODE_EQUIP_UN_WEAR\x10\x9cU\x12\x19\n" +
+	"\x14ROUTE_CODE_MAIL_LIST\x10\xf8U\x12\x19\n" +
+	"\x14ROUTE_CODE_MAIL_READ\x10\xf9U\x12\x1d\n" +
+	"\x18ROUTE_CODE_MAIL_READ_ALL\x10\xfaU\x12\x1a\n" +
+	"\x15ROUTE_CODE_MAIL_CLAIM\x10\xfbU\x12\x1e\n" +
+	"\x19ROUTE_CODE_MAIL_CLAIM_ALL\x10\xfcU\x12\x1b\n" +
+	"\x16ROUTE_CODE_MAIL_DELETE\x10\xfdU\x12!\n" +
+	"\x1cROUTE_CODE_MAIL_DELETE_CLEAN\x10\xfeU*\xea\x01\n" +
 	"\aErrCode\x12\x0f\n" +
 	"\vERR_CODE_OK\x10\x00\x12\x1c\n" +
 	"\x17ERR_CODE_INTERNAL_ERROR\x10\xe8\a\x12\x1c\n" +

@@ -4,66 +4,66 @@ package pb;
 
 option go_package = "server-cluster/share/pb";
 
-// 客户端路由号枚举
+// 客户端路由号枚举：按业务分模块，玩家预留 500 个号，其余模块预留 100 个号（玩家 10000~10499、物品 10500~10599）。
 enum RouteCode {
   // 游戏大厅服 10000~49999
   ROUTE_CODE_UNSPECIFIED = 0;
 
-  // 玩家 10000~19999
+  // 玩家 10000~10499（预留 500 个号）
   ROUTE_CODE_VERIFY = 10000; // 首包，验证账号令牌，用于绑定节点和网关
   ROUTE_CODE_ENTER_GAME = 10001; // 进入游戏
   ROUTE_CODE_LEAVE_GAME = 10002; // 离开游戏
-  ROUTE_CODE_SEVER_NOTIFY = 10003; // 服务器通知
-  ROUTE_CODE_GIFT_BUY = 10004; // 购买礼包（消耗资产并发放奖励）
-  ROUTE_CODE_EXCHANGE = 10005; // 兑换（消耗资产并发放奖励）
+  ROUTE_CODE_SERVER_NOTIFY = 10003; // 服务器通知
+  ROUTE_CODE_GIFT_BUY = 10004; // 购买礼包
+  ROUTE_CODE_EXCHANGE = 10005; // 兑换
   ROUTE_CODE_RECHARGE = 10006; // 充值（当前为假充值，直接发放奖励）
 
-  // 玩家物品 10010~10019
-  ROUTE_CODE_ITEM_LIST = 10010;  // 物品容器列表
-  ROUTE_CODE_ITEM_NOTIFY = 10011;  // 物品容器内变化通知
-  ROUTE_CODE_ITEM_ADD = 10012;  // 物品容器内对象添加(预发布和生成环境不开放)
-  ROUTE_CODE_ITEM_MOVE = 10013;  // 物品容器内对象移动
-  ROUTE_CODE_ITEM_ROTATE = 10014;  // 物品容器内对象旋转
-  ROUTE_CODE_ITEM_SORT = 10015;  // 物品容器一键整理对象
-  ROUTE_CODE_ITEM_TRANSFER = 10016;  // 物品容器间对象移动
+  // 玩家物品 10500~10599
+  ROUTE_CODE_ITEM_LIST = 10500;  // 物品容器列表
+  ROUTE_CODE_ITEM_NOTIFY = 10501;  // 物品容器内变化通知
+  ROUTE_CODE_ITEM_ADD = 10502;  // 物品容器内对象添加(预发布和生产环境不开放)
+  ROUTE_CODE_ITEM_MOVE = 10503;  // 物品容器内对象移动
+  ROUTE_CODE_ITEM_ROTATE = 10504;  // 物品容器内对象旋转
+  ROUTE_CODE_ITEM_SORT = 10505;  // 物品容器一键整理对象
+  ROUTE_CODE_ITEM_TRANSFER = 10506;  // 物品容器间对象移动
 
-  // 英雄 10020~10029
-  ROUTE_CODE_HERO_LIST = 10020; // 英雄列表
-  ROUTE_CODE_HERO_NOTIFY = 10021; // 英雄变化通知
-  ROUTE_CODE_HERO_ADD = 10022; // 新增英雄(预发布和生成环境不开放)
-  ROUTE_CODE_HERO_UPDATE = 10023; // 更新英雄(预发布和生成环境不开放)
-  ROUTE_CODE_HERO_ATTRIBUTE = 10024; // 查看英雄累计属性
-  ROUTE_CODE_HERO_UPGRADE = 10025; // 英雄升级（消耗物品）
+  // 英雄 10600~10699
+  ROUTE_CODE_HERO_LIST = 10600; // 英雄列表
+  ROUTE_CODE_HERO_NOTIFY = 10601; // 英雄变化通知
+  ROUTE_CODE_HERO_ADD = 10602; // 新增英雄(预发布和生产环境不开放)
+  ROUTE_CODE_HERO_UPDATE = 10603; // 更新英雄(预发布和生产环境不开放)
+  ROUTE_CODE_HERO_ATTRIBUTE = 10604; // 查看英雄累计属性
+  ROUTE_CODE_HERO_UPGRADE = 10605; // 英雄升级（消耗物品）
 
-  // 武器 10030~10039（固定绑定英雄，随英雄初始化；数据随 HeroList 一起下发，不提供单独列表/通知）
-  ROUTE_CODE_WEAPON_UPDATE = 10033; // 更新武器(预发布和生成环境不开放)
-  ROUTE_CODE_WEAPON_UPGRADE = 10034; // 武器升级（消耗物品）
-  ROUTE_CODE_WEAPON_UP_QUALITY = 10035; // 武器升品（消耗物品）
-  ROUTE_CODE_WEAPON_BREAKTHROUGH = 10036; // 武器突破（消耗物品）
+  // 武器 10700~10799
+  ROUTE_CODE_WEAPON_UPDATE = 10703; // 更新武器(预发布和生产环境不开放)
+  ROUTE_CODE_WEAPON_UPGRADE = 10704; // 武器升级（消耗物品）
+  ROUTE_CODE_WEAPON_UP_QUALITY = 10705; // 武器升品（消耗物品）
+  ROUTE_CODE_WEAPON_BREAKTHROUGH = 10706; // 武器突破（消耗物品）
 
-  // 技能 10040~10049（固定绑定英雄，随英雄初始化；数据随 HeroList 一起下发，不提供单独列表/通知）
-  ROUTE_CODE_SKILL_UPDATE = 10043; // 更新技能(预发布和生成环境不开放)
-  ROUTE_CODE_SKILL_UPGRADE = 10044; // 技能升级（消耗物品）
-  ROUTE_CODE_SKILL_UP_QUALITY = 10045; // 技能升品（消耗物品）
-  ROUTE_CODE_SKILL_BREAKTHROUGH = 10046; // 技能突破（消耗物品）
+  // 技能 10800~10899
+  ROUTE_CODE_SKILL_UPDATE = 10803; // 更新技能(预发布和生产环境不开放)
+  ROUTE_CODE_SKILL_UPGRADE = 10804; // 技能升级（消耗物品）
+  ROUTE_CODE_SKILL_UP_QUALITY = 10805; // 技能升品（消耗物品）
+  ROUTE_CODE_SKILL_BREAKTHROUGH = 10806; // 技能突破（消耗物品）
 
-  // 装备 10050~10059（数据随 HeroList 一起下发，不提供单独列表/通知）
-  ROUTE_CODE_EQUIP_ADD = 10052; // 新增装备(预发布和生成环境不开放)
-  ROUTE_CODE_EQUIP_UPDATE = 10053; // 更新装备(预发布和生成环境不开放)
-  ROUTE_CODE_EQUIP_UPGRADE = 10054; // 装备升级（消耗物品）
-  ROUTE_CODE_EQUIP_UP_QUALITY = 10055; // 装备升品（消耗物品）
-  ROUTE_CODE_EQUIP_BREAKTHROUGH = 10056; // 装备突破（消耗物品）
-  ROUTE_CODE_EQUIP_WEAR = 10057;         // 穿戴装备（同英雄同配置自动顶替）
-  ROUTE_CODE_EQUIP_UNWEAR = 10058;       // 卸载装备
+  // 装备 10900~10999
+  ROUTE_CODE_EQUIP_ADD = 10902; // 新增装备(预发布和生产环境不开放)
+  ROUTE_CODE_EQUIP_UPDATE = 10903; // 更新装备(预发布和生产环境不开放)
+  ROUTE_CODE_EQUIP_UPGRADE = 10904; // 装备升级（消耗物品）
+  ROUTE_CODE_EQUIP_UP_QUALITY = 10905; // 装备升品（消耗物品）
+  ROUTE_CODE_EQUIP_BREAKTHROUGH = 10906; // 装备突破（消耗物品）
+  ROUTE_CODE_EQUIP_WEAR = 10907;         // 穿戴装备（同英雄同配置自动顶替）
+  ROUTE_CODE_EQUIP_UN_WEAR = 10908;       // 卸载装备
 
-  // 邮件 10090~10099（系统通知/奖励，带附件可领取）
-  ROUTE_CODE_MAIL_LIST = 10090;          // 邮件列表（含未读数）
-  ROUTE_CODE_MAIL_READ = 10091;          // 标记已读
-  ROUTE_CODE_MAIL_READ_ALL = 10092;      // 全部标记已读
-  ROUTE_CODE_MAIL_CLAIM = 10093;         // 领取附件
-  ROUTE_CODE_MAIL_CLAIM_ALL = 10094;     // 一键领取全部附件
-  ROUTE_CODE_MAIL_DELETE = 10095;        // 删除邮件
-  ROUTE_CODE_MAIL_DELETE_CLEAN = 10096;  // 清理可删除邮件
+  // 邮件 11000~11099
+  ROUTE_CODE_MAIL_LIST = 11000;          // 邮件列表（含未读数）
+  ROUTE_CODE_MAIL_READ = 11001;          // 标记已读
+  ROUTE_CODE_MAIL_READ_ALL = 11002;      // 全部标记已读
+  ROUTE_CODE_MAIL_CLAIM = 11003;         // 领取附件
+  ROUTE_CODE_MAIL_CLAIM_ALL = 11004;     // 一键领取全部附件
+  ROUTE_CODE_MAIL_DELETE = 11005;        // 删除邮件
+  ROUTE_CODE_MAIL_DELETE_CLEAN = 11006;  // 清理可删除邮件
 
   // 战斗服 50000~59999
 

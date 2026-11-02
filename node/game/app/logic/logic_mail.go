@@ -6,6 +6,7 @@ import (
 	"sort"
 	"time"
 
+	"github.com/dobyte/due/v2/log"
 	"gorm.io/gorm"
 
 	"server-cluster/internal/svc"
@@ -114,7 +115,8 @@ func (this *mailLogic) MailReadAll(ctx context.Context, playerID int64, _ *pb.Ma
 	return &pb.MailReadAllResp{}, nil
 }
 
-// MailClaim 领取单封附件：发放资产并标记已领取；无附件或已领取时幂等返回。
+// MailClaim 领取单封附件：先落库领取状态再发放资产，避免发放成功后状态落库失败导致重试重复发放。
+// 残余风险：进程若在资产发放与状态回滚之间崩溃，仍可能有个别附件不一致；彻底解决需资产与邮件同事务。
 func (this *mailLogic) MailClaim(ctx context.Context, playerID int64, req *pb.MailClaimReq) (*pb.MailClaimResp, error) {
 	row, err := loadPlayerMail(ctx, playerID)
 	if err != nil {
@@ -127,7 +129,13 @@ func (this *mailLogic) MailClaim(ctx context.Context, playerID int64, req *pb.Ma
 	if m.Status == model.MailStatusClaimed || !m.HasAttachments() {
 		return &pb.MailClaimResp{Entry: toMailEntry(m)}, nil
 	}
-	// 发放全部附件
+	originStatus, originClaimedAt := m.Status, m.ClaimedAt
+	m.Status = model.MailStatusClaimed
+	m.ClaimedAt = time.Now().UnixMilli()
+	if !row.UpdateMail(m) {
+		return nil, errs.CodeInvalidParams.WithMessage("邮件不存在").Err()
+	}
+	// 状态已落库，再发放全部附件；失败时尽量回滚状态以便重试
 	granted := make([]*pb.AssetEntry, 0, len(m.Attachments))
 	for _, a := range m.Attachments {
 		count := a.Count
@@ -139,53 +147,78 @@ func (this *mailLogic) MailClaim(ctx context.Context, playerID int64, req *pb.Ma
 			Id:    a.CfgID,
 			Count: count,
 		}); err != nil {
+			log.Warnf("game: mail claim grant failed, player=%d mail=%d asset=%+v: %v", playerID, m.MailID, a, err)
+			m.Status, m.ClaimedAt = originStatus, originClaimedAt
+			if !row.UpdateMail(m) {
+				log.Warnf("game: mail claim rollback failed, player=%d mail=%d", playerID, m.MailID)
+			}
+			global.PlayerMailCache.Set(playerID, row)
 			return nil, err
 		}
 		granted = append(granted, &pb.AssetEntry{Type: a.Type, CfgId: a.CfgID, Count: count})
-	}
-	m.Status = model.MailStatusClaimed
-	m.ClaimedAt = time.Now().UnixMilli()
-	if !row.UpdateMail(m) {
-		return nil, errs.CodeInvalidParams.WithMessage("邮件不存在").Err()
 	}
 	global.PlayerMailCache.Set(playerID, row)
 	return &pb.MailClaimResp{Entry: toMailEntry(m), Attachments: granted}, nil
 }
 
+// pendingClaim 一键领取时先落库、后发放所需的原始状态快照。
+type pendingClaim struct {
+	mail            model.MailInfo
+	originStatus    int32
+	originClaimedAt int64
+}
+
 // MailClaimAll 一键领取全部未领取附件（跳过已领取/无附件邮件）。
+// 先在 UpdateAll 内把邮件标记为已领取并落库，再逐封发放，避免中途失败后邮件仍可重复领取。
+// 残余风险同 MailClaim：进程在发放与回滚之间崩溃仍可能不一致。
 func (this *mailLogic) MailClaimAll(ctx context.Context, playerID int64, _ *pb.MailClaimAllReq) (*pb.MailClaimAllResp, error) {
 	row, err := loadPlayerMail(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
-	claimed := make([]*pb.MailEntry, 0)
 	now := time.Now().UnixMilli()
+	pending := make([]pendingClaim, 0, row.Mails.Len())
 	if err := row.Mails.UpdateAll(func(m map[int64]model.MailInfo) error {
 		for id, mail := range m {
 			if mail.Status == model.MailStatusClaimed || !mail.HasAttachments() {
 				continue
 			}
-			for _, a := range mail.Attachments {
-				count := a.Count
-				if count <= 0 {
-					count = 1
-				}
-				if err := Asset().AssetAdd(ctx, playerID, &tpl.Asset{
-					Type:  tpl.AssetType(a.Type),
-					Id:    a.CfgID,
-					Count: count,
-				}); err != nil {
-					return err
-				}
-			}
+			originStatus, originClaimedAt := mail.Status, mail.ClaimedAt
 			mail.Status = model.MailStatusClaimed
 			mail.ClaimedAt = now
 			m[id] = mail
-			claimed = append(claimed, toMailEntry(mail))
+			pending = append(pending, pendingClaim{mail: mail, originStatus: originStatus, originClaimedAt: originClaimedAt})
 		}
 		return nil
 	}); err != nil {
 		return nil, err
+	}
+	claimed := make([]*pb.MailEntry, 0, len(pending))
+	for _, p := range pending {
+		granted := true
+		for _, a := range p.mail.Attachments {
+			count := a.Count
+			if count <= 0 {
+				count = 1
+			}
+			if err := Asset().AssetAdd(ctx, playerID, &tpl.Asset{
+				Type:  tpl.AssetType(a.Type),
+				Id:    a.CfgID,
+				Count: count,
+			}); err != nil {
+				log.Warnf("game: mail claim-all grant failed, player=%d mail=%d asset=%+v: %v", playerID, p.mail.MailID, a, err)
+				granted = false
+				break
+			}
+		}
+		if !granted {
+			p.mail.Status, p.mail.ClaimedAt = p.originStatus, p.originClaimedAt
+			if !row.UpdateMail(p.mail) {
+				log.Warnf("game: mail claim-all rollback failed, player=%d mail=%d", playerID, p.mail.MailID)
+			}
+			continue
+		}
+		claimed = append(claimed, toMailEntry(p.mail))
 	}
 	global.PlayerMailCache.Set(playerID, row)
 	return &pb.MailClaimAllResp{Entries: claimed}, nil

@@ -6,7 +6,7 @@ import "common.proto";
 
 option go_package = "server-cluster/share/pb";
 
-// 物品容器列表（路由 10010）
+// 物品容器列表（路由 10500）
 message ItemContainerListReq {
   ContainerType container_type = 1; // 物品容器类型（UNSPECIFIED 表示全部容器）
 }
@@ -17,13 +17,13 @@ message ItemContainerListResp {
   repeated ItemContainer item_containers = 2; // 物品容器列表
 }
 
-// 物品容器内对象变化（路由 10011）
+// 物品容器内对象变化（路由 10501）
 message ItemContainerNotify {
   ContainerType container_type = 1; // 物品容器类型
   ItemEntry item_entry = 2; // 物品容器内对象
 }
 
-// 物品容器内添加对象请求（路由 10012）
+// 物品容器内添加对象请求（路由 10502）
 message ItemAddReq {
   ContainerType container_type = 1; // 物品容器类型
   ItemEntry item_entry = 2; // 对象实例
@@ -34,7 +34,7 @@ message ItemAddResp {
   Result result = 1;
 }
 
-// 物品容器内移动对象请求（路由 10013）
+// 物品容器内移动对象请求（路由 10503）
 message ItemMoveReq {
   ContainerType container_type = 1; // 物品容器类型
   int64 id = 2;           // 对象实例ID
@@ -48,7 +48,7 @@ message ItemMoveResp {
   Result result = 1;
 }
 
-// 物品容器内旋转对象请求（路由 10014）
+// 物品容器内旋转对象请求（路由 10504）
 message ItemRotateReq {
   ContainerType container_type = 1; // 物品容器类型
   int64 id = 2;           // 对象实例ID
@@ -59,7 +59,7 @@ message ItemRotateResp {
   Result result = 1;
 }
 
-// 物品容器一键整理请求（路由 10015）
+// 物品容器一键整理请求（路由 10505）
 message ItemSortReq {
   ContainerType container_type = 1; // 物品容器类型
 }
@@ -69,7 +69,7 @@ message ItemSortResp {
   Result result = 1;
 }
 
-// 物品容器间移动对象请求（路由 10016）
+// 物品容器间移动对象请求（路由 10506）
 message ItemTransferReq {
   ContainerType from_type = 1; // 源物品容器类型
   ContainerType to_type = 2;   // 目标物品容器类型

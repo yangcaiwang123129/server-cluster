@@ -7,7 +7,7 @@ import "hero.proto";
 
 option go_package = "server-cluster/share/pb";
 
-// 更新武器请求（路由 10033）
+// 更新武器请求（路由 10703）
 message WeaponUpdateReq {
   int32 cfg_id = 1;       // 武器配置ID
   int32 level = 2;        // 等级
@@ -22,7 +22,7 @@ message WeaponUpdateResp {
   WeaponEntry weapon_entry = 2; // 更新后的持有状态
 }
 
-// 武器升级请求（路由 10034，消耗升级素材）
+// 武器升级请求（路由 10704，消耗升级素材）
 message WeaponUpgradeReq {
   int32 cfg_id = 1; // 武器配置ID
 }
@@ -34,7 +34,7 @@ message WeaponUpgradeResp {
   HeroAttribute attribute = 3; // 升级后的英雄累计属性
 }
 
-// 武器升品请求（路由 10035，消耗升品素材）
+// 武器升品请求（路由 10705，消耗升品素材）
 message WeaponUpQualityReq {
   int32 cfg_id = 1; // 武器配置ID
 }
@@ -46,7 +46,7 @@ message WeaponUpQualityResp {
   HeroAttribute attribute = 3; // 升品后的英雄累计属性
 }
 
-// 武器突破请求（路由 10036，消耗突破素材）
+// 武器突破请求（路由 10706，消耗突破素材）
 message WeaponBreakthroughReq {
   int32 cfg_id = 1; // 武器配置ID
 }

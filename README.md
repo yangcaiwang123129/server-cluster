@@ -37,13 +37,15 @@ cd node/game && go run .    # 其余服务同：在各自目录下执行
 
 由于每个服务都读取当前目录的 `./etc/etc.toml`，**切目录启动**；也可用 `-etc` 或 `DUE_ETC` 指定配置目录。
 
-生成脚本（Windows 批处理）：
+生成脚本：
 
 ```bash
-deploy/scripts/gen-proto.bat     # share/proto/*.proto → share/pb
-deploy/scripts/gen-config.bat    # Excel → share/cfg + cfg/data
-deploy/scripts/gen-swagger.bat   # login/admin 的 swagger 文档
+deploy/scripts/gen-proto.bat     # Windows 原生：share/proto/*.proto → share/pb
+deploy/scripts/gen-config.sh     # Excel → share/cfg + cfg/data（需 Git Bash / WSL）
+deploy/scripts/gen-swagger.sh    # login/admin 的 swagger 文档（需 Git Bash / WSL）
 ```
+
+Windows 原生仅提供 `gen-proto.bat`；`gen-config` 与 `gen-swagger` 依赖 bash，请在 Git Bash 或 WSL 中执行。
 
 校验：`go build ./... && go vet ./...`。
 

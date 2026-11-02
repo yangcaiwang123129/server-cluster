@@ -21,7 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// 更新技能请求（路由 10043）
+// 更新技能请求（路由 10803）
 type SkillUpdateReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"`  // 技能配置ID
@@ -143,7 +143,7 @@ func (x *SkillUpdateResp) GetSkillEntry() *SkillEntry {
 	return nil
 }
 
-// 技能升级请求（路由 10044，消耗升级素材）
+// 技能升级请求（路由 10804，消耗升级素材）
 type SkillUpgradeReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 技能配置ID
@@ -249,7 +249,7 @@ func (x *SkillUpgradeResp) GetAttribute() *HeroAttribute {
 	return nil
 }
 
-// 技能升品请求（路由 10045，消耗升品素材）
+// 技能升品请求（路由 10805，消耗升品素材）
 type SkillUpQualityReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 技能配置ID
@@ -355,7 +355,7 @@ func (x *SkillUpQualityResp) GetAttribute() *HeroAttribute {
 	return nil
 }
 
-// 技能突破请求（路由 10046，消耗突破素材）
+// 技能突破请求（路由 10806，消耗突破素材）
 type SkillBreakthroughReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 技能配置ID

@@ -21,7 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// 英雄列表请求（路由 10020）
+// 英雄列表请求（路由 10600）
 type HeroListReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -111,7 +111,7 @@ func (x *HeroListResp) GetHeroEntries() []*HeroEntry {
 	return nil
 }
 
-// 英雄变化通知（路由 10021，结构即完整持有，客户端收到后整体刷新该英雄）
+// 英雄变化通知（路由 10601，结构即完整持有，客户端收到后整体刷新该英雄）
 type HeroNotify struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	HeroEntry     *HeroEntry             `protobuf:"bytes,1,opt,name=hero_entry,json=heroEntry,proto3" json:"hero_entry,omitempty"`
@@ -156,7 +156,7 @@ func (x *HeroNotify) GetHeroEntry() *HeroEntry {
 	return nil
 }
 
-// 新增英雄请求（路由 10022）
+// 新增英雄请求（路由 10602）
 type HeroAddReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 英雄配置ID
@@ -254,7 +254,7 @@ func (x *HeroAddResp) GetHeroEntry() *HeroEntry {
 	return nil
 }
 
-// 更新英雄请求（路由 10023）
+// 更新英雄请求（路由 10603）
 type HeroUpdateReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"`    // 英雄配置ID
@@ -392,7 +392,7 @@ func (x *HeroUpdateResp) GetHeroEntry() *HeroEntry {
 	return nil
 }
 
-// 查看英雄累计属性请求（路由 10024）
+// 查看英雄累计属性请求（路由 10604）
 type HeroAttributeReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 英雄配置ID（0 表示当前出战英雄）
@@ -567,7 +567,7 @@ func (x *HeroAttributeResp) GetAttribute() *HeroAttribute {
 	return nil
 }
 
-// 英雄升级请求（路由 10025，消耗升级素材）
+// 英雄升级请求（路由 10605，消耗升级素材）
 type HeroUpgradeReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"` // 英雄配置ID

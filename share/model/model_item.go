@@ -3,10 +3,11 @@
 package model
 
 import (
-	"fmt"
+	"encoding/json"
 	"math"
 
 	"server-cluster/internal/container"
+	"server-cluster/share/consts"
 	"server-cluster/share/enum"
 	"server-cluster/share/tpl"
 )
@@ -49,7 +50,7 @@ type ItemEntry struct {
 	ItemCfgID int32 `json:"itemCfgID"`
 	Count     int32 `json:"count"`
 	GridX     int32 `json:"gridX"` // 容器内 rel 坐标（左上角）
-	GridY     int32 `json:"equip"`
+	GridY     int32 `json:"gridY"` // 容器内 rel 坐标（左上角）
 	Rotated   bool  `json:"rotated"`
 }
 
@@ -74,17 +75,25 @@ func (this *ItemEntry) SetPos(x, y int32, rotated bool) {
 
 // --- Item 专有辅助方法 ---
 
-// SizeOf 读取物品在当前朝向下的宽高；配置缺失时 panic。
+// UnmarshalJSON 兼容旧存档：GridY 的历史 JSON 键为 "equip"。
+func (this *ItemEntry) UnmarshalJSON(data []byte) error {
+	type itemEntryAlias ItemEntry
+	aux := struct {
+		*itemEntryAlias
+		LegacyY *int32 `json:"equip"`
+	}{itemEntryAlias: (*itemEntryAlias)(this)}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+	if this.GridY == 0 && aux.LegacyY != nil {
+		this.GridY = *aux.LegacyY
+	}
+	return nil
+}
+
+// SizeOf 读取物品在当前朝向下的宽高；配置缺失时按 1x1 处理。
 func (this *ItemEntry) SizeOf() (w, h int32) {
-	def := GetItemCfgById(this.ItemCfgID)
-	if def == nil {
-		panic(fmt.Sprintf("model: missing ItemCfg for itemCfgID=%d", this.ItemCfgID))
-	}
-	w, h = itemSize(def)
-	if this.Rotated {
-		return h, w
-	}
-	return w, h
+	return defaultItemSizeOf(this)
 }
 
 // RawSize 读取配置的原始（未旋转）占格。
@@ -177,15 +186,15 @@ func (PlayerItem) TableName() string { return enum.TablePlayerItem.String() }
 func NewPlayerItem(playerID int64) *PlayerItem {
 	return &PlayerItem{
 		PlayerID: playerID,
-		Backpack: newPlayerItemContainer(playerID, TypeBackpack, 6, 6),
-		Stash:    newPlayerItemContainer(playerID, TypeStash, 6, 6),
-		Secure:   newPlayerItemContainer(playerID, TypeSecure, 3, 3),
+		Backpack: newPlayerItemContainer(playerID, TypeBackpack, 8, 12),
+		Stash:    newPlayerItemContainer(playerID, TypeStash, 20, 20),
+		Secure:   newPlayerItemContainer(playerID, TypeSecure, 4, 6),
 	}
 }
 
 func newPlayerItemContainer(playerID int64, typ, gridW, gridH int32) *ItemContainer {
 	return NewItemContainer(typ, gridW, gridH,
-		playerID*10+int64(typ), playerID, OwnerPlayer)
+		playerID*consts.ContainerTypeStride+int64(typ), playerID, OwnerPlayer)
 }
 
 // All 返回全部容器。
@@ -223,7 +232,7 @@ func (p *PlayerItem) Rebuild() {
 	for _, c := range p.All() {
 		c.OwnerID = p.PlayerID
 		c.OwnerType = OwnerPlayer
-		c.GlobalID = p.PlayerID*10 + int64(c.Type)
+		c.GlobalID = p.PlayerID*consts.ContainerTypeStride + int64(c.Type)
 		c.SizeOf = defaultItemSizeOf
 		c.RawSizeOf = defaultItemRawSizeOf
 		c.EnsureInit()

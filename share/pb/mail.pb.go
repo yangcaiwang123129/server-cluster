@@ -175,7 +175,7 @@ func (x *MailEntry) GetClaimedAt() int64 {
 	return 0
 }
 
-// 邮件列表请求（路由 10090）。
+// 邮件列表请求（路由 11000）。
 type MailListReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -273,7 +273,7 @@ func (x *MailListResp) GetUnreadCount() int32 {
 	return 0
 }
 
-// 标记已读请求（路由 10091）。
+// 标记已读请求（路由 11001）。
 type MailReadReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 邮件实例ID
@@ -371,7 +371,7 @@ func (x *MailReadResp) GetEntry() *MailEntry {
 	return nil
 }
 
-// 全部标记已读请求（路由 10092）。
+// 全部标记已读请求（路由 11002）。
 type MailReadAllReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -453,7 +453,7 @@ func (x *MailReadAllResp) GetResult() *Result {
 	return nil
 }
 
-// 领取附件请求（路由 10093）。
+// 领取附件请求（路由 11003）。
 type MailClaimReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 邮件实例ID
@@ -559,7 +559,7 @@ func (x *MailClaimResp) GetAttachments() []*AssetEntry {
 	return nil
 }
 
-// 一键领取全部附件请求（路由 10094）。
+// 一键领取全部附件请求（路由 11004）。
 type MailClaimAllReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -649,7 +649,7 @@ func (x *MailClaimAllResp) GetEntries() []*MailEntry {
 	return nil
 }
 
-// 删除邮件请求（路由 10095）。
+// 删除邮件请求（路由 11005）。
 // 奖励邮件未领取时禁止删除；纯通知邮件任意状态可删；已领取邮件可删。
 type MailDeleteReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -740,7 +740,7 @@ func (x *MailDeleteResp) GetResult() *Result {
 	return nil
 }
 
-// 清理可删除邮件请求（路由 10096）：删除所有可删邮件（已读/已领取，或无附件）。
+// 清理可删除邮件请求（路由 11006）：删除所有可删邮件（已读/已领取，或无附件）。
 type MailDeleteCleanReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields

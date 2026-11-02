@@ -7,17 +7,20 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"server-cluster/share/util"
 	"sort"
 	"sync"
+
+	"server-cluster/share/pb"
+	"server-cluster/share/util"
 )
 
 // ============ 容器类型（通用，不属于玩家领域） ============
+// 玩家容器类型复用客户端协议 pb.ContainerType，保证服务端与协议取值单一来源。
 const (
-	TypeBackpack = 1 // 背包（玩家随身，死亡掉落）
-	TypeStash    = 2 // 仓库（玩家局外，不掉落）
-	TypeSecure   = 3 // 保险箱（玩家随身，不掉落）
-	// 世界容器（实体持有，如敌人/柜子）
+	TypeBackpack = int32(pb.ContainerType_CONTAINER_TYPE_BACKPACK) // 背包（玩家随身，死亡掉落）
+	TypeStash    = int32(pb.ContainerType_CONTAINER_TYPE_STASH)    // 仓库（玩家局外，不掉落）
+	TypeSecure   = int32(pb.ContainerType_CONTAINER_TYPE_SECURE)   // 保险箱（玩家随身，不掉落）
+	// 世界容器（实体持有，如敌人/柜子；仅服务端内部使用，不在客户端协议枚举中）
 	TypeWorldDrop = 10 // 地图掉落箱（敌人死亡生成）
 	TypeCabinet   = 11 // 柜子容器
 	TypeLoot      = 12 // 战利品容器

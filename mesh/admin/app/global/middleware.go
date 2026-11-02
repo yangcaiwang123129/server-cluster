@@ -193,13 +193,29 @@ func Allow(roleKey, path, method string) (bool, error) {
 	return false, nil
 }
 
-// matchRulePath 按路由模板匹配实际请求路径，模板中的 :param / * 段匹配任意单段。
+// matchRulePath 按路由模板匹配实际请求路径：:param / * 匹配任意单段，
+// 末尾的 * 段（如 /api/v1/gm/*）匹配剩余任意段数。
 func matchRulePath(pattern, path string) bool {
 	if pattern == path {
 		return true
 	}
 	ps := strings.Split(strings.Trim(pattern, "/"), "/")
 	as := strings.Split(strings.Trim(path, "/"), "/")
+	// 末尾 * 作为多段通配：前缀逐段匹配，剩余段数任意
+	if n := len(ps); n > 0 && strings.HasPrefix(ps[n-1], "*") {
+		if len(as) < n-1 {
+			return false
+		}
+		for i := 0; i < n-1; i++ {
+			if strings.HasPrefix(ps[i], ":") || strings.HasPrefix(ps[i], "*") {
+				continue
+			}
+			if ps[i] != as[i] {
+				return false
+			}
+		}
+		return true
+	}
 	if len(ps) != len(as) {
 		return false
 	}

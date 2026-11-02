@@ -7,7 +7,7 @@ import "hero.proto";
 
 option go_package = "server-cluster/share/pb";
 
-// 新增装备请求（路由 10052）
+// 新增装备请求（路由 10902）
 message EquipAddReq {
   int32 cfg_id = 1; // 装备配置ID
   int32 hero_id = 2; // 所属英雄ID，0 表示当前出战英雄
@@ -19,7 +19,7 @@ message EquipAddResp {
   EquipEntry equip_entry = 2; // 新增后的持有状态
 }
 
-// 更新装备请求（路由 10053）
+// 更新装备请求（路由 10903）
 message EquipUpdateReq {
   int64 id = 1;           // 装备实例ID
   int32 level = 2;        // 等级
@@ -35,7 +35,7 @@ message EquipUpdateResp {
   EquipEntry equip_entry = 2; // 更新后的持有状态
 }
 
-// 装备升级请求（路由 10054，消耗升级素材）
+// 装备升级请求（路由 10904，消耗升级素材）
 message EquipUpgradeReq {
   int64 id = 1; // 装备实例ID
 }
@@ -47,7 +47,7 @@ message EquipUpgradeResp {
   HeroAttribute attribute = 3; // 升级后的英雄累计属性
 }
 
-// 装备升品请求（路由 10055，消耗升品素材）
+// 装备升品请求（路由 10905，消耗升品素材）
 message EquipUpQualityReq {
   int64 id = 1; // 装备实例ID
 }
@@ -59,7 +59,7 @@ message EquipUpQualityResp {
   HeroAttribute attribute = 3; // 升品后的英雄累计属性
 }
 
-// 装备突破请求（路由 10056，消耗突破素材）
+// 装备突破请求（路由 10906，消耗突破素材）
 message EquipBreakthroughReq {
   int64 id = 1; // 装备实例ID
 }
@@ -71,7 +71,7 @@ message EquipBreakthroughResp {
   HeroAttribute attribute = 3; // 突破后的英雄累计属性
 }
 
-// 穿戴装备请求（路由 10057）
+// 穿戴装备请求（路由 10907）
 message EquipWearReq {
   int64 id = 1;      // 装备实例ID
   int32 hero_id = 2; // 目标英雄ID，0 表示当前出战英雄
@@ -84,7 +84,7 @@ message EquipWearResp {
   HeroAttribute attribute = 3;  // 操作后的英雄累计属性
 }
 
-// 卸载装备请求（路由 10058）
+// 卸载装备请求（路由 10908）
 message EquipUnwearReq {
   int64 id = 1; // 装备实例ID
 }
@@ -95,4 +95,3 @@ message EquipUnwearResp {
   EquipEntry equip_entry = 2;   // 卸载后的持有状态
   HeroAttribute attribute = 3;  // 操作后的英雄累计属性
 }
-

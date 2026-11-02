@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/dobyte/due/v2/cluster"
 	"github.com/dobyte/due/v2/cluster/node"
+	"github.com/dobyte/due/v2/etc"
 
 	"server-cluster/node/game/app/logic"
 	"server-cluster/share/pb"
@@ -18,6 +19,28 @@ type route struct {
 
 // routes 全部客户端路由表：装配期由各模块的 init 追加，Serve 前由 Register 统一装配。
 var routes []route
+
+// debugRouteCodes 仅在开发模式（etc mode = debug）注册的调试路由，预发布/生产环境不开放。
+// ITEM_ADD / ITEM_NOTIFY 为预留路由，逻辑层尚未实现。
+var debugRouteCodes = map[pb.RouteCode]struct{}{
+	pb.RouteCode_ROUTE_CODE_ITEM_ADD:      {},
+	pb.RouteCode_ROUTE_CODE_ITEM_NOTIFY:   {},
+	pb.RouteCode_ROUTE_CODE_HERO_ADD:      {},
+	pb.RouteCode_ROUTE_CODE_HERO_UPDATE:   {},
+	pb.RouteCode_ROUTE_CODE_WEAPON_UPDATE: {},
+	pb.RouteCode_ROUTE_CODE_SKILL_UPDATE:  {},
+	pb.RouteCode_ROUTE_CODE_EQUIP_ADD:     {},
+	pb.RouteCode_ROUTE_CODE_EQUIP_UPDATE:  {},
+}
+
+// debugRoutesEnabled 由 Register 按运行模式设置，bindActor 复用。
+var debugRoutesEnabled bool
+
+// isDebugRoute 判断路由是否属于仅开发模式开放的路由。
+func isDebugRoute(code int32) bool {
+	_, ok := debugRouteCodes[pb.RouteCode(code)]
+	return ok
+}
 
 // OnStateless 注册无状态路由（仅首包 VERIFY 使用）。
 func OnStateless(code pb.RouteCode, handler node.RouteHandler) {
@@ -37,7 +60,11 @@ func OnActor(code pb.RouteCode, handler node.RouteHandler) {
 // Register 装配客户端路由：节点侧注册全部路由，并把 actor 路由注册器注入 logic。
 // 必须在 Serve 之前、node Shut 状态下调用。
 func Register(proxy *node.Proxy) {
+	debugRoutesEnabled = etc.Get("mode").String() == "debug"
 	for _, r := range routes {
+		if !debugRoutesEnabled && isDebugRoute(r.code) {
+			continue
+		}
 		switch {
 		case r.stateless:
 			proxy.AddRouteHandler(r.code, r.handler)
@@ -62,9 +89,10 @@ func Register(proxy *node.Proxy) {
 // bindActor 把业务路由注册到玩家 actor（在 actor 的 Start 阶段调用）。
 func bindActor(act *node.Actor) {
 	for _, r := range routes {
-		if r.actor {
-			act.AddRouteHandler(r.code, r.handler)
+		if !r.actor || (!debugRoutesEnabled && isDebugRoute(r.code)) {
+			continue
 		}
+		act.AddRouteHandler(r.code, r.handler)
 	}
 }
 

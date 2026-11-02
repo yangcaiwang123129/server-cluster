@@ -16,8 +16,3 @@ func init() {
 
 // Battle 获取战斗模块业务单例。
 func Battle() global.BattleLogic { return battleLogicInst.MustGet() }
-
-//func (l *battleLogic) StartBattle(ctx context.Context, uid int64, req *pb.StartBattleReq) (*pb.StartBattleResp, error) {
-//	// TODO: 实现战斗匹配/创建房间逻辑
-//	return &pb.StartBattleResp{BattleId: 1, Status: "matched"}, nil
-//}

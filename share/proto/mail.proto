@@ -26,7 +26,7 @@ message MailEntry {
   int64 claimed_at = 8;               // 领取时间（毫秒时间戳，0 表示未领取）
 }
 
-// 邮件列表请求（路由 10090）。
+// 邮件列表请求（路由 11000）。
 message MailListReq {}
 
 // 邮件列表响应。
@@ -36,7 +36,7 @@ message MailListResp {
   int32 unread_count = 3;         // 未读数量（红点）
 }
 
-// 标记已读请求（路由 10091）。
+// 标记已读请求（路由 11001）。
 message MailReadReq {
   int64 id = 1; // 邮件实例ID
 }
@@ -47,7 +47,7 @@ message MailReadResp {
   MailEntry entry = 2; // 更新后的邮件状态
 }
 
-// 全部标记已读请求（路由 10092）。
+// 全部标记已读请求（路由 11002）。
 message MailReadAllReq {}
 
 // 全部标记已读响应。
@@ -55,7 +55,7 @@ message MailReadAllResp {
   Result result = 1;
 }
 
-// 领取附件请求（路由 10093）。
+// 领取附件请求（路由 11003）。
 message MailClaimReq {
   int64 id = 1; // 邮件实例ID
 }
@@ -67,7 +67,7 @@ message MailClaimResp {
   repeated AssetEntry attachments = 3; // 实际发放的附件
 }
 
-// 一键领取全部附件请求（路由 10094）。
+// 一键领取全部附件请求（路由 11004）。
 message MailClaimAllReq {}
 
 // 一键领取全部附件响应。
@@ -76,7 +76,7 @@ message MailClaimAllResp {
   repeated MailEntry entries = 2; // 本次领取到附件的邮件
 }
 
-// 删除邮件请求（路由 10095）。
+// 删除邮件请求（路由 11005）。
 // 奖励邮件未领取时禁止删除；纯通知邮件任意状态可删；已领取邮件可删。
 message MailDeleteReq {
   int64 id = 1; // 邮件实例ID
@@ -87,7 +87,7 @@ message MailDeleteResp {
   Result result = 1;
 }
 
-// 清理可删除邮件请求（路由 10096）：删除所有可删邮件（已读/已领取，或无附件）。
+// 清理可删除邮件请求（路由 11006）：删除所有可删邮件（已读/已领取，或无附件）。
 message MailDeleteCleanReq {}
 
 // 清理可删除邮件响应。

@@ -97,7 +97,7 @@ EquipUnwear(ctx context.Context, playerID int64, req *pb.EquipUnwearReq) (*pb.Eq
 
 ### 4.3 `node/game/app/handler/handler_equip.go`
 
-注册 `ROUTE_CODE_EQUIP_WEAR` / `ROUTE_CODE_EQUIP_UNWEAR`，新增 `handleEquipWear` / `handleEquipUnwear`（同现有 handler 写法）。
+注册 `ROUTE_CODE_EQUIP_WEAR` / `ROUTE_CODE_EQUIP_UNWEAR`，新增 `handleEquipWear` / `handleEquipUnWear`（同现有 handler 写法）。
 
 ### 4.4 `node/game/app/service`
 

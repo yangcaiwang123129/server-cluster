@@ -38,3 +38,13 @@
 - [x] F2 `go build ./...` 通过。
 - [x] F3 `go vet ./node/... ./share/... ./mesh/admin/...` 通过。
 - [x] F4 静态核对所有写入缓存后的返回点均有对应 `notify*` 调用，无重复推送。
+
+## G. 修复轮次：推送通道接入问题（2026-11-02）
+
+- [x] G1 `logic_hero_notify.go`：`notifyHeroEntry` 入口拦截 `playerID <= 0 || entry == nil`。
+- [x] G2 `logic_hero_notify.go`：`PushArgs` 增加 `Ack: true`，利用 due 的“清缓存 + 重新定位 + 重试一次”。
+- [x] G3 `logic_hero_notify.go`：错误分类——`ErrNotFoundUserLocation` / `ErrNotFoundSession` 记 `Debugf`，其余记 `Warnf` 并带 route。
+- [x] G4 `gofmt -w node/game/app/logic/logic_hero_notify.go`。
+- [x] G5 `go build ./...` 通过。
+- [x] G6 `go vet ./node/... ./share/...` 通过。
+- [x] G7 静态核对：`svc.NodeProxy().Push` 仍为唯一推送入口，route 仍取自枚举。

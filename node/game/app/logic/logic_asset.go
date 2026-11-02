@@ -11,10 +11,6 @@ import (
 	"server-cluster/share/tpl"
 )
 
-// AssetTypeSkill 技能资产类型。
-const AssetType_Weapon tpl.AssetType = 4
-const AssetTypeSkill tpl.AssetType = 5
-
 type assetLogic struct{}
 
 var assetLogicInst = singleton.NewContainer[global.AssetLogic]("AssetLogic")

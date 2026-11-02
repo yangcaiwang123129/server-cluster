@@ -21,7 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// 物品容器列表（路由 10010）
+// 物品容器列表（路由 10500）
 type ItemContainerListReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ContainerType ContainerType          `protobuf:"varint,1,opt,name=container_type,json=containerType,proto3,enum=pb.ContainerType" json:"container_type,omitempty"` // 物品容器类型（UNSPECIFIED 表示全部容器）
@@ -119,7 +119,7 @@ func (x *ItemContainerListResp) GetItemContainers() []*ItemContainer {
 	return nil
 }
 
-// 物品容器内对象变化（路由 10011）
+// 物品容器内对象变化（路由 10501）
 type ItemContainerNotify struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ContainerType ContainerType          `protobuf:"varint,1,opt,name=container_type,json=containerType,proto3,enum=pb.ContainerType" json:"container_type,omitempty"` // 物品容器类型
@@ -172,7 +172,7 @@ func (x *ItemContainerNotify) GetItemEntry() *ItemEntry {
 	return nil
 }
 
-// 物品容器内添加对象请求（路由 10012）
+// 物品容器内添加对象请求（路由 10502）
 type ItemAddReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ContainerType ContainerType          `protobuf:"varint,1,opt,name=container_type,json=containerType,proto3,enum=pb.ContainerType" json:"container_type,omitempty"` // 物品容器类型
@@ -270,7 +270,7 @@ func (x *ItemAddResp) GetResult() *Result {
 	return nil
 }
 
-// 物品容器内移动对象请求（路由 10013）
+// 物品容器内移动对象请求（路由 10503）
 type ItemMoveReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ContainerType ContainerType          `protobuf:"varint,1,opt,name=container_type,json=containerType,proto3,enum=pb.ContainerType" json:"container_type,omitempty"` // 物品容器类型
@@ -392,7 +392,7 @@ func (x *ItemMoveResp) GetResult() *Result {
 	return nil
 }
 
-// 物品容器内旋转对象请求（路由 10014）
+// 物品容器内旋转对象请求（路由 10504）
 type ItemRotateReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ContainerType ContainerType          `protobuf:"varint,1,opt,name=container_type,json=containerType,proto3,enum=pb.ContainerType" json:"container_type,omitempty"` // 物品容器类型
@@ -490,7 +490,7 @@ func (x *ItemRotateResp) GetResult() *Result {
 	return nil
 }
 
-// 物品容器一键整理请求（路由 10015）
+// 物品容器一键整理请求（路由 10505）
 type ItemSortReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ContainerType ContainerType          `protobuf:"varint,1,opt,name=container_type,json=containerType,proto3,enum=pb.ContainerType" json:"container_type,omitempty"` // 物品容器类型
@@ -580,7 +580,7 @@ func (x *ItemSortResp) GetResult() *Result {
 	return nil
 }
 
-// 物品容器间移动对象请求（路由 10016）
+// 物品容器间移动对象请求（路由 10506）
 type ItemTransferReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	FromType      ContainerType          `protobuf:"varint,1,opt,name=from_type,json=fromType,proto3,enum=pb.ContainerType" json:"from_type,omitempty"` // 源物品容器类型

@@ -7,7 +7,7 @@ import "hero.proto";
 
 option go_package = "server-cluster/share/pb";
 
-// 更新技能请求（路由 10043）
+// 更新技能请求（路由 10803）
 message SkillUpdateReq {
   int32 cfg_id = 1;       // 技能配置ID
   int32 level = 2;        // 等级
@@ -21,7 +21,7 @@ message SkillUpdateResp {
   SkillEntry skill_entry = 2; // 更新后的持有状态
 }
 
-// 技能升级请求（路由 10044，消耗升级素材）
+// 技能升级请求（路由 10804，消耗升级素材）
 message SkillUpgradeReq {
   int32 cfg_id = 1; // 技能配置ID
 }
@@ -33,7 +33,7 @@ message SkillUpgradeResp {
   HeroAttribute attribute = 3; // 升级后的英雄累计属性
 }
 
-// 技能升品请求（路由 10045，消耗升品素材）
+// 技能升品请求（路由 10805，消耗升品素材）
 message SkillUpQualityReq {
   int32 cfg_id = 1; // 技能配置ID
 }
@@ -45,7 +45,7 @@ message SkillUpQualityResp {
   HeroAttribute attribute = 3; // 升品后的英雄累计属性
 }
 
-// 技能突破请求（路由 10046，消耗突破素材）
+// 技能突破请求（路由 10806，消耗突破素材）
 message SkillBreakthroughReq {
   int32 cfg_id = 1; // 技能配置ID
 }

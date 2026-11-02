@@ -21,7 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// 新增装备请求（路由 10052）
+// 新增装备请求（路由 10902）
 type EquipAddReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	CfgId         int32                  `protobuf:"varint,1,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"`    // 装备配置ID
@@ -127,7 +127,7 @@ func (x *EquipAddResp) GetEquipEntry() *EquipEntry {
 	return nil
 }
 
-// 更新装备请求（路由 10053）
+// 更新装备请求（路由 10903）
 type EquipUpdateReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                       // 装备实例ID
@@ -265,7 +265,7 @@ func (x *EquipUpdateResp) GetEquipEntry() *EquipEntry {
 	return nil
 }
 
-// 装备升级请求（路由 10054，消耗升级素材）
+// 装备升级请求（路由 10904，消耗升级素材）
 type EquipUpgradeReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 装备实例ID
@@ -371,7 +371,7 @@ func (x *EquipUpgradeResp) GetAttribute() *HeroAttribute {
 	return nil
 }
 
-// 装备升品请求（路由 10055，消耗升品素材）
+// 装备升品请求（路由 10905，消耗升品素材）
 type EquipUpQualityReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 装备实例ID
@@ -477,7 +477,7 @@ func (x *EquipUpQualityResp) GetAttribute() *HeroAttribute {
 	return nil
 }
 
-// 装备突破请求（路由 10056，消耗突破素材）
+// 装备突破请求（路由 10906，消耗突破素材）
 type EquipBreakthroughReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 装备实例ID
@@ -583,7 +583,7 @@ func (x *EquipBreakthroughResp) GetAttribute() *HeroAttribute {
 	return nil
 }
 
-// 穿戴装备请求（路由 10057）
+// 穿戴装备请求（路由 10907）
 type EquipWearReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                       // 装备实例ID
@@ -697,7 +697,7 @@ func (x *EquipWearResp) GetAttribute() *HeroAttribute {
 	return nil
 }
 
-// 卸载装备请求（路由 10058）
+// 卸载装备请求（路由 10908）
 type EquipUnwearReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 装备实例ID

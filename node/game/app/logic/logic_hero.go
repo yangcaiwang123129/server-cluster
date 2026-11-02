@@ -193,10 +193,16 @@ func (this *heroLogic) HeroUpdate(ctx context.Context, playerID int64, req *pb.H
 		return nil, errs.CodeInvalidParams.WithMessage("英雄未拥有").Err()
 	}
 	h := old
-	h.Level = req.GetLevel()
+	h.Level = clampDim(req.GetLevel(), 1)
 	h.Exp = req.GetExp()
-	h.Star = req.GetStar()
+	if h.Exp < 0 {
+		h.Exp = 0
+	}
+	h.Star = clampDim(req.GetStar(), 1)
 	h.SkinID = req.GetSkinId()
+	if h.SkinID < 0 {
+		h.SkinID = 0
+	}
 	h.Equipped = req.GetEquipped()
 	// 出战英雄全局唯一：设置出战时先取消其它英雄的出战状态，记录被取消出战的英雄用于推送
 	var unsetHeroIDs []int32
