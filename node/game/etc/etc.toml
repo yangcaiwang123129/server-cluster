@@ -2,7 +2,7 @@
 # due 自动加载 ./etc/etc.toml。
 
 # 进程号
-pid = "../../pid/game.pid"
+pid = ""
 # 开发模式。支持模式：debug、test、release
 mode = "debug"
 # 统一时区设置

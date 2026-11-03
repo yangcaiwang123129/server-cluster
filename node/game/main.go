@@ -4,10 +4,13 @@ package main
 import (
 	"context"
 	"server-cluster/internal/router"
+	"server-cluster/internal/singleinstance"
 	_ "server-cluster/node/game/app/handler" // 触发 handler_gm_player.go 的 init() 注册路由到 routes 切片
 	"server-cluster/node/game/app/logic"
 	"server-cluster/node/game/app/service"
 	"server-cluster/share/consts"
+
+	// "server-cluster/share/consts" // TODO: 临时跳过
 	"server-cluster/share/pb"
 
 	"github.com/dobyte/due/locate/redis/v2"
@@ -17,14 +20,14 @@ import (
 	"github.com/dobyte/due/v2/cluster/node"
 	"github.com/dobyte/due/v2/log"
 
-	"server-cluster/internal/singleinstance"
+	// "server-cluster/internal/singleinstance" // TODO: 临时跳过
 	"server-cluster/internal/svc"
 	"server-cluster/node/game/app/global"
 )
 
 func main() {
 	// 单实例保护：重复启动会触发 due 日志 rotate 失败 panic，提前拦截
-	singleinstance.Check(consts.NodeInstanceID())
+	singleinstance.Check(consts.NodeInstanceID()) // TODO: 临时跳过开发环境残留
 	// 创建容器
 	container := due.NewContainer()
 	// 创建用户定位器

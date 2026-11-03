@@ -8,7 +8,7 @@ export default {
   note: 'The simulator opens a WebSocket from the admin server and speaks the gate protocol (4-byte route + 4-byte sequence + Protobuf), the same flow the Unity3D client follows.',
   formTitle: 'Connection',
   loginAddr: 'Login server',
-  loginAddrPlaceholder: 'e.g. http://188.18.23.72:8080',
+  loginAddrPlaceholder: 'e.g. http://127.0.0.1:8080',
   username: 'Account',
   usernamePlaceholder: 'Enter the account',
   password: 'Password',

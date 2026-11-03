@@ -75,7 +75,7 @@ func (m *SSHManager) GetByHost(host string) *SSHHostConfig {
 
 // ResolveFromEndpoint 从节点的 endpoint 字段提取 host 部分（去掉端口），然后查找 SSH 配置。
 //
-// due registry.ServiceInstance.Endpoint 形如 "127.0.0.1:8081" 或 "188.18.23.72:9000"。
+// due registry.ServiceInstance.Endpoint 形如 "127.0.0.1:8081" 或 "127.0.0.1:9000"。
 // 也接受不带端口的纯 IP。
 func (m *SSHManager) ResolveFromEndpoint(endpoint string) *SSHHostConfig {
 	if endpoint == "" {

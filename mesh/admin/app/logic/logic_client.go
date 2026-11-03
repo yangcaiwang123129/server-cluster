@@ -119,7 +119,7 @@ func clientVersionModel(req dto.ClientVersionSaveReq, excludeId int) (*model.Cli
 }
 
 const (
-	simDefaultLoginAddr = "http://188.18.23.72:8080"
+	simDefaultLoginAddr = "http://127.0.0.1:8080"
 	simLoginTimeout     = 5 * time.Second
 	simDialTimeout      = 5 * time.Second
 	simStepTimeout      = 5 * time.Second

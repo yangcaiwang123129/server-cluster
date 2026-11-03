@@ -8,7 +8,7 @@ export default {
   note: '模拟器在 admin 服务端建立 WebSocket，按 gate 协议收发二进制报文（4 字节路由 + 4 字节序号 + Protobuf），与 U3D 客户端走同一套流程。',
   formTitle: '连接参数',
   loginAddr: '登录服地址',
-  loginAddrPlaceholder: '例如 http://188.18.23.72:8080',
+  loginAddrPlaceholder: '例如 http://127.0.0.1:8080',
   username: '账号',
   usernamePlaceholder: '请输入账号',
   password: '密码',
