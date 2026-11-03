@@ -140,11 +140,11 @@ func ItemContainer(playerID int64, c *model.ItemContainer) *pb.ItemContainer {
 func ContainerTypeToModel(t pb.ContainerType) (int32, bool) {
 	switch t {
 	case pb.ContainerType_CONTAINER_TYPE_BACKPACK:
-		return model.TypeBackpack, true
+		return int32(pb.ContainerType_CONTAINER_TYPE_BACKPACK), true
 	case pb.ContainerType_CONTAINER_TYPE_STASH:
-		return model.TypeStash, true
+		return int32(pb.ContainerType_CONTAINER_TYPE_STASH), true
 	case pb.ContainerType_CONTAINER_TYPE_SECURE:
-		return model.TypeSecure, true
+		return int32(pb.ContainerType_CONTAINER_TYPE_SECURE), true
 	default:
 		return 0, false
 	}
@@ -152,17 +152,17 @@ func ContainerTypeToModel(t pb.ContainerType) (int32, bool) {
 
 // PlayerAttr 玩家实体 → 下发客户端的属性表：昵称/等级/经验/vip 取自 player_extra，币/金取自 player。
 // 键为 Attr 枚举值，值按实际类型放入 ObjectValue。
-func PlayerAttr(core *model.PlayerExtra, player *model.Player) *pb.AttrMap {
+func PlayerAttr(playerExtra *model.PlayerExtra, player *model.Player) *pb.AttrMap {
 	return &pb.AttrMap{Values: map[int32]*pb.ObjectValue{
-		int32(pb.Attr_PLAYER_ATTR_NAME):          {Kind: &pb.ObjectValue_StringValue{StringValue: core.Nickname}},
-		int32(pb.Attr_PLAYER_ATTR_LEVEL):         {Kind: &pb.ObjectValue_IntValue{IntValue: core.Level}},
-		int32(pb.Attr_PLAYER_ATTR_EXP):           {Kind: &pb.ObjectValue_BigintValue{BigintValue: core.Exp}},
-		int32(pb.Attr_PLAYER_ATTR_VIP_LEVEL):     {Kind: &pb.ObjectValue_IntValue{IntValue: core.VipLevel}},
-		int32(pb.Attr_PLAYER_ATTR_VIP_EXP):       {Kind: &pb.ObjectValue_BigintValue{BigintValue: core.VipExp}},
+		int32(pb.Attr_PLAYER_ATTR_NAME):          {Kind: &pb.ObjectValue_StringValue{StringValue: playerExtra.Nickname}},
+		int32(pb.Attr_PLAYER_ATTR_LEVEL):         {Kind: &pb.ObjectValue_IntValue{IntValue: playerExtra.Level}},
+		int32(pb.Attr_PLAYER_ATTR_EXP):           {Kind: &pb.ObjectValue_BigintValue{BigintValue: playerExtra.Exp}},
+		int32(pb.Attr_PLAYER_ATTR_VIP_LEVEL):     {Kind: &pb.ObjectValue_IntValue{IntValue: playerExtra.VipLevel}},
+		int32(pb.Attr_PLAYER_ATTR_VIP_EXP):       {Kind: &pb.ObjectValue_BigintValue{BigintValue: playerExtra.VipExp}},
 		int32(pb.Attr_PLAYER_ATTR_COIN):          {Kind: &pb.ObjectValue_BigintValue{BigintValue: player.Coin}},
 		int32(pb.Attr_PLAYER_ATTR_GOLD):          {Kind: &pb.ObjectValue_BigintValue{BigintValue: player.Gold}},
-		int32(pb.Attr_PLAYER_ATTR_SIGNATURE):     {Kind: &pb.ObjectValue_StringValue{StringValue: core.Signature}},
-		int32(pb.Attr_PLAYER_ATTR_SETTINGS_JSON): {Kind: &pb.ObjectValue_StringValue{StringValue: core.SettingsJSON}},
+		int32(pb.Attr_PLAYER_ATTR_SIGNATURE):     {Kind: &pb.ObjectValue_StringValue{StringValue: playerExtra.Signature}},
+		int32(pb.Attr_PLAYER_ATTR_SETTINGS_JSON): {Kind: &pb.ObjectValue_StringValue{StringValue: playerExtra.SettingsJSON}},
 	}}
 }
 

@@ -9,17 +9,8 @@ import (
 	"server-cluster/internal/container"
 	"server-cluster/share/consts"
 	"server-cluster/share/enum"
+	"server-cluster/share/pb"
 	"server-cluster/share/tpl"
-)
-
-// ============ 容器类型常量：从 container 包重新导出 ============
-const (
-	TypeBackpack  = container.TypeBackpack
-	TypeStash     = container.TypeStash
-	TypeSecure    = container.TypeSecure
-	TypeWorldDrop = container.TypeWorldDrop
-	TypeCabinet   = container.TypeCabinet
-	TypeLoot      = container.TypeLoot
 )
 
 // ============ 拥有者类型常量 ============
@@ -186,9 +177,9 @@ func (PlayerItem) TableName() string { return enum.TablePlayerItem.String() }
 func NewPlayerItem(playerID int64) *PlayerItem {
 	return &PlayerItem{
 		PlayerID: playerID,
-		Backpack: newPlayerItemContainer(playerID, TypeBackpack, 8, 12),
-		Stash:    newPlayerItemContainer(playerID, TypeStash, 20, 20),
-		Secure:   newPlayerItemContainer(playerID, TypeSecure, 4, 6),
+		Backpack: newPlayerItemContainer(playerID, int32(pb.ContainerType_CONTAINER_TYPE_BACKPACK), 8, 12),
+		Stash:    newPlayerItemContainer(playerID, int32(pb.ContainerType_CONTAINER_TYPE_STASH), 20, 20),
+		Secure:   newPlayerItemContainer(playerID, int32(pb.ContainerType_CONTAINER_TYPE_SECURE), 4, 6),
 	}
 }
 
@@ -205,11 +196,11 @@ func (p *PlayerItem) All() []*ItemContainer {
 // ByType 按枚举取容器；非法类型返回 nil。
 func (p *PlayerItem) ByType(typ int32) *ItemContainer {
 	switch typ {
-	case TypeBackpack:
+	case int32(pb.ContainerType_CONTAINER_TYPE_BACKPACK):
 		return p.Backpack
-	case TypeStash:
+	case int32(pb.ContainerType_CONTAINER_TYPE_STASH):
 		return p.Stash
-	case TypeSecure:
+	case int32(pb.ContainerType_CONTAINER_TYPE_SECURE):
 		return p.Secure
 	default:
 		return nil
@@ -221,13 +212,13 @@ func (p *PlayerItem) ByType(typ int32) *ItemContainer {
 // 所以需要在这里回填。
 func (p *PlayerItem) Rebuild() {
 	if p.Backpack == nil {
-		p.Backpack = newPlayerItemContainer(p.PlayerID, TypeBackpack, 8, 12)
+		p.Backpack = newPlayerItemContainer(p.PlayerID, int32(pb.ContainerType_CONTAINER_TYPE_BACKPACK), 8, 12)
 	}
 	if p.Stash == nil {
-		p.Stash = newPlayerItemContainer(p.PlayerID, TypeStash, 20, 20)
+		p.Stash = newPlayerItemContainer(p.PlayerID, int32(pb.ContainerType_CONTAINER_TYPE_STASH), 20, 20)
 	}
 	if p.Secure == nil {
-		p.Secure = newPlayerItemContainer(p.PlayerID, TypeSecure, 4, 6)
+		p.Secure = newPlayerItemContainer(p.PlayerID, int32(pb.ContainerType_CONTAINER_TYPE_SECURE), 4, 6)
 	}
 	for _, c := range p.All() {
 		c.OwnerID = p.PlayerID

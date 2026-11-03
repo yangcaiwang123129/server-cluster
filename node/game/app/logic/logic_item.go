@@ -107,7 +107,11 @@ func (this *itemLogic) ItemContainerList(ctx context.Context, playerID int64, re
 		return nil, err
 	}
 
-	types := []int32{model.TypeBackpack, model.TypeStash, model.TypeSecure}
+	types := []int32{
+		int32(pb.ContainerType_CONTAINER_TYPE_BACKPACK),
+		int32(pb.ContainerType_CONTAINER_TYPE_STASH),
+		int32(pb.ContainerType_CONTAINER_TYPE_SECURE),
+	}
 	if typ, ok := convert.ContainerTypeToModel(req.GetContainerType()); ok {
 		types = []int32{typ}
 	}
@@ -253,7 +257,7 @@ func (this *itemAssetHandler) Add(ctx context.Context, playerID int64, cfgID, co
 	if err != nil {
 		return err
 	}
-	if err := placeItemEntry(pc.ByType(model.TypeBackpack), cfgID, count); err != nil {
+	if err := placeItemEntry(pc.ByType(int32(pb.ContainerType_CONTAINER_TYPE_BACKPACK)), cfgID, count); err != nil {
 		return err
 	}
 
@@ -272,7 +276,7 @@ func (this *itemAssetHandler) Remove(ctx context.Context, playerID int64, cfgID,
 	if err != nil {
 		return err
 	}
-	c := pc.ByType(model.TypeBackpack)
+	c := pc.ByType(int32(pb.ContainerType_CONTAINER_TYPE_BACKPACK))
 	if owned := countItem(c, cfgID); owned < count {
 		return errs.CodeInvalidParams.WithMessage("物品数量不足").Err()
 	}
@@ -307,7 +311,7 @@ func (this *itemAssetHandler) Query(ctx context.Context, playerID int64, cfgID i
 	if err != nil {
 		return 0, err
 	}
-	return countItem(pc.ByType(model.TypeBackpack), cfgID), nil
+	return countItem(pc.ByType(int32(pb.ContainerType_CONTAINER_TYPE_BACKPACK)), cfgID), nil
 }
 
 // List 列出背包中按配置ID汇总的物品（按配置ID升序）。
@@ -318,7 +322,7 @@ func (this *itemAssetHandler) List(ctx context.Context, playerID int64) ([]*tpl.
 	}
 
 	agg := map[int32]int32{}
-	for _, it := range pc.ByType(model.TypeBackpack).Entries() {
+	for _, it := range pc.ByType(int32(pb.ContainerType_CONTAINER_TYPE_BACKPACK)).Entries() {
 		agg[it.ItemCfgID] += it.Count
 	}
 	assets := make([]*tpl.Asset, 0, len(agg))
