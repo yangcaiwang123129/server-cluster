@@ -35,7 +35,7 @@ export function listGameCatalog(params: {
 // ── 物品 ──────────────────────────────────────────────────────────
 
 /** 物品容器列表，containerType 为 0 时返回全部物品容器。 */
-export function listGmItem(params: { playerId: number; containerType?: number }) {
+export function listGmItem(params: { playerId: string; containerType?: number }) {
   return request<ApiResponse<GmItem[]>>({
     url: '/api/v1/gm/item',
     method: 'get',
@@ -45,7 +45,7 @@ export function listGmItem(params: { playerId: number; containerType?: number })
 
 /** 物品容器内移动物品。itemId 为雪花 ID 字符串（JSON 大 int64 会丢精度）。 */
 export function moveGmItem(data: {
-  playerId: number
+  playerId: string
   containerType: number
   itemId: string
   toX: number
@@ -60,7 +60,7 @@ export function moveGmItem(data: {
 }
 
 /** 物品容器内旋转物品。 */
-export function rotateGmItem(data: { playerId: number; containerType: number; itemId: string }) {
+export function rotateGmItem(data: { playerId: string; containerType: number; itemId: string }) {
   return request<ApiResponse<null>>({
     url: '/api/v1/gm/item/rotate',
     method: 'post',
@@ -69,7 +69,7 @@ export function rotateGmItem(data: { playerId: number; containerType: number; it
 }
 
 /** 物品容器一键整理。 */
-export function sortGmItem(data: { playerId: number; containerType: number }) {
+export function sortGmItem(data: { playerId: string; containerType: number }) {
   return request<ApiResponse<null>>({
     url: '/api/v1/gm/item/sort',
     method: 'post',
@@ -79,7 +79,7 @@ export function sortGmItem(data: { playerId: number; containerType: number }) {
 
 /** 物品容器间移动物品（返回变更后的源/目标容器）。 */
 export function transferGmItem(data: {
-  playerId: number
+  playerId: string
   fromType: number
   toType: number
   itemId: string
@@ -96,7 +96,7 @@ export function transferGmItem(data: {
 
 /** 向物品容器放入物品（返回变更后的容器）。 */
 export function addGmItem(data: {
-  playerId: number
+  playerId: string
   containerType: number
   itemCfgId: number
   count: number
@@ -113,7 +113,7 @@ export function addGmItem(data: {
 
 // ── 英雄 ──────────────────────────────────────────────────────────
 
-export function listGmHero(params: { playerId: number }) {
+export function listGmHero(params: { playerId: string }) {
   return request<ApiResponse<GmHeroListResp>>({
     url: '/api/v1/gm/hero',
     method: 'get',
@@ -121,7 +121,7 @@ export function listGmHero(params: { playerId: number }) {
   })
 }
 
-export function addGmHero(data: { playerId: number; heroId: number }) {
+export function addGmHero(data: { playerId: string; heroId: number }) {
   return request<ApiResponse<GmHero>>({
     url: '/api/v1/gm/hero',
     method: 'post',
@@ -130,7 +130,7 @@ export function addGmHero(data: { playerId: number; heroId: number }) {
 }
 
 export function updateGmHero(data: {
-  playerId: number
+  playerId: string
   heroId: number
   level: number
   exp: number
@@ -146,7 +146,7 @@ export function updateGmHero(data: {
 }
 
 /** 英雄累计属性；heroId 为 0 时取出战英雄。 */
-export function getGmHeroAttribute(params: { playerId: number; heroId?: number }) {
+export function getGmHeroAttribute(params: { playerId: string; heroId?: number }) {
   return request<ApiResponse<GmHeroAttribute>>({
     url: '/api/v1/gm/hero/attribute',
     method: 'get',
@@ -155,7 +155,7 @@ export function getGmHeroAttribute(params: { playerId: number; heroId?: number }
 }
 
 /** 英雄升级（消耗背包升级素材）。 */
-export function upgradeGmHero(data: { playerId: number; cfgId: number }) {
+export function upgradeGmHero(data: { playerId: string; cfgId: number }) {
   return request<ApiResponse<GmUpgradeResult>>({
     url: '/api/v1/gm/hero/upgrade',
     method: 'post',
@@ -165,7 +165,7 @@ export function upgradeGmHero(data: { playerId: number; cfgId: number }) {
 
 // ── 装备 ──────────────────────────────────────────────────────────
 
-export function listGmEquip(params: { playerId: number }) {
+export function listGmEquip(params: { playerId: string }) {
   return request<ApiResponse<GmEquip[]>>({
     url: '/api/v1/gm/equip',
     method: 'get',
@@ -173,7 +173,7 @@ export function listGmEquip(params: { playerId: number }) {
   })
 }
 
-export function addGmEquip(data: { playerId: number; equipId: number; heroId?: number }) {
+export function addGmEquip(data: { playerId: string; equipId: number; heroId?: number }) {
   return request<ApiResponse<GmEquip>>({
     url: '/api/v1/gm/equip',
     method: 'post',
@@ -182,7 +182,7 @@ export function addGmEquip(data: { playerId: number; equipId: number; heroId?: n
 }
 
 export function updateGmEquip(data: {
-  playerId: number
+  playerId: string
   id: string
   heroId?: number
   level: number
@@ -198,7 +198,7 @@ export function updateGmEquip(data: {
 }
 
 /** 装备穿戴（同英雄同配置自动顶替；heroId 为 0 时取当前出战英雄）。 */
-export function wearGmEquip(data: { playerId: number; id: string; heroId?: number }) {
+export function wearGmEquip(data: { playerId: string; id: string; heroId?: number }) {
   return request<ApiResponse<GmEquip>>({
     url: '/api/v1/gm/equip/wear',
     method: 'post',
@@ -207,7 +207,7 @@ export function wearGmEquip(data: { playerId: number; id: string; heroId?: numbe
 }
 
 /** 装备卸载。 */
-export function unwearGmEquip(data: { playerId: number; id: string }) {
+export function unwearGmEquip(data: { playerId: string; id: string }) {
   return request<ApiResponse<GmEquip>>({
     url: '/api/v1/gm/equip/unwear',
     method: 'post',
@@ -216,7 +216,7 @@ export function unwearGmEquip(data: { playerId: number; id: string }) {
 }
 
 /** 装备升级（消耗背包升级素材；equipId 为装备实例ID 字符串）。 */
-export function upgradeGmEquip(data: { playerId: number; equipId: string }) {
+export function upgradeGmEquip(data: { playerId: string; equipId: string }) {
   return request<ApiResponse<GmUpgradeResult>>({
     url: '/api/v1/gm/equip/upgrade',
     method: 'post',
@@ -225,7 +225,7 @@ export function upgradeGmEquip(data: { playerId: number; equipId: string }) {
 }
 
 /** 装备升品（消耗升品素材；equipId 为装备实例ID 字符串）。 */
-export function upQualityGmEquip(data: { playerId: number; equipId: string }) {
+export function upQualityGmEquip(data: { playerId: string; equipId: string }) {
   return request<ApiResponse<GmUpgradeResult>>({
     url: '/api/v1/gm/equip/up-quality',
     method: 'post',
@@ -234,7 +234,7 @@ export function upQualityGmEquip(data: { playerId: number; equipId: string }) {
 }
 
 /** 装备突破（消耗突破素材；equipId 为装备实例ID 字符串）。 */
-export function breakthroughGmEquip(data: { playerId: number; equipId: string }) {
+export function breakthroughGmEquip(data: { playerId: string; equipId: string }) {
   return request<ApiResponse<GmUpgradeResult>>({
     url: '/api/v1/gm/equip/breakthrough',
     method: 'post',
@@ -245,7 +245,7 @@ export function breakthroughGmEquip(data: { playerId: number; equipId: string })
 // ── 邮件 ──────────────────────────────────────────────────────────
 
 /** 玩家邮件列表（按未读优先、创建时间倒序排序）。 */
-export function listGmMail(params: { playerId: number }) {
+export function listGmMail(params: { playerId: string }) {
   return request<ApiResponse<GmMail[]>>({
     url: '/api/v1/gm/mail',
     method: 'get',
@@ -255,7 +255,7 @@ export function listGmMail(params: { playerId: number }) {
 
 /** 后台发送邮件（attachments 为空则为纯通知）。 */
 export function sendGmMail(data: {
-  playerId: number
+  playerId: string
   title: string
   content?: string
   attachments?: GmMailAttachment[]
@@ -273,7 +273,7 @@ export function sendGmMail(data: {
 export function listGmRecord(params: {
   action: number
   module: 'item' | 'equip' | 'weapon' | 'skill' | 'hero'
-  playerId?: number
+  playerId?: string
   cfgId?: number
   begin?: number
   end?: number

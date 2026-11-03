@@ -238,9 +238,10 @@ func (this *playerLogic) PlayerGetActors(ctx context.Context) ([]*global.PlayerA
 // 在线登记由 playerProcessor 的 Start/Destroy 生命周期维护。
 func (this *playerLogic) PlayerCreateActor(ctx context.Context, playerID int64, loginIP string) error {
 	if this.PlayerActors.Has(playerID) {
-		// 已在线：幂等更新登录 IP（断线重连可能换 IP）
+		// 已在线：幂等更新登录 IP 与重连时间（断线重连可能换 IP；ReconnectAt 供断线延迟销毁豁免判断）
 		if pa, ok := this.PlayerActors.Get(playerID); ok {
 			pa.LoginIP = loginIP
+			pa.ReconnectAt = xtime.Now().Unix()
 		}
 		return nil
 	}
@@ -271,10 +272,30 @@ func (this *playerLogic) PlayerCreateActor(ctx context.Context, playerID int64, 
 }
 
 // PlayerDestroyActor 销毁玩家 actor（幂等），Destroy 回调同步注销在线登记。
+// 同时解绑 redis locate（gate/node 路由），防止已删/已下线玩家的路由残留导致
+// locate 表只进不出、网关日志与后台玩家数据对不上。
 func (this *playerLogic) PlayerDestroyActor(ctx context.Context, playerID int64) error {
 	svc.NodeProxy().Kill(actorKindPlayer, playerActorID(playerID))
 	this.PlayerActors.Delete(playerID)
+
+	if nc, ok := ctx.(node.Context); ok {
+		_ = nc.UnbindGate(playerID)
+		_ = nc.UnbindNode(playerID)
+	}
 	return nil
+}
+
+// PlayerDestroyActorIfOffline 断线延迟销毁：仅当玩家在 since（断开时刻）之后未重连时才销毁 actor。
+// 同 uid 重连/互踢场景下旧连接的 Disconnect 不能删掉新连接正在使用的 actor。
+func (this *playerLogic) PlayerDestroyActorIfOffline(ctx context.Context, playerID int64, since int64) error {
+	pa, ok := this.PlayerActors.Get(playerID)
+	if !ok {
+		return nil // actor 已不存在（正常走 LeaveGame 清理），幂等
+	}
+	if pa.ReconnectAt >= since {
+		return nil // 断开后已重连（EnterGame 复用 actor 更新了 ReconnectAt），保留
+	}
+	return this.PlayerDestroyActor(ctx, playerID)
 }
 
 // PlayerKick 踢玩家下线：销毁 actor（注销在线登记）并强制断开网关连接。

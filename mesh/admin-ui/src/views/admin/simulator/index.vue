@@ -144,7 +144,7 @@ const form = reactive({
 
 const session = reactive({
   id: '',
-  playerId: 0,
+  playerId: '',
   token: '',
   gateAddr: ''
 })
@@ -243,7 +243,7 @@ const closeSession = async(silent = false) => {
 
 const reset = async() => {
   await closeSession(true)
-  session.playerId = 0
+  session.playerId = ''
   session.token = ''
   session.gateAddr = ''
   clearSteps(flow)

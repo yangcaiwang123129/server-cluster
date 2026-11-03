@@ -125,7 +125,7 @@ async function load() {
   const res = await listGmRecord({
     action: props.action,
     module: module.value,
-    playerId: toNumber(playerId.value),
+    playerId: playerId.value.trim() || undefined,
     cfgId: toNumber(cfgId.value),
     begin: range.value ? Number(range.value[0]) : undefined,
     end: range.value ? Number(range.value[1]) : undefined,

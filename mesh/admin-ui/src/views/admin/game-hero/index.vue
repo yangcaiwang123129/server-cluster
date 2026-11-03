@@ -281,8 +281,8 @@ const attrDialog = reactive({
 })
 
 const playerIdOrZero = () => {
-  const id = Number(playerId.value)
-  return Number.isInteger(id) && id > 0 ? id : 0
+  const raw = String(playerId.value ?? '').trim()
+  return /^\d+$/.test(raw) && raw !== '0' ? raw : ''
 }
 
 const loadList = async() => {

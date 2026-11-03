@@ -15,6 +15,7 @@ import gameRecord from './game-record'
 import simulator from './simulator'
 import clientVersion from './client-version'
 import cluster from './cluster'
+import activity from './activity'
 
 export default {
   sysUser,
@@ -33,5 +34,6 @@ export default {
   gameRecord,
   simulator,
   clientVersion,
-  cluster
+  cluster,
+  activity
 }

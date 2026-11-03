@@ -29,6 +29,8 @@ type PlayerLogic interface {
 	PlayerCreateActor(ctx context.Context, playerID int64, loginIP string) error
 	// PlayerDestroyActor 玩家销毁actor
 	PlayerDestroyActor(ctx context.Context, playerID int64) error
+	// PlayerDestroyActorIfOffline 断线延迟销毁：仅当玩家在 since 之后未重连时才销毁 actor
+	PlayerDestroyActorIfOffline(ctx context.Context, playerID int64, since int64) error
 	// PlayerKick 玩家踢下线
 	PlayerKick(ctx context.Context, playerID int64) error
 	// GiftBuy 购买礼包（按礼包配置扣除消耗资产并发放奖励）

@@ -15,6 +15,7 @@ import gameRecord from './game-record'
 import simulator from './simulator'
 import clientVersion from './client-version'
 import cluster from './cluster'
+import activity from './activity'
 
 /**
  * The admin section, one module per page under src/views/admin.
@@ -43,5 +44,6 @@ export default {
   gameRecord,
   simulator,
   clientVersion,
-  cluster
+  cluster,
+  activity
 }

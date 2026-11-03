@@ -17,7 +17,7 @@ type SimLoginReq struct {
 // SimLoginResp 账号登录结果，JSON 中的 request/response 为页面展示用的报文。
 type SimLoginResp struct {
 	SessionID string          `json:"sessionId"`
-	PlayerID  int64           `json:"playerId"`
+	PlayerID  int64           `json:"playerId,string"`
 	Token     string          `json:"token"`
 	GateAddr  string          `json:"gateAddr"`
 	TakenMs   int64           `json:"takenMs"`

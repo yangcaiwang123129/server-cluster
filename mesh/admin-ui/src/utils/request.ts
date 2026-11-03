@@ -1,6 +1,7 @@
 import axios from 'axios'
 import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { ElMessageBox, ElMessage } from 'element-plus'
+import JSONBig from 'json-bigint'
 import { useUserStore } from '@/stores/user'
 import { getToken } from '@/utils/auth'
 // No component instance here, so the global composer is the way in; it is a
@@ -38,10 +39,25 @@ const reported = <E extends Error>(error: E): E & { reported: true } =>
 export const asReportedError = (error: unknown): ReportedError =>
   error instanceof Error ? error : new Error(String(error))
 
+// 玩家ID等雪花 int64 超出 JS Number 安全范围（2^53），原生 JSON.parse 会静默
+// 丢失尾数（如 ...7088 被截成 ...100）。json-bigint 以自定义精度解析，超出安全
+// 范围的整数转为字符串、范围内保持 number，前端交互（playerId 均为 string）不受影响。
+const JSONBigParser = JSONBig({ storeAsString: true })
+
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API,
   // withCredentials: true, // send cookies when cross-domain requests
-  timeout: 10000
+  timeout: 10000,
+  transformResponse: [
+    (data: string) => {
+      if (typeof data !== 'string') return data
+      try {
+        return JSONBigParser.parse(data)
+      } catch {
+        return data // 非 JSON（如空体/纯文本）原样返回
+      }
+    }
+  ]
 })
 
 service.interceptors.request.use(

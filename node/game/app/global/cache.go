@@ -1,6 +1,7 @@
 package global
 
 import (
+	"server-cluster/share/enum"
 	"time"
 
 	"server-cluster/internal/cache"
@@ -10,25 +11,25 @@ import (
 // 玩家数据缓存：读走 LRU（miss 回源 MySQL），写异步批量 upsert。
 var (
 	// PlayerCache 玩家账号与货币（player，一玩家一行）
-	PlayerCache = cache.NewPlayerTableCache[model.Player](cache.CacherConfig{Name: "player"})
+	PlayerCache = cache.NewPlayerTableCache[model.Player](cache.CacherConfig{Name: enum.TablePlayer.String()})
 	// PlayerExtraCache 玩家核心数值（player_extra，一玩家一行）
-	PlayerExtraCache = cache.NewPlayerTableCache[model.PlayerExtra](cache.CacherConfig{Name: "player_extra"})
+	PlayerExtraCache = cache.NewPlayerTableCache[model.PlayerExtra](cache.CacherConfig{Name: enum.TablePlayerExtra.String()})
 	// PlayerHeroCache 玩家英雄持有（player_hero，一玩家一行，英雄 map JSON）
-	PlayerHeroCache = cache.NewPlayerTableCache[model.PlayerHero](cache.CacherConfig{Name: "player_hero"})
+	PlayerHeroCache = cache.NewPlayerTableCache[model.PlayerHero](cache.CacherConfig{Name: enum.TablePlayerHero.String()})
 	// PlayerWeaponCache 玩家武器持有（player_weapon，一玩家一行，武器 map JSON）
-	PlayerWeaponCache = cache.NewPlayerTableCache[model.PlayerWeapon](cache.CacherConfig{Name: "player_weapon"})
+	PlayerWeaponCache = cache.NewPlayerTableCache[model.PlayerWeapon](cache.CacherConfig{Name: enum.TablePlayerWeapon.String()})
 	// PlayerSkillCache 玩家技能持有（player_skill，一玩家一行，技能 map JSON）
-	PlayerSkillCache = cache.NewPlayerTableCache[model.PlayerSkill](cache.CacherConfig{Name: "player_skill"})
+	PlayerSkillCache = cache.NewPlayerTableCache[model.PlayerSkill](cache.CacherConfig{Name: enum.TablePlayerSkill.String()})
 	// PlayerEquipCache 玩家装备持有（player_equip，一玩家一行，装备 map JSON）
-	PlayerEquipCache = cache.NewPlayerTableCache[model.PlayerEquip](cache.CacherConfig{Name: "player_equip"})
+	PlayerEquipCache = cache.NewPlayerTableCache[model.PlayerEquip](cache.CacherConfig{Name: enum.TablePlayerEquip.String()})
 	// PlayerItemCache 玩家物品容器（player_item，一玩家一行）
-	PlayerItemCache = cache.NewPlayerTableCache[model.PlayerItem](cache.CacherConfig{Name: "player_item"})
+	PlayerItemCache = cache.NewPlayerTableCache[model.PlayerItem](cache.CacherConfig{Name: enum.TablePlayerItem.String()})
 	// PlayerMailCache 玩家邮件（player_mail，一玩家一行，邮件 map JSON）
-	PlayerMailCache = cache.NewPlayerTableCache[model.PlayerMail](cache.CacherConfig{Name: "player_mail"})
+	PlayerMailCache = cache.NewPlayerTableCache[model.PlayerMail](cache.CacherConfig{Name: enum.TablePlayerMail.String()})
 	// PlayerTaskCache 玩家任务进度（player_task，一玩家一行，任务 map JSON，key=taskId:periodKey）
-	PlayerTaskCache = cache.NewPlayerTableCache[model.PlayerTask](cache.CacherConfig{Name: "player_task"})
+	PlayerTaskCache = cache.NewPlayerTableCache[model.PlayerTask](cache.CacherConfig{Name: enum.TablePlayerTask.String()})
 	// PlayerActivityCache 玩家活动参与（player_activity，一玩家一行，活动 map JSON，key=活动实例ID）
-	PlayerActivityCache = cache.NewPlayerTableCache[model.PlayerActivity](cache.CacherConfig{Name: "player_activity"})
+	PlayerActivityCache = cache.NewPlayerTableCache[model.PlayerActivity](cache.CacherConfig{Name: enum.TableActivity.String()})
 )
 
 // CacheCloseStat 单个玩家数据缓存在停服刷盘时的统计，用于停服日志展示。

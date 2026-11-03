@@ -5,12 +5,8 @@ import (
 	"sort"
 	"time"
 
-	"github.com/dobyte/due/v2/cluster"
-	"github.com/dobyte/due/v2/errors"
 	"github.com/dobyte/due/v2/log"
-	"github.com/dobyte/due/v2/session"
 
-	"server-cluster/internal/svc"
 	"server-cluster/node/game/app/global"
 	"server-cluster/share/consts"
 	"server-cluster/share/convert"
@@ -204,7 +200,7 @@ func (this *taskLogic) TaskAccept(ctx context.Context, playerID int64, req *pb.T
 	pt.SetTask(info)
 	global.PlayerTaskCache.Set(playerID, pt)
 	entry := convert.TaskEntry(cfg, info)
-	notifyTaskEntries(ctx, playerID, []*pb.TaskEntry{entry})
+	global.NotifyTask(ctx, playerID, []*pb.TaskEntry{entry})
 	return &pb.TaskAcceptResp{Entry: entry}, nil
 }
 
@@ -279,7 +275,7 @@ func (this *taskLogic) EmitTaskEvent(ctx context.Context, e global.TaskEvent) {
 		return
 	}
 	global.PlayerTaskCache.Set(e.PlayerID, pt)
-	notifyTaskEntries(ctx, e.PlayerID, changed)
+	global.NotifyTask(ctx, e.PlayerID, changed)
 }
 
 // newTaskInfo 创建任务进度：自动接取进入进行中，手动接取停留在未接取。
@@ -445,26 +441,4 @@ func sortedTaskCfgs() []*tpl.TaskCfg {
 		return list[i].Id < list[j].Id
 	})
 	return list
-}
-
-// notifyTaskEntries 推送任务进度/状态变化；玩家离线只记日志。
-func notifyTaskEntries(ctx context.Context, playerID int64, entries []*pb.TaskEntry) {
-	if playerID <= 0 || len(entries) == 0 {
-		return
-	}
-	if err := svc.NodeProxy().Push(ctx, &cluster.PushArgs{
-		Kind:   session.User,
-		Target: playerID,
-		Ack:    true,
-		Message: &cluster.Message{
-			Route: int32(pb.RouteCode_ROUTE_CODE_TASK_NOTIFY),
-			Data:  &pb.TaskNotify{Entries: entries},
-		},
-	}); err != nil {
-		if errors.Is(err, errors.ErrNotFoundUserLocation) || errors.Is(err, errors.ErrNotFoundSession) {
-			log.Debugf("game: task notify skipped, player offline, player=%d", playerID)
-			return
-		}
-		log.Warnf("game: push task notify failed, player=%d: %v", playerID, err)
-	}
 }

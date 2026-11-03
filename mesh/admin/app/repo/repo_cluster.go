@@ -67,6 +67,9 @@ func (r *Repo) UpdateClusterNodeSSH(m *model.ClusterNode) error {
 
 // SyncClusterNodes 从 etcd registry 同步集群节点到 DB。
 //
+// 写入表名与查询保持一致（model.ClusterNode.TableName()，即 enum.TableCluster），
+// 避免出现「写 A 表、读 B 表」导致列表永远为空的问题。
+//
 // 策略：
 //  1. 入参 instances 是当前 etcd 中仍活着的所有节点（已由上层按 kind 枚举合并）。
 //  2. 批量 Upsert：node_id 已存在则更新 node_name/node_kind/endpoint/services/online=1/updated_at；
@@ -100,7 +103,7 @@ func (r *Repo) SyncClusterNodes(instances []*registry.ServiceInstance) error {
 		})
 	}
 	if len(rows) > 0 {
-		if err := d.Table("gm_cluster_node").Clauses(clause.OnConflict{
+		if err := d.Table(model.ClusterNode{}.TableName()).Clauses(clause.OnConflict{
 			Columns:   []clause.Column{{Name: "node_id"}},
 			DoUpdates: clause.AssignmentColumns([]string{"node_name", "node_kind", "alias", "endpoint", "services", "online", "updated_at"}),
 		}).Create(&rows).Error; err != nil {
@@ -135,7 +138,7 @@ func (r *Repo) markOffline(d *gorm.DB, rows []map[string]any) error {
 		Updates(map[string]any{"online": int8(0), "updated_at": time.Now()}).Error
 }
 
-// EnsureClusterNodesTable 确保 gm_cluster_node 表存在（admin AutoMigrate 已覆盖，这里兜底）。
+// EnsureClusterNodesTable 确保集群节点表存在（admin AutoMigrate 已覆盖，这里兜底）。
 func (r *Repo) EnsureClusterNodesTable() error {
 	d, err := r.db()
 	if err != nil {

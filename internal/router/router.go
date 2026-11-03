@@ -1,10 +1,14 @@
 package router
 
 import (
+	"context"
+	"time"
+
 	"github.com/dobyte/due/v2/cluster"
 	"github.com/dobyte/due/v2/cluster/node"
 	"github.com/dobyte/due/v2/etc"
 	"github.com/dobyte/due/v2/log"
+	"github.com/dobyte/due/v2/utils/xtime"
 
 	"server-cluster/node/game/app/logic"
 	"server-cluster/share/pb"
@@ -79,11 +83,17 @@ func Register(proxy *node.Proxy) {
 	// 玩家 actor 启动时注册业务路由（actor 属于 logic 包，注册器由 handler 注入以避免循环依赖）
 	logic.RegisterActorRouteRegistrar(bindActor)
 
-	// 断线兜底清理：客户端未走 LeaveGame 直接掉线时销毁玩家 actor（销毁幂等）
+	// 断线兜底清理：客户端未走 LeaveGame 直接掉线时销毁玩家 actor（销毁幂等）。
 	proxy.AddEventHandler(cluster.Disconnect, func(ctx node.Context) {
-		if uid := ctx.UID(); uid > 0 {
-			_ = logic.PlayerLogic().PlayerDestroyActor(ctx.Context(), uid)
+		playerID := ctx.UID()
+		if playerID <= 0 {
+			return
 		}
+		disconnectedAt := xtime.Now().Unix()
+		go func() {
+			time.Sleep(10 * time.Second)
+			_ = logic.PlayerLogic().PlayerDestroyActorIfOffline(context.Background(), playerID, disconnectedAt)
+		}()
 	})
 }
 

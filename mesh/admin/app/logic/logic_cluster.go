@@ -54,7 +54,7 @@ var clusterKinds = []string{cluster.Gate.String(), cluster.Node.String(), cluste
 //
 // 并发枚举 gate/node/mesh 三种服务，结果合并去重后一次性 Sync。
 func (this *clusterLogic) Sync(ctx context.Context) error {
-	reg := svc.Registry()
+	reg := svc.Ctx().Registry
 	if reg == nil {
 		log.Warnf("admin: registry not ready, skip cluster sync")
 		return nil
@@ -93,7 +93,10 @@ func (this *clusterLogic) Sync(ctx context.Context) error {
 }
 
 func (this *clusterLogic) List(ctx context.Context, q dto.ClusterNodeQuery, pageIndex, pageSize int) ([]dto.ClusterNodeResp, int64, error) {
-	_ = this.Sync(ctx) // 同步失败不阻塞查询，直接查 DB 现状
+	// 同步失败不阻塞查询，直接查 DB 现状，但必须留下错误日志便于定位
+	if err := this.Sync(ctx); err != nil {
+		log.Warnf("admin: sync cluster nodes failed: %v", err)
+	}
 	list, total, err := repo.R().ListClusterNodes(clusterNodeQuery(q), pageIndex, pageSize)
 	if err != nil {
 		return nil, 0, err
@@ -106,8 +109,10 @@ func (this *clusterLogic) Get(ctx context.Context, nodeID string) (*dto.ClusterN
 	if err != nil {
 		return nil, err
 	}
-	// 详情接口顺带触发一次 Sync（同步失败静默），刷新 online 标记
-	_ = this.Sync(ctx)
+	// 详情接口顺带触发一次 Sync（失败只记日志），刷新 online 标记
+	if err := this.Sync(ctx); err != nil {
+		log.Warnf("admin: sync cluster nodes failed: %v", err)
+	}
 	return toClusterNodeResp(m), nil
 }
 

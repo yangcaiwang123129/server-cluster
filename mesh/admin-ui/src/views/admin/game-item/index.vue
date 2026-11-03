@@ -362,8 +362,8 @@ const containerTypeLabel = (type: number) => {
 }
 
 const playerIdOrZero = () => {
-  const id = Number(query.playerId)
-  return Number.isInteger(id) && id > 0 ? id : 0
+  const raw = String(query.playerId ?? '').trim()
+  return /^\d+$/.test(raw) && raw !== '0' ? raw : ''
 }
 
 const applyItemContainers = (list?: GmItem[]) => {

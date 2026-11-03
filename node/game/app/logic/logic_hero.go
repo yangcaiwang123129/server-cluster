@@ -166,7 +166,7 @@ func (this *heroLogic) HeroAdd(ctx context.Context, playerID int64, req *pb.Hero
 	if err != nil {
 		return nil, err
 	}
-	notifyHeroEntry(ctx, playerID, entry)
+	global.NotifyHero(ctx, playerID, entry)
 	return &pb.HeroAddResp{HeroEntry: entry}, nil
 }
 
@@ -219,7 +219,7 @@ func (this *heroLogic) HeroUpdate(ctx context.Context, playerID int64, req *pb.H
 	for _, id := range unsetHeroIDs {
 		notifyHero(ctx, playerID, id)
 	}
-	notifyHeroEntry(ctx, playerID, entry)
+	global.NotifyHero(ctx, playerID, entry)
 	return &pb.HeroUpdateResp{HeroEntry: entry}, nil
 }
 
@@ -285,7 +285,7 @@ func (this *heroLogic) HeroUpgrade(ctx context.Context, playerID int64, req *pb.
 	if err != nil {
 		return nil, err
 	}
-	notifyHeroEntry(ctx, playerID, entry)
+	global.NotifyHero(ctx, playerID, entry)
 	return &pb.HeroUpgradeResp{HeroEntry: entry, Attribute: attr}, nil
 }
 

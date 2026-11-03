@@ -8,7 +8,7 @@
       <template #search>
         <el-form-item :label="$t('admin.player.playerId')">
           <el-input
-            v-model.number="table.query.playerId"
+            v-model="table.query.playerId"
             :placeholder="$t('admin.player.playerIdPlaceholder')"
             clearable
             @keyup.enter="table.search"
@@ -572,7 +572,7 @@ const resetSearch = () => {
 // 封号弹窗
 const banFormRef = ref<FormInstance>()
 const banDialog = reactive({ visible: false, player: null as Player | null })
-const banForm = reactive<PlayerBanReq>({ playerId: 0, duration: 0, reason: '' })
+const banForm = reactive<PlayerBanReq>({ playerId: '', duration: 0, reason: '' })
 const banRules: FormRules = {
   reason: [{ required: true, message: () => t('admin.player.banReasonRequired'), trigger: 'blur' }]
 }
@@ -623,7 +623,7 @@ const submitUnban = async(row: Player) => {
 // 重置密码弹窗
 const pwdFormRef = ref<FormInstance>()
 const pwdDialog = reactive({ visible: false, player: null as Player | null })
-const pwdForm = reactive<PlayerResetPasswordReq>({ playerId: 0, newPassword: '' })
+const pwdForm = reactive<PlayerResetPasswordReq>({ playerId: '', newPassword: '' })
 const pwdRules: FormRules = {
   newPassword: [
     { required: true, message: () => t('admin.player.pwdRequired'), trigger: 'blur' },

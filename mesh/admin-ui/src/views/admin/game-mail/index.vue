@@ -294,7 +294,7 @@ const playerLoading = ref(false)
 const sendDialog = reactive({
   visible: false,
   loading: false,
-  playerIds: [] as number[],
+  playerIds: [] as string[],
   title: '',
   content: '',
   attachments: [newAttachmentRow()] as AttachmentRow[]
@@ -305,18 +305,18 @@ function newAttachmentRow(): AttachmentRow {
 }
 
 const playerIdOrZero = () => {
-  const id = Number(playerId.value)
-  return Number.isInteger(id) && id > 0 ? id : 0
+  const raw = String(playerId.value ?? '').trim()
+  return /^\d+$/.test(raw) && raw !== '0' ? raw : ''
 }
 
 // 玩家下拉远程搜索：纯数字按玩家ID精确匹配，其余按账号模糊匹配。
 const searchPlayers = async(keyword: string) => {
   playerLoading.value = true
-  const params: { pageIndex: number; pageSize: number; playerId?: number; username?: string } = {
+  const params: { pageIndex: number; pageSize: number; playerId?: string; username?: string } = {
     pageIndex: 1,
     pageSize: 20
   }
-  if (/^\d+$/.test(keyword)) params.playerId = Number(keyword)
+  if (/^\d+$/.test(keyword)) params.playerId = keyword
   else if (keyword) params.username = keyword
   const res = await listPlayer(params).catch(() => null)
   playerLoading.value = false
@@ -443,7 +443,7 @@ const submitSend = async() => {
 
 const senderIncludesCurrentPlayer = () => {
   const id = playerIdOrZero()
-  return id > 0 && sendDialog.playerIds.includes(id)
+  return id !== '' && sendDialog.playerIds.includes(id)
 }
 
 const statusText = (s?: number) => {

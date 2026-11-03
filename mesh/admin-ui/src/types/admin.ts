@@ -213,7 +213,7 @@ export interface SysOperaLog {
 
 /** Filters the player list accepts. */
 export interface PlayerQuery {
-  playerId?: number
+  playerId?: string
   username?: string
   phoneNumber?: string
   /** 0 全部 1 正常 2 封号 */
@@ -225,7 +225,7 @@ export interface PlayerQuery {
 
 /** A player account row from the player table. Timestamps are unix milliseconds. */
 export interface Player {
-  playerId?: number
+  playerId?: string
   username?: string
   /** nickname from player_extra */
   nickname?: string
@@ -253,7 +253,7 @@ export interface Player {
 
 /** A player currently online, as reported by the game node. */
 export interface OnlinePlayer {
-  playerId?: number
+  playerId?: string
   enterTime?: number
   /** lobby (game) node instance id the player resides on */
   lobbyNodeId?: string
@@ -262,15 +262,15 @@ export interface OnlinePlayer {
 
 /** GM 封号请求：duration 单位秒，0 = 永久 */
 export interface PlayerBanReq {
-  playerId: number
+  playerId: string
   duration: number
   reason: string
 }
 
-export interface PlayerUnbanReq { playerId: number }
+export interface PlayerUnbanReq { playerId: string }
 
 export interface PlayerResetPasswordReq {
-  playerId: number
+  playerId: string
   newPassword: string
 }
 
@@ -316,7 +316,7 @@ export interface GmItemEntry {
 }
 
 export interface GmItem {
-  playerId?: number
+  playerId?: string
   containerType?: number
   gridW?: number
   gridH?: number
@@ -428,7 +428,7 @@ export interface GmMail {
 
 /** A record row from game_record (item/equip/weapon/skill/hero gain or consume). */
 export interface GmRecord {
-  playerId?: number
+  playerId?: string
   /** 1 gain, 2 consume. */
   action?: number
   cfgId?: number
@@ -467,7 +467,7 @@ export interface SimLoginPayload {
 /** 账号登录结果，request/response 为展示用报文。 */
 export interface SimLoginResult {
   sessionId: string
-  playerId: number
+  playerId: string
   token: string
   gateAddr: string
   takenMs: number
@@ -540,4 +540,56 @@ export interface ClusterExecResp {
   exitCode?: number
   stdout?: string
   stderr?: string
+}
+
+/** 运营活动实例（gm_activity 表 + 模板名聚合）。 */
+export interface GmActivity {
+  id?: number
+  cfgId?: number
+  cfgName?: string
+  round?: number
+  startTime?: number
+  endTime?: number
+  /** 见后端 consts.ActivityStatus*：0未开启 1已开启 2已结束 3已取消 */
+  status?: number
+  source?: number
+  createdBy?: string
+  remark?: string
+  createdAt?: number
+  updatedAt?: number
+}
+
+export interface GmActivityQuery {
+  cfgId?: number
+  /** 缺省为全部 */
+  status?: number
+}
+
+/** 活动模板配置（Luban 配置表聚合展示）。 */
+export interface GmActivityCfg {
+  id?: number
+  name?: string
+  desc?: string
+  icon?: string
+  /** 见 tpl.StrategyType */
+  strategyType?: number
+  strategyStartValue?: string
+  strategyEndValue?: string
+  roundCount?: number
+  triggerLogicType?: number
+  triggerConditions?: GmActivityCondition[]
+  rewards?: GmActivityAsset[]
+  taskCount?: number
+}
+
+export interface GmActivityCondition {
+  /** 见 tpl.ConditionType */
+  type?: number
+  args?: number
+}
+
+export interface GmActivityAsset {
+  type?: number
+  id?: number
+  count?: number
 }
