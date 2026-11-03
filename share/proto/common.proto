@@ -17,6 +17,7 @@ enum RouteCode {
   ROUTE_CODE_GIFT_BUY = 10004; // 购买礼包
   ROUTE_CODE_EXCHANGE = 10005; // 兑换
   ROUTE_CODE_RECHARGE = 10006; // 充值（当前为假充值，直接发放奖励）
+  ROUTE_CODE_ATTR_OPERATE = 10007; // 属性操作（按属性类型更新/领取）
 
   // 玩家物品 10500~10599
   ROUTE_CODE_ITEM_LIST = 10500;  // 物品容器列表
@@ -97,8 +98,8 @@ enum ErrCode {
   ERR_CODE_TASK_ALREADY_CLAIMED = 4103;     // 任务已领奖
   ERR_CODE_TASK_EXPIRED = 4104;             // 任务周期已过期
   ERR_CODE_TASK_NOT_ACCEPTED = 4105;        // 任务未接取
-  // 世界（活动/任务快照）
-  ERR_CODE_WORLD_UNAVAILABLE = 4201;        // 世界快照未就绪
+  // 活动（活动/任务快照）
+  ERR_CODE_ACTIVITY_UNAVAILABLE = 4201;     // 活动快照未就绪
 }
 
 //  ========== 通知类型 ==========
@@ -117,6 +118,12 @@ enum ContainerType {
   CONTAINER_TYPE_SECURE = 3;   // 保险箱（局内随身，不掉落）
 }
 
+//  ========== 属性动作类型 ==========
+enum AttrOperate {
+  UPDATE = 0; // 更新
+  CLAIM = 1; // 领取
+}
+
 //  ========== 属性枚举 ==========
 enum Attr {
   // 1~999 玩家相关属性
@@ -128,7 +135,8 @@ enum Attr {
   PLAYER_ATTR_VIP_EXP = 5;   // vip经验：int64
   PLAYER_ATTR_COIN = 6;      // 币：int64
   PLAYER_ATTR_GOLD = 7;      // 金：int64
-
+  PLAYER_ATTR_SIGNATURE = 8;      // 个性签名：string
+  PLAYER_ATTR_SETTINGS_JSON = 9;      // 个人设置：string
   // 1000~4999 任务/成就进度与领奖标记
   // 5000~9999 活动状态标记
   // 10001~20000 红点相关属性

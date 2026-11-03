@@ -56,7 +56,7 @@ func Init() error {
 		if err := syncMenus(gdb); err != nil {
 			return err
 		}
-		// 启动内嵌 World 模块（活动状态机 + Redis 快照发布）
+		// 启动内嵌活动模块（活动状态机 + Redis 快照发布）
 		if err := logic.Activity().Start(context.Background()); err != nil {
 			return err
 		}

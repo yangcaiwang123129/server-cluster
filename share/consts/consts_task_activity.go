@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// 活动/任务系统常量：状态、来源、玩家任务状态、周期 key 与 World 快照通道。
+// 活动/任务系统常量：状态、来源、玩家任务状态、周期 key 与活动快照通道。
 // 配置枚举（策略/任务类型/目标类型/接取领取方式/条件）统一使用 share/tpl 生成代码。
 // 全局单服，活动实例无 zone 维度。
 
@@ -16,12 +16,13 @@ const (
 	ActivityStatusRunning    int32 = 1 // 已开启
 	ActivityStatusEnded      int32 = 2 // 已结束
 	ActivityStatusCancelled  int32 = 3 // 已取消（不结算）
+	// ActivityStatusAll GM 列表查询专用：不过滤状态。
+	ActivityStatusAll int32 = -1
 )
 
 // 活动实例来源（activity_instance.source）。
 const (
 	ActivitySourceConfig int32 = 1 // 配置自动生成
-	ActivitySourceGm     int32 = 2 // GM 手动创建
 )
 
 // 玩家任务状态（player_task.status）。
@@ -34,18 +35,18 @@ const (
 
 // 活动调度与快照通道。
 const (
-	// WorldTickInterval admin 内 World 模块的状态推进间隔。
-	WorldTickInterval = time.Second
-	// WorldSnapshotInterval game 节点读取 Redis 快照的间隔。
-	WorldSnapshotInterval = 10 * time.Second
-	// WorldSnapshotVersionKey 快照版本号。
-	WorldSnapshotVersionKey = "sc:world:snapshot:version"
-	// WorldSnapshotPayloadKey 快照 JSON。
-	WorldSnapshotPayloadKey = "sc:world:snapshot:payload"
-	// WorldChangeChannel admin 发布快照后广播版本号；game 订阅后立即拉取，降低轮询延迟。
-	WorldChangeChannel = "sc:world:changed"
-	// WorldResetHour 每日/每周重置小时（本地时区）。
-	WorldResetHour = 0
+	// ActivityTickInterval admin 活动模块的状态推进间隔。
+	ActivityTickInterval = time.Second
+	// ActivitySnapshotInterval game 节点读取 Redis 活动快照的间隔。
+	ActivitySnapshotInterval = 10 * time.Second
+	// ActivitySnapshotVersionKey 活动快照版本号。
+	ActivitySnapshotVersionKey = "sc:activity:snapshot:version"
+	// ActivitySnapshotPayloadKey 活动快照 JSON。
+	ActivitySnapshotPayloadKey = "sc:activity:snapshot:payload"
+	// ActivityChangeChannel admin 发布快照后广播版本号；game 订阅后立即拉取，降低轮询延迟。
+	ActivityChangeChannel = "sc:activity:changed"
+	// ActivityResetHour 每日/每周重置小时（本地时区）。
+	ActivityResetHour = 0
 )
 
 // DailyKey 返回毫秒时间戳对应的日常周期 key（形如 20261102）。

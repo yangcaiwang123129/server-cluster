@@ -33,14 +33,6 @@
                 <el-input v-model="form.loginAddr" :placeholder="t('admin.simulator.loginAddrPlaceholder')" clearable />
               </el-form-item>
             </el-col>
-            <el-col :xs="24" :sm="24" :md="12">
-              <el-form-item :label="t('admin.simulator.mode')">
-                <el-radio-group v-model="form.mode">
-                  <el-radio value="login">{{ t('admin.simulator.modeLogin') }}</el-radio>
-                  <el-radio value="register">{{ t('admin.simulator.modeRegister') }}</el-radio>
-                </el-radio-group>
-              </el-form-item>
-            </el-col>
             <el-col :xs="24" :sm="12" :md="6">
               <el-form-item :label="t('admin.simulator.username')">
                 <el-input v-model="form.username" :placeholder="t('admin.simulator.usernamePlaceholder')" clearable />
@@ -145,7 +137,6 @@ interface StepState {
 const { t } = useI18n()
 
 const form = reactive({
-  mode: 'login' as 'login' | 'register',
   username: '',
   password: '',
   loginAddr: ''
@@ -278,7 +269,6 @@ const runStep = async(key: StepKey): Promise<boolean> => {
 
       await closeSession(true)
       const res = await simLogin({
-        mode: form.mode,
         username: form.username.trim(),
         password: form.password,
         loginAddr: form.loginAddr.trim()

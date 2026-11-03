@@ -16,10 +16,10 @@ import (
 	"server-cluster/share/tpl"
 )
 
-// worldSync game 节点侧 World 快照同步器：每 10s 读 Redis，版本变化才拉取 payload。
-// admin 内嵌 World 模块是唯一写入者，game 只读缓存。
-// 同时订阅 sc:world:changed 通道，admin 发布后立即拉取，10s 轮询作为兜底。
-type worldSync struct {
+// activitySync game 节点侧活动快照同步器：每 10s 读 Redis，版本变化才拉取 payload。
+// admin 活动模块是唯一写入者，game 只读缓存。
+// 同时订阅 sc:activity:changed 通道，admin 发布后立即拉取，10s 轮询作为兜底。
+type activitySync struct {
 	mu      sync.RWMutex
 	snap    *dto.ActivitySnapshot
 	version int64
@@ -27,13 +27,13 @@ type worldSync struct {
 	lastErr string
 }
 
-var worldSyncInst = &worldSync{}
+var activitySyncInst = &activitySync{}
 
-// WorldSync 获取快照同步器单例。
-func WorldSync() *worldSync { return worldSyncInst }
+// ActivitySync 获取活动快照同步器单例。
+func ActivitySync() *activitySync { return activitySyncInst }
 
 // Start 启动轮询（game main 在容器 Serve 前调用）。
-func (this *worldSync) Start(ctx context.Context) {
+func (this *activitySync) Start(ctx context.Context) {
 	this.mu.Lock()
 	if this.cancel != nil {
 		this.mu.Unlock()
@@ -50,7 +50,7 @@ func (this *worldSync) Start(ctx context.Context) {
 }
 
 // Stop 停止轮询。
-func (this *worldSync) Stop() {
+func (this *activitySync) Stop() {
 	this.mu.Lock()
 	cancel := this.cancel
 	this.cancel = nil
@@ -61,7 +61,7 @@ func (this *worldSync) Stop() {
 }
 
 // Snapshot 返回最近一次快照副本；未就绪返回 nil。
-func (this *worldSync) Snapshot() *dto.ActivitySnapshot {
+func (this *activitySync) Snapshot() *dto.ActivitySnapshot {
 	this.mu.RLock()
 	defer this.mu.RUnlock()
 	if this.snap == nil {
@@ -72,8 +72,8 @@ func (this *worldSync) Snapshot() *dto.ActivitySnapshot {
 	return &cp
 }
 
-func (this *worldSync) loop(ctx context.Context) {
-	t := time.NewTicker(consts.WorldSnapshotInterval)
+func (this *activitySync) loop(ctx context.Context) {
+	t := time.NewTicker(consts.ActivitySnapshotInterval)
 	defer t.Stop()
 	for {
 		select {
@@ -85,15 +85,15 @@ func (this *worldSync) loop(ctx context.Context) {
 	}
 }
 
-// subscribe 订阅 sc:world:changed；收到版本号信号立即触发同步。
+// subscribe 订阅 sc:activity:changed；收到版本号信号立即触发同步。
 // go-redis PubSub 内部自动重连；循环仅在 ctx 取消或订阅对象不可用时退出。
-func (this *worldSync) subscribe(ctx context.Context) {
+func (this *activitySync) subscribe(ctx context.Context) {
 	rdb, err := svc.Ctx().Redis.Default()
 	if err != nil {
 		this.warnOnce("redis unavailable: " + err.Error())
 		return
 	}
-	sub := rdb.Subscribe(ctx, consts.WorldChangeChannel)
+	sub := rdb.Subscribe(ctx, consts.ActivityChangeChannel)
 	defer sub.Close()
 	ch := sub.Channel()
 	for {
@@ -110,13 +110,13 @@ func (this *worldSync) subscribe(ctx context.Context) {
 }
 
 // sync 读取版本号；版本变化才拉取 payload 并更新本地缓存。
-func (this *worldSync) sync(ctx context.Context) {
+func (this *activitySync) sync(ctx context.Context) {
 	rdb, err := svc.Ctx().Redis.Default()
 	if err != nil {
 		this.warnOnce(err.Error())
 		return
 	}
-	ver, err := rdb.Get(ctx, consts.WorldSnapshotVersionKey).Int64()
+	ver, err := rdb.Get(ctx, consts.ActivitySnapshotVersionKey).Int64()
 	if err == redis.Nil {
 		return // admin 尚未发布快照
 	}
@@ -130,14 +130,14 @@ func (this *worldSync) sync(ctx context.Context) {
 	if ver == cur {
 		return
 	}
-	raw, err := rdb.Get(ctx, consts.WorldSnapshotPayloadKey).Bytes()
+	raw, err := rdb.Get(ctx, consts.ActivitySnapshotPayloadKey).Bytes()
 	if err != nil {
 		this.warnOnce(err.Error())
 		return
 	}
 	var snap dto.ActivitySnapshot
 	if err := json.Unmarshal(raw, &snap); err != nil {
-		this.warnOnce("decode world snapshot: " + err.Error())
+		this.warnOnce("decode activity snapshot: " + err.Error())
 		return
 	}
 	if snap.Version != ver {
@@ -152,12 +152,12 @@ func (this *worldSync) sync(ctx context.Context) {
 	this.mu.Unlock()
 
 	changed := diffActivities(old, &snap)
-	log.Infof("game: world snapshot updated version=%d activities=%d changed=%d daily=%s weekly=%s",
-		ver, len(snap.Activities), changed, snap.DailyKey, snap.WeeklyKey)
+	log.Infof("game: activity snapshot updated version=%d activities=%d changed=%d daily=%s weekly=%s monthly=%s",
+		ver, len(snap.Activities), changed, snap.DailyKey, snap.WeeklyKey, snap.MonthlyKey)
 }
 
 // Activities 从快照构建活动列表（键为实例ID，已取消的不下发）；快照未就绪返回 nil。
-func (this *worldSync) Activities() map[int64]*pb.ActivityEntry {
+func (this *activitySync) Activities() map[int64]*pb.ActivityEntry {
 	snap := this.Snapshot()
 	if snap == nil {
 		return nil
@@ -168,7 +168,7 @@ func (this *worldSync) Activities() map[int64]*pb.ActivityEntry {
 			continue
 		}
 		entry := &pb.ActivityEntry{
-			InstanceId: a.InstanceID,
+			InstanceId: a.ID,
 			CfgId:      a.CfgID,
 			Status:     a.Status,
 			StartTime:  a.StartTime,
@@ -180,7 +180,7 @@ func (this *worldSync) Activities() map[int64]*pb.ActivityEntry {
 			entry.Icon = cfg.Icon
 			entry.Desc = cfg.Desc
 		}
-		out[a.InstanceID] = entry
+		out[a.ID] = entry
 	}
 	if len(out) == 0 {
 		return nil
@@ -189,13 +189,13 @@ func (this *worldSync) Activities() map[int64]*pb.ActivityEntry {
 }
 
 // warnOnce 相同错误只告警一次，避免 Redis 不可用时刷屏。
-func (this *worldSync) warnOnce(msg string) {
+func (this *activitySync) warnOnce(msg string) {
 	this.mu.Lock()
 	dup := this.lastErr == msg
 	this.lastErr = msg
 	this.mu.Unlock()
 	if !dup {
-		log.Warnf("game: world snapshot sync failed: %s", msg)
+		log.Warnf("game: activity snapshot sync failed: %s", msg)
 	}
 }
 
@@ -206,11 +206,11 @@ func diffActivities(old, cur *dto.ActivitySnapshot) int {
 	}
 	prev := make(map[int64]int32, len(old.Activities))
 	for _, a := range old.Activities {
-		prev[a.InstanceID] = a.Status
+		prev[a.ID] = a.Status
 	}
 	n := 0
 	for _, a := range cur.Activities {
-		if s, ok := prev[a.InstanceID]; !ok || s != a.Status {
+		if s, ok := prev[a.ID]; !ok || s != a.Status {
 			n++
 		}
 	}

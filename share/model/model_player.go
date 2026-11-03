@@ -55,16 +55,17 @@ func (this PlayerAuth) Value() (driver.Value, error) { return ValueJSON(this) }
 
 // PlayerExtra 玩家拓展表
 type PlayerExtra struct {
-	PlayerID     int64  `gorm:"column:player_id;type:bigint;not null;primaryKey;comment:玩家ID" json:"player_id"`
-	Nickname     string `gorm:"column:nickname;type:varchar(64);not null;default:'';comment:昵称" json:"nickname"`
-	AvatarID     string `gorm:"column:avatar_id;type:varchar(200);not null;default:'';comment:头像" json:"avatar_id"`
-	Level        int32  `gorm:"column:level;type:int;not null;default:1;comment:等级" json:"level"`
-	Exp          int64  `gorm:"column:exp;type:bigint;not null;default:0;comment:经验" json:"exp"`
-	VipLevel     int32  `gorm:"column:vip_level;type:int;not null;default:1;comment:vip等级" json:"vipLevel"`
-	VipExp       int64  `gorm:"column:vip_exp;type:bigint;not null;default:0;comment:vip经验" json:"vipExp"`
-	TotalRecharge int64 `gorm:"column:total_recharge;type:bigint;not null;default:0;comment:累计充值次数" json:"totalRecharge"`
-	SettingsJSON string `gorm:"column:settings_json;type:json;comment:个性化设置(JSON)" json:"settings_json"`
-	TableModel   `gorm:"embedded"`
+	PlayerID      int64  `gorm:"column:player_id;type:bigint;not null;primaryKey;comment:玩家ID" json:"player_id"`
+	Nickname      string `gorm:"column:nickname;type:varchar(64);not null;default:'';comment:昵称" json:"nickname"`
+	AvatarID      string `gorm:"column:avatar_id;type:varchar(200);not null;default:'';comment:头像" json:"avatar_id"`
+	Level         int32  `gorm:"column:level;type:int;not null;default:1;comment:等级" json:"level"`
+	Exp           int64  `gorm:"column:exp;type:bigint;not null;default:0;comment:经验" json:"exp"`
+	VipLevel      int32  `gorm:"column:vip_level;type:int;not null;default:1;comment:vip等级" json:"vipLevel"`
+	VipExp        int64  `gorm:"column:vip_exp;type:bigint;not null;default:0;comment:vip经验" json:"vipExp"`
+	TotalRecharge int64  `gorm:"column:total_recharge;type:bigint;not null;default:0;comment:累计充值次数" json:"totalRecharge"`
+	Signature     string `gorm:"column:signature;type:varchar(500);not null;default:'';comment:个性签名" json:"signature"`
+	SettingsJSON  string `gorm:"column:settings_json;type:json;comment:个性化设置(JSON)" json:"settings_json"`
+	TableModel    `gorm:"embedded"`
 }
 
 func (this *PlayerExtra) Marshal() ([]byte, error)    { return json.Marshal(this) }

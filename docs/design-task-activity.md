@@ -10,25 +10,25 @@
 | # | 结论 |
 |---|---|
 | 1 | **游戏是全球单服**：不存在按 zone 分服的活动实例，所有玩家共享同一套活动与周期 |
-| 2 | **World 模块内嵌在常驻的 `mesh/admin` 进程里**，不新增独立进程。admin 负责全局时间边界、活动状态、全服计数、结算与快照发布 |
-| 3 | **不引入配置中心**（Apollo/Nacos/自建 config service）：Luban 静态配置随版本编译，天然一致；运营可变参数（活动时间/开关）放 DB，由 admin 内的 World 模块统一裁决 |
+| 2 | **活动模块内嵌在常驻的 `mesh/admin` 进程里**，不新增独立进程。admin 负责全局时间边界、活动状态、全服计数、结算与快照发布 |
+| 3 | **不引入配置中心**（Apollo/Nacos/自建 config service）：Luban 静态配置随版本编译，天然一致；运营可变参数（活动时间/开关）放 DB，由 admin 内的活动模块统一裁决 |
 | 4 | **静态表不做热更**：配置与代码强耦合，改表即发版；需要热更的仅限活动时间/开关等运行时数据 |
 | 5 | **玩家数据留在 game 节点**（player_task / player_activity），按玩家 actor 串行；admin 只发布「时间上下文 + 活动快照」 |
 | 6 | **分发通道用 Redis 快照**：admin 把 `version + payload` 写入固定 Redis key，game 节点每 10s 读取（版本未变只读 version），避免 admin 承担 gRPC provider 职责 |
-| 7 | **每日/每周重置由 admin 内的 World 模块统一计算周期 key 下发**，禁止各节点自己算时间，杜绝跨天不一致 |
+| 7 | **每日/每周重置由 admin 内的活动模块统一计算周期 key 下发**，禁止各节点自己算时间，杜绝跨天不一致 |
 | 8 | **etcd 不做业务状态总线**：它只负责服务注册发现；活动/任务状态一律走 MySQL（权威持久化）+ Redis（快照分发） |
 
 一句话架构：
 
 ```
             ┌────────────────────────────────────────────┐
-            │  mesh/admin（常驻，内嵌 World 模块）           │
+            │  mesh/admin（常驻，内嵌 活动模块）           │
             │  · 活动实例状态机（未开启→已开启→已结束）      │
             │  · 周期边界（dailyKey / weeklyKey）          │
             │  · 全服任务计数 / 结算发奖                    │
             │  · 活动快照 → Redis(version + payload)       │
-            │  · PUBLISH sc:world:changed 版本信号          │
-            │  · GM HTTP 接口（同进程直接调用 World 逻辑）   │
+            │  · PUBLISH sc:activity:changed 版本信号          │
+            │  · GM HTTP 接口（同进程直接调用 活动逻辑）   │
             └───────────────┬────────────────────────────┘
                             │ Redis 快照（10s 轮询兜底）
                             │ + Pub/Sub 信号立即拉取
@@ -53,8 +53,8 @@
 | 活动状态 | `未开启` → `已开启` → `已结束`，切换时产生「活动开启 / 活动结束」事件 |
 | 活动时间 | 每个活动实例有 `开始时间` / `结束时间` |
 | 活动轮询 | 到点自动开启、到点自动结束；轮询需幂等、单点执行 |
-| 开服策略 | 固定时间、每周循环、仅 GM 手动创建 |
-| 后台运行活动 | GM 手动创建、手动开启、提前结束、修改时间、取消 |
+| 开服策略 | 指定时间、每日、每周、每月循环，按策略自动生成实例 |
+| 后台运行活动 | 查看实例、修改时间、提前结束（GM 菜单「运营活动」） |
 | 活动关联任务 | 一个活动挂一组子任务；「签到活动」= 活动类型=签到 + 每日签到子任务 |
 
 ### 1.2 任务系统
@@ -64,19 +64,19 @@
 | 任务类型 `taskType` | 主线、日常、周常、活动任务、（本期新增）全服任务 |
 | 目标任务类型 `targetTaskType` | 击杀、登录、充值、消费、累计在线、签到等「进度来源」 |
 | 任务时间触发 | 按时间窗口开放/重置（每日、每周、活动周期） |
-| 任务进度 | 玩家级事件驱动推进；时间类指标轮询兜底；全服类由 World 累计 |
+| 任务进度 | 玩家级事件驱动推进；时间类指标轮询兜底；全服类由活动模块累计 |
 
 ### 1.3 全局服带来的关键差异（对比滚服方案）
 
 | 维度 | 滚服（旧方案） | **全球单服（本方案）** |
 |---|---|---|
 | 活动实例维度 | 按 `zone` 各自一套 | **全局一套**，无 zone 字段 |
-| 状态推进 | 各节点 CAS 抢状态 | **World 单写者推进**，DB 仅持久化 |
-| 全服广播 | 各节点各自广播本地玩家 | World 更新快照 → 各 game 节点拉取 → 广播本地玩家 |
-| 时间边界 | 各节点自己算 | **World 统一计算 dailyKey/weeklyKey 下发** |
-| 全服任务 | 无法做 | World 累计全服计数 |
-| 排行榜 | 分服榜 | World 统一全球榜 |
-| 结算 | 每服各结 | **World 单次结算**，邮件下发 |
+| 状态推进 | 各节点 CAS 抢状态 | **活动模块单写者推进**，DB 仅持久化 |
+| 全服广播 | 各节点各自广播本地玩家 | 活动模块更新快照 → 各 game 节点拉取 → 广播本地玩家 |
+| 时间边界 | 各节点自己算 | **活动模块统一计算 dailyKey/weeklyKey 下发** |
+| 全服任务 | 无法做 | 活动模块累计全服计数 |
+| 排行榜 | 分服榜 | 活动模块统一全球榜 |
+| 结算 | 每服各结 | **活动模块单次结算**，邮件下发 |
 
 ---
 
@@ -85,41 +85,41 @@
 **不引入独立配置中心进程（Apollo / Nacos / 自建 config service），也不做静态表热更。** 理由：
 
 1. **一致性靠编译期**：Luban 配置内嵌进二进制，所有节点必然同一版本，比配置中心下发更不容易出错。
-2. **动态性靠 DB**：活动时间、手动开关本身就是运行时数据，写在 `activity_instance` 里，World 每 tick 读取，GM 改完即生效。
+2. **动态性靠 DB**：活动时间、手动开关本身就是运行时数据，写在 `activity_instance` 里，活动模块每 tick 读取，GM 改完即生效。
 3. **配置与代码强耦合**：任务/活动模板的字段、枚举、引用关系和代码绑定，热更静态表容易导致老二进制解析新配置出错。改表即发版是最稳妥的策略。
 4. **多进程只会增加故障面**：单服项目体量下，多一个配置中心 = 多一个要部署、要监控、要保证可用的组件。
 
-> 活动实例这类**运行时全局状态**由 World（admin 内嵌）持有和裁决，不属于「配置中心」范畴，见第 3 节。
+> 活动实例这类**运行时全局状态**由活动模块（admin 内嵌）持有和裁决，不属于「配置中心」范畴，见第 3 节。
 
 ---
 
-## 3. World 模块（内嵌 admin）
+## 3. 活动模块（内嵌 admin）
 
-> **命名说明：内部称 World（世界服模块），不叫配置中心，但它不是独立进程。**
-> 判据是「它挂了玩家还能不能正常游戏」：配置中心挂掉只影响新配置下发，游戏照跑；World 挂掉则活动不开、全服任务停摆 —— 它是**运行时依赖**，属于游戏服，不属于基础设施。
+> **命名说明：内部称「活动模块」，不叫配置中心，但它不是独立进程。**
+> 判据是「它挂了玩家还能不能正常游戏」：配置中心挂掉只影响新配置下发，游戏照跑；活动模块挂掉则活动不开、全服任务停摆 —— 它是**运行时依赖**，属于游戏服，不属于基础设施。
 > 「配置中心」描述的是对外功能（存配置、发配置），会让人误以为它可以被 Nacos/Apollo 替换；而本项目要建的是「全局游戏状态的所有者」，天然包含活动状态机、结算、全服计数、排行。名字必须描述**它拥有的状态**，而不是**它提供的一项功能**。
 
 ### 3.1 职责边界
 
 | 能力 | 归属 | 说明 |
 |---|---|---|
-| 活动实例生成 | **admin 内 World 模块** | 按开服策略 + GM 手动创建 |
-| 活动状态推进 | **admin 内 World 模块** | 常驻进程内单 goroutine tick，无需 CAS 抢锁 |
-| 周期边界计算 | **admin 内 World 模块** | 产出 `dailyKey=20261102` / `weeklyKey=2026W44` / `monthlyKey=202611`，随快照下发 |
-| 活动快照发布 | **admin 内 World 模块** | 写 Redis `version + payload`，供 game 轮询 |
-| 全服任务计数 | **admin 内 World 模块** | 如「全服累计击杀 100 万」 |
-| 结算发奖 | **admin 内 World 模块** | 结束事件触发，通过邮件/资产接口下发 |
-| GM 管理接口 | **admin HTTP handler** | 同进程直接调用 World 逻辑，不经过 RPC |
+| 活动实例生成 | **admin 内活动模块** | 按开服策略自动生成 |
+| 活动状态推进 | **admin 内活动模块** | 常驻进程内单 goroutine tick，无需 CAS 抢锁 |
+| 周期边界计算 | **admin 内活动模块** | 产出 `dailyKey=20261102` / `weeklyKey=2026W44` / `monthlyKey=202611`，随快照下发 |
+| 活动快照发布 | **admin 内活动模块** | 写 Redis `version + payload`，供 game 轮询 |
+| 全服任务计数 | **admin 内活动模块** | 如「全服累计击杀 100 万」 |
+| 结算发奖 | **admin 内活动模块** | 结束事件触发，通过邮件/资产接口下发 |
+| GM 管理接口 | **admin HTTP handler** | 同进程直接调用 活动逻辑，不经过 RPC |
 | 玩家任务进度 | game 节点 | 玩家私有数据，本地缓存异步落库 |
 | 玩家活动参与状态 | game 节点 | 签到记录、领奖状态 |
 | 客户端协议收发 | game 节点 | 路由号走 11100/11200 段 |
 
-### 3.2 为什么内嵌 admin 而不是单开 node/world
+### 3.2 为什么内嵌 admin 而不是单开独立活动进程
 
 - admin 本身就是常驻的 HTTP mesh 服务，`singleinstance.Check` 已保证单实例，天然满足「全局唯一权威」；
-- 新增进程意味着新增端口、配置、部署脚本、监控项与故障面，而 World 的负载极低（1s tick + 10s 快照），没有独立扩容需求；
-- admin 是 HTTP 组件，不适合做 gRPC service provider；因此 **不走 WorldService RPC**，改用 Redis 快照（见 3.5）；
-- 未来若 World 负载真的需要拆分，Redis 快照契约不变，把模块搬进独立进程即可，game 侧零改动。
+- 新增进程意味着新增端口、配置、部署脚本、监控项与故障面，而活动模块的负载极低（1s tick + 10s 快照），没有独立扩容需求；
+- admin 是 HTTP 组件，不适合做 gRPC service provider；因此 **不走活动服务 RPC**，改用 Redis 快照（见 3.5）；
+- 未来若活动模块负载真的需要拆分，Redis 快照契约不变，把模块搬进独立进程即可，game 侧零改动。
 
 ### 3.3 为什么不是「game 节点各自轮询」
 
@@ -130,14 +130,14 @@
 - 各节点各自算日期，时区/时钟漂移会导致 0 点重置不同步；
 - N 个节点每 10s 都查一次 DB 全表，属于无谓放大。
 
-因此：**状态问题的本质是「单点权威」，不是「分布式协调」**，正确做法是有一个唯一写入者（admin 内的 World 模块）。
+因此：**状态问题的本质是「单点权威」，不是「分布式协调」**，正确做法是有一个唯一写入者（admin 内的活动模块）。
 
 ### 3.4 单实例与启动恢复
 
 | 层级 | 手段 |
 |---|---|
 | 部署层 | admin 只部署 1 个实例（沿用现有 `singleinstance.Check`） |
-| 进程层 | World 模块由 `global.Init()` 启动、`global.Destroy()` 停止，随 admin 生命周期 |
+| 进程层 | 活动模块由 `global.Init()` 启动、`global.Destroy()` 停止，随 admin 生命周期 |
 | 运行层 | 调度 goroutine 只由 admin 启动一次，不做多副本竞争 |
 | 故障层 | admin 重启后从 DB 全量恢复，按 `now` 补推跨越的状态 |
 
@@ -146,7 +146,7 @@ admin 启动：
   1. svc.Init + AutoMigrate（含 activity_instance / player_activity / player_task）
   2. 加载 Luban 配置
   3. 从 DB 读 activity_instance 全量 → 内存状态机
-  4. 修复因停机跨越的状态：now >= start → RUNNING；now >= end → ENDED（并补结算）
+  4. 修复因停机跨越的状态：now >= start → 已开启（`consts.ActivityStatusRunning`）；now >= end → 已结束（`consts.ActivityStatusEnded`，并补结算）
   5. 启动 ticker（1s 内部 tick，状态变化时刷新 Redis 快照）
 ```
 
@@ -154,8 +154,8 @@ admin 启动：
 
 | Key | 类型 | 内容 |
 |---|---|---|
-| `sc:world:snapshot:version` | String | 快照版本号（int64） |
-| `sc:world:snapshot:payload` | String | 快照 JSON（`ActivitySnapshot`，见 4.4） |
+| `sc:activity:snapshot:version` | String | 快照版本号（int64） |
+| `sc:activity:snapshot:payload` | String | 快照 JSON（`ActivitySnapshot`，见 4.4） |
 
 - admin 仅在内容变化时 `INCR version` 并写 payload（两次写用 pipeline，game 侧容忍一瞬不一致，下一次轮询自愈）。
 - game 每 10s 先读 version；与本地一致则跳过，否则读 payload 并更新缓存。
@@ -169,15 +169,14 @@ admin 启动：
 ### 4.1 状态机
 
 ```
-             Created（配置生成 / GM 手动）
+             Created（配置生成）
                     │
                     ▼
-              ┌──────────┐   now >= start_time（World tick）
+              ┌──────────┐   now >= start_time（活动 tick）
               │ 未开启 0 │ ──────────────────────┐
-              └──────────┘                        │
-                    │ GM 取消                     ▼
-                    │                      ┌──────────┐   now >= end_time（World tick）
-                    └────────────────────► │ 已开启 1 │ ──────────────────┐
+              └──────────┘                        ▼
+                                           ┌──────────┐   now >= end_time（活动 tick）
+                                           │ 已开启 1 │ ──────────────────┐
                                            └──────────┘                    │
                                                  │ GM 提前结束              ▼
                                                  └───────────────► ┌──────────┐
@@ -187,35 +186,34 @@ admin 启动：
 
 | 状态值 | 名称 | 含义 |
 |---|---|---|
-| 0 | 未开启 | 已创建，`now < start_time` |
-| 1 | 已开启 | `start_time <= now < end_time` |
-| 2 | 已结束 | `now >= end_time` 或 GM 提前结束 |
-| 3 | 已取消 | GM 取消，不结算不发奖，保留审计记录 |
+| 0 | 未开启（`consts.ActivityStatusNotStarted`） | 已创建，`now < start_time` |
+| 1 | 已开启（`consts.ActivityStatusRunning`） | `start_time <= now < end_time` |
+| 2 | 已结束（`consts.ActivityStatusEnded`） | `now >= end_time` 或 GM 提前结束 |
+| 3 | 已取消（`consts.ActivityStatusCancelled`） | 历史数据保留，当前无取消入口，不结算不发奖 |
 
 ### 4.2 状态切换副作用
 
 | 事件 | 副作用 |
 |---|---|
-| 活动开启 | 快照版本 +1；game 节点下次拉取后广播本节点在线玩家 `ActivityChangeNotify(RUNNING)`；活动任务对玩家开放（懒建） |
-| 活动结束 | 快照版本 +1；封盘活动任务；World 执行结算（排行/达标）→ 邮件下发；客户端收到 `ENDED` |
-| 活动取消 | 同结束，但**不结算** |
+| 活动开启 | 快照版本 +1；game 节点下次拉取后广播本节点在线玩家 `ActivityChangeNotify`（`consts.ActivityStatusRunning`）；活动任务对玩家开放（懒建） |
+| 活动结束 | 快照版本 +1；封盘活动任务；活动模块执行结算（排行/达标）→ 邮件下发；客户端收到 `consts.ActivityStatusEnded` |
 
 ### 4.3 开服策略
 
 | StrategyType | 名称 | StrategyStartValue / StrategyEndValue 格式 | 轮次 |
 |---|---|---|---|
-| 1 | 指定时间 | `"2026/11/3 0:00:00"` 本地绝对时间（日期 + 时分秒） | 只跑一轮 |
-| 2 | 每日 | `"0 0:00:00"` ~ `"0 23:59:59"` 每天固定时分秒，**不支持跨天**（结束必须晚于开始） | 每日一轮 |
-| 3 | 每周 | `"1 0:00:00"` 周几（1=周一..7=周日）+ 时分秒 | 每周一轮 |
-| 4 | 每月 | `"1 0:00:00"` 几号（1~31）+ 时分秒，`0` 表示月底 | 每月一轮 |
-| 0/其他 | 仅手动 | World 跳过自动生成，仅接受 GM 创建 | GM 控制 |
+| `tpl.StrategyType_Specify`(1) | 指定时间 | `"2026/11/3 0:00:00"` 本地绝对时间（日期 + 时分秒） | 只跑一轮 |
+| `tpl.StrategyType_Day`(2) | 每日 | `"0 0:00:00"` ~ `"0 23:59:59"` 每天固定时分秒，**不支持跨天**（结束必须晚于开始） | 每日一轮 |
+| `tpl.StrategyType_Week`(3) | 每周 | `"1 0:00:00"` 周几（1=周一..7=周日）+ 时分秒 | 每周一轮 |
+| `tpl.StrategyType_Month`(4) | 每月 | `"1 0:00:00"` 几号（1~31）+ 时分秒，`0` 表示月底 | 每月一轮 |
+| 未配置/非法值 | 不生成 | 活动模块跳过自动生成 | — |
 
 - 策略值由 `splitStrategyValue` 拆为「前缀 + 当天秒数」（`strings.FieldsFunc` 同时切 `_` 与空格），时分秒由 `parseTimeOfDay` 解析（兼容单数字小时，如 `0:00:00`）。
 - 多轮次：`round` 递增，唯一键 `(cfg_id, round)`；`RoundCount = -1` 无限，`> 0` 达到上限后停止生成。
 - 一轮未结束不会生成下一轮（避免同时存在两个同类活动造成客户端歧义）。
 - 指定时间策略（1）只跑一轮，生成后不再重复。
 
-### 4.4 活动快照（admin World → Redis → game）
+### 4.4 活动快照（admin 活动模块 → Redis → game）
 
 ```go
 // ActivitySnapshot 活动快照，admin 写入 Redis，game 节点按版本号缓存
@@ -248,20 +246,22 @@ type ActivityState struct {
 
 ## 5. 任务设计
 
-### 5.1 任务分类（新增「全服任务」）
+### 5.1 任务分类
 
 | taskType | 重置周期 | period_key | 进度归属 |
 |---|---|---|---|
-| 1 主线 | 不重置 | `main` | game（玩家） |
-| 2 日常 | 每日 | `20261102` | game（玩家） |
-| 3 周常 | 每周 | `2026W44` | game（玩家） |
-| 4 月常 | 每月 | `202611` | game（玩家） |
-| 0 活动 | 活动周期 | `activity:<instance_id>` | game（玩家） |
+| `tpl.TaskType_Main`(1) 主线 | 不重置 | `main` | game（玩家） |
+| `tpl.TaskType_Day`(2) 日常 | 每日 | `20261102` | game（玩家） |
+| `tpl.TaskType_Week`(3) 周常 | 每周 | `2026W44` | game（玩家） |
+| `tpl.TaskType_Month`(4) 月常 | 每月 | `202611` | game（玩家） |
+| `tpl.TaskType_Activity`(0) 活动 | 活动周期 | `activity:<instance_id>` | game（玩家） |
 
-### 5.2 时间触发：由 World 统一下发周期 key
+> 「全服任务」当前不在 `tpl.TaskType` 中；P3 若要落地，需先在 `cfg/excel/__enums__.xlsx` 的 TaskType 枚举扩值并重新生成，禁止自行约定数值。
+
+### 5.2 时间触发：由活动模块统一下发周期 key
 
 ```
-World tick（1s）：
+活动 tick（1s）：
    now = 当前毫秒
    if 跨过每日重置点 → dailyKey 变化，Version+1
    if 跨过每周重置点 → weeklyKey 变化，Version+1
@@ -270,7 +270,7 @@ World tick（1s）：
 game 节点：
    每次拉快照更新 dailyKey / weeklyKey
    玩家读写任务时以「本地快照里的 key」为准
-   → 玩家任务 period_key 永远与 World 一致，不存在边界抖动
+   → 玩家任务 period_key 永远与活动模块一致，不存在边界抖动
 ```
 
 重置点配置：`etc.task.resetHour`（默认 0 点），周起点固定周一。
@@ -312,11 +312,11 @@ onTaskEvent(e):
 > 旧枚举（在线时长/击杀/消费/签到/通关/获得物品/获得英雄/消耗金币）已随新表移除；
 > 消费（`AssetRemove`）与获得英雄（`addHeroWithBound`）埋点已删除，需要时扩枚举再接。
 
-全服级（taskType 5）在 World 累计：
+全服任务（预留：需先在 `__enums__.xlsx` 扩 `tpl.TaskType`）在活动模块累计：
 
 ```
 game 收集本节点增量 → 每 5s 批量 ReportGlobalProgress(targetType, param, sum)
-World 累加 → 达到目标 → 广播所有 game（快照 Version+1）
+活动模块累加 → 达到目标 → 广播所有 game（快照 Version+1）
 玩家领取全服奖励时：game 校验快照里的全服进度是否达标
 ```
 
@@ -327,10 +327,10 @@ World 累加 → 达到目标 → 广播所有 game（快照 Version+1）
 | 场景 | 位置 | 做法 |
 |---|---|---|
 | 累计在线时长 | game actor tick | actor 每分钟给在线玩家 +60s 进度 |
-| 周期重置 | World 计算 key / game 自然隔离 | 无需批量 UPDATE |
-| 时间窗任务 | World 快照 | 快照带窗口开关状态，game 本地判定 |
-| 活动任务封盘 | World 结束事件 | game 领奖时校验快照 status |
-| 全服任务 | World tick | 全局计数 |
+| 周期重置 | 活动模块计算 key / game 自然隔离 | 无需批量 UPDATE |
+| 时间窗任务 | 活动模块快照 | 快照带窗口开关状态，game 本地判定 |
+| 活动任务封盘 | 活动模块结束事件 | game 领奖时校验快照 status |
+| 全服任务 | 活动 tick | 全局计数 |
 
 ### 5.5 任务领奖
 
@@ -360,11 +360,11 @@ activity_cfg: Id=1001, StrategyType=1(指定时间),
 task_cfg:    7 条签到子任务（TaskGroupID=1001, TaskType=0 活动, TargetTaskType=3 登录, TargetTaskCount=1,
              AcceptType=0 自动接取, ClaimType=1 手动领取）
 
-活动开启（World）→ 快照 Version+1 → game 广播 RUNNING
+活动开启（活动模块）→ 快照 Version+1 → game 广播已开启（`consts.ActivityStatusRunning`）
 玩家进游戏 → EnterGame → TaskEvent(登录,1)
     → 推进当日签到任务（活动周期 key = activity:实例ID）
-跨轮次 → World 生成新一轮实例 → 任务换新 period_key（自然隔离）
-活动结束 → 快照 ENDED → 未领奖的达标任务仍可领，未完成作废
+跨轮次 → 活动模块生成新一轮实例 → 任务换新 period_key（自然隔离）
+活动结束 → 快照已结束（`consts.ActivityStatusEnded`）→ 未领奖的达标任务仍可领，未完成作废
 ```
 
 ---
@@ -397,7 +397,7 @@ message ActivityEntry {
   int64 instance_id = 1;   // 活动实例ID
   int32 cfg_id = 2;        // 活动模板ID
   int32 activity_type = 3; // 已废弃（配置表移除），恒 0
-  int32 status = 4;        // 0未开启 1已开启 2已结束 3已取消
+  int32 status = 4;        // 见 consts.ActivityStatus*
   int64 start_time = 5;    // 毫秒
   int64 end_time = 6;
   int32 round = 7;         // 轮次
@@ -452,7 +452,7 @@ message EnterGameResp {
 **为什么用 map、怎么保证顺序：**
 
 - 任务键用 `taskId`：配置 ID 全局唯一，同一时刻只展示当前周期的一条，不会撞键。
-- 活动键用 `instanceId`：同一模板可手动创建多个实例，用 `cfgId` 会撞键；`cfgId` 放在 value 里供客户端分组。
+- 活动键用 `instanceId`：同一模板按轮次生成多个实例，用 `cfgId` 会撞键；`cfgId` 放在 value 里供客户端分组。
 - proto map 不保证顺序，客户端展示按 `TaskEntry.sort`（活动可按 `cfgId + instanceId`）排序。
 - 独立路由 `11200` 仍保留，用于按 `taskType`/`activityCfgId` 过滤刷新；活动独立列表路由 `11100` 留到 P3。
 
@@ -467,16 +467,16 @@ message ActivityChangeNotify { int64 instance_id = 1; int32 cfg_id = 2; int32 st
 
 ### 6.4 快照通道：Redis（不新增 internal.proto 服务）
 
-admin 是 HTTP 组件，不做 gRPC provider；World 的对外产物只有 Redis 快照，契约见 3.5。game 侧读取逻辑：
+admin 是 HTTP 组件，不做 gRPC provider；活动模块的对外产物只有 Redis 快照，契约见 3.5。game 侧读取逻辑：
 
 ```go
 // ReadSnapshot 读取 Redis 快照：先读 version，未变直接复用本地缓存
 func ReadSnapshot(ctx context.Context, localVersion int64) (*ActivitySnapshot, error) {
-    ver, err := redis.Get(ctx, consts.WorldSnapshotVersionKey).Int64()
+    ver, err := redis.Get(ctx, consts.ActivitySnapshotVersionKey).Int64()
     if err != nil || ver == localVersion {
         return nil, err // nil 表示未变化
     }
-    raw, err := redis.Get(ctx, consts.WorldSnapshotPayloadKey).Bytes()
+    raw, err := redis.Get(ctx, consts.ActivitySnapshotPayloadKey).Bytes()
     if err != nil {
         return nil, err
     }
@@ -488,7 +488,7 @@ func ReadSnapshot(ctx context.Context, localVersion int64) (*ActivitySnapshot, e
 }
 ```
 
-> 快照一致性由 `version + payload` 保证（admin 用 `TxPipelined` 原子写）。admin 发布后 `PUBLISH sc:world:changed <version>`，game 订阅后立即拉取，10s 轮询作为兜底（防丢消息/Redis 短暂不可用）。Pub/Sub 只传版本号，不传数据。
+> 快照一致性由 `version + payload` 保证（admin 用 `TxPipelined` 原子写）。admin 发布后 `PUBLISH sc:activity:changed <version>`，game 订阅后立即拉取，10s 轮询作为兜底（防丢消息/Redis 短暂不可用）。Pub/Sub 只传版本号，不传数据。
 
 
 ### 6.5 ErrCode 新增
@@ -503,7 +503,7 @@ func ReadSnapshot(ctx context.Context, localVersion int64) (*ActivitySnapshot, e
 | 4102 | `ERR_CODE_TASK_NOT_COMPLETED` | 任务未完成 |
 | 4103 | `ERR_CODE_TASK_ALREADY_CLAIMED` | 任务已领奖 |
 | 4104 | `ERR_CODE_TASK_EXPIRED` | 任务周期已过期 |
-| 4201 | `ERR_CODE_WORLD_UNAVAILABLE` | 世界服不可用（快照未就绪） |
+| 4201 | `ERR_CODE_ACTIVITY_UNAVAILABLE` | 活动模块不可用（快照未就绪） |
 
 ---
 
@@ -514,7 +514,7 @@ func ReadSnapshot(ctx context.Context, localVersion int64) (*ActivitySnapshot, e
 | 表 | 归属 | 说明 |
 |---|---|---|
 | `activity_cfg` / `task_cfg` | Luban 静态 | 模板配置 |
-| `activity_instance` | World 写 | 全局活动实例（**无 zone**） |
+| `activity_instance` | 活动模块写 | 全局活动实例（**无 zone**） |
 | `player_activity` | game 写 | 玩家活动参与状态 |
 | `player_task` | game 写 | 玩家任务进度 |
 
@@ -617,23 +617,36 @@ CREATE TABLE player_task (
 
 ## 8. 服务端落地结构
 
-### 8.1 admin 内嵌 World 模块（不新增进程）
+### 8.1 admin 内嵌活动模块（不新增进程）
 
 ```
 mesh/admin/app/
 ├── repo/
-│   └── repo_activity.go        # activity_instance CRUD
+│   └── repo_activity.go            # activity_instance CRUD
 ├── logic/
-│   ├── logic_activity.go       # 活动状态机 + 开服策略 + 状态推进 + GM 操作
-│   └── logic_world.go          # 内存快照 + Redis 发布（version + payload）
+│   ├── logic_activity.go           # 接口 + 生命周期 + 状态机 + repair
+│   ├── logic_activity_gen.go       # 按策略生成实例 + 轮次判定
+│   ├── logic_activity_strategy.go  # 策略值解析 + 日/周/月时间窗
+│   ├── logic_activity_snapshot.go  # 快照构建 + 版本接续 + Redis 发布
+│   └── logic_activity_gm.go        # GM 查询/改时间/结束 + 模板列表
 ├── handler/
-│   └── handler_activity.go     # GM HTTP 接口
+│   └── handler_activity.go         # GM HTTP 接口（/api/v1/gm/activity*）
 └── global/
-    └── begin.go                # AutoMigrate + 启动调度器；Destroy 停止
+    ├── begin.go                    # AutoMigrate + 启动调度器；Destroy 停止
+    └── seed_menus.go               # GM 菜单「运营活动」+ 接口权限种子
 ```
 
+GM 接口清单（菜单「运营活动 → 活动实例 / 活动配置」）：
+
+| 方法 | 路径 | 说明 |
+|---|---|---|
+| GET | `/api/v1/gm/activity` | 活动实例分页列表 |
+| PUT | `/api/v1/gm/activity/:id/time` | 修改活动时间（仅未开启） |
+| POST | `/api/v1/gm/activity/:id/end` | 提前结束 |
+| GET | `/api/v1/gm/activity/configs` | 活动模板列表（策略/触发条件/奖励/关联任务数） |
+
 - 调度器为 `logic_activity.go` 内的一个 goroutine（1s tick），由 `global.Init()` 启动，`global.Destroy()` 关闭。
-- 快照写入 Redis（`sc:world:snapshot:*`），不注册 gRPC provider，不新增 proto service。
+- 快照写入 Redis（`sc:activity:snapshot:*`），不注册 gRPC provider，不新增 proto service。
 
 ### 8.2 game 节点
 
@@ -641,7 +654,7 @@ mesh/admin/app/
 node/game/app/
 ├── logic/
 │   ├── logic_task.go           # 任务列表/领奖/进度事件（已落地）
-│   ├── logic_world_sync.go     # 订阅 sc:world:changed + 10s 轮询 Redis 快照 + 本地缓存
+│   ├── logic_activity_sync.go     # 订阅 sc:activity:changed + 10s 轮询 Redis 快照 + 本地缓存
 │   ├── logic_activity.go       # 活动独立接口 + 签到（P3）
 │   └── logic_task_event.go     # 如需拆分事件匹配逻辑（可选，当前合并在 logic_task.go）
 ├── handler/
@@ -653,18 +666,18 @@ node/game/app/
     └── begin.go                # AutoMigrate player_activity / player_task
 ```
 
-- 登录下发：`EnterGame` 合并各模块返回，任务 map 由 `Task.EnterGame` 填充，活动 map 由 `WorldSync().Activities()` 填充。
+- 登录下发：`EnterGame` 合并各模块返回，任务 map 由 `Task.EnterGame` 填充，活动 map 由 `ActivitySync().Activities()` 填充。
 - 任务事件入口：`Task().EmitTaskEvent(ctx, global.TaskEvent{...})`，当前已接登录/充值/消费/获得英雄；击杀等待 battle 结算通道接入。
 
 ### 8.3 admin 后台
 
 | 页面 | 功能 | 调用路径 |
 |---|---|---|
-| 活动管理 | 列表/新建/改时间/开启/提前结束/取消 | admin HTTP handler → 同进程 World 逻辑 |
+| 活动管理 | 列表/改时间/提前结束 | admin HTTP handler → 同进程活动逻辑 |
 | 任务配置查询 | 只读展示 task_cfg（含活动归属） | 直读 Luban |
 | 玩家任务查询 | 按 playerID 查 player_task，GM 补偿改状态 | 直读 DB |
 
-- **GM 操作一律走同进程 World 逻辑**（`logic.Activity().Xxx`），不走「改 DB 等轮询」：World 内存是权威，绕过它会产生内存与 DB 不一致。
+- **GM 操作一律走同进程活动逻辑**（`logic.Activity().Xxx`），不走「改 DB 等轮询」：活动模块内存是权威，绕过它会产生内存与 DB 不一致。
 - 新增一级菜单「活动管理」（sort 介于「游戏管理」与「集群管理」之间），seed 在 `mesh/admin/app/global/seed.go`。
 
 
@@ -679,25 +692,25 @@ node/game/app/
 
 | 场景 | 处理 |
 |---|---|
-| World 重启 | 从 DB 全量恢复；用 `now` 补推跨越的状态；结算幂等（`status` 条件更新 + 结算标记） |
-| World 不可用 | game 节点继续用最后一次快照（只读能力可用）；写操作（签到/领奖）返回 `ERR_CODE_WORLD_UNAVAILABLE` 或降级校验本地快照 |
+| 活动模块重启 | 从 DB 全量恢复；用 `now` 补推跨越的状态；结算幂等（`status` 条件更新 + 结算标记） |
+| 活动模块不可用 | game 节点继续用最后一次快照（只读能力可用）；写操作（签到/领奖）返回 `ERR_CODE_ACTIVITY_UNAVAILABLE` 或降级校验本地快照 |
 | game 节点启动晚于活动开启 | 第一次拉快照即为最新状态，无需补偿 |
 | 玩家跨节点登录 | player_task/player_activity 以玩家为 key，与节点无关；下线 `FlushKey` 落库 |
 | game 节点重启 | 玩家离线会先走 LeaveGame 落库；异常宕机最多丢一个 flush 周期（与现有资产一致的容忍度） |
 | 玩家离线跨天 | period_key 自然隔离，上线读写新 key |
-| 玩家离线期间活动结束 | 快照 ENDED；已达标未领仍可领；未完成作废 |
+| 玩家离线期间活动结束 | 快照已结束（`consts.ActivityStatusEnded`）；已达标未领仍可领；未完成作废 |
 | GM 改活动时间 | 仅允许「未开启」；已开启只能「提前结束」 |
 | 同模板多轮次 | `uk_cfg_round` 唯一键；上一轮结束才生成下一轮 |
 | 重复领奖 | status CAS（可领取→已领取） |
-| 全服任务重复上报 | World 侧按 `(task_id, period_key)` 累加，天然幂等；game 上报带批次 ID 可选去重 |
-| 时钟漂移 | 周期 key 只由 World 产出；game 不用本机时间判断跨天 |
+| 全服任务重复上报 | 活动模块侧按 `(task_id, period_key)` 累加，天然幂等；game 上报带批次 ID 可选去重 |
+| 时钟漂移 | 周期 key 只由活动模块产出；game 不用本机时间判断跨天 |
 | 时间精度 | 统一毫秒时间戳；开服策略按整 24h 计算 |
 
 ---
 
 ## 10. 实施计划
 
-### P0 基础骨架（admin 内嵌 World）
+### P0 基础骨架（admin 内嵌活动模块）
 
 1. `share/consts/consts_task_activity.go`：活动状态/类型/任务类型/目标任务类型/Redis key/周期计算
 2. `share/enum/enum_table.go`：`activity_instance` / `player_activity` / `player_task`
@@ -711,7 +724,7 @@ node/game/app/
 7. `logic_activity.go`：开服策略计算 + 实例生成 + 状态推进 + GM 操作
 8. Redis 快照发布（version + payload）
 9. `handler_activity.go` + admin 路由注册
-10. game 侧 `logic_world_sync.go`：订阅 `sc:world:changed` + 10s 轮询 Redis 快照 + 本地缓存
+10. game 侧 `logic_activity_sync.go`：订阅 `sc:activity:changed` + 10s 轮询 Redis 快照 + 本地缓存
 
 ### P2 任务系统（game 侧）✅ 已完成
 
@@ -725,7 +738,7 @@ node/game/app/
 
 17. 活动任务封盘、签到活动完整链路（`TaskSignIn` + `activity.proto` 独立协议 11100 段）
 18. 全服任务进度上报 + 看板
-19. admin 活动管理页（同进程 World 逻辑）+ 菜单 seed + 玩家任务查询
+19. admin 活动管理页（同进程活动逻辑）+ 菜单 seed + 玩家任务查询
 20. 活动变化推送（11103）：game 快照 diff 后推本节点在线玩家
 
 
@@ -733,7 +746,7 @@ node/game/app/
 
 21. 排行榜活动（Redis ZSet + 结算邮件）
 22. 活动红点/预告、任务补发工具
-23. World 主备切换
+23. 活动模块主备切换
 
 ---
 
@@ -745,22 +758,22 @@ node/game/app/
 | 2 | 周起点周一还是周日？ | **周一 00:00** |
 | 3 | 活动结束后已完成未领奖励是否保留？ | **保留可领** |
 | 4 | 是否需要「全服任务」一期就做？ | **P3 做**，骨架已在文档预留 |
-| 5 | 签到是独立协议还是复用 `TaskSignIn`？ | **复用**（本质是 type=6 任务） |
-| 6 | World 一期是否做主备？ | **不做**，admin 本身单实例 |
+| 5 | 签到是独立协议还是复用 `TaskSignIn`？ | **复用**（`tpl.TaskType` 扩展值，需先扩枚举） |
+| 6 | 活动模块一期是否做主备？ | **不做**，admin 本身单实例 |
 | 7 | 排行榜活动是否一期要？ | **不做**（P4） |
-| 8 | 世界服是否也承载社交/跨服匹配？ | **暂不**，只做活动/任务/排行，保持职责单一 |
+| 8 | 活动模块是否也承载社交/跨服匹配？ | **暂不**，只做活动/任务/排行，保持职责单一 |
 | 9 | 配置热更新是否一期要？ | **不要**，静态表改表即发版，运行时数据走 DB |
-| 10 | 活动「未开启」是否允许客户端看到预告？ | **允许**，列表返回 NOT_STARTED + 展示倒计时 |
+| 10 | 活动「未开启」是否允许客户端看到预告？ | **允许**，列表返回 `consts.ActivityStatusNotStarted` + 展示倒计时 |
 
 ---
 
 ## 12. 关键代码草案
 
-### 12.1 World 快照发布（版本号控制，写 Redis）
+### 12.1 活动模块快照发布（版本号控制，写 Redis）
 
 ```go
-// logic_world.go
-func (this *worldLogic) publish(ctx context.Context) error {
+// logic_activity_snapshot.go
+func (this *activityLogic) publish(ctx context.Context) error {
     this.mu.RLock()
     snap := this.currentSnapshot() // 拷贝 Activities 切片
     this.mu.RUnlock()
@@ -776,8 +789,8 @@ func (this *worldLogic) publish(ctx context.Context) error {
         return err
     }
     _, err = rdb.Pipelined(ctx, func(p redis.Pipeliner) error {
-        p.Set(ctx, consts.WorldSnapshotPayloadKey, raw, 0)
-        p.Set(ctx, consts.WorldSnapshotVersionKey, ver, 0)
+        p.Set(ctx, consts.ActivitySnapshotPayloadKey, raw, 0)
+        p.Set(ctx, consts.ActivitySnapshotVersionKey, ver, 0)
         return nil
     })
     return err
@@ -805,7 +818,7 @@ func (this *activityLogic) tick(ctx context.Context) {
     // 2. 到点开启
     for _, inst := range this.notStartedBefore(now) {
         if err := this.startActivity(ctx, inst); err != nil {
-            log.Errorf("world: start activity %d failed: %v", inst.ID, err)
+            log.Errorf("admin: start activity %d failed: %v", inst.ID, err)
             continue
         }
         changed = true
@@ -814,7 +827,7 @@ func (this *activityLogic) tick(ctx context.Context) {
     // 3. 到点结束（含结算）
     for _, inst := range this.runningUntil(now) {
         if err := this.endActivity(ctx, inst, consts.ActivityStatusEnded); err != nil {
-            log.Errorf("world: end activity %d failed: %v", inst.ID, err)
+            log.Errorf("admin: end activity %d failed: %v", inst.ID, err)
             continue
         }
         changed = true
@@ -822,7 +835,7 @@ func (this *activityLogic) tick(ctx context.Context) {
 
     if changed {
         if err := this.publish(ctx); err != nil {
-            log.Errorf("world: publish snapshot failed: %v", err)
+            log.Errorf("admin: publish snapshot failed: %v", err)
         }
     }
 }
@@ -832,9 +845,9 @@ func (this *activityLogic) tick(ctx context.Context) {
 ### 12.3 game 快照同步（Redis 轮询）
 
 ```go
-// logic_world_sync.go
-func (this *worldSync) loop(ctx context.Context) {
-    t := time.NewTicker(consts.WorldSnapshotInterval) // 10s
+// logic_activity_sync.go
+func (this *activitySync) loop(ctx context.Context) {
+    t := time.NewTicker(consts.ActivitySnapshotInterval) // 10s
     defer t.Stop()
     for {
         select {
@@ -852,7 +865,7 @@ func (this *worldSync) loop(ctx context.Context) {
 }
 
 // broadcastDiff 只给本节点在线玩家推送变化，不关心其他节点（P2 接入客户端协议后启用）
-func (this *worldSync) broadcastDiff(old []consts.ActivityState, cur *consts.ActivitySnapshot) {
+func (this *activitySync) broadcastDiff(old []consts.ActivityState, cur *consts.ActivitySnapshot) {
     changed := diffActivities(old, cur.Activities)
     if len(changed) == 0 {
         return
@@ -874,7 +887,7 @@ func (this *taskLogic) EmitTaskEvent(ctx context.Context, e global.TaskEvent) {
     if e.PlayerID <= 0 || e.Count <= 0 || !tpl.Loaded() {
         return
     }
-    snap := WorldSync().Snapshot()
+    snap := ActivitySync().Snapshot()
     pt, err := global.PlayerTaskCache.Get(ctx, e.PlayerID) // 一玩家一行，tasks map JSON
     if err != nil {
         return
@@ -917,10 +930,10 @@ func (this *taskLogic) EmitTaskEvent(ctx context.Context, e global.TaskEvent) {
 
 | 检查点 | 结论 |
 |---|---|
-| 新进程 | **不新增** `node/world`；World 内嵌常驻 `mesh/admin`，随 admin 启停 |
+| 新进程 | **不新增独立活动进程**；活动模块内嵌常驻 `mesh/admin`，随 admin 启停 |
 | 服务注册 | admin 保持现有 HTTP mesh 注册方式；game 不依赖 admin 的 RPC，只读 Redis 快照 |
 | 单实例 | 由 admin 自身单实例保证（1s tick 单写者），无需额外 `singleinstance` 租约 |
-| 生命周期 | admin：`logic.Activity().Start/Stop` 挂在 `global.begin.go`；game：`WorldSync` 在 `main.go` 启停，`TaskLogic` 走 `moduleLogics()` |
+| 生命周期 | admin：`logic.Activity().Start/Stop` 挂在 `global.begin.go`；game：`ActivitySync` 在 `main.go` 启停，`TaskLogic` 走 `moduleLogics()` |
 | 缓存 | 复用 `internal/cache`：`PlayerTaskCache`/`PlayerActivityCache`（JSON map，一玩家一行）、`PlayerMailCache`（单行），`LeaveGame` 走 `flushAndEvict` |
 | 表名 | 追加 `share/enum/enum_table.go` |
 | 配置 | Luban 生成 + 内嵌；运营状态落 DB |
@@ -931,13 +944,13 @@ func (this *taskLogic) EmitTaskEvent(ctx context.Context, e global.TaskEvent) {
 
 ---
 
-## 14. 方案对比（为什么选 World 而不是其他）
+## 14. 方案对比（为什么选活动模块内嵌而不是其他）
 
 | 方案 | 优点 | 缺点 | 结论 |
 |---|---|---|---|
 | A. 各 game 节点轮询 + DB CAS | 不新增进程 | 无法做全服计数/排行/单次结算；N 节点重复查库；时钟不一致 | ❌ |
 | B. 只加 Redis 分布式锁 | 改动小 | 锁粒度难控；结算仍可能重复；无统一时间源 | ❌ |
-| C. **World 单实例权威 + 快照下发（内嵌 admin）** | 单一真源；全服能力天然支持；game 无状态化易扩容；不新增进程；故障恢复清晰 | admin 单实例是潜在瓶颈（读快照为主，压力很小），需守住「不扩 admin 多副本」 | ✅ **采用** |
+| C. **活动模块单实例权威 + 快照下发（内嵌 admin）** | 单一真源；全服能力天然支持；game 无状态化易扩容；不新增进程；故障恢复清晰 | admin 单实例是潜在瓶颈（读快照为主，压力很小），需守住「不扩 admin 多副本」 | ✅ **采用** |
 
 ---
 
@@ -959,7 +972,7 @@ func (this *taskLogic) EmitTaskEvent(ctx context.Context, e global.TaskEvent) {
 |---|---|---|
 | `registry.Watch(ctx, serviceName)` | 只能监听**服务实例**增删 | 不能拿来监听活动状态 key |
 | `node.Proxy.Broadcast` / `mesh.Proxy.Broadcast` | 语义是「推给所有在线**玩家**」（经 gate 分发） | 不是「推给所有**节点**」 |
-| 节点间通信 | mesh `Call` + `registry.Services` 枚举实例 | 天然可用于 admin/world → 各大厅服 |
+| 节点间通信 | mesh `Call` + `registry.Services` 枚举实例 | 天然可用于 admin（活动模块）→ 各大厅服 |
 | etcd 客户端 | 项目仅通过 due registry 间接使用 | 要做 KV watch 需新增 `go.etcd.io/etcd/client/v3` 依赖 |
 
 结论：在 due 架构里，「etcd 推送大厅服」**要自己造一层配置分发**，绕过了框架抽象；而「mesh RPC 拉取」是框架原生能力，零新增依赖。
@@ -980,12 +993,12 @@ func (this *taskLogic) EmitTaskEvent(ctx context.Context, e global.TaskEvent) {
 ┌─────────────────────────────┐
 │ GM 后台（只做运营意图，不做 tick） │
 │ · 手动开/关/改时间 → 写 DB        │
-│ · 调 World 逻辑立即生效（同进程）  │
+│ · 调 活动逻辑立即生效（同进程）  │
 └──────────────┬──────────────┘
                │ 低频操作
                ▼
 ┌─────────────────────────────┐
-│ 常驻调度器（World，单实例+租约）   │  ← 原来错放在 GM 后台的职责搬到这里
+│ 常驻调度器（活动模块，单实例+租约）   │  ← 原来错放在 GM 后台的职责搬到这里
 │ · 1s tick：状态推进 / 周期 key    │
 │ · 结算 / 全服计数 / 排行          │
 │ · 产出版本号 ver（几十字节）        │
@@ -995,7 +1008,7 @@ func (this *taskLogic) EmitTaskEvent(ctx context.Context, e global.TaskEvent) {
                ▼
 ┌─────────────────────────────┐
 │ 大厅服（多个）                  │
-│ · 方案 A：10s 调 World.Snapshot(ver)  → 原生 mesh RPC   │
+│ · 方案 A：10s 调 ActivityService.Snapshot(ver)  → 原生 mesh RPC   │
 │ · 方案 B：Watch etcd ver → 变了再调 RPC 拉全量          │
 │ · 拿到快照 → 与本地 diff → 推本节点在线玩家             │
 └─────────────────────────────┘
@@ -1011,7 +1024,7 @@ func (this *taskLogic) EmitTaskEvent(ctx context.Context, e global.TaskEvent) {
 | B. etcd 放 version，大厅服 watch 后拉全量 | etcd 客户端 | 亚秒级 | 需自己处理 watch 断连 + 重连 list | ⚠️ 有实时需求再上 |
 | C. GM 后台定时轮询 + 直接写 etcd 全量快照 | etcd 客户端 + 后台常驻化 | 秒级 | 后台重启即停摆；快照膨胀 | ❌ 不推荐 |
 
-> 最终落地：**World 内嵌常驻 admin**，1s tick 推进状态，快照写 Redis（`version + payload`），game 每 10s 读 version 短路；GM 操作同进程直接调 World 逻辑，不引入 RPC 与 etcd 业务通道。
+> 最终落地：**活动模块内嵌常驻 admin**，1s tick 推进状态，快照写 Redis（`version + payload`），game 每 10s 读 version 短路；GM 操作同进程直接调活动逻辑，不引入 RPC 与 etcd 业务通道。
 
 > 单服项目里，活动状态变化一天也就几次，**10s 的延迟完全可接受**，方案 A 是成本最低且最不容易出错的。
 
@@ -1025,7 +1038,7 @@ func (this *taskLogic) EmitTaskEvent(ctx context.Context, e global.TaskEvent) {
 | 4 | 网络方向要打通 | 后台所在网络要能访问游戏服/etcd，且权限最小化 |
 | 5 | 职责要拆清 | 至少把「调度」从「Web CRUD」拆成独立 goroutine/模块，接口化，否则后期无法独立迁移 |
 
-> 做完这 5 项，本质上就已经是一个「带 Web UI 的 World 服务」了 —— 那就不如直接拆出来，边界更干净、部署更可控。
+> 做完这 5 项，本质上就已经是一个「带 Web UI 的活动服务」了 —— 那就不如直接拆出来，边界更干净、部署更可控。
 
 ### 15.7 一句话回答
 
@@ -1034,4 +1047,4 @@ func (this *taskLogic) EmitTaskEvent(ctx context.Context, e global.TaskEvent) {
 - ✅ 对：状态应该由「发布者 → 订阅者」单向分发，而不是每个大厅服各自轮询 DB。
 - ❌ 错：发布者不能是 GM 后台（可用性等级不够、职责不匹配），通道不能是 etcd 当业务总线（框架不支持、数据模型不合适）。
 
-**改成「常驻 World 调度 + 版本号 + mesh RPC 拉取」，既保留了你的思路，又不引入新中间件和新的故障面。**
+**改成「常驻活动调度 + 版本号 + mesh RPC 拉取」，既保留了你的思路，又不引入新中间件和新的故障面。**

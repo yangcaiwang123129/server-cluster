@@ -13,7 +13,7 @@ import (
 // ActivityQuery 活动实例列表过滤条件。
 type ActivityQuery struct {
 	CfgID  int32
-	Status int32 // -1 表示全部
+	Status int32 // consts.ActivityStatusAll 表示全部
 	Order  string
 }
 
@@ -27,7 +27,7 @@ func (r *Repo) ListActivities(q ActivityQuery, pageIndex, pageSize int) ([]model
 	if q.CfgID > 0 {
 		tx = tx.Where("cfg_id = ?", q.CfgID)
 	}
-	if q.Status >= 0 {
+	if q.Status != consts.ActivityStatusAll {
 		tx = tx.Where("status = ?", q.Status)
 	}
 	return util.PageQuery[model.Activity](tx, pageIndex, pageSize, q.Order, "id desc")
@@ -46,7 +46,7 @@ func (r *Repo) GetActivity(id int64) (*model.Activity, error) {
 	return &m, nil
 }
 
-// CreateActivity 新增活动实例（GM 手动创建）。
+// CreateActivity 新增活动实例（自动生成）。
 func (r *Repo) CreateActivity(m *model.Activity) error {
 	d, err := r.db()
 	if err != nil {
@@ -104,7 +104,7 @@ func (r *Repo) ListActivitiesByStatus(status int32) ([]model.Activity, error) {
 	return list, err
 }
 
-// ListAllActivities 查询全量活动实例（World 启动恢复用）。
+// ListAllActivities 查询全量活动实例（活动模块启动恢复用）。
 func (r *Repo) ListAllActivities() ([]model.Activity, error) {
 	d, err := r.db()
 	if err != nil {
@@ -113,18 +113,4 @@ func (r *Repo) ListAllActivities() ([]model.Activity, error) {
 	var list []model.Activity
 	err = d.Order("id asc").Find(&list).Error
 	return list, err
-}
-
-// MaxRound 查询指定模板已生成的最大轮次。
-func (r *Repo) MaxRound(cfgID int32) (int32, error) {
-	d, err := r.db()
-	if err != nil {
-		return 0, err
-	}
-	var maxRound int32
-	err = d.Model(&model.Activity{}).
-		Where("cfg_id = ?", cfgID).
-		Select("COALESCE(MAX(round), 0)").
-		Scan(&maxRound).Error
-	return maxRound, err
 }

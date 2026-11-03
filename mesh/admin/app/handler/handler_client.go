@@ -157,12 +157,12 @@ func handleSimOptions(ctx http.Context) error {
 	return errs.OK(ctx, logic.SimOptions())
 }
 
-// handleSimLogin 模拟客户端登录/注册，返回 token 与网关地址。
-// @Summary 客户端模拟器登录
+// handleSimLogin 模拟客户端账号登录，返回 token 与网关地址。
+// @Summary 账号登录
 // @Tags sim
 // @Accept json
 // @Produce json
-// @Param body body dto.SimLoginReq true "登录参数"
+// @Param body body dto.SimLoginReq true "账号登录参数"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/client/sim/login [post]
 func handleSimLogin(ctx http.Context) error {

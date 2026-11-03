@@ -2,9 +2,10 @@
 package handler
 
 import (
-	"server-cluster/internal/router"
-
 	"github.com/dobyte/due/v2/cluster/node"
+	"github.com/dobyte/due/v2/log"
+
+	"server-cluster/internal/router"
 
 	"server-cluster/node/game/app/logic"
 	"server-cluster/share/pb"
@@ -23,11 +24,13 @@ func init() {
 func handleHeroList(ctx node.Context) {
 	req := &pb.HeroListReq{}
 	if err := ctx.Parse(req); err != nil {
+		log.Errorf("handler: hero list parse failed, uid=%d: %v", ctx.UID(), err)
 		_ = ctx.Response(err)
 		return
 	}
 	resp, err := logic.Hero().HeroList(ctx.Context(), ctx.UID())
 	if err != nil {
+		log.Errorf("handler: hero list logic failed, uid=%d: %v", ctx.UID(), err)
 		_ = ctx.Response(err)
 		return
 	}

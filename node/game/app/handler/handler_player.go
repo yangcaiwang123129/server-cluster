@@ -36,6 +36,7 @@ func init() {
 	router.OnActor(pb.RouteCode_ROUTE_CODE_GIFT_BUY, handleGiftBuy)
 	router.OnActor(pb.RouteCode_ROUTE_CODE_EXCHANGE, handleExchange)
 	router.OnActor(pb.RouteCode_ROUTE_CODE_RECHARGE, handleRecharge)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_ATTR_OPERATE, handleAttrOperate)
 }
 
 // handleVerify 首包：校验 login 服签发的 JWT，绑定网关与节点（proto 注释明确这是绑定入口）。
@@ -72,8 +73,8 @@ func handleEnterGame(ctx node.Context) {
 	}
 	// 把客户端 IP 注入 context 供下游 logic 存入 PlayerActor
 	stdCtx := injectLoginIP(ctx.Context(), ctx)
-	resp, err := logic.PlayerLogic().EnterGame(stdCtx, ctx.UID(), req)
-	if err != nil {
+	resp := &pb.EnterGameResp{}
+	if err := logic.PlayerLogic().EnterGame(stdCtx, ctx.UID(), req, resp); err != nil {
 		_ = ctx.Response(err)
 		return
 	}
@@ -87,8 +88,8 @@ func handleLeaveGame(ctx node.Context) {
 		_ = ctx.Response(err)
 		return
 	}
-	resp, err := logic.PlayerLogic().LeaveGame(ctx.Context(), ctx.UID(), req)
-	if err != nil {
+	resp := &pb.LeaveGameResp{}
+	if err := logic.PlayerLogic().LeaveGame(ctx.Context(), ctx.UID(), req, resp); err != nil {
 		_ = ctx.Response(err)
 		return
 	}
@@ -134,6 +135,21 @@ func handleRecharge(ctx node.Context) {
 		return
 	}
 	resp, err := logic.PlayerLogic().Recharge(ctx.Context(), ctx.UID(), req)
+	if err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	_ = ctx.Response(resp)
+}
+
+// handleAttrOperate 属性接口：客户端传属性类型，服务端按类型更新/领取。
+func handleAttrOperate(ctx node.Context) {
+	req := &pb.AttrOperateReq{}
+	if err := ctx.Parse(req); err != nil {
+		_ = ctx.Response(err)
+		return
+	}
+	resp, err := logic.PlayerLogic().AttrOperate(ctx.Context(), ctx.UID(), req)
 	if err != nil {
 		_ = ctx.Response(err)
 		return

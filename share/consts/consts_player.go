@@ -10,4 +10,10 @@ const (
 	DefaultPlayerSettingsJSON = "{}"
 	// ContainerTypeStride 物品容器实例 ID 步长：ID = playerID*Stride + 物品容器类型。
 	ContainerTypeStride int64 = 10
+	// MaxNicknameLen 昵称最大长度（字符）。
+	MaxNicknameLen = 20
+	// MaxSignatureLen 个性签名最大长度（字符）。
+	MaxSignatureLen = 100
+	// MaxSettingsJSONLen 个人设置 JSON 最大长度（字节）。
+	MaxSettingsJSONLen = 2048
 )

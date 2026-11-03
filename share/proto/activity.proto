@@ -8,8 +8,8 @@ option go_package = "server-cluster/share/pb";
 message ActivityEntry {
   int64 instance_id = 1;   // 活动实例ID
   int32 cfg_id = 2;        // 活动模板ID
-  int32 activity_type = 3; // 1签到 2任务 3充值返利 4排行 5累充 6兑换
-  int32 status = 4;        // 0未开启 1已开启 2已结束 3已取消
+  int32 activity_type = 3; // 已废弃（配置表移除），恒 0
+  int32 status = 4;        // 见 consts.ActivityStatus*
   int64 start_time = 5;    // 开始时间（毫秒）
   int64 end_time = 6;      // 结束时间（毫秒）
   int32 round = 7;         // 轮次
@@ -17,5 +17,5 @@ message ActivityEntry {
   string icon = 9;         // 图标
   string desc = 10;        // 描述
   int32 task_group_id = 11; // 关联任务组
-  int32 reset_type = 12;   // 1不重置 2每日 3每周 4活动周期
+  int32 reset_type = 12;   // 已废弃，恒 0
 }

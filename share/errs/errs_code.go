@@ -14,10 +14,10 @@ import (
 //	return nil, errs.CodeInvalidParams.WithMessage("xx不能为空").Err()  // 透传 codes.Convert 能识别
 //	return nil, codes.NewCode(400, "自定义错误").Err()                  // 也能识别
 var (
-	CodeOK             = codes.NewCode(int(pb.ErrCode_ERR_CODE_OK), "success")
-	CodeInternalError  = codes.NewCode(int(pb.ErrCode_ERR_CODE_INTERNAL_ERROR), "internal error")
-	CodeInvalidParams  = codes.NewCode(int(pb.ErrCode_ERR_CODE_INVALID_PARAMS), "invalid params")
-	CodeUnauthorized   = codes.NewCode(int(pb.ErrCode_ERR_CODE_UNAUTHORIZED), "unauthorized")
+	CodeOK              = codes.NewCode(int(pb.ErrCode_ERR_CODE_OK), "success")
+	CodeInternalError   = codes.NewCode(int(pb.ErrCode_ERR_CODE_INTERNAL_ERROR), "internal error")
+	CodeInvalidParams   = codes.NewCode(int(pb.ErrCode_ERR_CODE_INVALID_PARAMS), "invalid params")
+	CodeUnauthorized    = codes.NewCode(int(pb.ErrCode_ERR_CODE_UNAUTHORIZED), "unauthorized")
 	CodePlayerNotFound  = codes.NewCode(int(pb.ErrCode_ERR_CODE_PLAYER_NOT_FOUND), "player not found")
 	CodePlayerExists    = codes.NewCode(int(pb.ErrCode_ERR_CODE_PLAYER_EXISTS), "player already exists")
 	CodePasswordWrong   = codes.NewCode(int(pb.ErrCode_ERR_CODE_PASSWORD_WRONG), "password wrong")
@@ -28,7 +28,7 @@ var (
 	CodeAuthTypeUnknown = codes.NewCode(3004, "unknown auth type")
 )
 
-// 活动/任务/世界快照错误码（数值与 common.proto ErrCode 一致）。
+// 活动/任务/活动快照错误码（数值与 common.proto ErrCode 一致）。
 var (
 	CodeActivityNotFound       = codes.NewCode(int(pb.ErrCode_ERR_CODE_ACTIVITY_NOT_FOUND), "activity not found")
 	CodeActivityNotRunning     = codes.NewCode(int(pb.ErrCode_ERR_CODE_ACTIVITY_NOT_RUNNING), "activity not running")
@@ -39,7 +39,7 @@ var (
 	CodeTaskAlreadyClaimed     = codes.NewCode(int(pb.ErrCode_ERR_CODE_TASK_ALREADY_CLAIMED), "task reward already claimed")
 	CodeTaskExpired            = codes.NewCode(int(pb.ErrCode_ERR_CODE_TASK_EXPIRED), "task period expired")
 	CodeTaskNotAccepted        = codes.NewCode(int(pb.ErrCode_ERR_CODE_TASK_NOT_ACCEPTED), "task not accepted")
-	CodeWorldUnavailable       = codes.NewCode(int(pb.ErrCode_ERR_CODE_WORLD_UNAVAILABLE), "world snapshot unavailable")
+	CodeActivityUnavailable    = codes.NewCode(int(pb.ErrCode_ERR_CODE_ACTIVITY_UNAVAILABLE), "activity snapshot unavailable")
 )
 
 // ErrXxx 便捷入口：直接拿到 error（CodeXxx.Err()）。

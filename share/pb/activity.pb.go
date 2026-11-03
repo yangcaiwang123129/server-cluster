@@ -26,8 +26,8 @@ type ActivityEntry struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	InstanceId    int64                  `protobuf:"varint,1,opt,name=instance_id,json=instanceId,proto3" json:"instance_id,omitempty"`       // 活动实例ID
 	CfgId         int32                  `protobuf:"varint,2,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"`                      // 活动模板ID
-	ActivityType  int32                  `protobuf:"varint,3,opt,name=activity_type,json=activityType,proto3" json:"activity_type,omitempty"` // 1签到 2任务 3充值返利 4排行 5累充 6兑换
-	Status        int32                  `protobuf:"varint,4,opt,name=status,proto3" json:"status,omitempty"`                                 // 0未开启 1已开启 2已结束 3已取消
+	ActivityType  int32                  `protobuf:"varint,3,opt,name=activity_type,json=activityType,proto3" json:"activity_type,omitempty"` // 已废弃（配置表移除），恒 0
+	Status        int32                  `protobuf:"varint,4,opt,name=status,proto3" json:"status,omitempty"`                                 // 见 consts.ActivityStatus*
 	StartTime     int64                  `protobuf:"varint,5,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`          // 开始时间（毫秒）
 	EndTime       int64                  `protobuf:"varint,6,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`                // 结束时间（毫秒）
 	Round         int32                  `protobuf:"varint,7,opt,name=round,proto3" json:"round,omitempty"`                                   // 轮次
@@ -35,7 +35,7 @@ type ActivityEntry struct {
 	Icon          string                 `protobuf:"bytes,9,opt,name=icon,proto3" json:"icon,omitempty"`                                      // 图标
 	Desc          string                 `protobuf:"bytes,10,opt,name=desc,proto3" json:"desc,omitempty"`                                     // 描述
 	TaskGroupId   int32                  `protobuf:"varint,11,opt,name=task_group_id,json=taskGroupId,proto3" json:"task_group_id,omitempty"` // 关联任务组
-	ResetType     int32                  `protobuf:"varint,12,opt,name=reset_type,json=resetType,proto3" json:"reset_type,omitempty"`         // 1不重置 2每日 3每周 4活动周期
+	ResetType     int32                  `protobuf:"varint,12,opt,name=reset_type,json=resetType,proto3" json:"reset_type,omitempty"`         // 已废弃，恒 0
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

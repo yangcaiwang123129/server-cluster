@@ -7,15 +7,14 @@ type SimOptionsResp struct {
 	LoginAddr string `json:"loginAddr"` // 登录服地址
 }
 
-// SimLoginReq 模拟客户端登录/注册请求。
+// SimLoginReq 模拟客户端账号登录请求。
 type SimLoginReq struct {
-	Mode      string `json:"mode"`      // login | register
 	Username  string `json:"username"`  // 账号
 	Password  string `json:"password"`  // 密码
 	LoginAddr string `json:"loginAddr"` // 登录服地址，空则取默认配置
 }
 
-// SimLoginResp 登录/注册结果，JSON 中的 request/response 为页面展示用的报文。
+// SimLoginResp 账号登录结果，JSON 中的 request/response 为页面展示用的报文。
 type SimLoginResp struct {
 	SessionID string          `json:"sessionId"`
 	PlayerID  int64           `json:"playerId"`

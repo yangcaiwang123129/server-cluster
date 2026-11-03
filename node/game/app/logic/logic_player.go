@@ -50,7 +50,7 @@ func PlayerLogic() global.PlayerLogic { return playerLogicInst.MustGet() }
 // EnterGame 进入游戏：playerID 由 handler 层从 ctx.UID() 取得（首包 verify 已完成绑定）。
 // 先加载核心数据并驱动各玩家模块预热/建档，全部成功后才创建在线 actor。
 // loginIP 由 handler 通过 context value 注入（key 见 loginIPKey）。
-func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.EnterGameReq) (*pb.EnterGameResp, error) {
+func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.EnterGameReq, resp *pb.EnterGameResp) error {
 	// 从 context 取 handler 注入的登录 IP（key 与 handler_player.go 中 injectLoginIP 一致）
 	loginIP, _ := ctx.Value("player_login_ip").(string)
 
@@ -65,7 +65,7 @@ func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.
 		}
 		global.PlayerExtraCache.Set(playerID, core)
 	} else if err != nil {
-		return nil, err
+		return err
 	}
 
 	// 账号行由 login 服建档；异常缺失时按全 0 货币处理，不阻断进入游戏
@@ -73,70 +73,51 @@ func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		player = &model.Player{PlayerID: playerID}
 	} else if err != nil {
-		return nil, err
+		return err
 	}
 
-	// 各玩家数据模块预热/建档，并把各自需要下发的初始状态合并进响应；任一失败则不进入游戏
-	resp := &pb.EnterGameResp{PlayerAttr: buildPlayerAttr(core, player)}
+	// 玩家基础属性写入响应，再由各模块把各自的初始状态写入同一响应；任一失败则不进入游戏
+	resp.PlayerAttr = buildPlayerAttr(core, player)
 	for _, mod := range moduleLogics() {
-		part, err := mod.EnterGame(ctx, playerID, req)
-		if err != nil {
-			return nil, err
+		if err := mod.EnterGame(ctx, playerID, req, resp); err != nil {
+			return err
 		}
-		mergeEnterGameResp(resp, part)
 	}
 
 	// 创建玩家 actor（已在线则复用），在线登记由 actor 生命周期驱动。
 	if err := this.PlayerCreateActor(ctx, playerID, loginIP); err != nil {
-		return nil, err
+		return err
 	}
 
-	resp.Activities = WorldSync().Activities()
+	resp.Activities = ActivitySync().Activities()
 	resp.Result = &pb.Result{Code: pb.ErrCode_ERR_CODE_OK}
 	resp.ServerTime = xtime.Now().UnixMilli()
-	return resp, nil
+	return nil
 }
 
 // loginIPKey context 中 loginIP 的 key（handler 注入，EnterGame 读取）。
 // 注意：用字符串 key 避免跨包 type 不匹配。
-
-// mergeEnterGameResp 合并模块返回的初始状态（只取模块实际填充的字段）。
-func mergeEnterGameResp(dst, src *pb.EnterGameResp) {
-	if src == nil {
-		return
-	}
-	if src.HeroEntry != nil {
-		dst.HeroEntry = src.HeroEntry
-	}
-	if len(src.Tasks) > 0 {
-		if dst.Tasks == nil {
-			dst.Tasks = src.Tasks
-		} else {
-			for id, entry := range src.Tasks {
-				dst.Tasks[id] = entry
-			}
-		}
-	}
-}
 
 // buildPlayerAttr 组装下发给客户端的玩家属性表：
 // 昵称/等级/经验/vip 取自 player_extra，币/金取自 player。
 // 键为 Attr 枚举值，值按实际类型放入 ObjectValue。
 func buildPlayerAttr(core *model.PlayerExtra, player *model.Player) *pb.AttrMap {
 	return &pb.AttrMap{Values: map[int32]*pb.ObjectValue{
-		int32(pb.Attr_PLAYER_ATTR_NAME):      {Kind: &pb.ObjectValue_StringValue{StringValue: core.Nickname}},
-		int32(pb.Attr_PLAYER_ATTR_LEVEL):     {Kind: &pb.ObjectValue_IntValue{IntValue: core.Level}},
-		int32(pb.Attr_PLAYER_ATTR_EXP):       {Kind: &pb.ObjectValue_BigintValue{BigintValue: core.Exp}},
-		int32(pb.Attr_PLAYER_ATTR_VIP_LEVEL): {Kind: &pb.ObjectValue_IntValue{IntValue: core.VipLevel}},
-		int32(pb.Attr_PLAYER_ATTR_VIP_EXP):   {Kind: &pb.ObjectValue_BigintValue{BigintValue: core.VipExp}},
-		int32(pb.Attr_PLAYER_ATTR_COIN):      {Kind: &pb.ObjectValue_BigintValue{BigintValue: player.Coin}},
-		int32(pb.Attr_PLAYER_ATTR_GOLD):      {Kind: &pb.ObjectValue_BigintValue{BigintValue: player.Gold}},
+		int32(pb.Attr_PLAYER_ATTR_NAME):          {Kind: &pb.ObjectValue_StringValue{StringValue: core.Nickname}},
+		int32(pb.Attr_PLAYER_ATTR_LEVEL):         {Kind: &pb.ObjectValue_IntValue{IntValue: core.Level}},
+		int32(pb.Attr_PLAYER_ATTR_EXP):           {Kind: &pb.ObjectValue_BigintValue{BigintValue: core.Exp}},
+		int32(pb.Attr_PLAYER_ATTR_VIP_LEVEL):     {Kind: &pb.ObjectValue_IntValue{IntValue: core.VipLevel}},
+		int32(pb.Attr_PLAYER_ATTR_VIP_EXP):       {Kind: &pb.ObjectValue_BigintValue{BigintValue: core.VipExp}},
+		int32(pb.Attr_PLAYER_ATTR_COIN):          {Kind: &pb.ObjectValue_BigintValue{BigintValue: player.Coin}},
+		int32(pb.Attr_PLAYER_ATTR_GOLD):          {Kind: &pb.ObjectValue_BigintValue{BigintValue: player.Gold}},
+		int32(pb.Attr_PLAYER_ATTR_SIGNATURE):     {Kind: &pb.ObjectValue_StringValue{StringValue: core.Signature}},
+		int32(pb.Attr_PLAYER_ATTR_SETTINGS_JSON): {Kind: &pb.ObjectValue_StringValue{StringValue: core.SettingsJSON}},
 	}}
 }
 
 // LeaveGame 离开游戏：各模块待写数据同步落库并清缓存，再销毁玩家 actor。
 // 单个模块失败不阻断其余模块，返回首个错误。
-func (this *playerLogic) LeaveGame(ctx context.Context, playerID int64, req *pb.LeaveGameReq) (*pb.LeaveGameResp, error) {
+func (this *playerLogic) LeaveGame(ctx context.Context, playerID int64, req *pb.LeaveGameReq, resp *pb.LeaveGameResp) error {
 	var firstErr error
 	record := func(name string, err error) {
 		if err == nil {
@@ -150,15 +131,14 @@ func (this *playerLogic) LeaveGame(ctx context.Context, playerID int64, req *pb.
 
 	// 各玩家数据模块
 	for _, mod := range moduleLogics() {
-		_, err := mod.LeaveGame(ctx, playerID, req)
-		record("module", err)
+		record("module", mod.LeaveGame(ctx, playerID, req, resp))
 	}
 	// 无独立模块的玩家表：账号（含货币）、核心
 	record("player", flushAndEvict(ctx, global.PlayerCache, playerID))
 	record("player_core", flushAndEvict(ctx, global.PlayerExtraCache, playerID))
 
 	record("player_actor", this.PlayerDestroyActor(ctx, playerID))
-	return &pb.LeaveGameResp{}, firstErr
+	return firstErr
 }
 
 // ── 玩家资产消费：礼包购买 / 兑换 / 充值 ────────────────────────────

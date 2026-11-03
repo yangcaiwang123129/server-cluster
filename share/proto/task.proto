@@ -9,12 +9,12 @@ option go_package = "server-cluster/share/pb";
 // 任务条目（玩家持有状态 + 配置展示字段）。
 message TaskEntry {
   int32 task_id = 1;              // 任务ID（配置ID）
-  int32 task_type = 2;            // 1主线 2日常 3周常 4活动 5全服
-  int32 target_task_type = 3;     // 进度来源类型
-  string period_key = 4;          // 周期key（main / 日期 / 周 / activity:实例ID）
+  int32 task_type = 2;            // 见 tpl.TaskType（0活动 1主线 2日常 3周常 4月常）
+  int32 target_task_type = 3;     // 见 tpl.TargetTaskType
+  string period_key = 4;          // 周期key（main / 日期 / 周 / 月 / activity:实例ID）
   int64 progress = 5;             // 当前进度
   int64 target = 6;               // 目标进度
-  int32 status = 7;               // 0未接取 1进行中 2可领取 3已领取
+  int32 status = 7;               // 见 consts.TaskStatus*（0未接取 1进行中 2可领取 3已领取）
   int64 completed_at = 8;         // 完成时间（毫秒）
   int64 claimed_at = 9;           // 领奖时间（毫秒）
   string name = 10;               // 名称
@@ -23,7 +23,7 @@ message TaskEntry {
   int32 sort = 13;                // 排序
   int32 activity_cfg_id = 14;     // 归属活动模板
   int32 pre_task_id = 15;         // 前置任务ID
-  int32 accept_type = 16;         // 1系统自动接取 2玩家手动接取
+  int32 accept_type = 16;         // 见 tpl.AcceptType（0自动 1手动）
 }
 
 // 任务列表请求（路由 11200）。

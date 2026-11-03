@@ -301,25 +301,26 @@ func (this *heroLogic) HeroUpgrade(ctx context.Context, playerID int64, req *pb.
 }
 
 // EnterGame 进入游戏：加载玩家英雄持有，只下发当前出战英雄的完整持有状态。
-func (this *heroLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq) (*pb.EnterGameResp, error) {
+func (this *heroLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, resp *pb.EnterGameResp) error {
 	entries, err := heroEntries(ctx, playerID)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	for _, entry := range entries {
 		if entry.Equipped {
-			return &pb.EnterGameResp{HeroEntry: entry}, nil
+			resp.HeroEntry = entry
+			return nil
 		}
 	}
-	return &pb.EnterGameResp{}, nil
+	return nil
 }
 
 // LeaveGame 离开游戏：英雄持有数据同步落库，并逐出内存缓存。
-func (this *heroLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq) (*pb.LeaveGameResp, error) {
+func (this *heroLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
 	if err := flushAndEvict(ctx, global.PlayerHeroCache, playerID); err != nil {
-		return nil, err
+		return err
 	}
-	return &pb.LeaveGameResp{}, nil
+	return nil
 }
 
 // loadPlayerHero 加载玩家英雄持有；未建档则初始化空 map 并挂入缓存（异步落库）。

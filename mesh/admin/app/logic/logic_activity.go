@@ -14,7 +14,7 @@ import (
 	"github.com/dobyte/due/v2/log"
 )
 
-// ActivityLogic admin 内嵌 World 模块：活动状态机 + 开服策略 + 快照发布 + GM 操作。
+// ActivityLogic admin 内嵌活动模块：活动状态机 + 开服策略 + 快照发布 + GM 操作。
 type ActivityLogic interface {
 	// Start 加载活动实例与开服时间，修复跨停机状态，发布首份快照并启动 ticker。
 	Start(ctx context.Context) error
@@ -22,14 +22,12 @@ type ActivityLogic interface {
 	Stop()
 	// List GM 分页查询活动实例。
 	List(ctx context.Context, q dto.GmActivityQuery, pageIndex, pageSize int) ([]dto.GmActivityResp, int64, error)
-	// Create GM 手动创建活动实例。
-	Create(ctx context.Context, req dto.GmActivityCreateReq) (*dto.GmActivityResp, error)
+	// Configs GM 活动模板配置展示。
+	Configs() []dto.GmActivityCfgResp
 	// UpdateTime GM 修改活动时间（仅未开启允许）。
 	UpdateTime(ctx context.Context, id int64, req dto.GmActivityTimeReq) (*dto.GmActivityResp, error)
 	// End GM 提前结束活动。
 	End(ctx context.Context, id int64, operator string) (*dto.GmActivityResp, error)
-	// Cancel GM 取消活动（不结算）。
-	Cancel(ctx context.Context, id int64, operator string) (*dto.GmActivityResp, error)
 	// Snapshot 获取当前内存快照（只读）。
 	Snapshot() *dto.ActivitySnapshot
 }
@@ -38,12 +36,12 @@ var activityLogicInst = singleton.NewContainer[ActivityLogic]("ActivityLogic")
 
 func RegisterActivityLogic(inst ActivityLogic) { activityLogicInst.Register(inst) }
 
-// Activity 获取 World 活动模块单例。
+// Activity 获取活动模块单例。
 func Activity() ActivityLogic { return activityLogicInst.MustGet() }
 
 func init() { RegisterActivityLogic(&activityLogic{}) }
 
-// activityLogic World 活动模块：内存实例表为唯一实时态，DB 只做持久化与跨进程迁移校验。
+// activityLogic 活动模块：内存实例表为唯一实时态，DB 只做持久化与跨进程迁移校验。
 type activityLogic struct {
 	mu      sync.RWMutex
 	insts   map[int64]*model.Activity
@@ -68,7 +66,7 @@ func currentKeys(now int64) periodKeys {
 	}
 }
 
-// Start 启动 World 调度。
+// Start 启动活动调度。
 func (this *activityLogic) Start(ctx context.Context) error {
 	this.mu.Lock()
 	if this.cancel != nil {
@@ -97,11 +95,11 @@ func (this *activityLogic) Start(ctx context.Context) error {
 	this.repair(now)
 	this.publishSafe(runCtx, "start")
 	go this.loop(runCtx)
-	log.Infof("admin: world module started, activities=%d", len(list))
+	log.Infof("admin: activity module started, activities=%d", len(list))
 	return nil
 }
 
-// Stop 停止 World 调度。
+// Stop 停止活动调度。
 func (this *activityLogic) Stop() {
 	this.mu.Lock()
 	cancel := this.cancel
@@ -114,7 +112,7 @@ func (this *activityLogic) Stop() {
 
 // loop 1s tick：推进活动状态与周期 key。
 func (this *activityLogic) loop(ctx context.Context) {
-	t := time.NewTicker(consts.WorldTickInterval)
+	t := time.NewTicker(consts.ActivityTickInterval)
 	defer t.Stop()
 	for {
 		select {
@@ -188,7 +186,7 @@ func (this *activityLogic) advance(id, now int64) bool {
 	}
 	ok, err := this.transit(id, from, to, now, "")
 	if err != nil {
-		log.Errorf("admin: world transition activity %d %d->%d failed: %v", id, from, to, err)
+		log.Errorf("admin: activity transition %d %d->%d failed: %v", id, from, to, err)
 		return false
 	}
 	return ok
@@ -224,7 +222,7 @@ func (this *activityLogic) transit(id int64, from, to int32, now int64, remark s
 		inst.Version++
 	}
 	this.mu.Unlock()
-	log.Infof("admin: world activity %d status %d -> %d", id, from, to)
+	log.Infof("admin: activity %d status %d -> %d", id, from, to)
 	return true, nil
 }
 

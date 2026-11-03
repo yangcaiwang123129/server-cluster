@@ -228,13 +228,13 @@ func (this *weaponLogic) WeaponEnsureForHero(ctx context.Context, playerID int64
 }
 
 // EnterGame 进入游戏：加载玩家武器持有，未建档则初始化空集合；并按已拥有英雄兜底补建绑定武器。
-func (this *weaponLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq) (*pb.EnterGameResp, error) {
+func (this *weaponLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
 	if _, err := loadPlayerWeapon(ctx, playerID); err != nil {
-		return nil, err
+		return err
 	}
 	heroes, err := loadPlayerHero(ctx, playerID)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if heroes.Heroes != nil {
 		var ids []int32
@@ -244,20 +244,20 @@ func (this *weaponLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.En
 		})
 		for _, id := range ids {
 			if err := this.WeaponEnsureForHero(ctx, playerID, id); err != nil {
-				return nil, err
+				return err
 			}
 		}
 	}
 	// 武器数据由 WeaponList 下发，这里只预热缓存
-	return &pb.EnterGameResp{}, nil
+	return nil
 }
 
 // LeaveGame 离开游戏：武器持有数据同步落库，并逐出内存缓存。
-func (this *weaponLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq) (*pb.LeaveGameResp, error) {
+func (this *weaponLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
 	if err := flushAndEvict(ctx, global.PlayerWeaponCache, playerID); err != nil {
-		return nil, err
+		return err
 	}
-	return &pb.LeaveGameResp{}, nil
+	return nil
 }
 
 // loadPlayerWeapon 加载玩家武器持有；未建档则初始化空 map 并挂入缓存（异步落库）。

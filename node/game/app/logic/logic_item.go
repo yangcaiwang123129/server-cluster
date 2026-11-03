@@ -129,20 +129,20 @@ func itemContainerOf(ctx context.Context, playerID int64, t pb.ContainerType) (*
 }
 
 // EnterGame 进入游戏：加载/建档玩家物品容器，未建档则初始化并挂入缓存。
-func (this *itemLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq) (*pb.EnterGameResp, error) {
+func (this *itemLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
 	if _, err := loadItem(ctx, playerID); err != nil {
-		return nil, err
+		return err
 	}
 	// 物品容器数据由 ItemContainerList 下发，这里只预热缓存
-	return nil, nil
+	return nil
 }
 
 // LeaveGame 离开游戏：物品容器待写数据同步落库，并逐出内存缓存。
-func (this *itemLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq) (*pb.LeaveGameResp, error) {
+func (this *itemLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
 	if err := flushAndEvict(ctx, global.PlayerItemCache, playerID); err != nil {
-		return nil, err
+		return err
 	}
-	return &pb.LeaveGameResp{}, nil
+	return nil
 }
 
 // ItemContainerList 物品容器列表：指定类型返回该容器，UNSPECIFIED 返回全部容器。

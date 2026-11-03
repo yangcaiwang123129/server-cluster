@@ -457,15 +457,14 @@ export interface SimOptions {
   loginAddr?: string
 }
 
-/** 模拟客户端登录/注册参数。 */
+/** 模拟客户端账号登录参数。 */
 export interface SimLoginPayload {
-  mode: 'login' | 'register'
   username: string
   password: string
   loginAddr?: string
 }
 
-/** 登录/注册结果，request/response 为展示用报文。 */
+/** 账号登录结果，request/response 为展示用报文。 */
 export interface SimLoginResult {
   sessionId: string
   playerId: number

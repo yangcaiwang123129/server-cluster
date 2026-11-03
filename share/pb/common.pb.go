@@ -35,6 +35,7 @@ const (
 	RouteCode_ROUTE_CODE_GIFT_BUY      RouteCode = 10004 // 购买礼包
 	RouteCode_ROUTE_CODE_EXCHANGE      RouteCode = 10005 // 兑换
 	RouteCode_ROUTE_CODE_RECHARGE      RouteCode = 10006 // 充值（当前为假充值，直接发放奖励）
+	RouteCode_ROUTE_CODE_ATTR_OPERATE  RouteCode = 10007 // 属性操作（按属性类型更新/领取）
 	// 玩家物品 10500~10599
 	RouteCode_ROUTE_CODE_ITEM_LIST     RouteCode = 10500 // 物品容器列表
 	RouteCode_ROUTE_CODE_ITEM_NOTIFY   RouteCode = 10501 // 物品容器内变化通知
@@ -94,6 +95,7 @@ var (
 		10004: "ROUTE_CODE_GIFT_BUY",
 		10005: "ROUTE_CODE_EXCHANGE",
 		10006: "ROUTE_CODE_RECHARGE",
+		10007: "ROUTE_CODE_ATTR_OPERATE",
 		10500: "ROUTE_CODE_ITEM_LIST",
 		10501: "ROUTE_CODE_ITEM_NOTIFY",
 		10502: "ROUTE_CODE_ITEM_ADD",
@@ -143,6 +145,7 @@ var (
 		"ROUTE_CODE_GIFT_BUY":            10004,
 		"ROUTE_CODE_EXCHANGE":            10005,
 		"ROUTE_CODE_RECHARGE":            10006,
+		"ROUTE_CODE_ATTR_OPERATE":        10007,
 		"ROUTE_CODE_ITEM_LIST":           10500,
 		"ROUTE_CODE_ITEM_NOTIFY":         10501,
 		"ROUTE_CODE_ITEM_ADD":            10502,
@@ -235,8 +238,8 @@ const (
 	ErrCode_ERR_CODE_TASK_ALREADY_CLAIMED ErrCode = 4103 // 任务已领奖
 	ErrCode_ERR_CODE_TASK_EXPIRED         ErrCode = 4104 // 任务周期已过期
 	ErrCode_ERR_CODE_TASK_NOT_ACCEPTED    ErrCode = 4105 // 任务未接取
-	// 世界（活动/任务快照）
-	ErrCode_ERR_CODE_WORLD_UNAVAILABLE ErrCode = 4201 // 世界快照未就绪
+	// 活动（活动/任务快照）
+	ErrCode_ERR_CODE_ACTIVITY_UNAVAILABLE ErrCode = 4201 // 活动快照未就绪
 )
 
 // Enum value maps for ErrCode.
@@ -259,7 +262,7 @@ var (
 		4103: "ERR_CODE_TASK_ALREADY_CLAIMED",
 		4104: "ERR_CODE_TASK_EXPIRED",
 		4105: "ERR_CODE_TASK_NOT_ACCEPTED",
-		4201: "ERR_CODE_WORLD_UNAVAILABLE",
+		4201: "ERR_CODE_ACTIVITY_UNAVAILABLE",
 	}
 	ErrCode_value = map[string]int32{
 		"ERR_CODE_OK":                       0,
@@ -279,7 +282,7 @@ var (
 		"ERR_CODE_TASK_ALREADY_CLAIMED":     4103,
 		"ERR_CODE_TASK_EXPIRED":             4104,
 		"ERR_CODE_TASK_NOT_ACCEPTED":        4105,
-		"ERR_CODE_WORLD_UNAVAILABLE":        4201,
+		"ERR_CODE_ACTIVITY_UNAVAILABLE":     4201,
 	}
 )
 
@@ -412,19 +415,68 @@ func (ContainerType) EnumDescriptor() ([]byte, []int) {
 	return file_common_proto_rawDescGZIP(), []int{3}
 }
 
+// ========== 属性动作类型 ==========
+type AttrOperate int32
+
+const (
+	AttrOperate_UPDATE AttrOperate = 0 // 更新
+	AttrOperate_CLAIM  AttrOperate = 1 // 领取
+)
+
+// Enum value maps for AttrOperate.
+var (
+	AttrOperate_name = map[int32]string{
+		0: "UPDATE",
+		1: "CLAIM",
+	}
+	AttrOperate_value = map[string]int32{
+		"UPDATE": 0,
+		"CLAIM":  1,
+	}
+)
+
+func (x AttrOperate) Enum() *AttrOperate {
+	p := new(AttrOperate)
+	*p = x
+	return p
+}
+
+func (x AttrOperate) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (AttrOperate) Descriptor() protoreflect.EnumDescriptor {
+	return file_common_proto_enumTypes[4].Descriptor()
+}
+
+func (AttrOperate) Type() protoreflect.EnumType {
+	return &file_common_proto_enumTypes[4]
+}
+
+func (x AttrOperate) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use AttrOperate.Descriptor instead.
+func (AttrOperate) EnumDescriptor() ([]byte, []int) {
+	return file_common_proto_rawDescGZIP(), []int{4}
+}
+
 // ========== 属性枚举 ==========
 type Attr int32
 
 const (
 	// 1~999 玩家相关属性
-	Attr_PLAYER_ATTR_UNSPECIFIED Attr = 0
-	Attr_PLAYER_ATTR_NAME        Attr = 1 // 昵称：string
-	Attr_PLAYER_ATTR_LEVEL       Attr = 2 // 等级：int32
-	Attr_PLAYER_ATTR_EXP         Attr = 3 // 经验：int64
-	Attr_PLAYER_ATTR_VIP_LEVEL   Attr = 4 // vip等级：int32
-	Attr_PLAYER_ATTR_VIP_EXP     Attr = 5 // vip经验：int64
-	Attr_PLAYER_ATTR_COIN        Attr = 6 // 币：int64
-	Attr_PLAYER_ATTR_GOLD        Attr = 7 // 金：int64
+	Attr_PLAYER_ATTR_UNSPECIFIED   Attr = 0
+	Attr_PLAYER_ATTR_NAME          Attr = 1 // 昵称：string
+	Attr_PLAYER_ATTR_LEVEL         Attr = 2 // 等级：int32
+	Attr_PLAYER_ATTR_EXP           Attr = 3 // 经验：int64
+	Attr_PLAYER_ATTR_VIP_LEVEL     Attr = 4 // vip等级：int32
+	Attr_PLAYER_ATTR_VIP_EXP       Attr = 5 // vip经验：int64
+	Attr_PLAYER_ATTR_COIN          Attr = 6 // 币：int64
+	Attr_PLAYER_ATTR_GOLD          Attr = 7 // 金：int64
+	Attr_PLAYER_ATTR_SIGNATURE     Attr = 8 // 个性签名：string
+	Attr_PLAYER_ATTR_SETTINGS_JSON Attr = 9 // 个人设置：string
 )
 
 // Enum value maps for Attr.
@@ -438,16 +490,20 @@ var (
 		5: "PLAYER_ATTR_VIP_EXP",
 		6: "PLAYER_ATTR_COIN",
 		7: "PLAYER_ATTR_GOLD",
+		8: "PLAYER_ATTR_SIGNATURE",
+		9: "PLAYER_ATTR_SETTINGS_JSON",
 	}
 	Attr_value = map[string]int32{
-		"PLAYER_ATTR_UNSPECIFIED": 0,
-		"PLAYER_ATTR_NAME":        1,
-		"PLAYER_ATTR_LEVEL":       2,
-		"PLAYER_ATTR_EXP":         3,
-		"PLAYER_ATTR_VIP_LEVEL":   4,
-		"PLAYER_ATTR_VIP_EXP":     5,
-		"PLAYER_ATTR_COIN":        6,
-		"PLAYER_ATTR_GOLD":        7,
+		"PLAYER_ATTR_UNSPECIFIED":   0,
+		"PLAYER_ATTR_NAME":          1,
+		"PLAYER_ATTR_LEVEL":         2,
+		"PLAYER_ATTR_EXP":           3,
+		"PLAYER_ATTR_VIP_LEVEL":     4,
+		"PLAYER_ATTR_VIP_EXP":       5,
+		"PLAYER_ATTR_COIN":          6,
+		"PLAYER_ATTR_GOLD":          7,
+		"PLAYER_ATTR_SIGNATURE":     8,
+		"PLAYER_ATTR_SETTINGS_JSON": 9,
 	}
 )
 
@@ -462,11 +518,11 @@ func (x Attr) String() string {
 }
 
 func (Attr) Descriptor() protoreflect.EnumDescriptor {
-	return file_common_proto_enumTypes[4].Descriptor()
+	return file_common_proto_enumTypes[5].Descriptor()
 }
 
 func (Attr) Type() protoreflect.EnumType {
-	return &file_common_proto_enumTypes[4]
+	return &file_common_proto_enumTypes[5]
 }
 
 func (x Attr) Number() protoreflect.EnumNumber {
@@ -475,7 +531,7 @@ func (x Attr) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use Attr.Descriptor instead.
 func (Attr) EnumDescriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{4}
+	return file_common_proto_rawDescGZIP(), []int{5}
 }
 
 // 属性表：键为 Attr 枚举值，值为动态类型
@@ -1465,8 +1521,7 @@ const file_common_proto_rawDesc = "" +
 	"\bequipped\x18\x04 \x01(\bR\bequipped\x12\x17\n" +
 	"\ahero_id\x18\x05 \x01(\x05R\x06heroId\x12\x18\n" +
 	"\aquality\x18\x06 \x01(\x05R\aquality\x12\"\n" +
-	"\fbreakthrough\x18\a \x01(\x05R\fbreakthrough*\xfa\n" +
-	"\n" +
+	"\fbreakthrough\x18\a \x01(\x05R\fbreakthrough*\x98\v\n" +
 	"\tRouteCode\x12\x1a\n" +
 	"\x16ROUTE_CODE_UNSPECIFIED\x10\x00\x12\x16\n" +
 	"\x11ROUTE_CODE_VERIFY\x10\x90N\x12\x1a\n" +
@@ -1475,7 +1530,8 @@ const file_common_proto_rawDesc = "" +
 	"\x18ROUTE_CODE_SERVER_NOTIFY\x10\x93N\x12\x18\n" +
 	"\x13ROUTE_CODE_GIFT_BUY\x10\x94N\x12\x18\n" +
 	"\x13ROUTE_CODE_EXCHANGE\x10\x95N\x12\x18\n" +
-	"\x13ROUTE_CODE_RECHARGE\x10\x96N\x12\x19\n" +
+	"\x13ROUTE_CODE_RECHARGE\x10\x96N\x12\x1c\n" +
+	"\x17ROUTE_CODE_ATTR_OPERATE\x10\x97N\x12\x19\n" +
 	"\x14ROUTE_CODE_ITEM_LIST\x10\x84R\x12\x1b\n" +
 	"\x16ROUTE_CODE_ITEM_NOTIFY\x10\x85R\x12\x18\n" +
 	"\x13ROUTE_CODE_ITEM_ADD\x10\x86R\x12\x19\n" +
@@ -1514,7 +1570,7 @@ const file_common_proto_rawDesc = "" +
 	"\x14ROUTE_CODE_TASK_LIST\x10\xc0W\x12\x1b\n" +
 	"\x16ROUTE_CODE_TASK_NOTIFY\x10\xc1W\x12\x1a\n" +
 	"\x15ROUTE_CODE_TASK_CLAIM\x10\xc2W\x12\x1b\n" +
-	"\x16ROUTE_CODE_TASK_ACCEPT\x10\xc3W*\xb9\x04\n" +
+	"\x16ROUTE_CODE_TASK_ACCEPT\x10\xc3W*\xbc\x04\n" +
 	"\aErrCode\x12\x0f\n" +
 	"\vERR_CODE_OK\x10\x00\x12\x1c\n" +
 	"\x17ERR_CODE_INTERNAL_ERROR\x10\xe8\a\x12\x1c\n" +
@@ -1532,8 +1588,8 @@ const file_common_proto_rawDesc = "" +
 	"\x1bERR_CODE_TASK_NOT_COMPLETED\x10\x86 \x12\"\n" +
 	"\x1dERR_CODE_TASK_ALREADY_CLAIMED\x10\x87 \x12\x1a\n" +
 	"\x15ERR_CODE_TASK_EXPIRED\x10\x88 \x12\x1f\n" +
-	"\x1aERR_CODE_TASK_NOT_ACCEPTED\x10\x89 \x12\x1f\n" +
-	"\x1aERR_CODE_WORLD_UNAVAILABLE\x10\xe9 *X\n" +
+	"\x1aERR_CODE_TASK_NOT_ACCEPTED\x10\x89 \x12\"\n" +
+	"\x1dERR_CODE_ACTIVITY_UNAVAILABLE\x10\xe9 *X\n" +
 	"\vNOTIFY_TYPE\x12\x14\n" +
 	"\x10NOTIFY_TYPE_KICK\x10\x00\x12\x18\n" +
 	"\x14NOTIFY_TYPE_MAINTAIN\x10\x02\x12\x19\n" +
@@ -1542,7 +1598,11 @@ const file_common_proto_rawDesc = "" +
 	"\x1aCONTAINER_TYPE_UNSPECIFIED\x10\x00\x12\x1b\n" +
 	"\x17CONTAINER_TYPE_BACKPACK\x10\x01\x12\x18\n" +
 	"\x14CONTAINER_TYPE_STASH\x10\x02\x12\x19\n" +
-	"\x15CONTAINER_TYPE_SECURE\x10\x03*\xc5\x01\n" +
+	"\x15CONTAINER_TYPE_SECURE\x10\x03*$\n" +
+	"\vAttrOperate\x12\n" +
+	"\n" +
+	"\x06UPDATE\x10\x00\x12\t\n" +
+	"\x05CLAIM\x10\x01*\xff\x01\n" +
 	"\x04Attr\x12\x1b\n" +
 	"\x17PLAYER_ATTR_UNSPECIFIED\x10\x00\x12\x14\n" +
 	"\x10PLAYER_ATTR_NAME\x10\x01\x12\x15\n" +
@@ -1551,7 +1611,9 @@ const file_common_proto_rawDesc = "" +
 	"\x15PLAYER_ATTR_VIP_LEVEL\x10\x04\x12\x17\n" +
 	"\x13PLAYER_ATTR_VIP_EXP\x10\x05\x12\x14\n" +
 	"\x10PLAYER_ATTR_COIN\x10\x06\x12\x14\n" +
-	"\x10PLAYER_ATTR_GOLD\x10\aB\x19Z\x17server-cluster/share/pbb\x06proto3"
+	"\x10PLAYER_ATTR_GOLD\x10\a\x12\x19\n" +
+	"\x15PLAYER_ATTR_SIGNATURE\x10\b\x12\x1d\n" +
+	"\x19PLAYER_ATTR_SETTINGS_JSON\x10\tB\x19Z\x17server-cluster/share/pbb\x06proto3"
 
 var (
 	file_common_proto_rawDescOnce sync.Once
@@ -1565,41 +1627,42 @@ func file_common_proto_rawDescGZIP() []byte {
 	return file_common_proto_rawDescData
 }
 
-var file_common_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
+var file_common_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
 var file_common_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_common_proto_goTypes = []any{
 	(RouteCode)(0),        // 0: pb.RouteCode
 	(ErrCode)(0),          // 1: pb.ErrCode
 	(NOTIFY_TYPE)(0),      // 2: pb.NOTIFY_TYPE
 	(ContainerType)(0),    // 3: pb.ContainerType
-	(Attr)(0),             // 4: pb.Attr
-	(*AttrMap)(nil),       // 5: pb.AttrMap
-	(*Result)(nil),        // 6: pb.Result
-	(*Object)(nil),        // 7: pb.Object
-	(*ObjectList)(nil),    // 8: pb.ObjectList
-	(*ObjectValue)(nil),   // 9: pb.ObjectValue
-	(*AssetEntry)(nil),    // 10: pb.AssetEntry
-	(*ItemEntry)(nil),     // 11: pb.ItemEntry
-	(*ItemContainer)(nil), // 12: pb.ItemContainer
-	(*HeroEntry)(nil),     // 13: pb.HeroEntry
-	(*WeaponEntry)(nil),   // 14: pb.WeaponEntry
-	(*SkillEntry)(nil),    // 15: pb.SkillEntry
-	(*EquipEntry)(nil),    // 16: pb.EquipEntry
-	nil,                   // 17: pb.AttrMap.ValuesEntry
-	nil,                   // 18: pb.Object.ValuesEntry
+	(AttrOperate)(0),      // 4: pb.AttrOperate
+	(Attr)(0),             // 5: pb.Attr
+	(*AttrMap)(nil),       // 6: pb.AttrMap
+	(*Result)(nil),        // 7: pb.Result
+	(*Object)(nil),        // 8: pb.Object
+	(*ObjectList)(nil),    // 9: pb.ObjectList
+	(*ObjectValue)(nil),   // 10: pb.ObjectValue
+	(*AssetEntry)(nil),    // 11: pb.AssetEntry
+	(*ItemEntry)(nil),     // 12: pb.ItemEntry
+	(*ItemContainer)(nil), // 13: pb.ItemContainer
+	(*HeroEntry)(nil),     // 14: pb.HeroEntry
+	(*WeaponEntry)(nil),   // 15: pb.WeaponEntry
+	(*SkillEntry)(nil),    // 16: pb.SkillEntry
+	(*EquipEntry)(nil),    // 17: pb.EquipEntry
+	nil,                   // 18: pb.AttrMap.ValuesEntry
+	nil,                   // 19: pb.Object.ValuesEntry
 }
 var file_common_proto_depIdxs = []int32{
-	17, // 0: pb.AttrMap.values:type_name -> pb.AttrMap.ValuesEntry
+	18, // 0: pb.AttrMap.values:type_name -> pb.AttrMap.ValuesEntry
 	1,  // 1: pb.Result.code:type_name -> pb.ErrCode
-	18, // 2: pb.Object.values:type_name -> pb.Object.ValuesEntry
-	9,  // 3: pb.ObjectList.values:type_name -> pb.ObjectValue
+	19, // 2: pb.Object.values:type_name -> pb.Object.ValuesEntry
+	10, // 3: pb.ObjectList.values:type_name -> pb.ObjectValue
 	3,  // 4: pb.ItemContainer.type:type_name -> pb.ContainerType
-	11, // 5: pb.ItemContainer.item_entries:type_name -> pb.ItemEntry
-	14, // 6: pb.HeroEntry.weapon:type_name -> pb.WeaponEntry
-	15, // 7: pb.HeroEntry.skills:type_name -> pb.SkillEntry
-	16, // 8: pb.HeroEntry.equips:type_name -> pb.EquipEntry
-	9,  // 9: pb.AttrMap.ValuesEntry.value:type_name -> pb.ObjectValue
-	9,  // 10: pb.Object.ValuesEntry.value:type_name -> pb.ObjectValue
+	12, // 5: pb.ItemContainer.item_entries:type_name -> pb.ItemEntry
+	15, // 6: pb.HeroEntry.weapon:type_name -> pb.WeaponEntry
+	16, // 7: pb.HeroEntry.skills:type_name -> pb.SkillEntry
+	17, // 8: pb.HeroEntry.equips:type_name -> pb.EquipEntry
+	10, // 9: pb.AttrMap.ValuesEntry.value:type_name -> pb.ObjectValue
+	10, // 10: pb.Object.ValuesEntry.value:type_name -> pb.ObjectValue
 	11, // [11:11] is the sub-list for method output_type
 	11, // [11:11] is the sub-list for method input_type
 	11, // [11:11] is the sub-list for extension type_name
@@ -1624,7 +1687,7 @@ func file_common_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_common_proto_rawDesc), len(file_common_proto_rawDesc)),
-			NumEnums:      5,
+			NumEnums:      6,
 			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   0,

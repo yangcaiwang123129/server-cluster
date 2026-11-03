@@ -4,20 +4,29 @@ import (
 	"strconv"
 
 	"server-cluster/mesh/admin/app/logic"
+	"server-cluster/share/consts"
 	"server-cluster/share/dto"
 	"server-cluster/share/errs"
 
 	"github.com/dobyte/due/component/http/v2"
 )
 
-// RegisterActivity 注册活动管理路由（内嵌 World 模块，同进程直接调用）。
+// RegisterActivity 注册运营活动模块路由（内嵌活动模块，同进程直接调用）。
 func RegisterActivity(router http.Router) {
 	g := gmGroup(router)
 	g.Get("/activity", handleActivityList)
-	g.Post("/activity", handleActivityCreate)
+	g.Get("/activity/configs", handleActivityConfigList)
 	g.Put("/activity/:id/time", handleActivityUpdateTime)
 	g.Post("/activity/:id/end", handleActivityEnd)
-	g.Post("/activity/:id/cancel", handleActivityCancel)
+}
+
+// handleActivityConfigList 活动模板配置展示。
+// @Summary 活动模板列表
+// @Tags activity
+// @Produce json
+// @Router /api/v1/gm/activity/configs [get]
+func handleActivityConfigList(ctx http.Context) error {
+	return errs.OK(ctx, logic.Activity().Configs())
 }
 
 // handleActivityList 活动实例分页列表。
@@ -32,7 +41,7 @@ func RegisterActivity(router http.Router) {
 func handleActivityList(ctx http.Context) error {
 	req := dto.GmActivityQuery{
 		CfgID:  queryInt(ctx, "cfgId"),
-		Status: -1,
+		Status: consts.ActivityStatusAll,
 	}
 	if v := ctx.Query("status"); v != "" {
 		if i, err := strconv.Atoi(v); err == nil {
@@ -52,25 +61,6 @@ func handleActivityList(ctx http.Context) error {
 		return errs.FailErr(ctx, err)
 	}
 	return errs.OK(ctx, errs.Page(list, total, pageIndex, pageSize))
-}
-
-// handleActivityCreate GM 手动创建活动实例。
-// @Summary 创建活动实例
-// @Tags activity
-// @Accept json
-// @Produce json
-// @Param body body dto.GmActivityCreateReq true "活动实例"
-// @Router /api/v1/gm/activity [post]
-func handleActivityCreate(ctx http.Context) error {
-	var req dto.GmActivityCreateReq
-	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, 400, "invalid body")
-	}
-	resp, err := logic.Activity().Create(ctx.Context(), req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, resp)
 }
 
 // handleActivityUpdateTime 修改活动时间（仅未开启）。
@@ -109,24 +99,6 @@ func handleActivityEnd(ctx http.Context) error {
 		return errs.Fail(ctx, 400, "invalid activity id")
 	}
 	resp, err := logic.Activity().End(ctx.Context(), id, "")
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, resp)
-}
-
-// handleActivityCancel GM 取消活动（不结算）。
-// @Summary 取消活动
-// @Tags activity
-// @Produce json
-// @Param id path int true "活动实例ID"
-// @Router /api/v1/gm/activity/{id}/cancel [post]
-func handleActivityCancel(ctx http.Context) error {
-	id, err := strconv.ParseInt(ctx.Params("id"), 10, 64)
-	if err != nil || id <= 0 {
-		return errs.Fail(ctx, 400, "invalid activity id")
-	}
-	resp, err := logic.Activity().Cancel(ctx.Context(), id, "")
 	if err != nil {
 		return errs.FailErr(ctx, err)
 	}

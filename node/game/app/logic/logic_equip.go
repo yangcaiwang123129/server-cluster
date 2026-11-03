@@ -324,20 +324,20 @@ func (this *equipLogic) EquipBreakthrough(ctx context.Context, playerID int64, r
 }
 
 // EnterGame 进入游戏：加载玩家装备持有，未建档则初始化空集合。
-func (this *equipLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq) (*pb.EnterGameResp, error) {
+func (this *equipLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
 	if _, err := loadPlayerEquip(ctx, playerID); err != nil {
-		return nil, err
+		return err
 	}
 	// 装备数据由 EquipList 下发，这里只预热缓存
-	return &pb.EnterGameResp{}, nil
+	return nil
 }
 
 // LeaveGame 离开游戏：装备持有数据同步落库，并逐出内存缓存。
-func (this *equipLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq) (*pb.LeaveGameResp, error) {
+func (this *equipLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
 	if err := flushAndEvict(ctx, global.PlayerEquipCache, playerID); err != nil {
-		return nil, err
+		return err
 	}
-	return &pb.LeaveGameResp{}, nil
+	return nil
 }
 
 // loadPlayerEquip 加载玩家装备持有；未建档则初始化空 map 并挂入缓存（异步落库）。

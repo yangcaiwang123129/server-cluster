@@ -4,6 +4,7 @@ import (
 	"github.com/dobyte/due/v2/cluster"
 	"github.com/dobyte/due/v2/cluster/node"
 	"github.com/dobyte/due/v2/etc"
+	"github.com/dobyte/due/v2/log"
 
 	"server-cluster/node/game/app/logic"
 	"server-cluster/share/pb"
@@ -99,6 +100,8 @@ func bindActor(act *node.Actor) {
 // forwardToActor 节点侧转发：把消息交给该玩家绑定的 actor 串行处理。
 func forwardToActor(ctx node.Context) {
 	if err := ctx.Next(); err != nil {
+		// err 响应经 proto codec 序列化失败会被静默丢弃（客户端表现为超时），此处必须落日志
+		log.Errorf("router: forward to actor failed, uid=%d route=%d err=%v", ctx.UID(), ctx.Route(), err)
 		_ = ctx.Response(err)
 	}
 }

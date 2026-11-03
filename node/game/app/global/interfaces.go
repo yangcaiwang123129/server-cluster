@@ -12,10 +12,10 @@ import (
 // ModuleLogic 玩家模块生命周期接口：进入游戏预热/建档该模块数据，离开游戏同步落库并清除缓存。
 // 所有持有玩家数据的模块都实现它，由 PlayerLogic 的 EnterGame/LeaveGame 统一驱动。
 type ModuleLogic interface {
-	// EnterGame 进入游戏：加载并预热该模块的玩家数据（未建档则初始化）
-	EnterGame(ctx context.Context, playerID int64, req *pb.EnterGameReq) (*pb.EnterGameResp, error)
+	// EnterGame 进入游戏：加载并预热该模块的玩家数据（未建档则初始化），初始状态写入 resp
+	EnterGame(ctx context.Context, playerID int64, req *pb.EnterGameReq, resp *pb.EnterGameResp) error
 	// LeaveGame 离开游戏：该玩家的待写数据同步落库，并逐出内存缓存
-	LeaveGame(ctx context.Context, playerID int64, req *pb.LeaveGameReq) (*pb.LeaveGameResp, error)
+	LeaveGame(ctx context.Context, playerID int64, req *pb.LeaveGameReq, resp *pb.LeaveGameResp) error
 }
 
 // PlayerLogic 玩家模块业务接口：玩家生命周期 + 玩家资产消费入口（礼包购买/兑换/充值）。
@@ -37,6 +37,8 @@ type PlayerLogic interface {
 	Exchange(ctx context.Context, playerID int64, req *pb.ExchangeReq) (*pb.ExchangeResp, error)
 	// Recharge 充值（当前为假充值，校验配置后直接发放奖励）
 	Recharge(ctx context.Context, playerID int64, req *pb.RechargeReq) (*pb.RechargeResp, error)
+	// AttrOperate 属性接口：按属性类型执行更新/领取
+	AttrOperate(ctx context.Context, playerID int64, req *pb.AttrOperateReq) (*pb.AttrOperateResp, error)
 }
 
 // ItemLogic 物品容器业务接口：

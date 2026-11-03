@@ -813,7 +813,7 @@ const docTemplate = `{
                 "tags": [
                     "sim"
                 ],
-                "summary": "客户端模拟器登录",
+                "summary": "账号登录",
                 "parameters": [
                     {
                         "description": "登录参数",
@@ -4105,10 +4105,6 @@ const docTemplate = `{
             "properties": {
                 "loginAddr": {
                     "description": "登录服地址，空则取默认配置",
-                    "type": "string"
-                },
-                "mode": {
-                    "description": "login | register",
                     "type": "string"
                 },
                 "password": {

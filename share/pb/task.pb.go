@@ -25,12 +25,12 @@ const (
 type TaskEntry struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	TaskId         int32                  `protobuf:"varint,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`                           // 任务ID（配置ID）
-	TaskType       int32                  `protobuf:"varint,2,opt,name=task_type,json=taskType,proto3" json:"task_type,omitempty"`                     // 1主线 2日常 3周常 4活动 5全服
-	TargetTaskType int32                  `protobuf:"varint,3,opt,name=target_task_type,json=targetTaskType,proto3" json:"target_task_type,omitempty"` // 进度来源类型
-	PeriodKey      string                 `protobuf:"bytes,4,opt,name=period_key,json=periodKey,proto3" json:"period_key,omitempty"`                   // 周期key（main / 日期 / 周 / activity:实例ID）
+	TaskType       int32                  `protobuf:"varint,2,opt,name=task_type,json=taskType,proto3" json:"task_type,omitempty"`                     // 见 tpl.TaskType（0活动 1主线 2日常 3周常 4月常）
+	TargetTaskType int32                  `protobuf:"varint,3,opt,name=target_task_type,json=targetTaskType,proto3" json:"target_task_type,omitempty"` // 见 tpl.TargetTaskType
+	PeriodKey      string                 `protobuf:"bytes,4,opt,name=period_key,json=periodKey,proto3" json:"period_key,omitempty"`                   // 周期key（main / 日期 / 周 / 月 / activity:实例ID）
 	Progress       int64                  `protobuf:"varint,5,opt,name=progress,proto3" json:"progress,omitempty"`                                     // 当前进度
 	Target         int64                  `protobuf:"varint,6,opt,name=target,proto3" json:"target,omitempty"`                                         // 目标进度
-	Status         int32                  `protobuf:"varint,7,opt,name=status,proto3" json:"status,omitempty"`                                         // 0未接取 1进行中 2可领取 3已领取
+	Status         int32                  `protobuf:"varint,7,opt,name=status,proto3" json:"status,omitempty"`                                         // 见 consts.TaskStatus*（0未接取 1进行中 2可领取 3已领取）
 	CompletedAt    int64                  `protobuf:"varint,8,opt,name=completed_at,json=completedAt,proto3" json:"completed_at,omitempty"`            // 完成时间（毫秒）
 	ClaimedAt      int64                  `protobuf:"varint,9,opt,name=claimed_at,json=claimedAt,proto3" json:"claimed_at,omitempty"`                  // 领奖时间（毫秒）
 	Name           string                 `protobuf:"bytes,10,opt,name=name,proto3" json:"name,omitempty"`                                             // 名称
@@ -39,7 +39,7 @@ type TaskEntry struct {
 	Sort           int32                  `protobuf:"varint,13,opt,name=sort,proto3" json:"sort,omitempty"`                                            // 排序
 	ActivityCfgId  int32                  `protobuf:"varint,14,opt,name=activity_cfg_id,json=activityCfgId,proto3" json:"activity_cfg_id,omitempty"`   // 归属活动模板
 	PreTaskId      int32                  `protobuf:"varint,15,opt,name=pre_task_id,json=preTaskId,proto3" json:"pre_task_id,omitempty"`               // 前置任务ID
-	AcceptType     int32                  `protobuf:"varint,16,opt,name=accept_type,json=acceptType,proto3" json:"accept_type,omitempty"`              // 1系统自动接取 2玩家手动接取
+	AcceptType     int32                  `protobuf:"varint,16,opt,name=accept_type,json=acceptType,proto3" json:"accept_type,omitempty"`              // 见 tpl.AcceptType（0自动 1手动）
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }

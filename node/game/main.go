@@ -52,14 +52,14 @@ func main() {
 	router.Register(component.Proxy())
 	// 注册服务间 RPC provider
 	component.Proxy().AddServiceProvider(pb.GameAdminService_ServiceDesc.ServiceName, &pb.GameAdminService_ServiceDesc, &service.GmProvider{})
-	// 启动 World 快照同步（读 Redis，10s 轮询）
-	logic.WorldSync().Start(context.Background())
+	// 启动活动快照同步（读 Redis，10s 轮询）
+	logic.ActivitySync().Start(context.Background())
 	// 添加节点组件
 	container.Add(component)
 	// 启动容器
 	container.Serve()
 	// 停止快照同步
-	logic.WorldSync().Stop()
+	logic.ActivitySync().Stop()
 	// 释放资源
 	global.Destroy()
 }

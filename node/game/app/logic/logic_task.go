@@ -34,9 +34,9 @@ func init() {
 func Task() global.TaskLogic { return taskLogicInst.MustGet() }
 
 // EnterGame 进入游戏：预热玩家任务缓存，上报登录事件，并随响应下发任务列表。
-func (this *taskLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq) (*pb.EnterGameResp, error) {
+func (this *taskLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, resp *pb.EnterGameResp) error {
 	if _, err := loadPlayerTasks(ctx, playerID); err != nil {
-		return nil, err
+		return err
 	}
 	this.EmitTaskEvent(ctx, global.TaskEvent{
 		PlayerID:       playerID,
@@ -45,27 +45,28 @@ func (this *taskLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.Ente
 	})
 	entries, _, err := this.collect(ctx, playerID, 0, 0)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	tasks := make(map[int32]*pb.TaskEntry, len(entries))
 	for _, entry := range entries {
 		tasks[entry.TaskId] = entry
 	}
-	return &pb.EnterGameResp{Tasks: tasks}, nil
+	resp.Tasks = tasks
+	return nil
 }
 
 // LeaveGame 离开游戏：任务/活动进度同步落库并逐出内存缓存。
-func (this *taskLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq) (*pb.LeaveGameResp, error) {
+func (this *taskLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
 	if err := flushAndEvict(ctx, global.PlayerTaskCache, playerID); err != nil {
-		return nil, err
+		return err
 	}
 	if err := flushAndEvict(ctx, global.PlayerActivityCache, playerID); err != nil {
-		return nil, err
+		return err
 	}
-	return &pb.LeaveGameResp{}, nil
+	return nil
 }
 
-// TaskList 任务列表：按类型/活动过滤，周期 key 取自 World 快照（缺失时按本地时间兜底）。
+// TaskList 任务列表：按类型/活动过滤，周期 key 取自活动快照（缺失时按本地时间兜底）。
 func (this *taskLogic) TaskList(ctx context.Context, playerID int64, req *pb.TaskListReq) (*pb.TaskListResp, error) {
 	entries, claimable, err := this.collect(ctx, playerID, req.GetTaskType(), req.GetActivityCfgId())
 	if err != nil {
@@ -80,7 +81,7 @@ func (this *taskLogic) collect(ctx context.Context, playerID int64, taskType, ac
 	if err != nil {
 		return nil, 0, err
 	}
-	snap := WorldSync().Snapshot()
+	snap := ActivitySync().Snapshot()
 	now := time.Now().UnixMilli()
 	entries := make([]*pb.TaskEntry, 0, tpl.T().Task.Len())
 	claimable := int32(0)
@@ -117,7 +118,7 @@ func (this *taskLogic) TaskClaim(ctx context.Context, playerID int64, req *pb.Ta
 		return nil, errs.CodeTaskNotFound.Err()
 	}
 	now := time.Now().UnixMilli()
-	key, ok := resolvePeriodKey(cfg, WorldSync().Snapshot(), now)
+	key, ok := resolvePeriodKey(cfg, ActivitySync().Snapshot(), now)
 	if !ok {
 		return nil, errs.CodeTaskExpired.Err()
 	}
@@ -178,7 +179,7 @@ func (this *taskLogic) TaskAccept(ctx context.Context, playerID int64, req *pb.T
 		return nil, errs.CodeInvalidParams.WithMessage("该任务无需手动接取").Err()
 	}
 	now := time.Now().UnixMilli()
-	key, ok := resolvePeriodKey(cfg, WorldSync().Snapshot(), now)
+	key, ok := resolvePeriodKey(cfg, ActivitySync().Snapshot(), now)
 	if !ok {
 		return nil, errs.CodeTaskExpired.Err()
 	}
@@ -215,7 +216,7 @@ func (this *taskLogic) EmitTaskEvent(ctx context.Context, e global.TaskEvent) {
 	if len(cfgs) == 0 {
 		return
 	}
-	snap := WorldSync().Snapshot()
+	snap := ActivitySync().Snapshot()
 	now := time.Now().UnixMilli()
 	pt, err := loadPlayerTasks(ctx, e.PlayerID)
 	if err != nil {
@@ -385,7 +386,7 @@ func resolvePeriodKey(cfg *tpl.TaskCfg, snap *dto.ActivitySnapshot, now int64) (
 		if inst == nil {
 			return "", false
 		}
-		return consts.ActivityPeriodKey(inst.InstanceID), true
+		return consts.ActivityPeriodKey(inst.ID), true
 	default: // tpl.TaskType_Main
 		return consts.MainPeriodKey, true
 	}
@@ -411,7 +412,7 @@ func latestActivity(snap *dto.ActivitySnapshot, cfgID int32) *dto.ActivityState 
 		if a.CfgID != cfgID || a.Status == consts.ActivityStatusCancelled {
 			continue
 		}
-		if latest == nil || a.InstanceID > latest.InstanceID {
+		if latest == nil || a.ID > latest.ID {
 			latest = a
 		}
 	}

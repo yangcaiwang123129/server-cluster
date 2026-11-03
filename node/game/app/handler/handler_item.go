@@ -2,9 +2,10 @@
 package handler
 
 import (
-	"server-cluster/internal/router"
-
 	"github.com/dobyte/due/v2/cluster/node"
+	"github.com/dobyte/due/v2/log"
+
+	"server-cluster/internal/router"
 
 	"server-cluster/node/game/app/logic"
 	"server-cluster/share/pb"
@@ -23,11 +24,13 @@ func init() {
 func handleItemList(ctx node.Context) {
 	req := &pb.ItemContainerListReq{}
 	if err := ctx.Parse(req); err != nil {
+		log.Errorf("handler: item list parse failed, uid=%d: %v", ctx.UID(), err)
 		_ = ctx.Response(err)
 		return
 	}
 	resp, err := logic.Item().ItemContainerList(ctx.Context(), ctx.UID(), req)
 	if err != nil {
+		log.Errorf("handler: item list logic failed, uid=%d: %v", ctx.UID(), err)
 		_ = ctx.Response(err)
 		return
 	}

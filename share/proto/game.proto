@@ -82,3 +82,16 @@ message RechargeResp {
   Result result = 1;
   repeated AssetEntry rewards = 2; // 实际发放的奖励
 }
+
+// 属性操作请求（路由 10007）：客户端传属性类型，服务端按类型处理
+message AttrOperateReq {
+  AttrOperate operate = 1; // 操作类型：更新/领取
+  int32 attr = 2;          // 属性类型（Attr 枚举值）
+  ObjectValue value = 3;   // 更新目标值（领取时忽略）
+}
+
+// 属性操作响应
+message AttrOperateResp {
+  Result result = 1;
+  map<int32, ObjectValue> values = 2; // 操作后的属性值，键为 Attr 枚举值
+}

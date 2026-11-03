@@ -232,4 +232,23 @@ var defaultMenus = []seedMenu{
 			},
 		},
 	},
+	{
+		Menu: model.SysMenu{MenuName: "Operation", Title: "运营活动", Path: "/operation", MenuType: "M", Component: "Layout", Icon: "date", Sort: 7, Visible: "0", IsFrame: "1"},
+		Children: []seedMenu{
+			{
+				Menu: model.SysMenu{MenuName: "ActivityInstanceManage", Title: "活动实例", Path: "/operation/activity/index", Component: "/admin/activity/index", MenuType: "C", Icon: "date", Permission: "game:activity:list", Sort: 1, Visible: "0", IsFrame: "1"},
+				Apis: []seedAPI{
+					{"活动实例列表", "/api/v1/gm/activity", "GET"},
+					{"修改活动时间", "/api/v1/gm/activity/:id/time", "PUT"},
+					{"提前结束活动", "/api/v1/gm/activity/:id/end", "POST"},
+				},
+			},
+			{
+				Menu: model.SysMenu{MenuName: "ActivityConfigManage", Title: "活动配置", Path: "/operation/activity/config", Component: "/admin/activity/config", MenuType: "C", Icon: "list", Permission: "game:activity:config", Sort: 2, Visible: "0", IsFrame: "1"},
+				Apis: []seedAPI{
+					{"活动模板列表", "/api/v1/gm/activity/configs", "GET"},
+				},
+			},
+		},
+	},
 }

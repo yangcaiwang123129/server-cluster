@@ -8,7 +8,7 @@ import (
 	"server-cluster/share/util"
 )
 
-// 活动/任务全局数据表（由 admin 内嵌的 World 模块写入；全局单服，无 zone）。
+// 活动/任务全局数据表（由 admin 内嵌的活动模块写入；全局单服，无 zone）。
 
 // Activity 全局活动实例。状态由 admin 调度器推进，GM 操作也走同进程逻辑。
 type Activity struct {
@@ -18,7 +18,7 @@ type Activity struct {
 	StartTime  int64  `gorm:"column:start_time;type:bigint;not null;default:0;index:idx_status_time,priority:2;comment:开始时间(毫秒)" json:"startTime"`
 	EndTime    int64  `gorm:"column:end_time;type:bigint;not null;default:0;index:idx_status_time,priority:3;comment:结束时间(毫秒)" json:"endTime"`
 	Status     int32  `gorm:"column:status;type:tinyint;not null;default:0;index:idx_status_time,priority:1;comment:状态(0未开启 1已开启 2已结束 3已取消)" json:"status"`
-	Source     int32  `gorm:"column:source;type:tinyint;not null;default:1;comment:来源(1配置生成 2GM手动)" json:"source"`
+	Source     int32  `gorm:"column:source;type:tinyint;not null;default:1;comment:来源(1配置生成)" json:"source"`
 	CreatedBy  string `gorm:"column:created_by;type:varchar(64);not null;default:'';comment:GM 操作人" json:"createdBy"`
 	Remark     string `gorm:"column:remark;type:varchar(500);not null;default:'';comment:备注" json:"remark"`
 	TableModel `gorm:"embedded"`

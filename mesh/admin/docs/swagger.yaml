@@ -489,9 +489,6 @@ definitions:
       loginAddr:
         description: 登录服地址，空则取默认配置
         type: string
-      mode:
-        description: login | register
-        type: string
       password:
         description: 密码
         type: string
@@ -1112,7 +1109,7 @@ paths:
           description: 响应包在 {code, message, data} 中
           schema:
             $ref: '#/definitions/dto.Resp'
-      summary: 客户端模拟器登录
+      summary: 账号登录
       tags:
       - sim
   /api/v1/gm/client/sim/options:

@@ -31,19 +31,19 @@ func init() {
 func Mail() global.MailLogic { return mailLogicInst.MustGet() }
 
 // EnterGame 进入游戏：加载玩家邮件持有，未建档则初始化空集合（仅预热缓存）。
-func (this *mailLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq) (*pb.EnterGameResp, error) {
+func (this *mailLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
 	if _, err := loadPlayerMail(ctx, playerID); err != nil {
-		return nil, err
+		return err
 	}
-	return &pb.EnterGameResp{}, nil
+	return nil
 }
 
 // LeaveGame 离开游戏：邮件持有数据同步落库，并逐出内存缓存。
-func (this *mailLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq) (*pb.LeaveGameResp, error) {
+func (this *mailLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
 	if err := flushAndEvict(ctx, global.PlayerMailCache, playerID); err != nil {
-		return nil, err
+		return err
 	}
-	return &pb.LeaveGameResp{}, nil
+	return nil
 }
 
 // MailList 邮件列表：未读优先，同状态按创建时间倒序；返回未读数用于红点。

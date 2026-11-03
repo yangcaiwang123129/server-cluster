@@ -230,13 +230,13 @@ func (this *skillLogic) SkillEnsureForHero(ctx context.Context, playerID int64, 
 }
 
 // EnterGame 进入游戏：加载玩家技能持有，未建档则初始化空集合；并按已拥有英雄兜底补建绑定技能。
-func (this *skillLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq) (*pb.EnterGameResp, error) {
+func (this *skillLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
 	if _, err := loadPlayerSkill(ctx, playerID); err != nil {
-		return nil, err
+		return err
 	}
 	heroes, err := loadPlayerHero(ctx, playerID)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if heroes.Heroes != nil {
 		var ids []int32
@@ -246,20 +246,20 @@ func (this *skillLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.Ent
 		})
 		for _, id := range ids {
 			if err := this.SkillEnsureForHero(ctx, playerID, id); err != nil {
-				return nil, err
+				return err
 			}
 		}
 	}
 	// 技能数据由 SkillList 下发，这里只预热缓存
-	return &pb.EnterGameResp{}, nil
+	return nil
 }
 
 // LeaveGame 离开游戏：技能持有数据同步落库，并逐出内存缓存。
-func (this *skillLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq) (*pb.LeaveGameResp, error) {
+func (this *skillLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
 	if err := flushAndEvict(ctx, global.PlayerSkillCache, playerID); err != nil {
-		return nil, err
+		return err
 	}
-	return &pb.LeaveGameResp{}, nil
+	return nil
 }
 
 // loadPlayerSkill 加载玩家技能持有；未建档则初始化空 map 并挂入缓存（异步落库）。
