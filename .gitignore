@@ -13,10 +13,10 @@
 # 日志与临时文件
 *.log
 *.pid
-node_modules
 logs/
 tmp/
 
 # 打包产物
 dist/
 
+/node_modules/
