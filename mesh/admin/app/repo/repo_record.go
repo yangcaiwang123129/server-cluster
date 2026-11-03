@@ -58,15 +58,15 @@ func (r *Repo) recordDB() (*gorm.DB, error) {
 func recordTable(module string) (string, bool) {
 	switch module {
 	case model.RecordModuleItem:
-		return enum.TableItemRecord.String(), true
+		return enum.TableRecordItem.String(), true
 	case model.RecordModuleEquip:
-		return enum.TableEquipRecord.String(), true
+		return enum.TableRecordEquip.String(), true
 	case model.RecordModuleWeapon:
-		return enum.TableWeaponRecord.String(), true
+		return enum.TableRecordWeapon.String(), true
 	case model.RecordModuleSkill:
-		return enum.TableSkillRecord.String(), true
+		return enum.TableRecordSkill.String(), true
 	case model.RecordModuleHero:
-		return enum.TableHeroRecord.String(), true
+		return enum.TableRecordHero.String(), true
 	default:
 		return "", false
 	}

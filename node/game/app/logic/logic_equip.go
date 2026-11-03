@@ -10,6 +10,7 @@ import (
 
 	"server-cluster/internal/svc"
 	"server-cluster/node/game/app/global"
+	"server-cluster/share/convert"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
@@ -39,25 +40,12 @@ func (this *equipLogic) EquipList(ctx context.Context, playerID int64) ([]*pb.Eq
 
 	entries := make([]*pb.EquipEntry, 0, row.Equips.Len())
 	row.Equips.Range(func(_ int64, g model.EquipInfo) bool {
-		entries = append(entries, toEquipEntry(g))
+		entries = append(entries, convert.EquipEntry(g))
 		return true
 	})
 	// map 遍历无序，按实例ID排序保证客户端展示稳定
 	sort.Slice(entries, func(i, j int) bool { return entries[i].Id < entries[j].Id })
 	return entries, nil
-}
-
-// toEquipEntry 持有数据 → wire 条目（仅状态）。
-func toEquipEntry(g model.EquipInfo) *pb.EquipEntry {
-	return &pb.EquipEntry{
-		Id:           g.EquipID,
-		CfgId:        g.CfgID,
-		HeroId:       g.HeroID,
-		Level:        g.Level,
-		Equipped:     g.Equipped,
-		Quality:      g.Quality,
-		Breakthrough: g.Breakthrough,
-	}
 }
 
 // EquipAdd 新增装备：配置ID必须存在，装备归属于指定英雄（0 表示出战英雄），生成新的实例ID。
@@ -84,7 +72,7 @@ func (this *equipLogic) EquipAdd(ctx context.Context, playerID int64, req *pb.Eq
 	global.PlayerEquipCache.Set(playerID, row)
 	record.Record(ctx, model.RecordModuleEquip, playerID, model.RecordActionGain, req.GetCfgId(), 1)
 	notifyHero(ctx, playerID, g.HeroID)
-	return &pb.EquipAddResp{EquipEntry: toEquipEntry(g)}, nil
+	return &pb.EquipAddResp{EquipEntry: convert.EquipEntry(g)}, nil
 }
 
 // EquipUpdate 更新装备：hero_id>0 时改归该英雄，0 保持原归属；按实例ID定位。
@@ -126,7 +114,7 @@ func (this *equipLogic) EquipUpdate(ctx context.Context, playerID int64, req *pb
 		notifyHero(ctx, playerID, oldHeroID)
 	}
 	notifyHero(ctx, playerID, heroID)
-	return &pb.EquipUpdateResp{EquipEntry: toEquipEntry(g)}, nil
+	return &pb.EquipUpdateResp{EquipEntry: convert.EquipEntry(g)}, nil
 }
 
 // EquipWear 穿戴装备：归属改到目标英雄（hero_id=0 取当前出战英雄）。
@@ -176,7 +164,7 @@ func (this *equipLogic) EquipWear(ctx context.Context, playerID int64, req *pb.E
 	if err != nil {
 		return nil, err
 	}
-	return &pb.EquipWearResp{EquipEntry: toEquipEntry(g), Attribute: attr}, nil
+	return &pb.EquipWearResp{EquipEntry: convert.EquipEntry(g), Attribute: attr}, nil
 }
 
 // EquipUnwear 卸载装备：清穿戴状态，归属英雄保留（0 表示未分配）。
@@ -210,7 +198,7 @@ func (this *equipLogic) EquipUnwear(ctx context.Context, playerID int64, req *pb
 		}
 		attr = computed
 	}
-	return &pb.EquipUnwearResp{EquipEntry: toEquipEntry(g), Attribute: attr}, nil
+	return &pb.EquipUnwearResp{EquipEntry: convert.EquipEntry(g), Attribute: attr}, nil
 }
 
 // equipDimGrow 维度提升通用流程：校验持有与穿戴 → 取当前维度行得消耗 → 校验下一维度行存在 → 扣素材 → 维度+1。
@@ -272,7 +260,7 @@ func (this *equipLogic) EquipUpgrade(ctx context.Context, playerID int64, req *p
 	if err != nil {
 		return nil, err
 	}
-	return &pb.EquipUpgradeResp{EquipEntry: toEquipEntry(g), Attribute: attr}, nil
+	return &pb.EquipUpgradeResp{EquipEntry: convert.EquipEntry(g), Attribute: attr}, nil
 }
 
 // EquipUpQuality 装备升品：消耗 GearQuality 表当前品质的升品素材，品质 +1。
@@ -296,7 +284,7 @@ func (this *equipLogic) EquipUpQuality(ctx context.Context, playerID int64, req 
 	if err != nil {
 		return nil, err
 	}
-	return &pb.EquipUpQualityResp{EquipEntry: toEquipEntry(g), Attribute: attr}, nil
+	return &pb.EquipUpQualityResp{EquipEntry: convert.EquipEntry(g), Attribute: attr}, nil
 }
 
 // EquipBreakthrough 装备突破：消耗 GearBreakthrough 表当前突破的素材，突破 +1。
@@ -320,7 +308,7 @@ func (this *equipLogic) EquipBreakthrough(ctx context.Context, playerID int64, r
 	if err != nil {
 		return nil, err
 	}
-	return &pb.EquipBreakthroughResp{EquipEntry: toEquipEntry(g), Attribute: attr}, nil
+	return &pb.EquipBreakthroughResp{EquipEntry: convert.EquipEntry(g), Attribute: attr}, nil
 }
 
 // EnterGame 进入游戏：加载玩家装备持有，未建档则初始化空集合。

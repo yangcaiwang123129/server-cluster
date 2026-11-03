@@ -33,32 +33,32 @@ type ItemRecord struct {
 	RecordFields `gorm:"embedded"`
 }
 
-func (ItemRecord) TableName() string { return enum.TableItemRecord.String() }
+func (ItemRecord) TableName() string { return enum.TableRecordItem.String() }
 
 // EquipRecord 装备打点记录，对应 equip_record 表。
 type EquipRecord struct {
 	RecordFields `gorm:"embedded"`
 }
 
-func (EquipRecord) TableName() string { return enum.TableEquipRecord.String() }
+func (EquipRecord) TableName() string { return enum.TableRecordEquip.String() }
 
 // WeaponRecord 武器打点记录，对应 weapon_record 表。
 type WeaponRecord struct {
 	RecordFields `gorm:"embedded"`
 }
 
-func (WeaponRecord) TableName() string { return enum.TableWeaponRecord.String() }
+func (WeaponRecord) TableName() string { return enum.TableRecordWeapon.String() }
 
 // SkillRecord 技能打点记录，对应 skill_record 表。
 type SkillRecord struct {
 	RecordFields `gorm:"embedded"`
 }
 
-func (SkillRecord) TableName() string { return enum.TableSkillRecord.String() }
+func (SkillRecord) TableName() string { return enum.TableRecordSkill.String() }
 
 // HeroRecord 英雄打点记录，对应 hero_record 表。
 type HeroRecord struct {
 	RecordFields `gorm:"embedded"`
 }
 
-func (HeroRecord) TableName() string { return enum.TableHeroRecord.String() }
+func (HeroRecord) TableName() string { return enum.TableRecordHero.String() }

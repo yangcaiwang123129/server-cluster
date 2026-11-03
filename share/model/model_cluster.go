@@ -1,6 +1,7 @@
 package model
 
 import (
+	"server-cluster/share/enum"
 	"time"
 )
 
@@ -10,6 +11,7 @@ import (
 // 列表接口每次查询时都会把 etcd 里当前在线的节点 upsert 进本表：
 //   - 表里没有 → 插入
 //   - 表里有 → 更新 online/endpoint/services 等动态字段
+//
 // SSHHost/SSHUser/SSHKeyPath/DeployDir 等运维配置字段**不会被 etcd 同步覆盖**，
 // 需要管理员在列表里手动录入（或通过其他运维工具批量写入）。
 // 主键 node_id 是 due 在 etcd 里唯一的实例 ID，全集群不会重复，
@@ -33,4 +35,4 @@ type ClusterNode struct {
 }
 
 // TableName 表名。
-func (ClusterNode) TableName() string { return "gm_cluster_node" }
+func (ClusterNode) TableName() string { return enum.TableCluster.String() }

@@ -20,4 +20,4 @@ type ClientVersion struct {
 }
 
 // TableName 表名。
-func (ClientVersion) TableName() string { return enum.TableClientVersion.String() }
+func (ClientVersion) TableName() string { return enum.TableClient.String() }

@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 
 	"server-cluster/node/game/app/global"
+	"server-cluster/share/convert"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
@@ -79,7 +80,7 @@ func heroEntries(ctx context.Context, playerID int64) ([]*pb.HeroEntry, error) {
 
 	entries := make([]*pb.HeroEntry, 0, row.Heroes.Len())
 	row.Heroes.Range(func(_ int32, h model.HeroInfo) bool {
-		entry := toHeroEntry(h)
+		entry := convert.HeroEntry(h)
 		if cfg := tpl.T().RoleInfo.Get(h.HeroID); cfg != nil {
 			if cfg.WeaponId != 0 {
 				entry.Weapon = weaponByCfg[cfg.WeaponId]
@@ -111,18 +112,6 @@ func heroEntry(ctx context.Context, playerID int64, heroID int32) (*pb.HeroEntry
 		}
 	}
 	return nil, errs.CodeInvalidParams.WithMessage("英雄未拥有").Err()
-}
-
-// toHeroEntry 持有数据 → wire 条目（仅英雄状态；绑定的武器/技能/装备由 heroEntries 组装）。
-func toHeroEntry(h model.HeroInfo) *pb.HeroEntry {
-	return &pb.HeroEntry{
-		CfgId:    h.HeroID,
-		Level:    h.Level,
-		Exp:      h.Exp,
-		Star:     h.Star,
-		SkinId:   h.SkinID,
-		Equipped: h.Equipped,
-	}
 }
 
 // newHeroInfo 按英雄配置初始化持有状态。

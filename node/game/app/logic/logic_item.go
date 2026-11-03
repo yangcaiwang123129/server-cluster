@@ -11,7 +11,7 @@ import (
 	"server-cluster/internal/record"
 	"server-cluster/internal/svc"
 	"server-cluster/node/game/app/global"
-	"server-cluster/share/consts"
+	"server-cluster/share/convert"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
@@ -30,51 +30,6 @@ func init() {
 
 // Item 获取玩家物品容器业务单例。
 func Item() global.ItemLogic { return itemLogicInst.MustGet() }
-
-// containerTypeToModel pb 物品容器类型 → 领域物品容器类型；UNSPECIFIED 等非法值返回 false。
-func containerTypeToModel(t pb.ContainerType) (int32, bool) {
-	switch t {
-	case pb.ContainerType_CONTAINER_TYPE_BACKPACK:
-		return model.TypeBackpack, true
-	case pb.ContainerType_CONTAINER_TYPE_STASH:
-		return model.TypeStash, true
-	case pb.ContainerType_CONTAINER_TYPE_SECURE:
-		return model.TypeSecure, true
-	default:
-		return 0, false
-	}
-}
-
-// itemContainerID 物品容器实例 ID：playerID 与物品容器类型编码（playerID*ContainerTypeStride + type）。
-func itemContainerID(playerID int64, typ int32) int64 {
-	return playerID*consts.ContainerTypeStride + int64(typ)
-}
-
-// itemToContainer 物品容器 → wire 物品容器条目。
-// c 参数类型 *model.ItemContainer = *model.BaseContainer[*ItemEntry]。
-func itemToContainer(playerID int64, c *model.ItemContainer) *pb.ItemContainer {
-	meta := c.Meta()
-	items := c.Entries()
-	entries := make([]*pb.ItemEntry, 0, len(items))
-	for _, it := range items {
-		entries = append(entries, &pb.ItemEntry{
-			Id:      it.ItemID,
-			CfgId:   it.ItemCfgID,
-			Count:   it.Count,
-			GridX:   it.GridX,
-			GridY:   it.GridY,
-			Rotated: it.Rotated,
-		})
-	}
-	return &pb.ItemContainer{
-		Id:          itemContainerID(playerID, meta.Type),
-		Type:        pb.ContainerType(meta.Type),
-		GridW:       meta.GridW,
-		GridH:       meta.GridH,
-		Version:     meta.Ver,
-		ItemEntries: entries,
-	}
-}
 
 // itemErr 领域错误 → 客户端错误码；非预期错误保留原始信息。
 func itemErr(err error) error {
@@ -117,7 +72,7 @@ func itemContainerOf(ctx context.Context, playerID int64, t pb.ContainerType) (*
 	if err != nil {
 		return nil, nil, err
 	}
-	typ, ok := containerTypeToModel(t)
+	typ, ok := convert.ContainerTypeToModel(t)
 	if !ok {
 		return nil, nil, errs.CodeInvalidParams.Err()
 	}
@@ -153,13 +108,13 @@ func (this *itemLogic) ItemContainerList(ctx context.Context, playerID int64, re
 	}
 
 	types := []int32{model.TypeBackpack, model.TypeStash, model.TypeSecure}
-	if typ, ok := containerTypeToModel(req.GetContainerType()); ok {
+	if typ, ok := convert.ContainerTypeToModel(req.GetContainerType()); ok {
 		types = []int32{typ}
 	}
 
 	containers := make([]*pb.ItemContainer, 0, len(types))
 	for _, typ := range types {
-		containers = append(containers, itemToContainer(playerID, pc.ByType(typ)))
+		containers = append(containers, convert.ItemContainer(playerID, pc.ByType(typ)))
 	}
 	return &pb.ItemContainerListResp{ItemContainers: containers}, nil
 }
@@ -212,8 +167,8 @@ func (this *itemLogic) ItemSort(ctx context.Context, playerID int64, req *pb.Ite
 // ItemTransfer 物品容器间移动物品：目标容器放不下时源容器不变。
 // 新实现：调用目标容器的 TransferFrom 方法（跨容器按 GlobalID 升序加锁）。
 func (this *itemLogic) ItemTransfer(ctx context.Context, playerID int64, req *pb.ItemTransferReq) (*pb.ItemTransferResp, error) {
-	fromType, okFrom := containerTypeToModel(req.GetFromType())
-	toType, okTo := containerTypeToModel(req.GetToType())
+	fromType, okFrom := convert.ContainerTypeToModel(req.GetFromType())
+	toType, okTo := convert.ContainerTypeToModel(req.GetToType())
 	if !okFrom || !okTo || fromType == toType {
 		return nil, errs.CodeInvalidParams.Err()
 	}
@@ -234,8 +189,8 @@ func (this *itemLogic) ItemTransfer(ctx context.Context, playerID int64, req *pb
 
 	saveItem(playerID, pc)
 	return &pb.ItemTransferResp{
-		FromContainer: itemToContainer(playerID, fromC),
-		ToContainer:   itemToContainer(playerID, toC),
+		FromContainer: convert.ItemContainer(playerID, fromC),
+		ToContainer:   convert.ItemContainer(playerID, toC),
 	}, nil
 }
 
@@ -274,7 +229,7 @@ func (this *itemLogic) ItemAddEntry(ctx context.Context, playerID int64, req *pb
 
 	saveItem(playerID, pc)
 	record.Record(ctx, model.RecordModuleItem, playerID, model.RecordActionGain, req.GetCfgId(), count)
-	return &pb.ItemContainerListResp{ItemContainers: []*pb.ItemContainer{itemToContainer(playerID, c)}}, nil
+	return &pb.ItemContainerListResp{ItemContainers: []*pb.ItemContainer{convert.ItemContainer(playerID, c)}}, nil
 }
 
 // ============ 资产接口实现（AssetHandler，可叠加型，落在背包容器） ============

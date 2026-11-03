@@ -13,6 +13,7 @@ import (
 	"server-cluster/internal/svc"
 	"server-cluster/node/game/app/global"
 	"server-cluster/share/consts"
+	"server-cluster/share/convert"
 	"server-cluster/share/dto"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
@@ -106,7 +107,7 @@ func (this *taskLogic) collect(ctx context.Context, playerID int64, taskType, ac
 		if info.Status == consts.TaskStatusClaimable {
 			claimable++
 		}
-		entries = append(entries, toTaskEntry(cfg, info))
+		entries = append(entries, convert.TaskEntry(cfg, info))
 	}
 	return entries, claimable, nil
 }
@@ -166,7 +167,7 @@ func (this *taskLogic) TaskClaim(ctx context.Context, playerID int64, req *pb.Ta
 		}
 		return nil, err
 	}
-	return &pb.TaskClaimResp{Entry: toTaskEntry(cfg, info), Rewards: rewards}, nil
+	return &pb.TaskClaimResp{Entry: convert.TaskEntry(cfg, info), Rewards: rewards}, nil
 }
 
 // TaskAccept 任务接取：仅手动接取任务可调用，未接取→进行中。
@@ -202,7 +203,7 @@ func (this *taskLogic) TaskAccept(ctx context.Context, playerID int64, req *pb.T
 	info.CompletedAt = 0
 	pt.SetTask(info)
 	global.PlayerTaskCache.Set(playerID, pt)
-	entry := toTaskEntry(cfg, info)
+	entry := convert.TaskEntry(cfg, info)
 	notifyTaskEntries(ctx, playerID, []*pb.TaskEntry{entry})
 	return &pb.TaskAcceptResp{Entry: entry}, nil
 }
@@ -272,7 +273,7 @@ func (this *taskLogic) EmitTaskEvent(ctx context.Context, e global.TaskEvent) {
 			}
 		}
 		pt.SetTask(info)
-		changed = append(changed, toTaskEntry(cfg, info))
+		changed = append(changed, convert.TaskEntry(cfg, info))
 	}
 	if len(changed) == 0 {
 		return
@@ -444,35 +445,6 @@ func sortedTaskCfgs() []*tpl.TaskCfg {
 		return list[i].Id < list[j].Id
 	})
 	return list
-}
-
-// toTaskEntry 配置 + 进度 → wire 条目。
-func toTaskEntry(cfg *tpl.TaskCfg, info model.PlayerTaskInfo) *pb.TaskEntry {
-	rewards := make([]*pb.AssetEntry, 0, len(cfg.AssetRewards))
-	for _, a := range cfg.AssetRewards {
-		if a == nil {
-			continue
-		}
-		rewards = append(rewards, &pb.AssetEntry{Type: int32(a.Type), CfgId: a.Id, Count: a.Count})
-	}
-	return &pb.TaskEntry{
-		TaskId:         cfg.Id,
-		TaskType:       int32(cfg.TaskType),
-		TargetTaskType: int32(cfg.TargetTaskType),
-		PeriodKey:      info.PeriodKey,
-		Progress:       info.Progress,
-		Target:         info.Target,
-		Status:         info.Status,
-		CompletedAt:    info.CompletedAt,
-		ClaimedAt:      info.ClaimedAt,
-		Name:           cfg.Name,
-		Desc:           cfg.Desc,
-		Rewards:        rewards,
-		Sort:           cfg.Sort,
-		ActivityCfgId:  cfg.TaskGroupID,
-		PreTaskId:      cfg.PreTaskId,
-		AcceptType:     int32(cfg.AcceptType),
-	}
 }
 
 // notifyTaskEntries 推送任务进度/状态变化；玩家离线只记日志。

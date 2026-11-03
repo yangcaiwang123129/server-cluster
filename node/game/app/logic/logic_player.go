@@ -17,6 +17,7 @@ import (
 	"server-cluster/internal/svc"
 	"server-cluster/node/game/app/global"
 	"server-cluster/share/consts"
+	"server-cluster/share/convert"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
@@ -77,7 +78,7 @@ func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.
 	}
 
 	// 玩家基础属性写入响应，再由各模块把各自的初始状态写入同一响应；任一失败则不进入游戏
-	resp.PlayerAttr = buildPlayerAttr(core, player)
+	resp.PlayerAttr = convert.PlayerAttr(core, player)
 	for _, mod := range moduleLogics() {
 		if err := mod.EnterGame(ctx, playerID, req, resp); err != nil {
 			return err
@@ -98,22 +99,7 @@ func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.
 // loginIPKey context 中 loginIP 的 key（handler 注入，EnterGame 读取）。
 // 注意：用字符串 key 避免跨包 type 不匹配。
 
-// buildPlayerAttr 组装下发给客户端的玩家属性表：
-// 昵称/等级/经验/vip 取自 player_extra，币/金取自 player。
-// 键为 Attr 枚举值，值按实际类型放入 ObjectValue。
-func buildPlayerAttr(core *model.PlayerExtra, player *model.Player) *pb.AttrMap {
-	return &pb.AttrMap{Values: map[int32]*pb.ObjectValue{
-		int32(pb.Attr_PLAYER_ATTR_NAME):          {Kind: &pb.ObjectValue_StringValue{StringValue: core.Nickname}},
-		int32(pb.Attr_PLAYER_ATTR_LEVEL):         {Kind: &pb.ObjectValue_IntValue{IntValue: core.Level}},
-		int32(pb.Attr_PLAYER_ATTR_EXP):           {Kind: &pb.ObjectValue_BigintValue{BigintValue: core.Exp}},
-		int32(pb.Attr_PLAYER_ATTR_VIP_LEVEL):     {Kind: &pb.ObjectValue_IntValue{IntValue: core.VipLevel}},
-		int32(pb.Attr_PLAYER_ATTR_VIP_EXP):       {Kind: &pb.ObjectValue_BigintValue{BigintValue: core.VipExp}},
-		int32(pb.Attr_PLAYER_ATTR_COIN):          {Kind: &pb.ObjectValue_BigintValue{BigintValue: player.Coin}},
-		int32(pb.Attr_PLAYER_ATTR_GOLD):          {Kind: &pb.ObjectValue_BigintValue{BigintValue: player.Gold}},
-		int32(pb.Attr_PLAYER_ATTR_SIGNATURE):     {Kind: &pb.ObjectValue_StringValue{StringValue: core.Signature}},
-		int32(pb.Attr_PLAYER_ATTR_SETTINGS_JSON): {Kind: &pb.ObjectValue_StringValue{StringValue: core.SettingsJSON}},
-	}}
-}
+// 玩家属性表组装：见 convert.PlayerAttr。
 
 // LeaveGame 离开游戏：各模块待写数据同步落库并清缓存，再销毁玩家 actor。
 // 单个模块失败不阻断其余模块，返回首个错误。

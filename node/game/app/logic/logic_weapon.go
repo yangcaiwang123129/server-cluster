@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 
 	"server-cluster/node/game/app/global"
+	"server-cluster/share/convert"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
@@ -29,17 +30,6 @@ func init() {
 // Weapon 获取武器业务单例。
 func Weapon() global.WeaponLogic { return weaponLogicInst.MustGet() }
 
-// toWeaponEntry 持有数据 → wire 条目（仅状态）。
-func toWeaponEntry(w model.WeaponInfo) *pb.WeaponEntry {
-	return &pb.WeaponEntry{
-		CfgId:        w.WeaponID,
-		Level:        w.Level,
-		Durability:   w.Durability,
-		Quality:      w.Quality,
-		Breakthrough: w.Breakthrough,
-	}
-}
-
 // newWeaponInfo 新获得武器的默认状态：等级 1、品质 1、突破 0。
 func newWeaponInfo(cfgID int32) model.WeaponInfo {
 	return model.WeaponInfo{WeaponID: cfgID, Level: 1, Quality: 1}
@@ -54,7 +44,7 @@ func (this *weaponLogic) WeaponList(ctx context.Context, playerID int64) ([]*pb.
 
 	entries := make([]*pb.WeaponEntry, 0, row.Weapons.Len())
 	row.Weapons.Range(func(_ int32, w model.WeaponInfo) bool {
-		entries = append(entries, toWeaponEntry(w))
+		entries = append(entries, convert.WeaponEntry(w))
 		return true
 	})
 	// map 遍历无序，按配置ID排序保证客户端展示稳定
@@ -82,7 +72,7 @@ func (this *weaponLogic) WeaponUpdate(ctx context.Context, playerID int64, req *
 
 	global.PlayerWeaponCache.Set(playerID, row)
 	notifyHeroByWeapon(ctx, playerID, w.WeaponID)
-	return &pb.WeaponUpdateResp{WeaponEntry: toWeaponEntry(w)}, nil
+	return &pb.WeaponUpdateResp{WeaponEntry: convert.WeaponEntry(w)}, nil
 }
 
 // weaponOwned 取玩家指定武器持有与其绑定英雄ID。
@@ -154,7 +144,7 @@ func (this *weaponLogic) WeaponUpgrade(ctx context.Context, playerID int64, req 
 	if err != nil {
 		return nil, err
 	}
-	return &pb.WeaponUpgradeResp{WeaponEntry: toWeaponEntry(w), Attribute: attr}, nil
+	return &pb.WeaponUpgradeResp{WeaponEntry: convert.WeaponEntry(w), Attribute: attr}, nil
 }
 
 // WeaponUpQuality 武器升品：消耗 WeaponQuality 表当前品质的升品素材，品质 +1。
@@ -179,7 +169,7 @@ func (this *weaponLogic) WeaponUpQuality(ctx context.Context, playerID int64, re
 	if err != nil {
 		return nil, err
 	}
-	return &pb.WeaponUpQualityResp{WeaponEntry: toWeaponEntry(w), Attribute: attr}, nil
+	return &pb.WeaponUpQualityResp{WeaponEntry: convert.WeaponEntry(w), Attribute: attr}, nil
 }
 
 // WeaponBreakthrough 武器突破：消耗 WeaponBreakthrough 表当前突破的素材，突破 +1。
@@ -204,7 +194,7 @@ func (this *weaponLogic) WeaponBreakthrough(ctx context.Context, playerID int64,
 	if err != nil {
 		return nil, err
 	}
-	return &pb.WeaponBreakthroughResp{WeaponEntry: toWeaponEntry(w), Attribute: attr}, nil
+	return &pb.WeaponBreakthroughResp{WeaponEntry: convert.WeaponEntry(w), Attribute: attr}, nil
 }
 
 // WeaponEnsureForHero 按英雄配置初始化固定绑定武器：未持有则补建默认状态。

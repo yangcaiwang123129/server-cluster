@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 
 	"server-cluster/node/game/app/global"
+	"server-cluster/share/convert"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
@@ -29,16 +30,6 @@ func init() {
 // Skill 获取技能业务单例。
 func Skill() global.SkillLogic { return skillLogicInst.MustGet() }
 
-// toSkillEntry 持有数据 → wire 条目（仅状态）。
-func toSkillEntry(s model.SkillInfo) *pb.SkillEntry {
-	return &pb.SkillEntry{
-		CfgId:        s.SkillID,
-		Level:        s.Level,
-		Quality:      s.Quality,
-		Breakthrough: s.Breakthrough,
-	}
-}
-
 // newSkillInfo 新获得技能的默认状态：等级 1、品质 1、突破 0。
 func newSkillInfo(cfgID int32) model.SkillInfo {
 	return model.SkillInfo{SkillID: cfgID, Level: 1, Quality: 1}
@@ -53,7 +44,7 @@ func (this *skillLogic) SkillList(ctx context.Context, playerID int64) ([]*pb.Sk
 
 	entries := make([]*pb.SkillEntry, 0, row.Skills.Len())
 	row.Skills.Range(func(_ int32, s model.SkillInfo) bool {
-		entries = append(entries, toSkillEntry(s))
+		entries = append(entries, convert.SkillEntry(s))
 		return true
 	})
 	// map 遍历无序，按配置ID排序保证客户端展示稳定
@@ -80,7 +71,7 @@ func (this *skillLogic) SkillUpdate(ctx context.Context, playerID int64, req *pb
 
 	global.PlayerSkillCache.Set(playerID, row)
 	notifyHeroBySkill(ctx, playerID, s.SkillID)
-	return &pb.SkillUpdateResp{SkillEntry: toSkillEntry(s)}, nil
+	return &pb.SkillUpdateResp{SkillEntry: convert.SkillEntry(s)}, nil
 }
 
 // skillOwned 取玩家指定技能持有与其绑定英雄ID。
@@ -151,7 +142,7 @@ func (this *skillLogic) SkillUpgrade(ctx context.Context, playerID int64, req *p
 	if err != nil {
 		return nil, err
 	}
-	return &pb.SkillUpgradeResp{SkillEntry: toSkillEntry(s), Attribute: attr}, nil
+	return &pb.SkillUpgradeResp{SkillEntry: convert.SkillEntry(s), Attribute: attr}, nil
 }
 
 // SkillUpQuality 技能升品：消耗 SkillQuality 表当前品质的升品素材，品质 +1。
@@ -176,7 +167,7 @@ func (this *skillLogic) SkillUpQuality(ctx context.Context, playerID int64, req 
 	if err != nil {
 		return nil, err
 	}
-	return &pb.SkillUpQualityResp{SkillEntry: toSkillEntry(s), Attribute: attr}, nil
+	return &pb.SkillUpQualityResp{SkillEntry: convert.SkillEntry(s), Attribute: attr}, nil
 }
 
 // SkillBreakthrough 技能突破：消耗 SkillBreakthrough 表当前突破的素材，突破 +1。
@@ -201,7 +192,7 @@ func (this *skillLogic) SkillBreakthrough(ctx context.Context, playerID int64, r
 	if err != nil {
 		return nil, err
 	}
-	return &pb.SkillBreakthroughResp{SkillEntry: toSkillEntry(s), Attribute: attr}, nil
+	return &pb.SkillBreakthroughResp{SkillEntry: convert.SkillEntry(s), Attribute: attr}, nil
 }
 
 // SkillEnsureForHero 按英雄配置初始化固定绑定技能：未持有则补建默认状态。

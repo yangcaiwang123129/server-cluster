@@ -11,6 +11,7 @@ import (
 
 	"server-cluster/internal/svc"
 	"server-cluster/node/game/app/global"
+	"server-cluster/share/convert"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
@@ -58,7 +59,7 @@ func (this *mailLogic) MailList(ctx context.Context, playerID int64) (*pb.MailLi
 		if m.Status == model.MailStatusDeleted {
 			return true
 		}
-		entries = append(entries, toMailEntry(m))
+		entries = append(entries, convert.MailEntry(m))
 		if m.Status == model.MailStatusUnread {
 			unread++
 		}
@@ -92,7 +93,7 @@ func (this *mailLogic) MailRead(ctx context.Context, playerID int64, req *pb.Mai
 		}
 		global.PlayerMailCache.Set(playerID, row)
 	}
-	return &pb.MailReadResp{Entry: toMailEntry(m)}, nil
+	return &pb.MailReadResp{Entry: convert.MailEntry(m)}, nil
 }
 
 // MailReadAll 全部未读标记已读。
@@ -130,7 +131,7 @@ func (this *mailLogic) MailClaim(ctx context.Context, playerID int64, req *pb.Ma
 		return nil, errs.CodeInvalidParams.WithMessage("邮件不存在").Err()
 	}
 	if m.Status == model.MailStatusClaimed || !m.HasAttachments() {
-		return &pb.MailClaimResp{Entry: toMailEntry(m)}, nil
+		return &pb.MailClaimResp{Entry: convert.MailEntry(m)}, nil
 	}
 	originStatus, originClaimedAt := m.Status, m.ClaimedAt
 	m.Status = model.MailStatusClaimed
@@ -161,7 +162,7 @@ func (this *mailLogic) MailClaim(ctx context.Context, playerID int64, req *pb.Ma
 		granted = append(granted, &pb.AssetEntry{Type: a.Type, CfgId: a.CfgID, Count: count})
 	}
 	global.PlayerMailCache.Set(playerID, row)
-	return &pb.MailClaimResp{Entry: toMailEntry(m), Attachments: granted}, nil
+	return &pb.MailClaimResp{Entry: convert.MailEntry(m), Attachments: granted}, nil
 }
 
 // pendingClaim 一键领取时先落库、后发放所需的原始状态快照。
@@ -221,7 +222,7 @@ func (this *mailLogic) MailClaimAll(ctx context.Context, playerID int64, _ *pb.M
 			}
 			continue
 		}
-		claimed = append(claimed, toMailEntry(p.mail))
+		claimed = append(claimed, convert.MailEntry(p.mail))
 	}
 	global.PlayerMailCache.Set(playerID, row)
 	return &pb.MailClaimAllResp{Entries: claimed}, nil
@@ -301,7 +302,7 @@ func (this *mailLogic) MailSend(ctx context.Context, playerID int64, req *pb.GmM
 		return nil, errs.CodeInternalError.WithMessage("邮件创建失败").Err()
 	}
 	global.PlayerMailCache.Set(playerID, row)
-	return toMailEntry(m), nil
+	return convert.MailEntry(m), nil
 }
 
 // loadPlayerMail 加载玩家邮件；未建档则初始化空 map 并挂入缓存（异步落库）。
@@ -319,22 +320,4 @@ func loadPlayerMail(ctx context.Context, playerID int64) (*model.PlayerMail, err
 		row.Mails = util.NewSafeMap[int64, model.MailInfo]()
 	}
 	return row, nil
-}
-
-// toMailEntry 持有数据 → wire 条目。
-func toMailEntry(m model.MailInfo) *pb.MailEntry {
-	atts := make([]*pb.AssetEntry, 0, len(m.Attachments))
-	for _, a := range m.Attachments {
-		atts = append(atts, &pb.AssetEntry{Type: a.Type, CfgId: a.CfgID, Count: a.Count})
-	}
-	return &pb.MailEntry{
-		Id:          m.MailID,
-		Title:       m.Title,
-		Content:     m.Content,
-		Attachments: atts,
-		Status:      pb.MailStatus(m.Status),
-		CreatedAt:   m.CreatedAt,
-		ReadAt:      m.ReadAt,
-		ClaimedAt:   m.ClaimedAt,
-	}
 }

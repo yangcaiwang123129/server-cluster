@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"server-cluster/node/game/app/global"
+	"server-cluster/share/convert"
 	"server-cluster/share/errs"
 	"server-cluster/share/pb"
 	"server-cluster/share/singleton"
@@ -105,7 +106,7 @@ func deductAssets(ctx context.Context, playerID int64, assets []*tpl.Asset) ([]*
 		if err := Asset().AssetRemove(ctx, playerID, a); err != nil {
 			return nil, err
 		}
-		entries = append(entries, toAssetEntry(a))
+		entries = append(entries, convert.AssetEntry(a))
 	}
 	return entries, nil
 }
@@ -120,16 +121,7 @@ func grantAssets(ctx context.Context, playerID int64, assets []*tpl.Asset) ([]*p
 		if err := Asset().AssetAdd(ctx, playerID, a); err != nil {
 			return nil, err
 		}
-		entries = append(entries, toAssetEntry(a))
+		entries = append(entries, convert.AssetEntry(a))
 	}
 	return entries, nil
-}
-
-// toAssetEntry 资产配置 → wire 条目；Count<=0 与 AssetAdd 一致按 1 处理。
-func toAssetEntry(a *tpl.Asset) *pb.AssetEntry {
-	count := a.Count
-	if count <= 0 {
-		count = 1
-	}
-	return &pb.AssetEntry{Type: int32(a.Type), CfgId: a.Id, Count: count}
 }
