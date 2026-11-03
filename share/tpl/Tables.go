@@ -132,6 +132,7 @@ type Tables struct {
 	SkillLevel         *Table[SkillLevelCfg]         //
 	SkillQuality       *Table[SkillQualityCfg]       //
 	SkillBreakthrough  *Table[SkillBreakthroughCfg]  //
+	Task               *Table[TaskCfg]               //
 }
 
 var (
@@ -255,6 +256,9 @@ func Load() error {
 		return err
 	}
 	if t.SkillBreakthrough, err = LoadTable("skillbreakthroughconfig", func(r *SkillBreakthroughCfg) int32 { return r.Id }); err != nil {
+		return err
+	}
+	if t.Task, err = LoadTable("taskconfig", func(r *TaskCfg) int32 { return r.Id }); err != nil {
 		return err
 	}
 	tables = t

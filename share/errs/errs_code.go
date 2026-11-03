@@ -28,6 +28,20 @@ var (
 	CodeAuthTypeUnknown = codes.NewCode(3004, "unknown auth type")
 )
 
+// 活动/任务/世界快照错误码（数值与 common.proto ErrCode 一致）。
+var (
+	CodeActivityNotFound       = codes.NewCode(int(pb.ErrCode_ERR_CODE_ACTIVITY_NOT_FOUND), "activity not found")
+	CodeActivityNotRunning     = codes.NewCode(int(pb.ErrCode_ERR_CODE_ACTIVITY_NOT_RUNNING), "activity not running")
+	CodeActivityAlreadyClaimed = codes.NewCode(int(pb.ErrCode_ERR_CODE_ACTIVITY_ALREADY_CLAIMED), "activity reward already claimed")
+	CodeSignInAlready          = codes.NewCode(int(pb.ErrCode_ERR_CODE_SIGN_IN_ALREADY), "already signed in today")
+	CodeTaskNotFound           = codes.NewCode(int(pb.ErrCode_ERR_CODE_TASK_NOT_FOUND), "task not found")
+	CodeTaskNotCompleted       = codes.NewCode(int(pb.ErrCode_ERR_CODE_TASK_NOT_COMPLETED), "task not completed")
+	CodeTaskAlreadyClaimed     = codes.NewCode(int(pb.ErrCode_ERR_CODE_TASK_ALREADY_CLAIMED), "task reward already claimed")
+	CodeTaskExpired            = codes.NewCode(int(pb.ErrCode_ERR_CODE_TASK_EXPIRED), "task period expired")
+	CodeTaskNotAccepted        = codes.NewCode(int(pb.ErrCode_ERR_CODE_TASK_NOT_ACCEPTED), "task not accepted")
+	CodeWorldUnavailable       = codes.NewCode(int(pb.ErrCode_ERR_CODE_WORLD_UNAVAILABLE), "world snapshot unavailable")
+)
+
 // ErrXxx 便捷入口：直接拿到 error（CodeXxx.Err()）。
 // 优先级：logic 层推荐 CodeXxx.WithMessage("xxx").Err() 链式覆盖；旧代码可用 ErrXxx。
 var (

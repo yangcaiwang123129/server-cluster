@@ -76,6 +76,11 @@ const (
 	RouteCode_ROUTE_CODE_MAIL_CLAIM_ALL    RouteCode = 11004 // 一键领取全部附件
 	RouteCode_ROUTE_CODE_MAIL_DELETE       RouteCode = 11005 // 删除邮件
 	RouteCode_ROUTE_CODE_MAIL_DELETE_CLEAN RouteCode = 11006 // 清理可删除邮件
+	// 任务 11200~11299
+	RouteCode_ROUTE_CODE_TASK_LIST   RouteCode = 11200 // 任务列表（含进度/红点）
+	RouteCode_ROUTE_CODE_TASK_NOTIFY RouteCode = 11201 // 任务进度/状态变化通知
+	RouteCode_ROUTE_CODE_TASK_CLAIM  RouteCode = 11202 // 任务领奖
+	RouteCode_ROUTE_CODE_TASK_ACCEPT RouteCode = 11203 // 任务接取（手动接取任务）
 )
 
 // Enum value maps for RouteCode.
@@ -124,6 +129,10 @@ var (
 		11004: "ROUTE_CODE_MAIL_CLAIM_ALL",
 		11005: "ROUTE_CODE_MAIL_DELETE",
 		11006: "ROUTE_CODE_MAIL_DELETE_CLEAN",
+		11200: "ROUTE_CODE_TASK_LIST",
+		11201: "ROUTE_CODE_TASK_NOTIFY",
+		11202: "ROUTE_CODE_TASK_CLAIM",
+		11203: "ROUTE_CODE_TASK_ACCEPT",
 	}
 	RouteCode_value = map[string]int32{
 		"ROUTE_CODE_UNSPECIFIED":         0,
@@ -169,6 +178,10 @@ var (
 		"ROUTE_CODE_MAIL_CLAIM_ALL":      11004,
 		"ROUTE_CODE_MAIL_DELETE":         11005,
 		"ROUTE_CODE_MAIL_DELETE_CLEAN":   11006,
+		"ROUTE_CODE_TASK_LIST":           11200,
+		"ROUTE_CODE_TASK_NOTIFY":         11201,
+		"ROUTE_CODE_TASK_CLAIM":          11202,
+		"ROUTE_CODE_TASK_ACCEPT":         11203,
 	}
 )
 
@@ -211,6 +224,19 @@ const (
 	ErrCode_ERR_CODE_PLAYER_EXISTS    ErrCode = 2001
 	ErrCode_ERR_CODE_PASSWORD_WRONG   ErrCode = 2002
 	ErrCode_ERR_CODE_TOKEN_INVALID    ErrCode = 2003
+	// 活动
+	ErrCode_ERR_CODE_ACTIVITY_NOT_FOUND       ErrCode = 4001 // 活动不存在
+	ErrCode_ERR_CODE_ACTIVITY_NOT_RUNNING     ErrCode = 4002 // 活动未开启/已结束
+	ErrCode_ERR_CODE_ACTIVITY_ALREADY_CLAIMED ErrCode = 4003 // 活动奖励已领
+	ErrCode_ERR_CODE_SIGN_IN_ALREADY          ErrCode = 4004 // 今日已签到
+	// 任务
+	ErrCode_ERR_CODE_TASK_NOT_FOUND       ErrCode = 4101 // 任务不存在
+	ErrCode_ERR_CODE_TASK_NOT_COMPLETED   ErrCode = 4102 // 任务未完成
+	ErrCode_ERR_CODE_TASK_ALREADY_CLAIMED ErrCode = 4103 // 任务已领奖
+	ErrCode_ERR_CODE_TASK_EXPIRED         ErrCode = 4104 // 任务周期已过期
+	ErrCode_ERR_CODE_TASK_NOT_ACCEPTED    ErrCode = 4105 // 任务未接取
+	// 世界（活动/任务快照）
+	ErrCode_ERR_CODE_WORLD_UNAVAILABLE ErrCode = 4201 // 世界快照未就绪
 )
 
 // Enum value maps for ErrCode.
@@ -224,16 +250,36 @@ var (
 		2001: "ERR_CODE_PLAYER_EXISTS",
 		2002: "ERR_CODE_PASSWORD_WRONG",
 		2003: "ERR_CODE_TOKEN_INVALID",
+		4001: "ERR_CODE_ACTIVITY_NOT_FOUND",
+		4002: "ERR_CODE_ACTIVITY_NOT_RUNNING",
+		4003: "ERR_CODE_ACTIVITY_ALREADY_CLAIMED",
+		4004: "ERR_CODE_SIGN_IN_ALREADY",
+		4101: "ERR_CODE_TASK_NOT_FOUND",
+		4102: "ERR_CODE_TASK_NOT_COMPLETED",
+		4103: "ERR_CODE_TASK_ALREADY_CLAIMED",
+		4104: "ERR_CODE_TASK_EXPIRED",
+		4105: "ERR_CODE_TASK_NOT_ACCEPTED",
+		4201: "ERR_CODE_WORLD_UNAVAILABLE",
 	}
 	ErrCode_value = map[string]int32{
-		"ERR_CODE_OK":               0,
-		"ERR_CODE_INTERNAL_ERROR":   1000,
-		"ERR_CODE_INVALID_PARAMS":   1001,
-		"ERR_CODE_UNAUTHORIZED":     1002,
-		"ERR_CODE_PLAYER_NOT_FOUND": 2000,
-		"ERR_CODE_PLAYER_EXISTS":    2001,
-		"ERR_CODE_PASSWORD_WRONG":   2002,
-		"ERR_CODE_TOKEN_INVALID":    2003,
+		"ERR_CODE_OK":                       0,
+		"ERR_CODE_INTERNAL_ERROR":           1000,
+		"ERR_CODE_INVALID_PARAMS":           1001,
+		"ERR_CODE_UNAUTHORIZED":             1002,
+		"ERR_CODE_PLAYER_NOT_FOUND":         2000,
+		"ERR_CODE_PLAYER_EXISTS":            2001,
+		"ERR_CODE_PASSWORD_WRONG":           2002,
+		"ERR_CODE_TOKEN_INVALID":            2003,
+		"ERR_CODE_ACTIVITY_NOT_FOUND":       4001,
+		"ERR_CODE_ACTIVITY_NOT_RUNNING":     4002,
+		"ERR_CODE_ACTIVITY_ALREADY_CLAIMED": 4003,
+		"ERR_CODE_SIGN_IN_ALREADY":          4004,
+		"ERR_CODE_TASK_NOT_FOUND":           4101,
+		"ERR_CODE_TASK_NOT_COMPLETED":       4102,
+		"ERR_CODE_TASK_ALREADY_CLAIMED":     4103,
+		"ERR_CODE_TASK_EXPIRED":             4104,
+		"ERR_CODE_TASK_NOT_ACCEPTED":        4105,
+		"ERR_CODE_WORLD_UNAVAILABLE":        4201,
 	}
 )
 
@@ -1419,7 +1465,7 @@ const file_common_proto_rawDesc = "" +
 	"\bequipped\x18\x04 \x01(\bR\bequipped\x12\x17\n" +
 	"\ahero_id\x18\x05 \x01(\x05R\x06heroId\x12\x18\n" +
 	"\aquality\x18\x06 \x01(\x05R\aquality\x12\"\n" +
-	"\fbreakthrough\x18\a \x01(\x05R\fbreakthrough*\x89\n" +
+	"\fbreakthrough\x18\a \x01(\x05R\fbreakthrough*\xfa\n" +
 	"\n" +
 	"\tRouteCode\x12\x1a\n" +
 	"\x16ROUTE_CODE_UNSPECIFIED\x10\x00\x12\x16\n" +
@@ -1464,7 +1510,11 @@ const file_common_proto_rawDesc = "" +
 	"\x15ROUTE_CODE_MAIL_CLAIM\x10\xfbU\x12\x1e\n" +
 	"\x19ROUTE_CODE_MAIL_CLAIM_ALL\x10\xfcU\x12\x1b\n" +
 	"\x16ROUTE_CODE_MAIL_DELETE\x10\xfdU\x12!\n" +
-	"\x1cROUTE_CODE_MAIL_DELETE_CLEAN\x10\xfeU*\xea\x01\n" +
+	"\x1cROUTE_CODE_MAIL_DELETE_CLEAN\x10\xfeU\x12\x19\n" +
+	"\x14ROUTE_CODE_TASK_LIST\x10\xc0W\x12\x1b\n" +
+	"\x16ROUTE_CODE_TASK_NOTIFY\x10\xc1W\x12\x1a\n" +
+	"\x15ROUTE_CODE_TASK_CLAIM\x10\xc2W\x12\x1b\n" +
+	"\x16ROUTE_CODE_TASK_ACCEPT\x10\xc3W*\xb9\x04\n" +
 	"\aErrCode\x12\x0f\n" +
 	"\vERR_CODE_OK\x10\x00\x12\x1c\n" +
 	"\x17ERR_CODE_INTERNAL_ERROR\x10\xe8\a\x12\x1c\n" +
@@ -1473,7 +1523,17 @@ const file_common_proto_rawDesc = "" +
 	"\x19ERR_CODE_PLAYER_NOT_FOUND\x10\xd0\x0f\x12\x1b\n" +
 	"\x16ERR_CODE_PLAYER_EXISTS\x10\xd1\x0f\x12\x1c\n" +
 	"\x17ERR_CODE_PASSWORD_WRONG\x10\xd2\x0f\x12\x1b\n" +
-	"\x16ERR_CODE_TOKEN_INVALID\x10\xd3\x0f*X\n" +
+	"\x16ERR_CODE_TOKEN_INVALID\x10\xd3\x0f\x12 \n" +
+	"\x1bERR_CODE_ACTIVITY_NOT_FOUND\x10\xa1\x1f\x12\"\n" +
+	"\x1dERR_CODE_ACTIVITY_NOT_RUNNING\x10\xa2\x1f\x12&\n" +
+	"!ERR_CODE_ACTIVITY_ALREADY_CLAIMED\x10\xa3\x1f\x12\x1d\n" +
+	"\x18ERR_CODE_SIGN_IN_ALREADY\x10\xa4\x1f\x12\x1c\n" +
+	"\x17ERR_CODE_TASK_NOT_FOUND\x10\x85 \x12 \n" +
+	"\x1bERR_CODE_TASK_NOT_COMPLETED\x10\x86 \x12\"\n" +
+	"\x1dERR_CODE_TASK_ALREADY_CLAIMED\x10\x87 \x12\x1a\n" +
+	"\x15ERR_CODE_TASK_EXPIRED\x10\x88 \x12\x1f\n" +
+	"\x1aERR_CODE_TASK_NOT_ACCEPTED\x10\x89 \x12\x1f\n" +
+	"\x1aERR_CODE_WORLD_UNAVAILABLE\x10\xe9 *X\n" +
 	"\vNOTIFY_TYPE\x12\x14\n" +
 	"\x10NOTIFY_TYPE_KICK\x10\x00\x12\x18\n" +
 	"\x14NOTIFY_TYPE_MAINTAIN\x10\x02\x12\x19\n" +

@@ -2,8 +2,10 @@
 package main
 
 import (
+	"context"
 	"server-cluster/internal/router"
 	_ "server-cluster/node/game/app/handler" // 触发 handler_gm_player.go 的 init() 注册路由到 routes 切片
+	"server-cluster/node/game/app/logic"
 	"server-cluster/node/game/app/service"
 	"server-cluster/share/consts"
 	"server-cluster/share/pb"
@@ -47,10 +49,14 @@ func main() {
 	router.Register(component.Proxy())
 	// 注册服务间 RPC provider
 	component.Proxy().AddServiceProvider(pb.GameAdminService_ServiceDesc.ServiceName, &pb.GameAdminService_ServiceDesc, &service.GmProvider{})
+	// 启动 World 快照同步（读 Redis，10s 轮询）
+	logic.WorldSync().Start(context.Background())
 	// 添加节点组件
 	container.Add(component)
 	// 启动容器
 	container.Serve()
+	// 停止快照同步
+	logic.WorldSync().Stop()
 	// 释放资源
 	global.Destroy()
 }

@@ -25,6 +25,10 @@ var (
 	PlayerItemCache = cache.NewPlayerTableCache[model.PlayerItem](cache.CacherConfig{Name: "player_item"})
 	// PlayerMailCache 玩家邮件（player_mail，一玩家一行，邮件 map JSON）
 	PlayerMailCache = cache.NewPlayerTableCache[model.PlayerMail](cache.CacherConfig{Name: "player_mail"})
+	// PlayerTaskCache 玩家任务进度（player_task，一玩家一行，任务 map JSON，key=taskId:periodKey）
+	PlayerTaskCache = cache.NewPlayerTableCache[model.PlayerTask](cache.CacherConfig{Name: "player_task"})
+	// PlayerActivityCache 玩家活动参与（player_activity，一玩家一行，活动 map JSON，key=活动实例ID）
+	PlayerActivityCache = cache.NewPlayerTableCache[model.PlayerActivity](cache.CacherConfig{Name: "player_activity"})
 )
 
 // CacheCloseStat 单个玩家数据缓存在停服刷盘时的统计，用于停服日志展示。
@@ -58,5 +62,7 @@ func CloseCaches() []CacheCloseStat {
 		closeOne(PlayerEquipCache),
 		closeOne(PlayerItemCache),
 		closeOne(PlayerMailCache),
+		closeOne(PlayerTaskCache),
+		closeOne(PlayerActivityCache),
 	}
 }

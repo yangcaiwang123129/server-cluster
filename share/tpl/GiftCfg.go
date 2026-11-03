@@ -12,6 +12,6 @@ type GiftCfg struct {
 	Id           int32    `json:"id"`           // id
 	Desc         string   `json:"desc"`         // 描述
 	Name         string   `json:"name"`         // 名字
-	AssetCost    *Asset   `json:"AssetCost"`    // 资产消耗
-	AssetRewards []*Asset `json:"AssetRewards"` // 资产奖励
+	AssetCost    *Asset   `json:"assetCost"`    // 资产消耗
+	AssetRewards []*Asset `json:"assetRewards"` // 资产奖励
 }

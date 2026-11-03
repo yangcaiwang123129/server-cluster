@@ -3,6 +3,8 @@ syntax = "proto3";
 package pb;
 
 import "common.proto";
+import "task.proto";
+import "activity.proto";
 
 option go_package = "server-cluster/share/pb";
 
@@ -27,6 +29,8 @@ message EnterGameResp {
   AttrMap player_attr = 2;         // 玩家属性（键为 Attr 枚举值）
   HeroEntry hero_entry = 3;        // 当前英雄（已含绑定武器）
   int64 server_time = 4;           // 服务器毫秒时间戳
+  map<int32, TaskEntry> tasks = 5; // 任务列表（键为任务ID，按 sort 排序展示）
+  map<int64, ActivityEntry> activities = 6; // 活动列表（键为活动实例ID）
 }
 
 // 离开游戏请求（路由 10002）

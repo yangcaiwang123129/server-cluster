@@ -1,6 +1,7 @@
 package global
 
 import (
+	"context"
 	"server-cluster/share/consts"
 	"server-cluster/share/model"
 	"server-cluster/share/tpl"
@@ -8,6 +9,7 @@ import (
 	"github.com/dobyte/due/v2/log"
 
 	"server-cluster/internal/svc"
+	"server-cluster/mesh/admin/app/logic"
 )
 
 // Init 初始化应用：svc（DB/Redis/雪花ID/JWT）→ 自动建表 → 种子数据。
@@ -36,6 +38,9 @@ func Init() error {
 			&model.SysCasbinRule{},
 			&model.ClientVersion{},
 			&model.ClusterNode{},
+			&model.Activity{},
+			&model.PlayerActivity{},
+			&model.PlayerTask{},
 		); err != nil {
 			return err
 		}
@@ -51,11 +56,16 @@ func Init() error {
 		if err := syncMenus(gdb); err != nil {
 			return err
 		}
+		// 启动内嵌 World 模块（活动状态机 + Redis 快照发布）
+		if err := logic.Activity().Start(context.Background()); err != nil {
+			return err
+		}
 	}
 	return nil
 }
 
 // Destroy 进程退出后释放 DB / Redis 等资源，并按统一停服日志输出。
 func Destroy() {
+	logic.Activity().Stop()
 	svc.CloseWithLog(consts.MeshInstanceID())
 }

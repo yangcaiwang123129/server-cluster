@@ -41,7 +41,7 @@ func init() {
 // moduleLogics 持有玩家数据的模块，按进入/离开的统一顺序驱动。
 // 延迟获取单例：各模块的 init 注册顺序不确定，不能在包初始化阶段调用。
 func moduleLogics() []global.ModuleLogic {
-	return []global.ModuleLogic{Item(), Hero(), Weapon(), Skill(), Equip(), Mail()}
+	return []global.ModuleLogic{Item(), Hero(), Weapon(), Skill(), Equip(), Mail(), Task()}
 }
 
 // PlayerLogic 获取玩家模块业务单例。
@@ -91,6 +91,7 @@ func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.
 		return nil, err
 	}
 
+	resp.Activities = WorldSync().Activities()
 	resp.Result = &pb.Result{Code: pb.ErrCode_ERR_CODE_OK}
 	resp.ServerTime = xtime.Now().UnixMilli()
 	return resp, nil
@@ -106,6 +107,15 @@ func mergeEnterGameResp(dst, src *pb.EnterGameResp) {
 	}
 	if src.HeroEntry != nil {
 		dst.HeroEntry = src.HeroEntry
+	}
+	if len(src.Tasks) > 0 {
+		if dst.Tasks == nil {
+			dst.Tasks = src.Tasks
+		} else {
+			for id, entry := range src.Tasks {
+				dst.Tasks[id] = entry
+			}
+		}
 	}
 }
 
@@ -210,6 +220,23 @@ func (this *playerLogic) Recharge(ctx context.Context, playerID int64, req *pb.R
 	if err != nil {
 		return nil, err
 	}
+	// 累计充值次数（player_extra），缓存未命中不阻断充值流程
+	if extra, err := global.PlayerExtraCache.Get(ctx, playerID); err == nil && extra != nil {
+		extra.TotalRecharge++
+		global.PlayerExtraCache.Set(playerID, extra)
+	}
+	// 固定充值（按配置ID匹配）与累计充值（全匹配）双事件
+	Task().EmitTaskEvent(ctx, global.TaskEvent{
+		PlayerID:       playerID,
+		TargetTaskType: int32(tpl.TargetTaskType_FixedRecharge),
+		Param:          req.GetCfgId(),
+		Count:          1,
+	})
+	Task().EmitTaskEvent(ctx, global.TaskEvent{
+		PlayerID:       playerID,
+		TargetTaskType: int32(tpl.TargetTaskType_CumulativeRecharge),
+		Count:          1,
+	})
 	return &pb.RechargeResp{Rewards: rewards}, nil
 }
 

@@ -65,6 +65,6 @@
 
 - 未使用 `gen-proto.sh` / `gen-swagger.sh`（本机无 bash），改以等价命令直接执行 `protoc` 与 `swag init`。
 - `ItemTransferResp` 的 `from_entry` / `to_entry` 随类型改名为 `from_container` / `to_container`（类型已变为 `ItemContainer`，语义更准确）。
-- 额外修复既有编译错误：`share/consts` 的 `instanceID` 未导出却被 `mesh/admin/main.go` 调用，改名为 `InstanceID`（否则全仓 build 不通过，阻断验证）。
+- 额外修复既有编译错误：`share/consts` 的 `instanceID` 未导出却被 `mesh/admin/main.go` 调用，改名为 `ActivityID`（否则全仓 build 不通过，阻断验证）。
 - `pnpm test:unit` 失败项均为既有 Windows 环境问题（`src/lang` 路径分隔符、jsdom `localStorage`），与本次改名无关；本次改动的文件在语言覆盖率扫描中为零中文残留。
 - `tests/e2e/mocked/player-item.spec.ts` 指向的 `/player/item` 页面在仓库中并无对应组件（既有遗留），仅同步了 `containerType`→`itemType` 字段。

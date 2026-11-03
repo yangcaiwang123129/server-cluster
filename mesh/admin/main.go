@@ -63,6 +63,7 @@ func main() {
 	handler.RegisterHero(httpComponent.Proxy().Router())
 	handler.RegisterMail(httpComponent.Proxy().Router())
 	handler.RegisterRecord(httpComponent.Proxy().Router())
+	handler.RegisterActivity(httpComponent.Proxy().Router())
 	// 添加组件到容器
 	container.Add(httpComponent)
 	// 手动注册 admin 到 etcd mesh kind（due 的 HTTP 组件不会自动注册）

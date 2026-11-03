@@ -3,12 +3,12 @@
     "id": 1,
     "desc": "热源卷兑换巡界币",
     "name": "热源卷兑换巡界币",
-    "AssetCost": {
+    "assetCost": {
       "type": 1,
       "id": 2,
       "count": 1
     },
-    "AssetRewards": [
+    "assetRewards": [
       {
         "type": 1,
         "id": 1,
@@ -20,12 +20,12 @@
     "id": 2,
     "desc": "热源卷兑换巡界金",
     "name": "热源卷兑换巡界币",
-    "AssetCost": {
+    "assetCost": {
       "type": 1,
       "id": 2,
       "count": 1
     },
-    "AssetRewards": [
+    "assetRewards": [
       {
         "type": 1,
         "id": 3,

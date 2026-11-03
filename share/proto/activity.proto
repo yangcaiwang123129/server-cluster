@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "server-cluster/share/pb";
+
+// 活动条目（当前可见的活动实例 + 配置展示字段）。
+message ActivityEntry {
+  int64 instance_id = 1;   // 活动实例ID
+  int32 cfg_id = 2;        // 活动模板ID
+  int32 activity_type = 3; // 1签到 2任务 3充值返利 4排行 5累充 6兑换
+  int32 status = 4;        // 0未开启 1已开启 2已结束 3已取消
+  int64 start_time = 5;    // 开始时间（毫秒）
+  int64 end_time = 6;      // 结束时间（毫秒）
+  int32 round = 7;         // 轮次
+  string name = 8;         // 名称
+  string icon = 9;         // 图标
+  string desc = 10;        // 描述
+  int32 task_group_id = 11; // 关联任务组
+  int32 reset_type = 12;   // 1不重置 2每日 3每周 4活动周期
+}

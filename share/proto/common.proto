@@ -65,6 +65,12 @@ enum RouteCode {
   ROUTE_CODE_MAIL_DELETE = 11005;        // 删除邮件
   ROUTE_CODE_MAIL_DELETE_CLEAN = 11006;  // 清理可删除邮件
 
+  // 任务 11200~11299
+  ROUTE_CODE_TASK_LIST = 11200;   // 任务列表（含进度/红点）
+  ROUTE_CODE_TASK_NOTIFY = 11201; // 任务进度/状态变化通知
+  ROUTE_CODE_TASK_CLAIM = 11202;  // 任务领奖
+  ROUTE_CODE_TASK_ACCEPT = 11203; // 任务接取（手动接取任务）
+
   // 战斗服 50000~59999
 
   // 社交服 60000~69999
@@ -80,6 +86,19 @@ enum ErrCode {
   ERR_CODE_PLAYER_EXISTS = 2001;
   ERR_CODE_PASSWORD_WRONG = 2002;
   ERR_CODE_TOKEN_INVALID = 2003;
+  // 活动
+  ERR_CODE_ACTIVITY_NOT_FOUND = 4001;       // 活动不存在
+  ERR_CODE_ACTIVITY_NOT_RUNNING = 4002;     // 活动未开启/已结束
+  ERR_CODE_ACTIVITY_ALREADY_CLAIMED = 4003; // 活动奖励已领
+  ERR_CODE_SIGN_IN_ALREADY = 4004;          // 今日已签到
+  // 任务
+  ERR_CODE_TASK_NOT_FOUND = 4101;           // 任务不存在
+  ERR_CODE_TASK_NOT_COMPLETED = 4102;       // 任务未完成
+  ERR_CODE_TASK_ALREADY_CLAIMED = 4103;     // 任务已领奖
+  ERR_CODE_TASK_EXPIRED = 4104;             // 任务周期已过期
+  ERR_CODE_TASK_NOT_ACCEPTED = 4105;        // 任务未接取
+  // 世界（活动/任务快照）
+  ERR_CODE_WORLD_UNAVAILABLE = 4201;        // 世界快照未就绪
 }
 
 //  ========== 通知类型 ==========

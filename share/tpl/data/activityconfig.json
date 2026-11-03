@@ -1,22 +1,90 @@
 [
   {
     "id": 1001,
-    "name": "首充好礼"
-  },
-  {
-    "id": 2001,
-    "name": "超值福利"
+    "name": "每日签到活动",
+    "desc": "每日签到活动",
+    "strategyType": 1,
+    "strategyStartValue": "2026/11/3 0:00:00",
+    "strategyEndValue": "2026/11/3 23:59:59",
+    "roundCount": -1,
+    "assetRewards": [],
+    "triggerLogicType": 2,
+    "triggerConditionTypes": [
+      {
+        "type": 1,
+        "args": 1
+      },
+      {
+        "type": 2,
+        "args": 1
+      }
+    ],
+    "icon": ""
   },
   {
     "id": 1002,
-    "name": "每日签到"
+    "name": "天累计充值",
+    "desc": "天累计充值",
+    "strategyType": 2,
+    "strategyStartValue": "0 0:00:00",
+    "strategyEndValue": "0 23:59:59",
+    "roundCount": -1,
+    "assetRewards": [],
+    "triggerLogicType": 1,
+    "triggerConditionTypes": [
+      {
+        "type": 1,
+        "args": 1
+      },
+      {
+        "type": 2,
+        "args": 1
+      }
+    ],
+    "icon": ""
   },
   {
     "id": 1003,
-    "name": "精彩奖励"
+    "name": "周累计充值",
+    "desc": "周累计充值",
+    "strategyType": 3,
+    "strategyStartValue": "1 0:00:00",
+    "strategyEndValue": "1 23:59:59",
+    "roundCount": -1,
+    "assetRewards": [],
+    "triggerLogicType": 1,
+    "triggerConditionTypes": [
+      {
+        "type": 1,
+        "args": 1
+      },
+      {
+        "type": 2,
+        "args": 1
+      }
+    ],
+    "icon": ""
   },
   {
     "id": 1004,
-    "name": "S1赛季"
+    "name": "月累计充值",
+    "desc": "月累计充值",
+    "strategyType": 4,
+    "strategyStartValue": "1 0:00:00",
+    "strategyEndValue": "0 23:59:59",
+    "roundCount": -1,
+    "assetRewards": [],
+    "triggerLogicType": 1,
+    "triggerConditionTypes": [
+      {
+        "type": 1,
+        "args": 1
+      },
+      {
+        "type": 2,
+        "args": 1
+      }
+    ],
+    "icon": ""
   }
 ]

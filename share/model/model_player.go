@@ -62,6 +62,7 @@ type PlayerExtra struct {
 	Exp          int64  `gorm:"column:exp;type:bigint;not null;default:0;comment:经验" json:"exp"`
 	VipLevel     int32  `gorm:"column:vip_level;type:int;not null;default:1;comment:vip等级" json:"vipLevel"`
 	VipExp       int64  `gorm:"column:vip_exp;type:bigint;not null;default:0;comment:vip经验" json:"vipExp"`
+	TotalRecharge int64 `gorm:"column:total_recharge;type:bigint;not null;default:0;comment:累计充值次数" json:"totalRecharge"`
 	SettingsJSON string `gorm:"column:settings_json;type:json;comment:个性化设置(JSON)" json:"settings_json"`
 	TableModel   `gorm:"embedded"`
 }

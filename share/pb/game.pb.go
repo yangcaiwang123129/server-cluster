@@ -158,11 +158,13 @@ func (x *EnterGameReq) GetToken() string {
 
 // 进入游戏响应（登录成功后返回给客户端的结构体）
 type EnterGameResp struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Result        *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`                            // 业务结果
-	PlayerAttr    *AttrMap               `protobuf:"bytes,2,opt,name=player_attr,json=playerAttr,proto3" json:"player_attr,omitempty"`  // 玩家属性（键为 Attr 枚举值）
-	HeroEntry     *HeroEntry             `protobuf:"bytes,3,opt,name=hero_entry,json=heroEntry,proto3" json:"hero_entry,omitempty"`     // 当前英雄（已含绑定武器）
-	ServerTime    int64                  `protobuf:"varint,4,opt,name=server_time,json=serverTime,proto3" json:"server_time,omitempty"` // 服务器毫秒时间戳
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Result        *Result                  `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`                                                                                    // 业务结果
+	PlayerAttr    *AttrMap                 `protobuf:"bytes,2,opt,name=player_attr,json=playerAttr,proto3" json:"player_attr,omitempty"`                                                          // 玩家属性（键为 Attr 枚举值）
+	HeroEntry     *HeroEntry               `protobuf:"bytes,3,opt,name=hero_entry,json=heroEntry,proto3" json:"hero_entry,omitempty"`                                                             // 当前英雄（已含绑定武器）
+	ServerTime    int64                    `protobuf:"varint,4,opt,name=server_time,json=serverTime,proto3" json:"server_time,omitempty"`                                                         // 服务器毫秒时间戳
+	Tasks         map[int32]*TaskEntry     `protobuf:"bytes,5,rep,name=tasks,proto3" json:"tasks,omitempty" protobuf_key:"varint,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`           // 任务列表（键为任务ID，按 sort 排序展示）
+	Activities    map[int64]*ActivityEntry `protobuf:"bytes,6,rep,name=activities,proto3" json:"activities,omitempty" protobuf_key:"varint,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"` // 活动列表（键为活动实例ID）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -223,6 +225,20 @@ func (x *EnterGameResp) GetServerTime() int64 {
 		return x.ServerTime
 	}
 	return 0
+}
+
+func (x *EnterGameResp) GetTasks() map[int32]*TaskEntry {
+	if x != nil {
+		return x.Tasks
+	}
+	return nil
+}
+
+func (x *EnterGameResp) GetActivities() map[int64]*ActivityEntry {
+	if x != nil {
+		return x.Activities
+	}
+	return nil
 }
 
 // 离开游戏请求（路由 10002）
@@ -676,7 +692,8 @@ var File_game_proto protoreflect.FileDescriptor
 const file_game_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"game.proto\x12\x02pb\x1a\fcommon.proto\"!\n" +
+	"game.proto\x12\x02pb\x1a\fcommon.proto\x1a\n" +
+	"task.proto\x1a\x0eactivity.proto\"!\n" +
 	"\tVerifyReq\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\"0\n" +
 	"\n" +
@@ -684,7 +701,7 @@ const file_game_proto_rawDesc = "" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\"$\n" +
 	"\fEnterGameReq\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\"\xb0\x01\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\"\xc2\x03\n" +
 	"\rEnterGameResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\x12,\n" +
@@ -693,7 +710,18 @@ const file_game_proto_rawDesc = "" +
 	"\n" +
 	"hero_entry\x18\x03 \x01(\v2\r.pb.HeroEntryR\theroEntry\x12\x1f\n" +
 	"\vserver_time\x18\x04 \x01(\x03R\n" +
-	"serverTime\"\x0e\n" +
+	"serverTime\x122\n" +
+	"\x05tasks\x18\x05 \x03(\v2\x1c.pb.EnterGameResp.TasksEntryR\x05tasks\x12A\n" +
+	"\n" +
+	"activities\x18\x06 \x03(\v2!.pb.EnterGameResp.ActivitiesEntryR\n" +
+	"activities\x1aG\n" +
+	"\n" +
+	"TasksEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\x05R\x03key\x12#\n" +
+	"\x05value\x18\x02 \x01(\v2\r.pb.TaskEntryR\x05value:\x028\x01\x1aP\n" +
+	"\x0fActivitiesEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\x03R\x03key\x12'\n" +
+	"\x05value\x18\x02 \x01(\v2\x11.pb.ActivityEntryR\x05value:\x028\x01\"\x0e\n" +
 	"\fLeaveGameReq\"3\n" +
 	"\rLeaveGameResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
@@ -736,7 +764,7 @@ func file_game_proto_rawDescGZIP() []byte {
 	return file_game_proto_rawDescData
 }
 
-var file_game_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_game_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_game_proto_goTypes = []any{
 	(*VerifyReq)(nil),     // 0: pb.VerifyReq
 	(*VerifyResp)(nil),    // 1: pb.VerifyResp
@@ -751,32 +779,40 @@ var file_game_proto_goTypes = []any{
 	(*ExchangeResp)(nil),  // 10: pb.ExchangeResp
 	(*RechargeReq)(nil),   // 11: pb.RechargeReq
 	(*RechargeResp)(nil),  // 12: pb.RechargeResp
-	(*Result)(nil),        // 13: pb.Result
-	(*AttrMap)(nil),       // 14: pb.AttrMap
-	(*HeroEntry)(nil),     // 15: pb.HeroEntry
-	(NOTIFY_TYPE)(0),      // 16: pb.NOTIFY_TYPE
-	(*AssetEntry)(nil),    // 17: pb.AssetEntry
+	nil,                   // 13: pb.EnterGameResp.TasksEntry
+	nil,                   // 14: pb.EnterGameResp.ActivitiesEntry
+	(*Result)(nil),        // 15: pb.Result
+	(*AttrMap)(nil),       // 16: pb.AttrMap
+	(*HeroEntry)(nil),     // 17: pb.HeroEntry
+	(NOTIFY_TYPE)(0),      // 18: pb.NOTIFY_TYPE
+	(*AssetEntry)(nil),    // 19: pb.AssetEntry
+	(*TaskEntry)(nil),     // 20: pb.TaskEntry
+	(*ActivityEntry)(nil), // 21: pb.ActivityEntry
 }
 var file_game_proto_depIdxs = []int32{
-	13, // 0: pb.VerifyResp.result:type_name -> pb.Result
-	13, // 1: pb.EnterGameResp.result:type_name -> pb.Result
-	14, // 2: pb.EnterGameResp.player_attr:type_name -> pb.AttrMap
-	15, // 3: pb.EnterGameResp.hero_entry:type_name -> pb.HeroEntry
-	13, // 4: pb.LeaveGameResp.result:type_name -> pb.Result
-	16, // 5: pb.ServerNotify.notify_type:type_name -> pb.NOTIFY_TYPE
-	13, // 6: pb.GiftBuyResp.result:type_name -> pb.Result
-	17, // 7: pb.GiftBuyResp.costs:type_name -> pb.AssetEntry
-	17, // 8: pb.GiftBuyResp.rewards:type_name -> pb.AssetEntry
-	13, // 9: pb.ExchangeResp.result:type_name -> pb.Result
-	17, // 10: pb.ExchangeResp.costs:type_name -> pb.AssetEntry
-	17, // 11: pb.ExchangeResp.rewards:type_name -> pb.AssetEntry
-	13, // 12: pb.RechargeResp.result:type_name -> pb.Result
-	17, // 13: pb.RechargeResp.rewards:type_name -> pb.AssetEntry
-	14, // [14:14] is the sub-list for method output_type
-	14, // [14:14] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	15, // 0: pb.VerifyResp.result:type_name -> pb.Result
+	15, // 1: pb.EnterGameResp.result:type_name -> pb.Result
+	16, // 2: pb.EnterGameResp.player_attr:type_name -> pb.AttrMap
+	17, // 3: pb.EnterGameResp.hero_entry:type_name -> pb.HeroEntry
+	13, // 4: pb.EnterGameResp.tasks:type_name -> pb.EnterGameResp.TasksEntry
+	14, // 5: pb.EnterGameResp.activities:type_name -> pb.EnterGameResp.ActivitiesEntry
+	15, // 6: pb.LeaveGameResp.result:type_name -> pb.Result
+	18, // 7: pb.ServerNotify.notify_type:type_name -> pb.NOTIFY_TYPE
+	15, // 8: pb.GiftBuyResp.result:type_name -> pb.Result
+	19, // 9: pb.GiftBuyResp.costs:type_name -> pb.AssetEntry
+	19, // 10: pb.GiftBuyResp.rewards:type_name -> pb.AssetEntry
+	15, // 11: pb.ExchangeResp.result:type_name -> pb.Result
+	19, // 12: pb.ExchangeResp.costs:type_name -> pb.AssetEntry
+	19, // 13: pb.ExchangeResp.rewards:type_name -> pb.AssetEntry
+	15, // 14: pb.RechargeResp.result:type_name -> pb.Result
+	19, // 15: pb.RechargeResp.rewards:type_name -> pb.AssetEntry
+	20, // 16: pb.EnterGameResp.TasksEntry.value:type_name -> pb.TaskEntry
+	21, // 17: pb.EnterGameResp.ActivitiesEntry.value:type_name -> pb.ActivityEntry
+	18, // [18:18] is the sub-list for method output_type
+	18, // [18:18] is the sub-list for method input_type
+	18, // [18:18] is the sub-list for extension type_name
+	18, // [18:18] is the sub-list for extension extendee
+	0,  // [0:18] is the sub-list for field type_name
 }
 
 func init() { file_game_proto_init() }
@@ -785,13 +821,15 @@ func file_game_proto_init() {
 		return
 	}
 	file_common_proto_init()
+	file_task_proto_init()
+	file_activity_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_proto_rawDesc), len(file_game_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   13,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

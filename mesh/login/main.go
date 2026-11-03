@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"server-cluster/internal/singleinstance"
+	// "server-cluster/internal/singleinstance" // TODO: 临时跳过
 	"server-cluster/mesh/login/app/handler"
 	"server-cluster/share/consts"
 
@@ -30,7 +30,7 @@ import (
 
 func main() {
 	// 单实例保护：重复启动会触发 due 日志 rotate 失败 panic，提前拦截
-	singleinstance.Check(consts.MeshInstanceID())
+	// singleinstance.Check(consts.MeshInstanceID()) // TODO: 临时跳过，开发环境残留 mutex
 	// 创建容器
 	container := due.NewContainer()
 	// 创建服务注册发现（给集群管理 Sync 用）

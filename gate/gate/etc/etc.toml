@@ -2,7 +2,7 @@
 # due 自动加载 ./etc/etc.toml。
 
 # 进程号
-pid = "../../pid/gate.pid"
+pid = ""
 # 开发模式。支持模式：debug、test、release
 mode = "debug"
 # 统一时区设置
@@ -30,7 +30,7 @@ timezone = "Local"
     callFullPath = true
     [log.file]
         # 日志输出文件
-        path = "../../log/gate.log"
+        path = "../../.dev/log/gate.log"
         # 日志输出格式，可选：text | json
         format = "text"
         # 文件最大留存时间
@@ -80,7 +80,7 @@ timezone = "Local"
 
 [network.ws.server]
     # 服务器监听地址（WebSocket 客户端接入地址）
-    addr = "188.18.23.72:9000"
+    addr = "127.0.0.1:9000"
     # 客户端连接路径
     path = "/"
     # 服务器最大连接数

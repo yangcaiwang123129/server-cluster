@@ -153,6 +153,27 @@ type MailLogic interface {
 	MailSend(ctx context.Context, playerID int64, req *pb.GmMailSendReq) (*pb.MailEntry, error)
 }
 
+// TaskEvent 任务进度事件：由业务埋点上报，按 targetTaskType + param 匹配任务配置。
+type TaskEvent struct {
+	PlayerID       int64 // 玩家ID
+	TargetTaskType int32 // 进度来源类型（tpl.TargetTaskType_*）
+	Param          int32 // 细分参数（如充值配置ID），0 匹配全部
+	Count          int64 // 增量
+}
+
+// TaskLogic 任务业务接口：列表/领奖 + 进度事件入口。
+type TaskLogic interface {
+	ModuleLogic
+	// TaskList 任务列表（按类型/活动过滤，含进度与红点）
+	TaskList(ctx context.Context, playerID int64, req *pb.TaskListReq) (*pb.TaskListResp, error)
+	// TaskClaim 任务领奖
+	TaskClaim(ctx context.Context, playerID int64, req *pb.TaskClaimReq) (*pb.TaskClaimResp, error)
+	// TaskAccept 任务接取（仅手动接取任务：未接取→进行中）
+	TaskAccept(ctx context.Context, playerID int64, req *pb.TaskAcceptReq) (*pb.TaskAcceptResp, error)
+	// EmitTaskEvent 上报任务进度事件（内部吞掉错误，不阻断业务主流程）
+	EmitTaskEvent(ctx context.Context, e TaskEvent)
+}
+
 // AssetLogic 资产业务统一入口：按 tpl.AssetType 路由到对应实现（item/equip/weapon/skill/hero 等），
 // 供奖励发放、消耗校验等场景复用，不关心资产落在哪张表/哪个容器。
 type AssetLogic interface {

@@ -15,6 +15,13 @@ const (
 	TablePlayerMail   Table = "player_mail"   // 玩家邮件表 持有（1:1，邮件 JSON，key=邮件实例ID）
 )
 
+// 活动/任务表（全局单服，无 zone）
+const (
+	TableActivity       Table = "activity"        // 全局活动实例
+	TablePlayerActivity Table = "player_activity" // 玩家活动参与状态
+	TablePlayerTask     Table = "player_task"     // 玩家任务进度
+)
+
 // 游戏打点记录表
 const (
 	TableItemRecord   Table = "item_record"   // 物品打点

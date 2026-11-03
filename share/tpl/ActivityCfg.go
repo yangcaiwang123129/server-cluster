@@ -9,6 +9,15 @@
 package tpl
 
 type ActivityCfg struct {
-	Id   int32  `json:"id"`   // id
-	Name string `json:"name"` // 名字
+	Id                    int32        `json:"id"`                    // id
+	Name                  string       `json:"name"`                  // 名字
+	Desc                  string       `json:"desc"`                  // 描述
+	StrategyType          StrategyType `json:"strategyType"`          // 活动策略
+	StrategyStartValue    string       `json:"strategyStartValue"`    // 开启策略
+	StrategyEndValue      string       `json:"strategyEndValue"`      // 结束策略
+	RoundCount            int32        `json:"roundCount"`            // 轮次：-1 表示无限，1 表示单轮，N 表示 N 轮
+	AssetRewards          []*Asset     `json:"assetRewards"`          // 资产奖励
+	TriggerLogicType      LogicType    `json:"triggerLogicType"`      // 逻辑类型
+	TriggerConditionTypes []*Condition `json:"triggerConditionTypes"` // 条件列表
+	Icon                  string       `json:"icon"`                  // 图标
 }

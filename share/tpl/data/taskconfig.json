@@ -1,0 +1,310 @@
+[
+  {
+    "id": 1001001,
+    "name": "每日签到：第1天",
+    "desc": "每日签到：第1天",
+    "taskGroupID": 1001,
+    "taskType": 0,
+    "targetTaskType": 3,
+    "targetTaskParam": 0,
+    "targetTaskCount": 1,
+    "preTaskId": 0,
+    "assetRewards": [
+      {
+        "type": 1,
+        "id": 1,
+        "count": 100
+      }
+    ],
+    "claimType": 1,
+    "claimLogicType": 2,
+    "claimConditionTypes": [
+      {
+        "type": 1,
+        "args": 1
+      },
+      {
+        "type": 2,
+        "args": 1
+      }
+    ],
+    "acceptLogicType": 2,
+    "acceptConditionTypes": [
+      {
+        "type": 1,
+        "args": 1
+      },
+      {
+        "type": 2,
+        "args": 1
+      }
+    ],
+    "acceptType": 0,
+    "icon": "",
+    "sort": 0
+  },
+  {
+    "id": 1001002,
+    "name": "每日签到：第2天",
+    "desc": "每日签到：第2天",
+    "taskGroupID": 1001,
+    "taskType": 0,
+    "targetTaskType": 3,
+    "targetTaskParam": 0,
+    "targetTaskCount": 1,
+    "preTaskId": 0,
+    "assetRewards": [
+      {
+        "type": 1,
+        "id": 2,
+        "count": 50
+      }
+    ],
+    "claimType": 1,
+    "claimLogicType": 1,
+    "claimConditionTypes": [
+      {
+        "type": 1,
+        "args": 1
+      },
+      {
+        "type": 2,
+        "args": 1
+      }
+    ],
+    "acceptLogicType": 1,
+    "acceptConditionTypes": [
+      {
+        "type": 1,
+        "args": 1
+      },
+      {
+        "type": 2,
+        "args": 1
+      }
+    ],
+    "acceptType": 0,
+    "icon": "",
+    "sort": 0
+  },
+  {
+    "id": 1001003,
+    "name": "每日签到：第3天",
+    "desc": "每日签到：第3天",
+    "taskGroupID": 1001,
+    "taskType": 0,
+    "targetTaskType": 3,
+    "targetTaskParam": 0,
+    "targetTaskCount": 1,
+    "preTaskId": 0,
+    "assetRewards": [
+      {
+        "type": 1,
+        "id": 1,
+        "count": 50
+      }
+    ],
+    "claimType": 1,
+    "claimLogicType": 1,
+    "claimConditionTypes": [
+      {
+        "type": 1,
+        "args": 1
+      },
+      {
+        "type": 2,
+        "args": 1
+      }
+    ],
+    "acceptLogicType": 1,
+    "acceptConditionTypes": [
+      {
+        "type": 1,
+        "args": 1
+      },
+      {
+        "type": 2,
+        "args": 1
+      }
+    ],
+    "acceptType": 0,
+    "icon": "",
+    "sort": 0
+  },
+  {
+    "id": 1001004,
+    "name": "每日签到：第4天",
+    "desc": "每日签到：第4天",
+    "taskGroupID": 1001,
+    "taskType": 0,
+    "targetTaskType": 3,
+    "targetTaskParam": 0,
+    "targetTaskCount": 1,
+    "preTaskId": 0,
+    "assetRewards": [
+      {
+        "type": 1,
+        "id": 1,
+        "count": 80
+      }
+    ],
+    "claimType": 1,
+    "claimLogicType": 1,
+    "claimConditionTypes": [
+      {
+        "type": 1,
+        "args": 1
+      },
+      {
+        "type": 2,
+        "args": 1
+      }
+    ],
+    "acceptLogicType": 1,
+    "acceptConditionTypes": [
+      {
+        "type": 1,
+        "args": 1
+      },
+      {
+        "type": 2,
+        "args": 1
+      }
+    ],
+    "acceptType": 0,
+    "icon": "",
+    "sort": 0
+  },
+  {
+    "id": 1001005,
+    "name": "每日签到：第5天",
+    "desc": "每日签到：第5天",
+    "taskGroupID": 1001,
+    "taskType": 0,
+    "targetTaskType": 3,
+    "targetTaskParam": 0,
+    "targetTaskCount": 1,
+    "preTaskId": 0,
+    "assetRewards": [
+      {
+        "type": 1,
+        "id": 2,
+        "count": 20
+      }
+    ],
+    "claimType": 1,
+    "claimLogicType": 2,
+    "claimConditionTypes": [
+      {
+        "type": 1,
+        "args": 1
+      },
+      {
+        "type": 2,
+        "args": 1
+      }
+    ],
+    "acceptLogicType": 2,
+    "acceptConditionTypes": [
+      {
+        "type": 1,
+        "args": 1
+      },
+      {
+        "type": 2,
+        "args": 1
+      }
+    ],
+    "acceptType": 0,
+    "icon": "",
+    "sort": 0
+  },
+  {
+    "id": 1001006,
+    "name": "每日签到：第6天",
+    "desc": "每日签到：第6天",
+    "taskGroupID": 1001,
+    "taskType": 0,
+    "targetTaskType": 3,
+    "targetTaskParam": 0,
+    "targetTaskCount": 1,
+    "preTaskId": 0,
+    "assetRewards": [
+      {
+        "type": 1,
+        "id": 2,
+        "count": 20
+      }
+    ],
+    "claimType": 1,
+    "claimLogicType": 1,
+    "claimConditionTypes": [
+      {
+        "type": 1,
+        "args": 1
+      },
+      {
+        "type": 2,
+        "args": 1
+      }
+    ],
+    "acceptLogicType": 1,
+    "acceptConditionTypes": [
+      {
+        "type": 1,
+        "args": 1
+      },
+      {
+        "type": 2,
+        "args": 1
+      }
+    ],
+    "acceptType": 0,
+    "icon": "",
+    "sort": 0
+  },
+  {
+    "id": 1001007,
+    "name": "每日签到：第7天",
+    "desc": "每日签到：第7天",
+    "taskGroupID": 1001,
+    "taskType": 0,
+    "targetTaskType": 3,
+    "targetTaskParam": 0,
+    "targetTaskCount": 1,
+    "preTaskId": 0,
+    "assetRewards": [
+      {
+        "type": 1,
+        "id": 2,
+        "count": 20
+      }
+    ],
+    "claimType": 1,
+    "claimLogicType": 1,
+    "claimConditionTypes": [
+      {
+        "type": 1,
+        "args": 1
+      },
+      {
+        "type": 2,
+        "args": 1
+      }
+    ],
+    "acceptLogicType": 1,
+    "acceptConditionTypes": [
+      {
+        "type": 1,
+        "args": 1
+      },
+      {
+        "type": 2,
+        "args": 1
+      }
+    ],
+    "acceptType": 0,
+    "icon": "",
+    "sort": 0
+  }
+]
