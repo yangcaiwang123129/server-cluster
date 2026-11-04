@@ -21,79 +21,79 @@ func RegisterSys(router http.Router) {
 	pg := publicGroup(router)
 	pg.Get("/captcha", handleCaptcha)
 	pg.Post("/login", handleLogin)
-	pg.Get("/app-config", handleAppConfig)
+	GET(pg, "/app-config", handleAppConfig)
 
 	// --- 受保护的系统路由 ---
-	g.Post("/logout", handleLogout)
-	g.Get("/getinfo", handle(handleGetInfo))
-	g.Get("/menurole", handle(handleMenuRole))
+	POSTMsg(g, "/logout", "注销成功", handleLogout)
+	GET(g, "/getinfo", handleGetInfo)
+	GET(g, "/menurole", handleMenuRole)
 
 	// 接口管理
-	g.Get("/sys-api", handle(handleApiList))
-	g.Get("/sys-api/:id", handle(handleApiGet))
-	g.Post("/sys-api", handle(handleApiCreate))
-	g.Put("/sys-api/:id", handle(handleApiUpdate))
-	g.Delete("/sys-api", handleApiDelete)
+	GET(g, "/sys-api", handleApiList)
+	GET(g, "/sys-api/:id", handleApiGet)
+	POST(g, "/sys-api", handleApiCreate)
+	PUT(g, "/sys-api/:id", handleApiUpdate)
+	DELETEMsg(g, "/sys-api", "删除成功", handleApiDelete)
 
 	// 用户
-	g.Get("/sys-user", handle(handleUserList))
-	g.Get("/sys-user/:userId", handle(handleUserGet))
-	g.Post("/sys-user", handle(handleUserCreate))
-	g.Put("/sys-user", handle(handleUserUpdate))
-	g.Delete("/sys-user", handleUserDelete)
-	g.Put("/user/status", handleUserStatus)
-	g.Put("/user/pwd/reset", handleUserResetPwd)
-	g.Get("/user/profile", handle(handleUserProfile))
-	g.Put("/sys-user/profile", handle(handleUserProfileUpdate))
-	g.Put("/user/pwd/set", handleUserPwdSet)
+	GET(g, "/sys-user", handleUserList)
+	GET(g, "/sys-user/:userId", handleUserGet)
+	POST(g, "/sys-user", handleUserCreate)
+	PUT(g, "/sys-user", handleUserUpdate)
+	DELETEMsg(g, "/sys-user", "删除成功", handleUserDelete)
+	PUTMsg(g, "/user/status", "操作成功", handleUserStatus)
+	PUTMsg(g, "/user/pwd/reset", "密码重置成功", handleUserResetPwd)
+	GET(g, "/user/profile", handleUserProfile)
+	PUT(g, "/sys-user/profile", handleUserProfileUpdate)
+	PUTMsg(g, "/user/pwd/set", "密码修改成功", handleUserPwdSet)
 
 	// 角色
-	g.Get("/role", handle(handleRoleList))
-	g.Get("/role/:roleId", handle(handleRoleGet))
-	g.Post("/role", handle(handleRoleCreate))
-	g.Put("/role/:roleId", handle(handleRoleUpdate))
-	g.Delete("/role", handleRoleDelete)
-	g.Put("/role-status", handleRoleStatus)
+	GET(g, "/role", handleRoleList)
+	GET(g, "/role/:roleId", handleRoleGet)
+	POST(g, "/role", handleRoleCreate)
+	PUT(g, "/role/:roleId", handleRoleUpdate)
+	DELETEMsg(g, "/role", "删除成功", handleRoleDelete)
+	PUTMsg(g, "/role-status", "操作成功", handleRoleStatus)
 
 	// 菜单
-	g.Get("/menu", handle(handleMenuList))
-	g.Get("/menu/:menuId", handle(handleMenuGet))
-	g.Get("/roleMenuTreeselect/:roleId", handle(handleRoleMenuTreeselect))
-	g.Post("/menu", handle(handleMenuCreate))
-	g.Put("/menu/:id", handle(handleMenuUpdate))
-	g.Delete("/menu", handleMenuDelete)
+	GET(g, "/menu", handleMenuList)
+	GET(g, "/menu/:menuId", handleMenuGet)
+	GET(g, "/roleMenuTreeselect/:roleId", handleRoleMenuTreeselect)
+	POST(g, "/menu", handleMenuCreate)
+	PUT(g, "/menu/:id", handleMenuUpdate)
+	DELETEMsg(g, "/menu", "删除成功", handleMenuDelete)
 
 	// 字典
-	g.Get("/dict/type", handle(handleDictTypeList))
-	g.Get("/dict/type/:id", handle(handleDictTypeGet))
-	g.Post("/dict/type", handle(handleDictTypeCreate))
-	g.Put("/dict/type/:id", handle(handleDictTypeUpdate))
-	g.Delete("/dict/type", handleDictTypeDelete)
-	g.Get("/dict/type-option-select", handle(handleDictTypeOptions))
-	g.Get("/dict/data", handle(handleDictDataList))
-	g.Get("/dict/data/:dictCode", handle(handleDictDataGet))
-	g.Post("/dict/data", handle(handleDictDataCreate))
-	g.Put("/dict/data/:dictCode", handle(handleDictDataUpdate))
-	g.Delete("/dict/data", handleDictDataDelete)
-	g.Get("/dict-data/option-select", handle(handleDictDataOptions))
+	GET(g, "/dict/type", handleDictTypeList)
+	GET(g, "/dict/type/:id", handleDictTypeGet)
+	POST(g, "/dict/type", handleDictTypeCreate)
+	PUT(g, "/dict/type/:id", handleDictTypeUpdate)
+	DELETEMsg(g, "/dict/type", "删除成功", handleDictTypeDelete)
+	GET(g, "/dict/type-option-select", handleDictTypeOptions)
+	GET(g, "/dict/data", handleDictDataList)
+	GET(g, "/dict/data/:dictCode", handleDictDataGet)
+	POST(g, "/dict/data", handleDictDataCreate)
+	PUT(g, "/dict/data/:dictCode", handleDictDataUpdate)
+	DELETEMsg(g, "/dict/data", "删除成功", handleDictDataDelete)
+	GET(g, "/dict-data/option-select", handleDictDataOptions)
 
 	// 系统配置
-	g.Get("/config", handle(handleConfigList))
-	g.Get("/config/:id", handle(handleConfigGet))
-	g.Get("/configKey/:key", handle(handleConfigKey))
-	g.Post("/config", handle(handleConfigCreate))
-	g.Put("/config/:id", handle(handleConfigUpdate))
-	g.Delete("/config", handleConfigDelete)
-	g.Get("/set-config", handle(handleGetSetConfig))
-	g.Put("/set-config", handleUpdateSetConfig)
+	GET(g, "/config", handleConfigList)
+	GET(g, "/config/:id", handleConfigGet)
+	GET(g, "/configKey/:key", handleConfigKey)
+	POST(g, "/config", handleConfigCreate)
+	PUT(g, "/config/:id", handleConfigUpdate)
+	DELETEMsg(g, "/config", "删除成功", handleConfigDelete)
+	GET(g, "/set-config", handleGetSetConfig)
+	PUTMsg(g, "/set-config", "保存成功", handleUpdateSetConfig)
 
 	// 日志
-	g.Get("/sys-login-log", handle(handleLoginLogList))
-	g.Get("/sys-login-log/:id", handle(handleLoginLogGet))
-	g.Delete("/sys-login-log", handleLoginLogDelete)
-	g.Get("/sys-opera-log", handle(handleOperaLogList))
-	g.Delete("/sys-opera-log", handleOperaLogDelete)
-	g.Delete("/operlog/clean", handleOperaLogClean)
+	GET(g, "/sys-login-log", handleLoginLogList)
+	GET(g, "/sys-login-log/:id", handleLoginLogGet)
+	DELETEMsg(g, "/sys-login-log", "删除成功", handleLoginLogDelete)
+	GET(g, "/sys-opera-log", handleOperaLogList)
+	DELETEMsg(g, "/sys-opera-log", "删除成功", handleOperaLogDelete)
+	DELETEMsg(g, "/operlog/clean", "清空成功", handleOperaLogClean)
 }
 
 // handleApiList 接口分页列表。
@@ -178,15 +178,15 @@ func handleApiUpdate(ctx http.Context) (*model.SysApi, error) {
 // @Param body body dto.IdsReq true "批量删除ID"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/sys-api [delete]
-func handleApiDelete(ctx http.Context) error {
+func handleApiDelete(ctx http.Context) (any, error) {
 	var req dto.IdsReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.ApiDelete(req.Ids); err != nil {
-		return errs.FailErr(ctx, err)
+		return nil, err
 	}
-	return errs.OK(ctx, nil, "删除成功")
+	return nil, nil
 }
 
 // handleCaptcha 返回图形验证码。
@@ -226,7 +226,7 @@ func handleLogin(ctx http.Context) error {
 // @Produce json
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/logout [post]
-func handleLogout(ctx http.Context) error { return errs.OK(ctx, nil, "注销成功") }
+func handleLogout(ctx http.Context) (any, error) { return nil, nil }
 
 // handleGetInfo 返回当前登录用户的角色、权限与资料。
 // @Summary 获取当前用户信息
@@ -352,15 +352,15 @@ func handleConfigUpdate(ctx http.Context) (*model.SysConfig, error) {
 // @Param body body dto.IdsReq true "批量删除ID"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/config [delete]
-func handleConfigDelete(ctx http.Context) error {
+func handleConfigDelete(ctx http.Context) (any, error) {
 	var req dto.IdsReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.ConfigDelete(req.Ids); err != nil {
-		return errs.FailErr(ctx, err)
+		return nil, err
 	}
-	return errs.OK(ctx, nil, "删除成功")
+	return nil, nil
 }
 
 // handleGetSetConfig 系统配置页的内置键取值。
@@ -381,15 +381,15 @@ func handleGetSetConfig(ctx http.Context) (map[string]string, error) {
 // @Param body body dto.SetConfigReq true "请求体"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/set-config [put]
-func handleUpdateSetConfig(ctx http.Context) error {
+func handleUpdateSetConfig(ctx http.Context) (any, error) {
 	var req dto.SetConfigReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.UpdateSettings(req); err != nil {
-		return errs.FailErr(ctx, err)
+		return nil, err
 	}
-	return errs.OK(ctx, nil, "保存成功")
+	return nil, nil
 }
 
 // handleDictTypeList 字典类型分页列表。
@@ -471,15 +471,15 @@ func handleDictTypeUpdate(ctx http.Context) (*model.SysDictType, error) {
 // @Param body body dto.IdsReq true "批量删除ID"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/dict/type [delete]
-func handleDictTypeDelete(ctx http.Context) error {
+func handleDictTypeDelete(ctx http.Context) (any, error) {
 	var req dto.IdsReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.DictTypeDelete(req.Ids); err != nil {
-		return errs.FailErr(ctx, err)
+		return nil, err
 	}
-	return errs.OK(ctx, nil, "删除成功")
+	return nil, nil
 }
 
 // handleDictTypeOptions 字典类型下拉项。
@@ -572,15 +572,15 @@ func handleDictDataUpdate(ctx http.Context) (*model.SysDictData, error) {
 // @Param body body dto.IdsReq true "批量删除ID"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/dict/data [delete]
-func handleDictDataDelete(ctx http.Context) error {
+func handleDictDataDelete(ctx http.Context) (any, error) {
 	var req dto.IdsReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.DictDataDelete(req.Ids); err != nil {
-		return errs.FailErr(ctx, err)
+		return nil, err
 	}
-	return errs.OK(ctx, nil, "删除成功")
+	return nil, nil
 }
 
 // handleDictDataOptions 指定字典类型的下拉项。
@@ -644,15 +644,15 @@ func handleLoginLogGet(ctx http.Context) (*model.SysLoginLog, error) {
 // @Param body body dto.IdsReq true "批量删除ID"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/sys-login-log [delete]
-func handleLoginLogDelete(ctx http.Context) error {
+func handleLoginLogDelete(ctx http.Context) (any, error) {
 	var req dto.IdsReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.LoginLogDelete(req.Ids); err != nil {
-		return errs.FailErr(ctx, err)
+		return nil, err
 	}
-	return errs.OK(ctx, nil, "删除成功")
+	return nil, nil
 }
 
 // handleOperaLogList 操作日志分页列表。
@@ -694,15 +694,15 @@ func handleOperaLogList(ctx http.Context) (util.PageResp[model.SysOperaLog], err
 // @Param body body dto.IdsReq true "批量删除ID"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/sys-opera-log [delete]
-func handleOperaLogDelete(ctx http.Context) error {
+func handleOperaLogDelete(ctx http.Context) (any, error) {
 	var req dto.IdsReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.OperaLogDelete(req.Ids); err != nil {
-		return errs.FailErr(ctx, err)
+		return nil, err
 	}
-	return errs.OK(ctx, nil, "删除成功")
+	return nil, nil
 }
 
 // handleOperaLogClean 清空操作日志。
@@ -711,11 +711,11 @@ func handleOperaLogDelete(ctx http.Context) error {
 // @Produce json
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/operlog/clean [delete]
-func handleOperaLogClean(ctx http.Context) error {
+func handleOperaLogClean(ctx http.Context) (any, error) {
 	if err := logic.OperaLogClean(); err != nil {
-		return errs.FailErr(ctx, err)
+		return nil, err
 	}
-	return errs.OK(ctx, nil, "清空成功")
+	return nil, nil
 }
 
 // handleMenuList 菜单树（不分页）。
@@ -798,15 +798,15 @@ func handleMenuUpdate(ctx http.Context) (*model.SysMenu, error) {
 // @Param body body dto.IdsReq true "批量删除ID"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/menu [delete]
-func handleMenuDelete(ctx http.Context) error {
+func handleMenuDelete(ctx http.Context) (any, error) {
 	var req dto.IdsReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.MenuDelete(req.Ids); err != nil {
-		return errs.FailErr(ctx, err)
+		return nil, err
 	}
-	return errs.OK(ctx, nil, "删除成功")
+	return nil, nil
 }
 
 // handleRoleList 角色分页列表。
@@ -889,15 +889,15 @@ func handleRoleUpdate(ctx http.Context) (*model.SysRole, error) {
 // @Param body body dto.IdsReq true "批量删除ID"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/role [delete]
-func handleRoleDelete(ctx http.Context) error {
+func handleRoleDelete(ctx http.Context) (any, error) {
 	var req dto.IdsReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.RoleDelete(req.Ids); err != nil {
-		return errs.FailErr(ctx, err)
+		return nil, err
 	}
-	return errs.OK(ctx, nil, "删除成功")
+	return nil, nil
 }
 
 // handleRoleStatus 启用/停用角色。
@@ -908,15 +908,15 @@ func handleRoleDelete(ctx http.Context) error {
 // @Param body body dto.RoleStatusReq true "请求体"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/role-status [put]
-func handleRoleStatus(ctx http.Context) error {
+func handleRoleStatus(ctx http.Context) (any, error) {
 	var req dto.RoleStatusReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.RoleUpdateStatus(req); err != nil {
-		return errs.FailErr(ctx, err)
+		return nil, err
 	}
-	return errs.OK(ctx, nil, "操作成功")
+	return nil, nil
 }
 
 // handleUserList 用户分页列表。
@@ -999,15 +999,15 @@ func handleUserUpdate(ctx http.Context) (*model.SysUser, error) {
 // @Param body body dto.IdsReq true "批量删除ID"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/sys-user [delete]
-func handleUserDelete(ctx http.Context) error {
+func handleUserDelete(ctx http.Context) (any, error) {
 	var req dto.IdsReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.UserDelete(req.Ids); err != nil {
-		return errs.FailErr(ctx, err)
+		return nil, err
 	}
-	return errs.OK(ctx, nil, "删除成功")
+	return nil, nil
 }
 
 // handleUserStatus 启用/停用用户。
@@ -1018,15 +1018,15 @@ func handleUserDelete(ctx http.Context) error {
 // @Param body body dto.UserStatusReq true "请求体"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/user/status [put]
-func handleUserStatus(ctx http.Context) error {
+func handleUserStatus(ctx http.Context) (any, error) {
 	var req dto.UserStatusReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.UserUpdateStatus(req); err != nil {
-		return errs.FailErr(ctx, err)
+		return nil, err
 	}
-	return errs.OK(ctx, nil, "操作成功")
+	return nil, nil
 }
 
 // handleUserResetPwd 重置指定用户密码。
@@ -1037,15 +1037,15 @@ func handleUserStatus(ctx http.Context) error {
 // @Param body body dto.UserPasswordResetReq true "请求体"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/user/pwd/reset [put]
-func handleUserResetPwd(ctx http.Context) error {
+func handleUserResetPwd(ctx http.Context) (any, error) {
 	var req dto.UserPasswordResetReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.UserResetPassword(req); err != nil {
-		return errs.FailErr(ctx, err)
+		return nil, err
 	}
-	return errs.OK(ctx, nil, "密码重置成功")
+	return nil, nil
 }
 
 // handleUserProfile 当前登录用户的资料。
@@ -1086,13 +1086,13 @@ func handleUserProfileUpdate(ctx http.Context) (*model.SysUser, error) {
 // @Param body body dto.UserPasswordSetReq true "请求体"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/user/pwd/set [put]
-func handleUserPwdSet(ctx http.Context) error {
+func handleUserPwdSet(ctx http.Context) (any, error) {
 	var req dto.UserPasswordSetReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.UserSetPassword(global.CurrentUser(ctx), req); err != nil {
-		return errs.FailErr(ctx, err)
+		return nil, err
 	}
-	return errs.OK(ctx, nil, "密码修改成功")
+	return nil, nil
 }

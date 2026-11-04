@@ -11,8 +11,8 @@ import (
 // RegisterMail 注册 GM 邮件管理路由。
 func RegisterMail(router http.Router) {
 	g := gmGroup(router)
-	g.Get("/mail", handle(handleGmMailList))
-	g.Post("/mail", handle(handleGmMailSend))
+	GET(g, "/mail", handleGmMailList)
+	POST(g, "/mail", handleGmMailSend)
 }
 
 // handleGmMailList 玩家邮件列表。

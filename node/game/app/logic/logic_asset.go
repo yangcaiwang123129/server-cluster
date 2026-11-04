@@ -67,29 +67,24 @@ func applyAsset[R any](t tpl.AssetType, op func(h global.AssetStore) (R, error))
 	return op(h)
 }
 
-// AssetAdd 发放资产。
 func (this *assetLogic) AssetAdd(ctx context.Context, playerID int64, asset *tpl.Asset) error {
 	return this.apply(ctx, playerID, asset, global.AssetStore.Add)
 }
 
-// AssetRemove 扣除资产。
 func (this *assetLogic) AssetRemove(ctx context.Context, playerID int64, asset *tpl.Asset) error {
 	return this.apply(ctx, playerID, asset, global.AssetStore.Remove)
 }
 
-// AssetUpdate 覆盖持有状态。
 func (this *assetLogic) AssetUpdate(ctx context.Context, playerID int64, asset *tpl.Asset) error {
 	return this.apply(ctx, playerID, asset, global.AssetStore.Update)
 }
 
-// AssetQuery 查询持有数量。
 func (this *assetLogic) AssetQuery(ctx context.Context, playerID int64, assetType tpl.AssetType, cfgID int32) (int32, error) {
 	return applyAsset(assetType, func(h global.AssetStore) (int32, error) {
 		return h.Query(ctx, playerID, cfgID)
 	})
 }
 
-// AssetList 列出某类资产全部持有。
 func (this *assetLogic) AssetList(ctx context.Context, playerID int64, assetType tpl.AssetType) ([]*tpl.Asset, error) {
 	return applyAsset(assetType, func(h global.AssetStore) ([]*tpl.Asset, error) {
 		return h.List(ctx, playerID)

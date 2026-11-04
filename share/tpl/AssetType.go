@@ -31,4 +31,16 @@ const (
 	 * 技能
 	 */
 	AssetType_Skill AssetType = 5
+	/**
+	 * 点券（player 列 coupon）
+	 */
+	AssetType_Coupon AssetType = 101
+	/**
+	 * 金币（player 列 gold）
+	 */
+	AssetType_Gold AssetType = 102
+	/**
+	 * 钻石（model.Player 字段名 Coin，player 列 diamond）
+	 */
+	AssetType_Coin AssetType = 103
 )

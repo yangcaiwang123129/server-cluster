@@ -37,7 +37,6 @@ func newSkillInfo(cfgID int32) model.SkillInfo {
 	return model.SkillInfo{SkillID: cfgID, Level: 1, Quality: 1}
 }
 
-// SkillList 技能持有列表（供 HeroList 聚合下发与 GM 查询）。
 func (this *skillLogic) SkillList(ctx context.Context, playerID int64) ([]*pb.SkillEntry, error) {
 	row, err := this.Load(ctx, playerID)
 	if err != nil {
@@ -54,7 +53,6 @@ func (this *skillLogic) SkillList(ctx context.Context, playerID int64) ([]*pb.Sk
 	return entries, nil
 }
 
-// SkillUpdate 更新技能：整体覆盖持有状态，未拥有返回错误。
 func (this *skillLogic) SkillUpdate(ctx context.Context, playerID int64, req *pb.SkillUpdateReq) (*pb.SkillUpdateResp, error) {
 	row, err := this.Load(ctx, playerID)
 	if err != nil {
@@ -122,7 +120,6 @@ func skillDimGrow(ctx context.Context, playerID int64, cfgID int32,
 	return s, heroID, nil
 }
 
-// SkillUpgrade 技能升级：消耗 SkillLevel 表当前等级的升级素材，等级 +1。
 func (this *skillLogic) SkillUpgrade(ctx context.Context, playerID int64, req *pb.SkillUpgradeReq) (*pb.SkillUpgradeResp, error) {
 	s, heroID, err := skillDimGrow(ctx, playerID, req.GetCfgId(),
 		func(s model.SkillInfo) int32 { return s.Level },
@@ -153,7 +150,6 @@ func (this *skillLogic) SkillUpgrade(ctx context.Context, playerID int64, req *p
 	return &pb.SkillUpgradeResp{SkillEntry: convert.SkillEntry(s), Attribute: attr}, nil
 }
 
-// SkillUpQuality 技能升品：消耗 SkillQuality 表当前品质的升品素材，品质 +1。
 func (this *skillLogic) SkillUpQuality(ctx context.Context, playerID int64, req *pb.SkillUpQualityReq) (*pb.SkillUpQualityResp, error) {
 	s, heroID, err := skillDimGrow(ctx, playerID, req.GetCfgId(),
 		func(s model.SkillInfo) int32 { return s.Quality },
@@ -184,7 +180,6 @@ func (this *skillLogic) SkillUpQuality(ctx context.Context, playerID int64, req 
 	return &pb.SkillUpQualityResp{SkillEntry: convert.SkillEntry(s), Attribute: attr}, nil
 }
 
-// SkillBreakthrough 技能突破：消耗 SkillBreakthrough 表当前突破的素材，突破 +1。
 func (this *skillLogic) SkillBreakthrough(ctx context.Context, playerID int64, req *pb.SkillBreakthroughReq) (*pb.SkillBreakthroughResp, error) {
 	s, heroID, err := skillDimGrow(ctx, playerID, req.GetCfgId(),
 		func(s model.SkillInfo) int32 { return s.Breakthrough },
@@ -215,7 +210,6 @@ func (this *skillLogic) SkillBreakthrough(ctx context.Context, playerID int64, r
 	return &pb.SkillBreakthroughResp{SkillEntry: convert.SkillEntry(s), Attribute: attr}, nil
 }
 
-// SkillEnsureForHero 按英雄配置初始化固定绑定技能：未持有则补建默认状态。
 func (this *skillLogic) SkillEnsureForHero(ctx context.Context, playerID int64, heroCfgID int32) error {
 	cfg := tpl.T().RoleInfo.Get(heroCfgID)
 	if cfg == nil {
@@ -240,7 +234,6 @@ func (this *skillLogic) SkillEnsureForHero(ctx context.Context, playerID int64, 
 	return nil
 }
 
-// EnterGame 进入游戏：加载玩家技能持有，未建档则初始化空集合；并按已拥有英雄兜底补建绑定技能。
 func (this *skillLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
 	if _, err := this.Load(ctx, playerID); err != nil {
 		return err
@@ -265,7 +258,6 @@ func (this *skillLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.E
 	return nil
 }
 
-// LeaveGame 离开游戏：技能持有数据同步落库，并逐出内存缓存。
 func (this *skillLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
 	if err := flushAndEvict(ctx, skillCache, playerID); err != nil {
 		return err
@@ -273,7 +265,6 @@ func (this *skillLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.L
 	return nil
 }
 
-// Load 加载玩家技能持有；未建档则初始化空 map 并挂入缓存（异步落库）。
 func (this *skillLogic) Load(ctx context.Context, playerID int64) (*model.PlayerSkill, error) {
 	return skillCache.GetOrInit(ctx, playerID,
 		func(id int64) *model.PlayerSkill {
@@ -286,12 +277,10 @@ func (this *skillLogic) Load(ctx context.Context, playerID int64) (*model.Player
 		})
 }
 
-// Save 写回玩家技能持有并挂入异步落库队列。
 func (this *skillLogic) Save(playerID int64, row *model.PlayerSkill) {
 	skillCache.Set(playerID, row)
 }
 
-// Flush 同步落库并逐出缓存（GM 直改 DB 后强制回源）。
 func (this *skillLogic) Flush(ctx context.Context, playerID int64) error {
 	return flushAndEvict(ctx, skillCache, playerID)
 }
@@ -301,10 +290,8 @@ func (this *skillLogic) Flush(ctx context.Context, playerID int64) error {
 // skillAssetStore 技能资产实现：落在 player_skill。技能由英雄配置绑定，发放幂等。
 type skillAssetStore struct{}
 
-// AssetType 资产类型：技能。
 func (this *skillAssetStore) AssetType() tpl.AssetType { return tpl.AssetType_Skill }
 
-// Add 发放技能：已拥有视为成功（技能随英雄自动补建，避免奖励重复发放失败）。
 func (this *skillAssetStore) Add(ctx context.Context, playerID int64, cfgID, _ int32) error {
 	if !tpl.T().Skill.Has(cfgID) {
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "技能配置不存在")
@@ -326,7 +313,6 @@ func (this *skillAssetStore) Add(ctx context.Context, playerID int64, cfgID, _ i
 	return nil
 }
 
-// Remove 扣除技能；未拥有返回错误。
 func (this *skillAssetStore) Remove(ctx context.Context, playerID int64, cfgID, _ int32) error {
 	row, err := Skill().Load(ctx, playerID)
 	if err != nil {
@@ -342,7 +328,6 @@ func (this *skillAssetStore) Remove(ctx context.Context, playerID int64, cfgID, 
 	return nil
 }
 
-// Update 覆盖持有：count<=0 移除，>0 确保持有。
 func (this *skillAssetStore) Update(ctx context.Context, playerID int64, cfgID, count int32) error {
 	owned, err := this.Query(ctx, playerID, cfgID)
 	if err != nil {
@@ -358,7 +343,6 @@ func (this *skillAssetStore) Update(ctx context.Context, playerID int64, cfgID, 
 	}
 }
 
-// Query 查询是否持有：持有 1，未持有 0。
 func (this *skillAssetStore) Query(ctx context.Context, playerID int64, cfgID int32) (int32, error) {
 	row, err := Skill().Load(ctx, playerID)
 	if err != nil {
@@ -370,7 +354,6 @@ func (this *skillAssetStore) Query(ctx context.Context, playerID int64, cfgID in
 	return 0, nil
 }
 
-// List 列出全部技能（按配置ID升序）。
 func (this *skillAssetStore) List(ctx context.Context, playerID int64) ([]*tpl.Asset, error) {
 	row, err := Skill().Load(ctx, playerID)
 	if err != nil {

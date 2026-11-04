@@ -11,14 +11,14 @@ import (
 // RegisterEquip 注册 GM 装备管理路由。
 func RegisterEquip(router http.Router) {
 	g := gmGroup(router)
-	g.Get("/equip", handle(handleGmEquipList))
-	g.Post("/equip", handle(handleGmEquipAdd))
-	g.Put("/equip", handle(handleGmEquipUpdate))
-	g.Post("/equip/upgrade", handle(handleGmEquipUpgrade))
-	g.Post("/equip/up-quality", handle(handleGmEquipUpQuality))
-	g.Post("/equip/breakthrough", handle(handleGmEquipBreakthrough))
-	g.Post("/equip/wear", handle(handleGmEquipWear))
-	g.Post("/equip/unwear", handle(handleGmEquipUnwear))
+	GET(g, "/equip", handleGmEquipList)
+	POST(g, "/equip", handleGmEquipAdd)
+	PUT(g, "/equip", handleGmEquipUpdate)
+	POST(g, "/equip/upgrade", handleGmEquipUpgrade)
+	POST(g, "/equip/up-quality", handleGmEquipUpQuality)
+	POST(g, "/equip/breakthrough", handleGmEquipBreakthrough)
+	POST(g, "/equip/wear", handleGmEquipWear)
+	POST(g, "/equip/unwear", handleGmEquipUnwear)
 }
 
 // handleGmEquipWear 穿戴装备（同英雄同配置自动顶替）。

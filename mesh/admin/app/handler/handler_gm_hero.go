@@ -11,11 +11,11 @@ import (
 // RegisterHero 注册 GM 英雄管理路由。
 func RegisterHero(router http.Router) {
 	g := gmGroup(router)
-	g.Get("/hero", handle(handleGmHeroList))
-	g.Post("/hero", handle(handleGmHeroAdd))
-	g.Put("/hero", handle(handleGmHeroUpdate))
-	g.Get("/hero/attribute", handle(handleGmHeroAttribute))
-	g.Post("/hero/upgrade", handle(handleGmHeroUpgrade))
+	GET(g, "/hero", handleGmHeroList)
+	POST(g, "/hero", handleGmHeroAdd)
+	PUT(g, "/hero", handleGmHeroUpdate)
+	GET(g, "/hero/attribute", handleGmHeroAttribute)
+	POST(g, "/hero/upgrade", handleGmHeroUpgrade)
 }
 
 // handleGmHeroList 英雄列表。

@@ -41,12 +41,9 @@ func init() {
 
 // HeroList 英雄列表（含绑定的武器/技能/装备）。
 func (this *gmHeroLogic) HeroList(req dto.GmPlayerReq) (*dto.GmHeroListResp, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), rpcTimeout)
-	defer cancel()
-
-	resp := &pb.HeroListResp{}
-	if err := gmCall(ctx, req.PlayerID, pb.GameAdminService_HeroList_FullMethodName,
-		&pb.GmHeroListReq{PlayerId: req.PlayerID}, resp); err != nil {
+	resp, err := gmCall[pb.HeroListResp](context.Background(), req.PlayerID, pb.GameAdminService_HeroList_FullMethodName,
+		&pb.GmHeroListReq{PlayerId: req.PlayerID})
+	if err != nil {
 		return nil, err
 	}
 
@@ -59,15 +56,12 @@ func (this *gmHeroLogic) HeroList(req dto.GmPlayerReq) (*dto.GmHeroListResp, err
 
 // HeroAdd 新增英雄。
 func (this *gmHeroLogic) HeroAdd(req dto.GmHeroAddReq) (*dto.GmHeroEntry, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), rpcTimeout)
-	defer cancel()
-
-	resp := &pb.HeroAddResp{}
 	callReq := &pb.GmHeroAddReq{
 		PlayerId: req.PlayerID,
 		Req:      &pb.HeroAddReq{CfgId: req.HeroID},
 	}
-	if err := gmCall(ctx, req.PlayerID, pb.GameAdminService_HeroAdd_FullMethodName, callReq, resp); err != nil {
+	resp, err := gmCall[pb.HeroAddResp](context.Background(), req.PlayerID, pb.GameAdminService_HeroAdd_FullMethodName, callReq)
+	if err != nil {
 		return nil, err
 	}
 	entry := toGmHeroEntry(resp.GetHeroEntry())
@@ -76,10 +70,6 @@ func (this *gmHeroLogic) HeroAdd(req dto.GmHeroAddReq) (*dto.GmHeroEntry, error)
 
 // HeroUpdate 更新英雄。
 func (this *gmHeroLogic) HeroUpdate(req dto.GmHeroUpdateReq) (*dto.GmHeroEntry, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), rpcTimeout)
-	defer cancel()
-
-	resp := &pb.HeroUpdateResp{}
 	callReq := &pb.GmHeroUpdateReq{
 		PlayerId: req.PlayerID,
 		Req: &pb.HeroUpdateReq{
@@ -91,7 +81,8 @@ func (this *gmHeroLogic) HeroUpdate(req dto.GmHeroUpdateReq) (*dto.GmHeroEntry, 
 			Equipped: req.Equipped,
 		},
 	}
-	if err := gmCall(ctx, req.PlayerID, pb.GameAdminService_HeroUpdate_FullMethodName, callReq, resp); err != nil {
+	resp, err := gmCall[pb.HeroUpdateResp](context.Background(), req.PlayerID, pb.GameAdminService_HeroUpdate_FullMethodName, callReq)
+	if err != nil {
 		return nil, err
 	}
 	entry := toGmHeroEntry(resp.GetHeroEntry())
@@ -100,12 +91,9 @@ func (this *gmHeroLogic) HeroUpdate(req dto.GmHeroUpdateReq) (*dto.GmHeroEntry, 
 
 // HeroAttribute 查看英雄累计属性。
 func (this *gmHeroLogic) HeroAttribute(req dto.GmHeroAttributeReq) (*dto.GmHeroAttribute, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), rpcTimeout)
-	defer cancel()
-
-	resp := &pb.HeroAttributeResp{}
 	callReq := &pb.GmHeroAttributeReq{PlayerId: req.PlayerID, HeroId: req.HeroID}
-	if err := gmCall(ctx, req.PlayerID, pb.GameAdminService_HeroAttribute_FullMethodName, callReq, resp); err != nil {
+	resp, err := gmCall[pb.HeroAttributeResp](context.Background(), req.PlayerID, pb.GameAdminService_HeroAttribute_FullMethodName, callReq)
+	if err != nil {
 		return nil, err
 	}
 	entry := resp.GetHeroEntry()

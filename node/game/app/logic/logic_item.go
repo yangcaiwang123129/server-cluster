@@ -48,7 +48,6 @@ func itemErr(err error) error {
 	}
 }
 
-// Load 加载玩家物品容器集合；未建档则初始化并挂入缓存（异步落库）。
 func (this *itemLogic) Load(ctx context.Context, playerID int64) (*model.PlayerItem, error) {
 	return itemCache.GetOrInit(ctx, playerID,
 		func(id int64) *model.PlayerItem {
@@ -60,12 +59,10 @@ func (this *itemLogic) Load(ctx context.Context, playerID int64) (*model.PlayerI
 		})
 }
 
-// Save 写回玩家物品容器并挂入异步落库队列。
 func (this *itemLogic) Save(playerID int64, row *model.PlayerItem) {
 	itemCache.Set(playerID, row)
 }
 
-// Flush 同步落库并逐出缓存（GM 直改 DB 后强制回源）。
 func (this *itemLogic) Flush(ctx context.Context, playerID int64) error {
 	return flushAndEvict(ctx, itemCache, playerID)
 }
@@ -87,7 +84,6 @@ func itemContainerOf(ctx context.Context, playerID int64, t pb.ContainerType) (*
 	return pc, c, nil
 }
 
-// EnterGame 进入游戏：加载/建档玩家物品容器，未建档则初始化并挂入缓存。
 func (this *itemLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
 	if _, err := this.Load(ctx, playerID); err != nil {
 		return err
@@ -96,7 +92,6 @@ func (this *itemLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.En
 	return nil
 }
 
-// LeaveGame 离开游戏：物品容器待写数据同步落库，并逐出内存缓存。
 func (this *itemLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
 	if err := flushAndEvict(ctx, itemCache, playerID); err != nil {
 		return err
@@ -104,7 +99,6 @@ func (this *itemLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.Le
 	return nil
 }
 
-// ItemContainerList 物品容器列表：指定类型返回该容器，UNSPECIFIED 返回全部容器。
 func (this *itemLogic) ItemContainerList(ctx context.Context, playerID int64, req *pb.ItemContainerListReq) (*pb.ItemContainerListResp, error) {
 	pc, err := this.Load(ctx, playerID)
 	if err != nil {
@@ -127,7 +121,6 @@ func (this *itemLogic) ItemContainerList(ctx context.Context, playerID int64, re
 	return &pb.ItemContainerListResp{ItemContainers: containers}, nil
 }
 
-// ItemMove 物品容器内移动物品。
 func (this *itemLogic) ItemMove(ctx context.Context, playerID int64, req *pb.ItemMoveReq) (*pb.ItemMoveResp, error) {
 	pc, c, err := itemContainerOf(ctx, playerID, req.GetContainerType())
 	if err != nil {
@@ -149,7 +142,6 @@ func (this *itemLogic) ItemMove(ctx context.Context, playerID int64, req *pb.Ite
 	return &pb.ItemMoveResp{}, nil
 }
 
-// ItemRotate 物品容器内旋转物品。
 func (this *itemLogic) ItemRotate(ctx context.Context, playerID int64, req *pb.ItemRotateReq) (*pb.ItemRotateResp, error) {
 	pc, c, err := itemContainerOf(ctx, playerID, req.GetContainerType())
 	if err != nil {
@@ -171,7 +163,6 @@ func (this *itemLogic) ItemRotate(ctx context.Context, playerID int64, req *pb.I
 	return &pb.ItemRotateResp{}, nil
 }
 
-// ItemSort 物品容器一键整理。
 func (this *itemLogic) ItemSort(ctx context.Context, playerID int64, req *pb.ItemSortReq) (*pb.ItemSortResp, error) {
 	pc, c, err := itemContainerOf(ctx, playerID, req.GetContainerType())
 	if err != nil {
@@ -193,8 +184,6 @@ func (this *itemLogic) ItemSort(ctx context.Context, playerID int64, req *pb.Ite
 	return &pb.ItemSortResp{}, nil
 }
 
-// ItemTransfer 物品容器间移动物品：目标容器放不下时源容器不变。
-// 新实现：调用目标容器的 TransferFrom 方法（跨容器按 GlobalID 升序加锁）。
 func (this *itemLogic) ItemTransfer(ctx context.Context, playerID int64, req *pb.ItemTransferReq) (*pb.ItemTransferResp, error) {
 	fromType, okFrom := convert.ContainerTypeToModel(req.GetFromType())
 	toType, okTo := convert.ContainerTypeToModel(req.GetToType())
@@ -227,7 +216,6 @@ func (this *itemLogic) ItemTransfer(ctx context.Context, playerID int64, req *pb
 	}, nil
 }
 
-// ItemAddEntry 向物品容器放入对象（GM）：校验配置与占格后挂缓存待落库。
 func (this *itemLogic) ItemAddEntry(ctx context.Context, playerID int64, req *pb.GmItemAddEntryReq) (*pb.ItemContainerListResp, error) {
 	if !tpl.T().Item.Has(req.GetCfgId()) {
 		return &pb.ItemContainerListResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "物品配置不存在")}, nil
@@ -277,10 +265,8 @@ func (this *itemLogic) ItemAddEntry(ctx context.Context, playerID int64, req *pb
 // itemAssetStore 物品资产实现：放在玩家背包的网格里。
 type itemAssetStore struct{}
 
-// AssetType 资产类型：物品。
 func (this *itemAssetStore) AssetType() tpl.AssetType { return tpl.AssetType_Item }
 
-// Add 发放物品到背包；背包放不下返回错误。
 func (this *itemAssetStore) Add(ctx context.Context, playerID int64, cfgID, count int32) error {
 	if !tpl.T().Item.Has(cfgID) {
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "物品配置不存在")
@@ -302,7 +288,6 @@ func (this *itemAssetStore) Add(ctx context.Context, playerID int64, cfgID, coun
 	return nil
 }
 
-// Remove 从背包扣除物品；数量不足返回错误且不改动数据。
 func (this *itemAssetStore) Remove(ctx context.Context, playerID int64, cfgID, count int32) error {
 	if count <= 0 {
 		count = 1
@@ -323,7 +308,6 @@ func (this *itemAssetStore) Remove(ctx context.Context, playerID int64, cfgID, c
 	return nil
 }
 
-// Update 覆盖持有数量：count<=0 全部移除，>0 补足/扣除差额。
 func (this *itemAssetStore) Update(ctx context.Context, playerID int64, cfgID, count int32) error {
 	owned, err := this.Query(ctx, playerID, cfgID)
 	if err != nil {
@@ -341,7 +325,6 @@ func (this *itemAssetStore) Update(ctx context.Context, playerID int64, cfgID, c
 	}
 }
 
-// Query 查询背包中该物品的持有总量。
 func (this *itemAssetStore) Query(ctx context.Context, playerID int64, cfgID int32) (int32, error) {
 	pc, err := Item().Load(ctx, playerID)
 	if err != nil {
@@ -350,7 +333,6 @@ func (this *itemAssetStore) Query(ctx context.Context, playerID int64, cfgID int
 	return countItem(pc.ByType(int32(pb.ContainerType_CONTAINER_TYPE_BACKPACK)), cfgID), nil
 }
 
-// List 列出背包中按配置ID汇总的物品（按配置ID升序）。
 func (this *itemAssetStore) List(ctx context.Context, playerID int64) ([]*tpl.Asset, error) {
 	pc, err := Item().Load(ctx, playerID)
 	if err != nil {

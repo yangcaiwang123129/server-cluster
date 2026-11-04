@@ -14,12 +14,12 @@ import (
 // RegisterPlayer 注册玩家管理路由（列表/在线/踢下线/封号/解封/改密）。
 func RegisterPlayer(router http.Router) {
 	g := gmGroup(router)
-	g.Get("/player", handle(handlePlayerList))
-	g.Get("/player/online", handle(handlePlayerOnline))
-	g.Post("/player/kick", handle(handlePlayerKick))
-	g.Post("/player/ban", handle(handlePlayerBan))
-	g.Post("/player/unban", handle(handlePlayerUnban))
-	g.Post("/player/reset-password", handle(handlePlayerResetPassword))
+	GET(g, "/player", handlePlayerList)
+	GET(g, "/player/online", handlePlayerOnline)
+	POST(g, "/player/kick", handlePlayerKick)
+	POST(g, "/player/ban", handlePlayerBan)
+	POST(g, "/player/unban", handlePlayerUnban)
+	POST(g, "/player/reset-password", handlePlayerResetPassword)
 }
 
 // handlePlayerList 玩家分页列表（player）。

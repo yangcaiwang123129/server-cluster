@@ -37,7 +37,6 @@ func newWeaponInfo(cfgID int32) model.WeaponInfo {
 	return model.WeaponInfo{WeaponID: cfgID, Level: 1, Quality: 1}
 }
 
-// WeaponList 武器持有列表（供 HeroList 聚合下发与 GM 查询）。
 func (this *weaponLogic) WeaponList(ctx context.Context, playerID int64) ([]*pb.WeaponEntry, error) {
 	row, err := this.Load(ctx, playerID)
 	if err != nil {
@@ -54,7 +53,6 @@ func (this *weaponLogic) WeaponList(ctx context.Context, playerID int64) ([]*pb.
 	return entries, nil
 }
 
-// WeaponUpdate 更新武器：整体覆盖持有状态，未拥有返回错误。
 func (this *weaponLogic) WeaponUpdate(ctx context.Context, playerID int64, req *pb.WeaponUpdateReq) (*pb.WeaponUpdateResp, error) {
 	row, err := this.Load(ctx, playerID)
 	if err != nil {
@@ -124,7 +122,6 @@ func weaponDimGrow(ctx context.Context, playerID int64, cfgID int32,
 	return row, w, heroID, nil
 }
 
-// WeaponUpgrade 武器升级：消耗 WeaponLevel 表当前等级的升级素材，等级 +1。
 func (this *weaponLogic) WeaponUpgrade(ctx context.Context, playerID int64, req *pb.WeaponUpgradeReq) (*pb.WeaponUpgradeResp, error) {
 	_, w, heroID, err := weaponDimGrow(ctx, playerID, req.GetCfgId(),
 		func(w model.WeaponInfo) int32 { return w.Level },
@@ -155,7 +152,6 @@ func (this *weaponLogic) WeaponUpgrade(ctx context.Context, playerID int64, req 
 	return &pb.WeaponUpgradeResp{WeaponEntry: convert.WeaponEntry(w), Attribute: attr}, nil
 }
 
-// WeaponUpQuality 武器升品：消耗 WeaponQuality 表当前品质的升品素材，品质 +1。
 func (this *weaponLogic) WeaponUpQuality(ctx context.Context, playerID int64, req *pb.WeaponUpQualityReq) (*pb.WeaponUpQualityResp, error) {
 	_, w, heroID, err := weaponDimGrow(ctx, playerID, req.GetCfgId(),
 		func(w model.WeaponInfo) int32 { return w.Quality },
@@ -186,7 +182,6 @@ func (this *weaponLogic) WeaponUpQuality(ctx context.Context, playerID int64, re
 	return &pb.WeaponUpQualityResp{WeaponEntry: convert.WeaponEntry(w), Attribute: attr}, nil
 }
 
-// WeaponBreakthrough 武器突破：消耗 WeaponBreakthrough 表当前突破的素材，突破 +1。
 func (this *weaponLogic) WeaponBreakthrough(ctx context.Context, playerID int64, req *pb.WeaponBreakthroughReq) (*pb.WeaponBreakthroughResp, error) {
 	_, w, heroID, err := weaponDimGrow(ctx, playerID, req.GetCfgId(),
 		func(w model.WeaponInfo) int32 { return w.Breakthrough },
@@ -217,7 +212,6 @@ func (this *weaponLogic) WeaponBreakthrough(ctx context.Context, playerID int64,
 	return &pb.WeaponBreakthroughResp{WeaponEntry: convert.WeaponEntry(w), Attribute: attr}, nil
 }
 
-// WeaponEnsureForHero 按英雄配置初始化固定绑定武器：未持有则补建默认状态。
 func (this *weaponLogic) WeaponEnsureForHero(ctx context.Context, playerID int64, heroCfgID int32) error {
 	cfg := tpl.T().RoleInfo.Get(heroCfgID)
 	if cfg == nil || cfg.WeaponId <= 0 {
@@ -237,7 +231,6 @@ func (this *weaponLogic) WeaponEnsureForHero(ctx context.Context, playerID int64
 	return nil
 }
 
-// EnterGame 进入游戏：加载玩家武器持有，未建档则初始化空集合；并按已拥有英雄兜底补建绑定武器。
 func (this *weaponLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
 	if _, err := this.Load(ctx, playerID); err != nil {
 		return err
@@ -262,7 +255,6 @@ func (this *weaponLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.
 	return nil
 }
 
-// LeaveGame 离开游戏：武器持有数据同步落库，并逐出内存缓存。
 func (this *weaponLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
 	if err := flushAndEvict(ctx, weaponCache, playerID); err != nil {
 		return err
@@ -270,7 +262,6 @@ func (this *weaponLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.
 	return nil
 }
 
-// Load 加载玩家武器持有；未建档则初始化空 map 并挂入缓存（异步落库）。
 func (this *weaponLogic) Load(ctx context.Context, playerID int64) (*model.PlayerWeapon, error) {
 	return weaponCache.GetOrInit(ctx, playerID,
 		func(id int64) *model.PlayerWeapon {
@@ -283,12 +274,10 @@ func (this *weaponLogic) Load(ctx context.Context, playerID int64) (*model.Playe
 		})
 }
 
-// Save 写回玩家武器持有并挂入异步落库队列。
 func (this *weaponLogic) Save(playerID int64, row *model.PlayerWeapon) {
 	weaponCache.Set(playerID, row)
 }
 
-// Flush 同步落库并逐出缓存（GM 直改 DB 后强制回源）。
 func (this *weaponLogic) Flush(ctx context.Context, playerID int64) error {
 	return flushAndEvict(ctx, weaponCache, playerID)
 }
@@ -298,10 +287,8 @@ func (this *weaponLogic) Flush(ctx context.Context, playerID int64) error {
 // weaponAssetStore 武器资产实现：落在 player_weapon。武器由英雄配置绑定，发放幂等。
 type weaponAssetStore struct{}
 
-// AssetType 资产类型：武器。
 func (this *weaponAssetStore) AssetType() tpl.AssetType { return tpl.AssetType_Weapon }
 
-// Add 发放武器：已拥有视为成功（武器随英雄自动补建，避免奖励重复发放失败）。
 func (this *weaponAssetStore) Add(ctx context.Context, playerID int64, cfgID, _ int32) error {
 	if !tpl.T().Weapon.Has(cfgID) {
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "武器配置不存在")
@@ -323,7 +310,6 @@ func (this *weaponAssetStore) Add(ctx context.Context, playerID int64, cfgID, _ 
 	return nil
 }
 
-// Remove 扣除武器；未拥有返回错误。
 func (this *weaponAssetStore) Remove(ctx context.Context, playerID int64, cfgID, _ int32) error {
 	row, err := Weapon().Load(ctx, playerID)
 	if err != nil {
@@ -339,7 +325,6 @@ func (this *weaponAssetStore) Remove(ctx context.Context, playerID int64, cfgID,
 	return nil
 }
 
-// Update 覆盖持有：count<=0 移除，>0 确保持有。
 func (this *weaponAssetStore) Update(ctx context.Context, playerID int64, cfgID, count int32) error {
 	owned, err := this.Query(ctx, playerID, cfgID)
 	if err != nil {
@@ -355,7 +340,6 @@ func (this *weaponAssetStore) Update(ctx context.Context, playerID int64, cfgID,
 	}
 }
 
-// Query 查询是否持有：持有 1，未持有 0。
 func (this *weaponAssetStore) Query(ctx context.Context, playerID int64, cfgID int32) (int32, error) {
 	row, err := Weapon().Load(ctx, playerID)
 	if err != nil {
@@ -367,7 +351,6 @@ func (this *weaponAssetStore) Query(ctx context.Context, playerID int64, cfgID i
 	return 0, nil
 }
 
-// List 列出全部武器（按配置ID升序）。
 func (this *weaponAssetStore) List(ctx context.Context, playerID int64) ([]*tpl.Asset, error) {
 	row, err := Weapon().Load(ctx, playerID)
 	if err != nil {
@@ -383,8 +366,6 @@ func (this *weaponAssetStore) List(ctx context.Context, playerID int64) ([]*tpl.
 	return assets, nil
 }
 
-// AttributeBonus 武器模块对英雄的伤害贡献：基础伤害 × 等级系数 × 品质系数 × 突破系数。
-// 基础伤害取 AttributeWeapon 的 1 星档行；英雄未绑定武器、玩家未持有或配置缺失时为 0。
 func (this *weaponLogic) AttributeBonus(ctx context.Context, playerID int64, heroID int32) (*pb.HeroAttribute, error) {
 	cfg := tpl.T().RoleInfo.Get(heroID)
 	if cfg == nil || cfg.WeaponId <= 0 {

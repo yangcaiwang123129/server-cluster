@@ -13,7 +13,7 @@ func notifyHero(ctx context.Context, playerID int64, heroID int32) {
 	if heroID <= 0 {
 		return
 	}
-	entry, err := heroEntry(ctx, playerID, heroID)
+	entry, err := buildHeroEntry(ctx, playerID, heroID)
 	if err != nil {
 		log.Warnf("game: assemble hero entry failed, player=%d hero=%d: %v", playerID, heroID, err)
 		return

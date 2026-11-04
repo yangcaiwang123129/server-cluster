@@ -2,7 +2,6 @@ package logic
 
 import (
 	"context"
-	"strings"
 	"sync"
 
 	"github.com/dobyte/due/v2/registry"
@@ -14,21 +13,13 @@ import (
 )
 
 // gmCall 调用 game 服的 GM 内部 RPC（服务名固定为 GameAdminService）。
-// method 传 FullMethodName（/pkg.Service/Method），这里截取末段方法名供 client.Call 拼接。
-func gmCall(ctx context.Context, playerID int64, method string, req, resp any) error {
+// method 传 FullMethodName（/pkg.Service/Method），由 rpc.Call 拆出服务名与短方法名。
+func gmCall[Resp any](ctx context.Context, playerID int64, method string, req any) (*Resp, error) {
 	client, err := gmClient(ctx, playerID)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return client.Call(ctx, pb.GameAdminService_ServiceDesc.ServiceName, methodName(method), req, resp)
-}
-
-// methodName 从 FullMethodName 提取纯方法名。
-func methodName(fullMethod string) string {
-	if i := strings.LastIndex(fullMethod, "/"); i >= 0 {
-		return fullMethod[i+1:]
-	}
-	return fullMethod
+	return rpc.Call[Resp](ctx, client, method, req)
 }
 
 // gmClient 选择处理 GM 请求的 game 实例：
@@ -71,8 +62,8 @@ func onlineNodeID(ctx context.Context, playerID int64) string {
 			if err != nil {
 				return
 			}
-			resp := &pb.GetOnlinePlayersResp{}
-			if err := client.Call(ctx, pb.GameAdminService_ServiceDesc.ServiceName, methodName(pb.GameAdminService_GetOnlinePlayers_FullMethodName), &pb.GetOnlinePlayersReq{}, resp); err != nil {
+			resp, err := rpc.Call[pb.GetOnlinePlayersResp](ctx, client, pb.GameAdminService_GetOnlinePlayers_FullMethodName, &pb.GetOnlinePlayersReq{})
+			if err != nil {
 				return
 			}
 			for _, p := range resp.Players {

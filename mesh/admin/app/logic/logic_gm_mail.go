@@ -35,12 +35,9 @@ func init() {
 
 // MailList 玩家邮件列表。
 func (this *gmMailLogic) MailList(req dto.GmPlayerReq) ([]dto.GmMailEntry, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), rpcTimeout)
-	defer cancel()
-
-	resp := &pb.GmMailListResp{}
-	if err := gmCall(ctx, req.PlayerID, pb.GameAdminService_MailList_FullMethodName,
-		&pb.GmMailListReq{PlayerId: req.PlayerID}, resp); err != nil {
+	resp, err := gmCall[pb.GmMailListResp](context.Background(), req.PlayerID, pb.GameAdminService_MailList_FullMethodName,
+		&pb.GmMailListReq{PlayerId: req.PlayerID})
+	if err != nil {
 		return nil, err
 	}
 	return util.MapSlice(resp.GetEntries(), toGmMailEntry), nil
@@ -48,20 +45,17 @@ func (this *gmMailLogic) MailList(req dto.GmPlayerReq) ([]dto.GmMailEntry, error
 
 // MailSend 发送邮件。
 func (this *gmMailLogic) MailSend(req dto.GmMailSendReq) (*dto.GmMailEntry, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), rpcTimeout)
-	defer cancel()
-
 	atts := util.MapSlice(req.Attachments, func(a dto.GmMailAttachment) *pb.AssetEntry {
 		return &pb.AssetEntry{Type: a.Type, CfgId: a.CfgID, Count: a.Count}
 	})
-	resp := &pb.MailEntry{}
 	callReq := &pb.GmMailSendReq{
 		PlayerId:    req.PlayerID,
 		Title:       req.Title,
 		Content:     req.Content,
 		Attachments: atts,
 	}
-	if err := gmCall(ctx, req.PlayerID, pb.GameAdminService_MailSend_FullMethodName, callReq, resp); err != nil {
+	resp, err := gmCall[pb.MailEntry](context.Background(), req.PlayerID, pb.GameAdminService_MailSend_FullMethodName, callReq)
+	if err != nil {
 		return nil, err
 	}
 	entry := toGmMailEntry(resp)

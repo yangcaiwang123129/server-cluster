@@ -15,10 +15,10 @@ import (
 // RegisterActivity 注册运营活动模块路由（内嵌活动模块，同进程直接调用）。
 func RegisterActivity(router http.Router) {
 	g := gmGroup(router)
-	g.Get("/activity", handle(handleActivityList))
-	g.Get("/activity/configs", handle(handleActivityConfigList))
-	g.Put("/activity/:id/time", handle(handleActivityUpdateTime))
-	g.Post("/activity/:id/end", handle(handleActivityEnd))
+	GET(g, "/activity", handleActivityList)
+	GET(g, "/activity/configs", handleActivityConfigList)
+	PUT(g, "/activity/:id/time", handleActivityUpdateTime)
+	POST(g, "/activity/:id/end", handleActivityEnd)
 }
 
 // handleActivityConfigList 活动模板配置展示。

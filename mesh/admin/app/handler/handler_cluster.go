@@ -16,10 +16,10 @@ import (
 // RegisterCluster 注册集群管理路由（列表/详情/SSH配置更新/远程运维）。
 func RegisterCluster(router http.Router) {
 	g := gmGroup(router)
-	g.Get("/cluster", handle(handleClusterList))
-	g.Get("/cluster/:nodeId", handle(handleClusterDetail))
-	g.Put("/cluster/:nodeId", handle(handleClusterUpdate))
-	g.Post("/cluster/:nodeId/exec", handle(handleClusterExec))
+	GET(g, "/cluster", handleClusterList)
+	GET(g, "/cluster/:nodeId", handleClusterDetail)
+	PUT(g, "/cluster/:nodeId", handleClusterUpdate)
+	POST(g, "/cluster/:nodeId/exec", handleClusterExec)
 }
 
 // handleClusterList 集群节点分页列表（自动触发 etcd → DB 同步）。

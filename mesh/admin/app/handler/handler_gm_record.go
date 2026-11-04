@@ -14,7 +14,7 @@ import (
 // RegisterRecord 注册打点记录查询路由（获得/消耗共用，action 区分）。
 func RegisterRecord(router http.Router) {
 	g := gmGroup(router)
-	g.Get("/record", handle(handleGmRecordList))
+	GET(g, "/record", handleGmRecordList)
 }
 
 // handleGmRecordList 打点记录分页列表。

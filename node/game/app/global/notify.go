@@ -36,6 +36,17 @@ func NotifyTask(ctx context.Context, playerID int64, entries []*pb.TaskEntry) {
 	}, "task")
 }
 
+// NotifyAttr 推送玩家属性变化（当前用于货币快照，键为 Attr 枚举值）；玩家离线只记日志。
+func NotifyAttr(ctx context.Context, playerID int64, values *pb.AttrMap) {
+	if playerID <= 0 || values == nil || len(values.Values) == 0 {
+		return
+	}
+	pushToPlayer(ctx, playerID, &cluster.Message{
+		Route: int32(pb.RouteCode_ROUTE_CODE_ATTR_NOTIFY),
+		Data:  &pb.AttrNotify{Values: values},
+	}, "attr")
+}
+
 // pushToPlayer 向指定玩家推送消息。
 // Ack=true：gate 上找不到该用户会话时，due 会清除本地定位缓存并重新定位后重试一次，
 // 避免玩家换网关/跨节点重连后仍向旧网关推送导致静默丢失。

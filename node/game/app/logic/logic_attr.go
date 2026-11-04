@@ -29,7 +29,6 @@ var attrHandlers = map[pb.Attr]struct {
 	pb.Attr_PLAYER_ATTR_SETTINGS_JSON: {update: updateSettingsJSON},
 }
 
-// AttrOperate 属性接口：客户端传属性类型与操作，按属性类型分发处理。
 func (this *playerLogic) AttrOperate(ctx context.Context, playerID int64, req *pb.AttrOperateReq) (*pb.AttrOperateResp, error) {
 	attr := pb.Attr(req.GetAttr())
 	h, ok := attrHandlers[attr]

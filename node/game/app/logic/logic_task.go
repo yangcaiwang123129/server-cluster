@@ -37,7 +37,6 @@ func init() {
 // Task 获取任务业务单例。
 func Task() global.TaskLogic { return taskLogicInst.MustGet() }
 
-// EnterGame 进入游戏：预热玩家任务缓存，上报登录事件，并随响应下发任务列表。
 func (this *taskLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, resp *pb.EnterGameResp) error {
 	if _, err := this.Load(ctx, playerID); err != nil {
 		return err
@@ -59,7 +58,6 @@ func (this *taskLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.En
 	return nil
 }
 
-// LeaveGame 离开游戏：任务/活动进度同步落库并逐出内存缓存。
 func (this *taskLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
 	if err := flushAndEvict(ctx, taskCache, playerID); err != nil {
 		return err
@@ -70,7 +68,6 @@ func (this *taskLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.Le
 	return nil
 }
 
-// TaskList 任务列表：按类型/活动过滤，周期 key 取自活动快照（缺失时按本地时间兜底）。
 func (this *taskLogic) TaskList(ctx context.Context, playerID int64, req *pb.TaskListReq) (*pb.TaskListResp, error) {
 	entries, claimable, err := this.collect(ctx, playerID, req.GetTaskType(), req.GetActivityCfgId())
 	if err != nil {
@@ -115,7 +112,6 @@ func (this *taskLogic) collect(ctx context.Context, playerID int64, taskType, ac
 	return entries, claimable, nil
 }
 
-// TaskClaim 任务领奖：先落库领取状态再发放奖励，失败回滚以允许重试。
 func (this *taskLogic) TaskClaim(ctx context.Context, playerID int64, req *pb.TaskClaimReq) (*pb.TaskClaimResp, error) {
 	cfg := tpl.T().Task.Get(req.GetTaskId())
 	if cfg == nil {
@@ -176,7 +172,6 @@ func (this *taskLogic) TaskClaim(ctx context.Context, playerID int64, req *pb.Ta
 	return &pb.TaskClaimResp{Entry: convert.TaskEntry(cfg, info), Rewards: rewards}, nil
 }
 
-// TaskAccept 任务接取：仅手动接取任务可调用，未接取→进行中。
 func (this *taskLogic) TaskAccept(ctx context.Context, playerID int64, req *pb.TaskAcceptReq) (*pb.TaskAcceptResp, error) {
 	cfg := tpl.T().Task.Get(req.GetTaskId())
 	if cfg == nil {
@@ -214,7 +209,6 @@ func (this *taskLogic) TaskAccept(ctx context.Context, playerID int64, req *pb.T
 	return &pb.TaskAcceptResp{Entry: entry}, nil
 }
 
-// EmitTaskEvent 上报进度：按 targetTaskType + param 匹配任务配置，推进玩家周期任务。
 func (this *taskLogic) EmitTaskEvent(ctx context.Context, e global.TaskEvent) {
 	if e.PlayerID <= 0 || e.Count <= 0 || !tpl.Loaded() {
 		return
@@ -302,7 +296,6 @@ func newTaskInfo(cfg *tpl.TaskCfg, key string) model.PlayerTaskInfo {
 	}
 }
 
-// Load 加载玩家任务容器；未建档则初始化空 map 并挂入缓存。
 func (this *taskLogic) Load(ctx context.Context, playerID int64) (*model.PlayerTask, error) {
 	return taskCache.GetOrInit(ctx, playerID,
 		func(id int64) *model.PlayerTask {
@@ -315,12 +308,10 @@ func (this *taskLogic) Load(ctx context.Context, playerID int64) (*model.PlayerT
 		})
 }
 
-// Save 写回玩家任务进度并挂入异步落库队列。
 func (this *taskLogic) Save(playerID int64, row *model.PlayerTask) {
 	taskCache.Set(playerID, row)
 }
 
-// Flush 同步落库并逐出缓存（GM 直改 DB 后强制回源）。
 func (this *taskLogic) Flush(ctx context.Context, playerID int64) error {
 	return flushAndEvict(ctx, taskCache, playerID)
 }

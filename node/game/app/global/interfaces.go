@@ -10,30 +10,26 @@ import (
 	"server-cluster/share/tpl"
 )
 
-// PlayerLifecycle 玩家数据模块进出场钩子：进入游戏预热/建档该模块数据，离开游戏同步落库并清除缓存。
-// 所有持有玩家数据的模块都实现它，由 PlayerLogic 的 EnterGame/LeaveGame 统一驱动
-// （模块行类型异构，遍历走非泛型接口）。
+// PlayerLifecycle 玩家生命周期钩子接口
 type PlayerLifecycle interface {
-	// OnEnterGame 进入游戏：加载并预热该模块的玩家数据（未建档则初始化），初始状态写入 resp
+	// OnEnterGame 进入游戏
 	OnEnterGame(ctx context.Context, playerID int64, req *pb.EnterGameReq, resp *pb.EnterGameResp) error
-	// OnLeaveGame 离开游戏：该玩家的待写数据同步落库，并逐出内存缓存
+	// OnLeaveGame 离开游戏
 	OnLeaveGame(ctx context.Context, playerID int64, req *pb.LeaveGameReq, resp *pb.LeaveGameResp) error
 }
 
-// PlayerModule 玩家数据模块接口：业务一律通过模块单例读写，不直接操作底层缓存实例。
-// T 为该模块的玩家行指针（如 *model.PlayerHero），约束 model.PlayerRow 保证可持久化。
-// 进出场行为复用 PlayerLifecycle（moduleLogics() 驱动异构模块遍历）。
+// PlayerModule 玩家缓存模块接口
 type PlayerModule[T model.PlayerRow] interface {
 	PlayerLifecycle
-	// Load 读缓存；未建档则初始化并挂入缓存（异步落库）。语义同 Cache.GetOrInit。
+	// Load 读缓存；未建档则初始化并写入缓存
 	Load(ctx context.Context, playerID int64) (T, error)
-	// Save 写回该玩家的行并挂入异步落库队列。立即落库请调用方另行 Flush。
+	// Save 异步入库
 	Save(playerID int64, row T)
-	// Flush 同步落库该玩家的行并逐出缓存（GM 直改 DB 后强制下次读回源）。
+	// Flush 同步落库该玩家的行并清除缓存
 	Flush(ctx context.Context, playerID int64) error
 }
 
-// PlayerLogic 玩家模块业务接口：玩家生命周期 + 核心数据（player_extra）模块能力 + 玩家资产消费入口（礼包购买/兑换/充值）。
+// PlayerLogic 玩家模块业务接口
 type PlayerLogic interface {
 	PlayerModule[*model.PlayerExtra]
 	// GetActor 获取玩家actor
@@ -58,7 +54,7 @@ type PlayerLogic interface {
 	AttrOperate(ctx context.Context, playerID int64, req *pb.AttrOperateReq) (*pb.AttrOperateResp, error)
 }
 
-// ItemLogic 物品容器业务接口：
+// ItemLogic 物品容器业务接口
 type ItemLogic interface {
 	PlayerModule[*model.PlayerItem]
 	// ItemContainerList 物品容器列表
@@ -75,7 +71,7 @@ type ItemLogic interface {
 	ItemAddEntry(ctx context.Context, playerID int64, req *pb.GmItemAddEntryReq) (*pb.ItemContainerListResp, error)
 }
 
-// HeroLogic 英雄业务接口：玩家英雄持有数据生命周期（武器/技能/装备为独立模块，由英雄配置表关联）。
+// HeroLogic 英雄业务接口
 type HeroLogic interface {
 	PlayerModule[*model.PlayerHero]
 	// HeroList 英雄列表
@@ -92,7 +88,7 @@ type HeroLogic interface {
 	AttributeBonus(ctx context.Context, playerID int64, heroID int32) (*pb.HeroAttribute, error)
 }
 
-// WeaponLogic 武器业务接口：武器固定绑定英雄（配置表决定归属），持有 key 为武器配置ID。
+// WeaponLogic 武器模块接口
 type WeaponLogic interface {
 	PlayerModule[*model.PlayerWeapon]
 	// WeaponList 武器持有列表（供 HeroList 聚合下发与 GM 查询）
@@ -111,7 +107,7 @@ type WeaponLogic interface {
 	AttributeBonus(ctx context.Context, playerID int64, heroID int32) (*pb.HeroAttribute, error)
 }
 
-// SkillLogic 技能业务接口：技能固定绑定英雄（配置表决定归属），持有 key 为技能配置ID。
+// SkillLogic 技能模块接口
 type SkillLogic interface {
 	PlayerModule[*model.PlayerSkill]
 	// SkillList 技能持有列表（供 HeroList 聚合下发与 GM 查询）
@@ -128,7 +124,7 @@ type SkillLogic interface {
 	SkillEnsureForHero(ctx context.Context, playerID int64, heroCfgID int32) error
 }
 
-// EquipLogic 装备业务接口：玩家装备持有数据生命周期。
+// EquipLogic 装备模块接口
 type EquipLogic interface {
 	PlayerModule[*model.PlayerEquip]
 	// EquipList 装备持有列表（供 HeroList 聚合下发与 GM 查询）
@@ -151,7 +147,7 @@ type EquipLogic interface {
 	AttributeBonus(ctx context.Context, playerID int64, heroID int32) (*pb.HeroAttribute, error)
 }
 
-// MailLogic 邮件业务接口：系统通知/奖励邮件（可带附件），状态未读 → 已读 → 已领取。
+// MailLogic 邮件模块接口
 type MailLogic interface {
 	PlayerModule[*model.PlayerMail]
 	// MailList 邮件列表（未读优先，按创建时间倒序；含未读数用于红点）
@@ -180,7 +176,7 @@ type TaskEvent struct {
 	Count          int64 // 增量
 }
 
-// TaskLogic 任务业务接口：列表/领奖 + 进度事件入口。
+// TaskLogic 任务模块接口
 type TaskLogic interface {
 	PlayerModule[*model.PlayerTask]
 	// TaskList 任务列表（按类型/活动过滤，含进度与红点）
@@ -193,8 +189,7 @@ type TaskLogic interface {
 	EmitTaskEvent(ctx context.Context, e TaskEvent)
 }
 
-// AssetLogic 资产业务统一入口：按 tpl.AssetType 路由到对应实现（item/equip/weapon/skill/hero 等），
-// 供奖励发放、消耗校验等场景复用，不关心资产落在哪张表/哪个容器。
+// AssetLogic 资产接口
 type AssetLogic interface {
 	// AssetAdd 发放资产；Count<=0 按 1 处理
 	AssetAdd(ctx context.Context, playerID int64, asset *tpl.Asset) error
@@ -208,7 +203,7 @@ type AssetLogic interface {
 	AssetList(ctx context.Context, playerID int64, assetType tpl.AssetType) ([]*tpl.Asset, error)
 }
 
-// AssetStore 单类资产的增删改查实现：item / equip / weapon / skill / hero 各一个实现类。
+// AssetStore 单类资产的增删改查接口
 type AssetStore interface {
 	// AssetType 该实现负责的资产类型
 	AssetType() tpl.AssetType

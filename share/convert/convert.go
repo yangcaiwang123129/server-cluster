@@ -160,6 +160,7 @@ func PlayerAttr(playerExtra *model.PlayerExtra, player *model.Player) *pb.AttrMa
 		int32(pb.Attr_PLAYER_ATTR_VIP_EXP):       {Kind: &pb.ObjectValue_BigintValue{BigintValue: playerExtra.VipExp}},
 		int32(pb.Attr_PLAYER_ATTR_COIN):          {Kind: &pb.ObjectValue_BigintValue{BigintValue: player.Coin}},
 		int32(pb.Attr_PLAYER_ATTR_GOLD):          {Kind: &pb.ObjectValue_BigintValue{BigintValue: player.Gold}},
+		int32(pb.Attr_PLAYER_ATTR_COUPON):        {Kind: &pb.ObjectValue_BigintValue{BigintValue: player.Coupon}},
 		int32(pb.Attr_PLAYER_ATTR_SIGNATURE):     {Kind: &pb.ObjectValue_StringValue{StringValue: playerExtra.Signature}},
 		int32(pb.Attr_PLAYER_ATTR_SETTINGS_JSON): {Kind: &pb.ObjectValue_StringValue{StringValue: playerExtra.SettingsJSON}},
 	}}

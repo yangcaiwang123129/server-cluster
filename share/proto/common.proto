@@ -18,6 +18,7 @@ enum RouteCode {
   ROUTE_CODE_EXCHANGE = 10005; // 兑换
   ROUTE_CODE_RECHARGE = 10006; // 充值（当前为假充值，直接发放奖励）
   ROUTE_CODE_ATTR_OPERATE = 10007; // 属性操作（按属性类型更新/领取）
+  ROUTE_CODE_ATTR_NOTIFY = 10008; // 玩家属性变化通知
 
   // 玩家物品 10500~10599
   ROUTE_CODE_ITEM_LIST = 10500;  // 物品容器列表
@@ -144,6 +145,7 @@ enum Attr {
   PLAYER_ATTR_GOLD = 7;      // 金：int64
   PLAYER_ATTR_SIGNATURE = 8;      // 个性签名：string
   PLAYER_ATTR_SETTINGS_JSON = 9;      // 个人设置：string
+  PLAYER_ATTR_COUPON = 10;      // 点券：int64
   // 1000~4999 任务/成就进度与领奖标记
   // 5000~9999 活动状态标记
   // 10001~20000 红点相关属性

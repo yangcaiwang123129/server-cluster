@@ -6,7 +6,6 @@ import (
 	"encoding/hex"
 	"slices"
 	"sync"
-	"time"
 
 	"github.com/dobyte/due/v2/cluster"
 	"github.com/dobyte/due/v2/registry"
@@ -21,9 +20,6 @@ import (
 
 	"github.com/dobyte/due/v2/codes"
 )
-
-// rpcTimeout 服务间调用超时。
-const rpcTimeout = 3 * time.Second
 
 // PlayerLogic 玩家管理业务接口。
 type PlayerLogic interface {
@@ -72,10 +68,7 @@ func (this *playerLogic) PlayerList(req dto.PlayerListReq) ([]dto.PlayerResp, in
 
 // PlayerOnline 在线玩家列表：枚举提供玩家服务的全部 game 实例，并发定向拉取后聚合。
 func (this *playerLogic) PlayerOnline() ([]dto.OnlinePlayerResp, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), rpcTimeout)
-	defer cancel()
-
-	instances, err := gameInstances(ctx, pb.GameAdminService_ServiceDesc.ServiceName)
+	instances, err := gameInstances(context.Background(), pb.GameAdminService_ServiceDesc.ServiceName)
 	if err != nil {
 		return nil, err
 	}
@@ -93,8 +86,8 @@ func (this *playerLogic) PlayerOnline() ([]dto.OnlinePlayerResp, error) {
 			if err != nil {
 				return // 实例不可达：跳过，避免单实例故障拖垮整个列表
 			}
-			resp := &pb.GetOnlinePlayersResp{}
-			if err := client.Call(ctx, pb.GameAdminService_ServiceDesc.ServiceName, methodName(pb.GameAdminService_GetOnlinePlayers_FullMethodName), &pb.GetOnlinePlayersReq{}, resp); err != nil {
+			resp, err := rpc.Call[pb.GetOnlinePlayersResp](context.Background(), client, pb.GameAdminService_GetOnlinePlayers_FullMethodName, &pb.GetOnlinePlayersReq{})
+			if err != nil {
 				return
 			}
 			mu.Lock()
@@ -130,15 +123,13 @@ func gameInstances(ctx context.Context, serviceName string) ([]*registry.Service
 
 // PlayerKick 踢玩家下线：按玩家所在实例定向调用（协议按服批量，单踢为一批）。
 func (this *playerLogic) PlayerKick(req dto.PlayerKickReq) error {
-	ctx, cancel := context.WithTimeout(context.Background(), rpcTimeout)
-	defer cancel()
 	client, err := rpc.NewDirectClient(req.NodeID)
 	if err != nil {
 		return err
 	}
-	resp := &pb.KickPlayerResp{}
-	if err := client.Call(ctx, pb.GameAdminService_ServiceDesc.ServiceName, methodName(pb.GameAdminService_KickPlayer_FullMethodName),
-		&pb.KickPlayerReq{PlayerIds: []int64{req.PlayerID}}, resp); err != nil {
+	resp, err := rpc.Call[pb.KickPlayerResp](context.Background(), client, pb.GameAdminService_KickPlayer_FullMethodName,
+		&pb.KickPlayerReq{PlayerIds: []int64{req.PlayerID}})
+	if err != nil {
 		return err
 	}
 	if len(resp.FailedIds) > 0 {
@@ -158,18 +149,14 @@ func (this *playerLogic) PlayerBan(req dto.PlayerBanReq) error {
 		return err
 	}
 	// 在线则按服踢下线：枚举 mesh 实例找玩家（简化版，逐实例尝试，失败忽略）
-	ctx, cancel := context.WithTimeout(context.Background(), rpcTimeout)
-	defer cancel()
-	instances, _ := gameInstances(ctx, pb.GameAdminService_ServiceDesc.ServiceName)
+	instances, _ := gameInstances(context.Background(), pb.GameAdminService_ServiceDesc.ServiceName)
 	for _, ins := range instances {
 		client, err := rpc.NewDirectClient(ins.ID)
 		if err != nil {
 			continue
 		}
-		resp := &pb.KickPlayerResp{}
-		_ = client.Call(ctx, pb.GameAdminService_ServiceDesc.ServiceName,
-			methodName(pb.GameAdminService_KickPlayer_FullMethodName),
-			&pb.KickPlayerReq{PlayerIds: []int64{req.PlayerID}}, resp)
+		_, _ = rpc.Call[pb.KickPlayerResp](context.Background(), client, pb.GameAdminService_KickPlayer_FullMethodName,
+			&pb.KickPlayerReq{PlayerIds: []int64{req.PlayerID}})
 	}
 	return nil
 }

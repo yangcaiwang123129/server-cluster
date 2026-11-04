@@ -14,18 +14,18 @@ import (
 // RegisterClient 注册客户端版本管理路由。
 func RegisterClient(router http.Router) {
 	g := gmGroup(router)
-	g.Get("/client/version", handle(handleClientVersionList))
-	g.Get("/client/version/:id", handle(handleClientVersionGet))
-	g.Post("/client/version", handle(handleClientVersionCreate))
-	g.Put("/client/version/:id", handle(handleClientVersionUpdate))
-	g.Delete("/client/version", handleClientVersionDelete)
-	g.Put("/client/version-status", handleClientVersionStatus)
+	GET(g, "/client/version", handleClientVersionList)
+	GET(g, "/client/version/:id", handleClientVersionGet)
+	POST(g, "/client/version", handleClientVersionCreate)
+	PUT(g, "/client/version/:id", handleClientVersionUpdate)
+	DELETEMsg(g, "/client/version", "删除成功", handleClientVersionDelete)
+	PUTMsg(g, "/client/version-status", "操作成功", handleClientVersionStatus)
 
-	g.Get("/client/sim/options", handle(handleSimOptions))
-	g.Post("/client/sim/login", handle(handleSimLogin))
-	g.Post("/client/sim/connect", handle(handleSimConnect))
-	g.Post("/client/sim/step", handle(handleSimStep))
-	g.Post("/client/sim/close", handleSimClose)
+	GET(g, "/client/sim/options", handleSimOptions)
+	POST(g, "/client/sim/login", handleSimLogin)
+	POST(g, "/client/sim/connect", handleSimConnect)
+	POST(g, "/client/sim/step", handleSimStep)
+	POSTMsg(g, "/client/sim/close", "ok", handleSimClose)
 }
 
 // handleClientVersionList 客户端版本分页列表。
@@ -108,15 +108,15 @@ func handleClientVersionUpdate(ctx http.Context) (*model.ClientVersion, error) {
 // @Param body body dto.IdsReq true "批量删除ID"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/client/version [delete]
-func handleClientVersionDelete(ctx http.Context) error {
+func handleClientVersionDelete(ctx http.Context) (any, error) {
 	var req dto.IdsReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.ClientVersionDelete(req.Ids); err != nil {
-		return errs.FailErr(ctx, err)
+		return nil, err
 	}
-	return errs.OK(ctx, nil, "删除成功")
+	return nil, nil
 }
 
 // handleClientVersionStatus 启用/停用客户端版本。
@@ -127,15 +127,15 @@ func handleClientVersionDelete(ctx http.Context) error {
 // @Param body body dto.ClientVersionStatusReq true "请求体"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/client/version-status [put]
-func handleClientVersionStatus(ctx http.Context) error {
+func handleClientVersionStatus(ctx http.Context) (any, error) {
 	var req dto.ClientVersionStatusReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.ClientVersionUpdateStatus(req); err != nil {
-		return errs.FailErr(ctx, err)
+		return nil, err
 	}
-	return errs.OK(ctx, nil, "操作成功")
+	return nil, nil
 }
 
 // handleSimOptions 模拟器默认参数。
@@ -204,13 +204,13 @@ func handleSimStep(ctx http.Context) (*dto.SimStepResp, error) {
 // @Param body body dto.SimSessionReq true "会话参数"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/client/sim/close [post]
-func handleSimClose(ctx http.Context) error {
+func handleSimClose(ctx http.Context) (any, error) {
 	var req dto.SimSessionReq
 	if err := bindBody(ctx, &req); err != nil || req.SessionID == "" {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.SimClose(req.SessionID); err != nil {
-		return errs.FailErr(ctx, err)
+		return nil, err
 	}
-	return errs.OK(ctx, nil, "ok")
+	return nil, nil
 }

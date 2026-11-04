@@ -36,6 +36,7 @@ const (
 	RouteCode_ROUTE_CODE_EXCHANGE      RouteCode = 10005 // 兑换
 	RouteCode_ROUTE_CODE_RECHARGE      RouteCode = 10006 // 充值（当前为假充值，直接发放奖励）
 	RouteCode_ROUTE_CODE_ATTR_OPERATE  RouteCode = 10007 // 属性操作（按属性类型更新/领取）
+	RouteCode_ROUTE_CODE_ATTR_NOTIFY   RouteCode = 10008 // 玩家属性变化通知
 	// 玩家物品 10500~10599
 	RouteCode_ROUTE_CODE_ITEM_LIST     RouteCode = 10500 // 物品容器列表
 	RouteCode_ROUTE_CODE_ITEM_NOTIFY   RouteCode = 10501 // 物品容器内变化通知
@@ -96,6 +97,7 @@ var (
 		10005: "ROUTE_CODE_EXCHANGE",
 		10006: "ROUTE_CODE_RECHARGE",
 		10007: "ROUTE_CODE_ATTR_OPERATE",
+		10008: "ROUTE_CODE_ATTR_NOTIFY",
 		10500: "ROUTE_CODE_ITEM_LIST",
 		10501: "ROUTE_CODE_ITEM_NOTIFY",
 		10502: "ROUTE_CODE_ITEM_ADD",
@@ -146,6 +148,7 @@ var (
 		"ROUTE_CODE_EXCHANGE":            10005,
 		"ROUTE_CODE_RECHARGE":            10006,
 		"ROUTE_CODE_ATTR_OPERATE":        10007,
+		"ROUTE_CODE_ATTR_NOTIFY":         10008,
 		"ROUTE_CODE_ITEM_LIST":           10500,
 		"ROUTE_CODE_ITEM_NOTIFY":         10501,
 		"ROUTE_CODE_ITEM_ADD":            10502,
@@ -487,30 +490,32 @@ type Attr int32
 const (
 	// 1~999 玩家相关属性
 	Attr_PLAYER_ATTR_UNSPECIFIED   Attr = 0
-	Attr_PLAYER_ATTR_NAME          Attr = 1 // 昵称：string
-	Attr_PLAYER_ATTR_LEVEL         Attr = 2 // 等级：int32
-	Attr_PLAYER_ATTR_EXP           Attr = 3 // 经验：int64
-	Attr_PLAYER_ATTR_VIP_LEVEL     Attr = 4 // vip等级：int32
-	Attr_PLAYER_ATTR_VIP_EXP       Attr = 5 // vip经验：int64
-	Attr_PLAYER_ATTR_COIN          Attr = 6 // 币：int64
-	Attr_PLAYER_ATTR_GOLD          Attr = 7 // 金：int64
-	Attr_PLAYER_ATTR_SIGNATURE     Attr = 8 // 个性签名：string
-	Attr_PLAYER_ATTR_SETTINGS_JSON Attr = 9 // 个人设置：string
+	Attr_PLAYER_ATTR_NAME          Attr = 1  // 昵称：string
+	Attr_PLAYER_ATTR_LEVEL         Attr = 2  // 等级：int32
+	Attr_PLAYER_ATTR_EXP           Attr = 3  // 经验：int64
+	Attr_PLAYER_ATTR_VIP_LEVEL     Attr = 4  // vip等级：int32
+	Attr_PLAYER_ATTR_VIP_EXP       Attr = 5  // vip经验：int64
+	Attr_PLAYER_ATTR_COIN          Attr = 6  // 币：int64
+	Attr_PLAYER_ATTR_GOLD          Attr = 7  // 金：int64
+	Attr_PLAYER_ATTR_SIGNATURE     Attr = 8  // 个性签名：string
+	Attr_PLAYER_ATTR_SETTINGS_JSON Attr = 9  // 个人设置：string
+	Attr_PLAYER_ATTR_COUPON        Attr = 10 // 点券：int64
 )
 
 // Enum value maps for Attr.
 var (
 	Attr_name = map[int32]string{
-		0: "PLAYER_ATTR_UNSPECIFIED",
-		1: "PLAYER_ATTR_NAME",
-		2: "PLAYER_ATTR_LEVEL",
-		3: "PLAYER_ATTR_EXP",
-		4: "PLAYER_ATTR_VIP_LEVEL",
-		5: "PLAYER_ATTR_VIP_EXP",
-		6: "PLAYER_ATTR_COIN",
-		7: "PLAYER_ATTR_GOLD",
-		8: "PLAYER_ATTR_SIGNATURE",
-		9: "PLAYER_ATTR_SETTINGS_JSON",
+		0:  "PLAYER_ATTR_UNSPECIFIED",
+		1:  "PLAYER_ATTR_NAME",
+		2:  "PLAYER_ATTR_LEVEL",
+		3:  "PLAYER_ATTR_EXP",
+		4:  "PLAYER_ATTR_VIP_LEVEL",
+		5:  "PLAYER_ATTR_VIP_EXP",
+		6:  "PLAYER_ATTR_COIN",
+		7:  "PLAYER_ATTR_GOLD",
+		8:  "PLAYER_ATTR_SIGNATURE",
+		9:  "PLAYER_ATTR_SETTINGS_JSON",
+		10: "PLAYER_ATTR_COUPON",
 	}
 	Attr_value = map[string]int32{
 		"PLAYER_ATTR_UNSPECIFIED":   0,
@@ -523,6 +528,7 @@ var (
 		"PLAYER_ATTR_GOLD":          7,
 		"PLAYER_ATTR_SIGNATURE":     8,
 		"PLAYER_ATTR_SETTINGS_JSON": 9,
+		"PLAYER_ATTR_COUPON":        10,
 	}
 )
 
@@ -1540,7 +1546,7 @@ const file_common_proto_rawDesc = "" +
 	"\bequipped\x18\x04 \x01(\bR\bequipped\x12\x17\n" +
 	"\ahero_id\x18\x05 \x01(\x05R\x06heroId\x12\x18\n" +
 	"\aquality\x18\x06 \x01(\x05R\aquality\x12\"\n" +
-	"\fbreakthrough\x18\a \x01(\x05R\fbreakthrough*\x98\v\n" +
+	"\fbreakthrough\x18\a \x01(\x05R\fbreakthrough*\xb5\v\n" +
 	"\tRouteCode\x12\x1a\n" +
 	"\x16ROUTE_CODE_UNSPECIFIED\x10\x00\x12\x16\n" +
 	"\x11ROUTE_CODE_VERIFY\x10\x90N\x12\x1a\n" +
@@ -1550,7 +1556,8 @@ const file_common_proto_rawDesc = "" +
 	"\x13ROUTE_CODE_GIFT_BUY\x10\x94N\x12\x18\n" +
 	"\x13ROUTE_CODE_EXCHANGE\x10\x95N\x12\x18\n" +
 	"\x13ROUTE_CODE_RECHARGE\x10\x96N\x12\x1c\n" +
-	"\x17ROUTE_CODE_ATTR_OPERATE\x10\x97N\x12\x19\n" +
+	"\x17ROUTE_CODE_ATTR_OPERATE\x10\x97N\x12\x1b\n" +
+	"\x16ROUTE_CODE_ATTR_NOTIFY\x10\x98N\x12\x19\n" +
 	"\x14ROUTE_CODE_ITEM_LIST\x10\x84R\x12\x1b\n" +
 	"\x16ROUTE_CODE_ITEM_NOTIFY\x10\x85R\x12\x18\n" +
 	"\x13ROUTE_CODE_ITEM_ADD\x10\x86R\x12\x19\n" +
@@ -1627,7 +1634,7 @@ const file_common_proto_rawDesc = "" +
 	"\vAttrOperate\x12\n" +
 	"\n" +
 	"\x06UPDATE\x10\x00\x12\t\n" +
-	"\x05CLAIM\x10\x01*\xff\x01\n" +
+	"\x05CLAIM\x10\x01*\x97\x02\n" +
 	"\x04Attr\x12\x1b\n" +
 	"\x17PLAYER_ATTR_UNSPECIFIED\x10\x00\x12\x14\n" +
 	"\x10PLAYER_ATTR_NAME\x10\x01\x12\x15\n" +
@@ -1638,7 +1645,9 @@ const file_common_proto_rawDesc = "" +
 	"\x10PLAYER_ATTR_COIN\x10\x06\x12\x14\n" +
 	"\x10PLAYER_ATTR_GOLD\x10\a\x12\x19\n" +
 	"\x15PLAYER_ATTR_SIGNATURE\x10\b\x12\x1d\n" +
-	"\x19PLAYER_ATTR_SETTINGS_JSON\x10\tB\x19Z\x17server-cluster/share/pbb\x06proto3"
+	"\x19PLAYER_ATTR_SETTINGS_JSON\x10\t\x12\x16\n" +
+	"\x12PLAYER_ATTR_COUPON\x10\n" +
+	"B\x19Z\x17server-cluster/share/pbb\x06proto3"
 
 var (
 	file_common_proto_rawDescOnce sync.Once

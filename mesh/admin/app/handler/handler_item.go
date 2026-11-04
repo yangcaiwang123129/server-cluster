@@ -13,12 +13,12 @@ import (
 // RegisterItem 注册 GM 物品管理路由。
 func RegisterItem(router http.Router) {
 	g := gmGroup(router)
-	g.Get("/item", handle(handleGmItemList))
-	g.Post("/item/move", handle(handleGmItemMove))
-	g.Post("/item/rotate", handle(handleGmItemRotate))
-	g.Post("/item/sort", handle(handleGmItemSort))
-	g.Post("/item/transfer", handle(handleGmItemTransfer))
-	g.Post("/item/add", handle(handleGmItemAdd))
+	GET(g, "/item", handleGmItemList)
+	POST(g, "/item/move", handleGmItemMove)
+	POST(g, "/item/rotate", handleGmItemRotate)
+	POST(g, "/item/sort", handleGmItemSort)
+	POST(g, "/item/transfer", handleGmItemTransfer)
+	POST(g, "/item/add", handleGmItemAdd)
 }
 
 // handleGmItemList 物品容器列表。

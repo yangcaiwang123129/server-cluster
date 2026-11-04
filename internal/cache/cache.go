@@ -102,6 +102,37 @@ func (this *Cache[K, V]) Get(ctx context.Context, key K) (V, error) {
 	return this.cache.Get(ctx, key)
 }
 
+// Peek 只读探测当前内存中最完整的值：pending 待落库值优先（与 LRU 层同源同指针，取 pending 更新），
+// 未命中再查 LRU 层已缓存条目。不回源、不触发 loader、不参与 singleflight、不挂 pending。
+// 用于旁路写路径（如货币原子 SQL）在事务成功后把最新值同步进已缓存的内存行；
+// 条目不在内存时返回 (零值, false)，调用方需自行决定是否回源。
+func (this *Cache[K, V]) Peek(key K) (V, bool) {
+	// pending 优先：Set 同时写入 LRU 与 pending，pending 即最新值
+	this.mu.Lock()
+	v, ok := this.pending[key]
+	this.mu.Unlock()
+	if ok {
+		return v, true
+	}
+	// theine 无单 key 非加载读取，退化为 Range 全表扫描（RLock，跳过已过期条目），
+	// 命中即提前终止；仅旁路同步场景调用，频率与在线玩家资产操作同量级。
+	var zero V
+	var val V
+	found := false
+	this.cache.Range(func(k K, cached V) bool {
+		if k == key {
+			val = cached
+			found = true
+			return false
+		}
+		return true
+	})
+	if found {
+		return val, true
+	}
+	return zero, false
+}
+
 // GetOrInit 读缓存；未建档（gorm.ErrRecordNotFound）时用 init 初始化新行并挂入缓存（异步落库）；
 // 命中后用 fix 修补 DB 中为 NULL 的集合字段（补空集合，避免业务写操作 panic），fix 可为 nil。
 func (this *Cache[K, V]) GetOrInit(

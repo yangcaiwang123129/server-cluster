@@ -55,8 +55,6 @@ func moduleLogics() []global.PlayerLifecycle {
 // PlayerLogic 获取玩家模块业务单例。
 func PlayerLogic() global.PlayerLogic { return playerLogicInst.MustGet() }
 
-// Load 读玩家核心数据（player_extra，一玩家一行）；未建档则初始化默认昵称/等级并挂入缓存（异步落库）。
-// 语义同 Cache.GetOrInit。
 func (this *playerLogic) Load(ctx context.Context, playerID int64) (*model.PlayerExtra, error) {
 	return playerExtraCache.GetOrInit(ctx, playerID,
 		func(id int64) *model.PlayerExtra {
@@ -69,18 +67,14 @@ func (this *playerLogic) Load(ctx context.Context, playerID int64) (*model.Playe
 		}, nil)
 }
 
-// Save 写回玩家核心数据并挂入异步落库队列。
 func (this *playerLogic) Save(playerID int64, row *model.PlayerExtra) {
 	playerExtraCache.Set(playerID, row)
 }
 
-// Flush 同步落库并逐出玩家核心数据缓存（GM 直改 DB 后强制回源）。
 func (this *playerLogic) Flush(ctx context.Context, playerID int64) error {
 	return flushAndEvict(ctx, playerExtraCache, playerID)
 }
 
-// OnEnterGame 进入游戏：playerID 由 handler 层从 ctx.UID() 取得（首包 verify 已完成绑定与 actor 创建）。
-// 加载核心数据并驱动各玩家模块预热/建档。
 func (this *playerLogic) OnEnterGame(ctx context.Context, playerID int64, req *pb.EnterGameReq, resp *pb.EnterGameResp) error {
 	core, err := this.Load(ctx, playerID)
 	if err != nil {
@@ -111,8 +105,6 @@ func (this *playerLogic) OnEnterGame(ctx context.Context, playerID int64, req *p
 
 // 玩家属性表组装：见 convert.PlayerAttr。
 
-// LeaveGame 离开游戏：各模块待写数据同步落库并清缓存，再销毁玩家 actor。
-// 单个模块失败不阻断其余模块，返回首个错误。
 func (this *playerLogic) OnLeaveGame(ctx context.Context, playerID int64, req *pb.LeaveGameReq, resp *pb.LeaveGameResp) error {
 	var firstErr error
 	record := func(name string, err error) {
@@ -140,8 +132,6 @@ func (this *playerLogic) OnLeaveGame(ctx context.Context, playerID int64, req *p
 
 // ── 玩家资产消费：礼包购买 / 兑换 / 充值 ────────────────────────────
 
-// GiftBuy 购买礼包：按 GiftCfg 扣除 AssetCost 并发放 AssetRewards。
-// 配置不存在或资产不足返回错误，已扣减的部分不回滚（与现有资产逻辑一致）。
 func (this *playerLogic) GiftBuy(ctx context.Context, playerID int64, req *pb.GiftBuyReq) (*pb.GiftBuyResp, error) {
 	cfg := tpl.T().Gift.Get(req.GetCfgId())
 	if cfg == nil {
@@ -165,8 +155,6 @@ func (this *playerLogic) GiftBuy(ctx context.Context, playerID int64, req *pb.Gi
 	return &pb.GiftBuyResp{Costs: costs, Rewards: rewards}, nil
 }
 
-// Exchange 兑换：按 ExchangeCfg 扣除 AssetCost 并发放 AssetRewards。
-// 配置不存在或资产不足返回错误，已扣减的部分不回滚（与现有资产逻辑一致）。
 func (this *playerLogic) Exchange(ctx context.Context, playerID int64, req *pb.ExchangeReq) (*pb.ExchangeResp, error) {
 	cfg := tpl.T().Exchange.Get(req.GetCfgId())
 	if cfg == nil {
@@ -197,7 +185,6 @@ var notifyRechargeOrder = func(playerID int64, cfgID int32) {
 	log.Infof("logic: recharge order notify reserved, playerID=%d, cfgID=%d", playerID, cfgID)
 }
 
-// Recharge 充值（假充值）：校验配置后直接发放 AssetReward，不做订单校验。
 func (this *playerLogic) Recharge(ctx context.Context, playerID int64, req *pb.RechargeReq) (*pb.RechargeResp, error) {
 	cfg := tpl.T().Recharge.Get(req.GetCfgId())
 	if cfg == nil {
@@ -253,7 +240,6 @@ func codedResult(err error) *pb.Result {
 	return errs.BuildErrResult(pb.ErrCode(c.Code()), c.Message())
 }
 
-// GetActor 获取玩家 actor；玩家不在线时返回玩家不存在。
 func (this *playerLogic) GetActor(ctx context.Context, playerID int64) (*global.PlayerActor, error) {
 	if pa, ok := this.PlayerActors.Get(playerID); ok {
 		return pa, nil
@@ -261,7 +247,6 @@ func (this *playerLogic) GetActor(ctx context.Context, playerID int64) (*global.
 	return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_PLAYER_NOT_FOUND, "player actor not found")
 }
 
-// GetActors 获取全部在线玩家 actor（快照，可在遍历外安全使用）。
 func (this *playerLogic) GetActors(ctx context.Context) ([]*global.PlayerActor, error) {
 	actors := make([]*global.PlayerActor, 0, this.PlayerActors.Len())
 	this.PlayerActors.Range(func(_ int64, pa *global.PlayerActor) bool {
@@ -271,9 +256,6 @@ func (this *playerLogic) GetActors(ctx context.Context) ([]*global.PlayerActor, 
 	return actors, nil
 }
 
-// CreateActor 创建玩家 actor（已在线则幂等复用）。
-// loginIP 从 node.Context.GetIP() 取，存入内存，不落库。
-// 在线登记由 playerProcessor 的 Start/Destroy 生命周期维护。
 func (this *playerLogic) CreateActor(ctx context.Context, playerID int64, loginIP string) error {
 	if this.PlayerActors.Has(playerID) {
 		// 已在线：幂等更新登录 IP 与重连时间（断线重连可能换 IP；ReconnectAt 供断线延迟销毁豁免判断）
@@ -309,9 +291,6 @@ func (this *playerLogic) CreateActor(ctx context.Context, playerID int64, loginI
 	return nil
 }
 
-// DestroyActor 销毁玩家 actor（幂等），Destroy 回调同步注销在线登记。
-// 同时解绑 redis locate（gate/node 路由），防止已删/已下线玩家的路由残留导致
-// locate 表只进不出、网关日志与后台玩家数据对不上。
 func (this *playerLogic) DestroyActor(ctx context.Context, playerID int64) error {
 	svc.NodeProxy().Kill(actorKindPlayer, playerActorID(playerID))
 	this.PlayerActors.Delete(playerID)
@@ -323,8 +302,6 @@ func (this *playerLogic) DestroyActor(ctx context.Context, playerID int64) error
 	return nil
 }
 
-// DestroyActorIfOffline 断线延迟销毁：仅当玩家在 since（断开时刻）之后未重连时才销毁 actor。
-// 同 uid 重连/互踢场景下旧连接的 Disconnect 不能删掉新连接正在使用的 actor。
 func (this *playerLogic) DestroyActorIfOffline(ctx context.Context, playerID int64, since int64) error {
 	pa, ok := this.PlayerActors.Get(playerID)
 	if !ok {
@@ -336,7 +313,6 @@ func (this *playerLogic) DestroyActorIfOffline(ctx context.Context, playerID int
 	return this.DestroyActor(ctx, playerID)
 }
 
-// Kick 踢玩家下线：销毁 actor（注销在线登记）并强制断开网关连接。
 func (this *playerLogic) Kick(ctx context.Context, playerID int64) error {
 	if !this.PlayerActors.Has(playerID) {
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_PLAYER_NOT_FOUND, "player is not online")

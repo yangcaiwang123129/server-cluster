@@ -690,8 +690,8 @@ func (x *RechargeResp) GetRewards() []*AssetEntry {
 // 属性操作请求（路由 10007）：客户端传属性类型，服务端按类型处理
 type AttrOperateReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Attr          int32                  `protobuf:"varint,1,opt,name=attr,proto3" json:"attr,omitempty"`                           // 属性类型（Attr 枚举值）
-	Operate       AttrOperate            `protobuf:"varint,2,opt,name=operate,proto3,enum=pb.AttrOperate" json:"operate,omitempty"` // 操作类型：更新/领取
+	Operate       AttrOperate            `protobuf:"varint,1,opt,name=operate,proto3,enum=pb.AttrOperate" json:"operate,omitempty"` // 操作类型：更新/领取
+	Attr          int32                  `protobuf:"varint,2,opt,name=attr,proto3" json:"attr,omitempty"`                           // 属性类型（Attr 枚举值）
 	Value         *ObjectValue           `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`                          // 更新目标值（领取时忽略）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -727,18 +727,18 @@ func (*AttrOperateReq) Descriptor() ([]byte, []int) {
 	return file_game_proto_rawDescGZIP(), []int{13}
 }
 
-func (x *AttrOperateReq) GetAttr() int32 {
-	if x != nil {
-		return x.Attr
-	}
-	return 0
-}
-
 func (x *AttrOperateReq) GetOperate() AttrOperate {
 	if x != nil {
 		return x.Operate
 	}
 	return AttrOperate_UPDATE
+}
+
+func (x *AttrOperateReq) GetAttr() int32 {
+	if x != nil {
+		return x.Attr
+	}
+	return 0
 }
 
 func (x *AttrOperateReq) GetValue() *ObjectValue {
@@ -795,6 +795,51 @@ func (x *AttrOperateResp) GetResult() *Result {
 }
 
 func (x *AttrOperateResp) GetValues() map[int32]*ObjectValue {
+	if x != nil {
+		return x.Values
+	}
+	return nil
+}
+
+// 玩家属性变化通知（路由 10008）：服务端主动推送，当前用于货币快照
+type AttrNotify struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Values        *AttrMap               `protobuf:"bytes,1,opt,name=values,proto3" json:"values,omitempty"` // 变更后的属性值，键为 Attr 枚举值
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AttrNotify) Reset() {
+	*x = AttrNotify{}
+	mi := &file_game_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AttrNotify) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AttrNotify) ProtoMessage() {}
+
+func (x *AttrNotify) ProtoReflect() protoreflect.Message {
+	mi := &file_game_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AttrNotify.ProtoReflect.Descriptor instead.
+func (*AttrNotify) Descriptor() ([]byte, []int) {
+	return file_game_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *AttrNotify) GetValues() *AttrMap {
 	if x != nil {
 		return x.Values
 	}
@@ -865,9 +910,9 @@ const file_game_proto_rawDesc = "" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\x12(\n" +
 	"\arewards\x18\x02 \x03(\v2\x0e.pb.AssetEntryR\arewards\"v\n" +
-	"\x0eAttrOperateReq\x12\x12\n" +
-	"\x04attr\x18\x01 \x01(\x05R\x04attr\x12)\n" +
-	"\aoperate\x18\x02 \x01(\x0e2\x0f.pb.AttrOperateR\aoperate\x12%\n" +
+	"\x0eAttrOperateReq\x12)\n" +
+	"\aoperate\x18\x01 \x01(\x0e2\x0f.pb.AttrOperateR\aoperate\x12\x12\n" +
+	"\x04attr\x18\x02 \x01(\x05R\x04attr\x12%\n" +
 	"\x05value\x18\x03 \x01(\v2\x0f.pb.ObjectValueR\x05value\"\xba\x01\n" +
 	"\x0fAttrOperateResp\x12\"\n" +
 	"\x06result\x18\x01 \x01(\v2\n" +
@@ -875,7 +920,10 @@ const file_game_proto_rawDesc = "" +
 	"\x06values\x18\x02 \x03(\v2\x1f.pb.AttrOperateResp.ValuesEntryR\x06values\x1aJ\n" +
 	"\vValuesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\x05R\x03key\x12%\n" +
-	"\x05value\x18\x02 \x01(\v2\x0f.pb.ObjectValueR\x05value:\x028\x01B\x19Z\x17server-cluster/share/pbb\x06proto3"
+	"\x05value\x18\x02 \x01(\v2\x0f.pb.ObjectValueR\x05value:\x028\x01\"1\n" +
+	"\n" +
+	"AttrNotify\x12#\n" +
+	"\x06values\x18\x01 \x01(\v2\v.pb.AttrMapR\x06valuesB\x19Z\x17server-cluster/share/pbb\x06proto3"
 
 var (
 	file_game_proto_rawDescOnce sync.Once
@@ -889,7 +937,7 @@ func file_game_proto_rawDescGZIP() []byte {
 	return file_game_proto_rawDescData
 }
 
-var file_game_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_game_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_game_proto_goTypes = []any{
 	(*VerifyReq)(nil),       // 0: pb.VerifyReq
 	(*VerifyResp)(nil),      // 1: pb.VerifyResp
@@ -906,48 +954,50 @@ var file_game_proto_goTypes = []any{
 	(*RechargeResp)(nil),    // 12: pb.RechargeResp
 	(*AttrOperateReq)(nil),  // 13: pb.AttrOperateReq
 	(*AttrOperateResp)(nil), // 14: pb.AttrOperateResp
-	nil,                     // 15: pb.EnterGameResp.TasksEntry
-	nil,                     // 16: pb.EnterGameResp.ActivitiesEntry
-	nil,                     // 17: pb.AttrOperateResp.ValuesEntry
-	(*Result)(nil),          // 18: pb.Result
-	(*AttrMap)(nil),         // 19: pb.AttrMap
-	(*HeroEntry)(nil),       // 20: pb.HeroEntry
-	(NOTIFY_TYPE)(0),        // 21: pb.NOTIFY_TYPE
-	(*AssetEntry)(nil),      // 22: pb.AssetEntry
-	(AttrOperate)(0),        // 23: pb.AttrOperate
-	(*ObjectValue)(nil),     // 24: pb.ObjectValue
-	(*TaskEntry)(nil),       // 25: pb.TaskEntry
-	(*ActivityEntry)(nil),   // 26: pb.ActivityEntry
+	(*AttrNotify)(nil),      // 15: pb.AttrNotify
+	nil,                     // 16: pb.EnterGameResp.TasksEntry
+	nil,                     // 17: pb.EnterGameResp.ActivitiesEntry
+	nil,                     // 18: pb.AttrOperateResp.ValuesEntry
+	(*Result)(nil),          // 19: pb.Result
+	(*AttrMap)(nil),         // 20: pb.AttrMap
+	(*HeroEntry)(nil),       // 21: pb.HeroEntry
+	(NOTIFY_TYPE)(0),        // 22: pb.NOTIFY_TYPE
+	(*AssetEntry)(nil),      // 23: pb.AssetEntry
+	(AttrOperate)(0),        // 24: pb.AttrOperate
+	(*ObjectValue)(nil),     // 25: pb.ObjectValue
+	(*TaskEntry)(nil),       // 26: pb.TaskEntry
+	(*ActivityEntry)(nil),   // 27: pb.ActivityEntry
 }
 var file_game_proto_depIdxs = []int32{
-	18, // 0: pb.VerifyResp.result:type_name -> pb.Result
-	18, // 1: pb.EnterGameResp.result:type_name -> pb.Result
-	19, // 2: pb.EnterGameResp.player_attr:type_name -> pb.AttrMap
-	20, // 3: pb.EnterGameResp.hero_entry:type_name -> pb.HeroEntry
-	15, // 4: pb.EnterGameResp.tasks:type_name -> pb.EnterGameResp.TasksEntry
-	16, // 5: pb.EnterGameResp.activities:type_name -> pb.EnterGameResp.ActivitiesEntry
-	18, // 6: pb.LeaveGameResp.result:type_name -> pb.Result
-	21, // 7: pb.ServerNotify.notify_type:type_name -> pb.NOTIFY_TYPE
-	18, // 8: pb.GiftBuyResp.result:type_name -> pb.Result
-	22, // 9: pb.GiftBuyResp.costs:type_name -> pb.AssetEntry
-	22, // 10: pb.GiftBuyResp.rewards:type_name -> pb.AssetEntry
-	18, // 11: pb.ExchangeResp.result:type_name -> pb.Result
-	22, // 12: pb.ExchangeResp.costs:type_name -> pb.AssetEntry
-	22, // 13: pb.ExchangeResp.rewards:type_name -> pb.AssetEntry
-	18, // 14: pb.RechargeResp.result:type_name -> pb.Result
-	22, // 15: pb.RechargeResp.rewards:type_name -> pb.AssetEntry
-	23, // 16: pb.AttrOperateReq.operate:type_name -> pb.AttrOperate
-	24, // 17: pb.AttrOperateReq.value:type_name -> pb.ObjectValue
-	18, // 18: pb.AttrOperateResp.result:type_name -> pb.Result
-	17, // 19: pb.AttrOperateResp.values:type_name -> pb.AttrOperateResp.ValuesEntry
-	25, // 20: pb.EnterGameResp.TasksEntry.value:type_name -> pb.TaskEntry
-	26, // 21: pb.EnterGameResp.ActivitiesEntry.value:type_name -> pb.ActivityEntry
-	24, // 22: pb.AttrOperateResp.ValuesEntry.value:type_name -> pb.ObjectValue
-	23, // [23:23] is the sub-list for method output_type
-	23, // [23:23] is the sub-list for method input_type
-	23, // [23:23] is the sub-list for extension type_name
-	23, // [23:23] is the sub-list for extension extendee
-	0,  // [0:23] is the sub-list for field type_name
+	19, // 0: pb.VerifyResp.result:type_name -> pb.Result
+	19, // 1: pb.EnterGameResp.result:type_name -> pb.Result
+	20, // 2: pb.EnterGameResp.player_attr:type_name -> pb.AttrMap
+	21, // 3: pb.EnterGameResp.hero_entry:type_name -> pb.HeroEntry
+	16, // 4: pb.EnterGameResp.tasks:type_name -> pb.EnterGameResp.TasksEntry
+	17, // 5: pb.EnterGameResp.activities:type_name -> pb.EnterGameResp.ActivitiesEntry
+	19, // 6: pb.LeaveGameResp.result:type_name -> pb.Result
+	22, // 7: pb.ServerNotify.notify_type:type_name -> pb.NOTIFY_TYPE
+	19, // 8: pb.GiftBuyResp.result:type_name -> pb.Result
+	23, // 9: pb.GiftBuyResp.costs:type_name -> pb.AssetEntry
+	23, // 10: pb.GiftBuyResp.rewards:type_name -> pb.AssetEntry
+	19, // 11: pb.ExchangeResp.result:type_name -> pb.Result
+	23, // 12: pb.ExchangeResp.costs:type_name -> pb.AssetEntry
+	23, // 13: pb.ExchangeResp.rewards:type_name -> pb.AssetEntry
+	19, // 14: pb.RechargeResp.result:type_name -> pb.Result
+	23, // 15: pb.RechargeResp.rewards:type_name -> pb.AssetEntry
+	24, // 16: pb.AttrOperateReq.operate:type_name -> pb.AttrOperate
+	25, // 17: pb.AttrOperateReq.value:type_name -> pb.ObjectValue
+	19, // 18: pb.AttrOperateResp.result:type_name -> pb.Result
+	18, // 19: pb.AttrOperateResp.values:type_name -> pb.AttrOperateResp.ValuesEntry
+	20, // 20: pb.AttrNotify.values:type_name -> pb.AttrMap
+	26, // 21: pb.EnterGameResp.TasksEntry.value:type_name -> pb.TaskEntry
+	27, // 22: pb.EnterGameResp.ActivitiesEntry.value:type_name -> pb.ActivityEntry
+	25, // 23: pb.AttrOperateResp.ValuesEntry.value:type_name -> pb.ObjectValue
+	24, // [24:24] is the sub-list for method output_type
+	24, // [24:24] is the sub-list for method input_type
+	24, // [24:24] is the sub-list for extension type_name
+	24, // [24:24] is the sub-list for extension extendee
+	0,  // [0:24] is the sub-list for field type_name
 }
 
 func init() { file_game_proto_init() }
@@ -964,7 +1014,7 @@ func file_game_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_proto_rawDesc), len(file_game_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   18,
+			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

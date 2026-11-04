@@ -95,3 +95,8 @@ message AttrOperateResp {
   Result result = 1;
   map<int32, ObjectValue> values = 2; // 操作后的属性值，键为 Attr 枚举值
 }
+
+// 玩家属性变化通知（路由 10008）：服务端主动推送，当前用于货币快照
+message AttrNotify {
+  AttrMap values = 1; // 变更后的属性值，键为 Attr 枚举值
+}

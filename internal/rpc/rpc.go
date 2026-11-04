@@ -1,9 +1,11 @@
-// Package rpc 服务间 RPC 调用封装：基于 HTTP 组件代理创建 mesh 客户端，并提供并发批调用。
+// Package rpc 服务间 RPC 调用封装：基于 HTTP 组件代理创建 mesh 客户端，并提供泛型调用入口。
 package rpc
 
 import (
 	"context"
-	"sync"
+	"fmt"
+	"strings"
+	"time"
 
 	"server-cluster/internal/svc"
 
@@ -15,6 +17,9 @@ const discoveryScheme = "discovery://"
 
 // directScheme mesh 定向直连地址前缀；其后拼接实例 ID 或地址。
 const directScheme = "direct://"
+
+// defaultRPCTimeout 调用方 ctx 未携带 deadline 时施加的默认超时。
+const defaultRPCTimeout = 3 * time.Second
 
 // NewClient 创建指向指定 provider 服务名的 mesh 客户端。
 // target 须为服务名（discovery 按实例的 services 字段分组），而非节点名。
@@ -28,35 +33,31 @@ func NewDirectClient(instanceID string) (transport.Client, error) {
 	return svc.HTTPProxy().NewMeshClient(directScheme + instanceID)
 }
 
-// Invoke 发起一次服务间调用；连接由 transporter 连接池复用，重复创建客户端开销低。
-func Invoke(ctx context.Context, service, method string, req, resp any) error {
-	client, err := NewClient(service)
+// Call 泛型远程调用：fullMethod 传 FullMethodName（/pkg.Service/Method），
+// 自动拆出 gRPC 服务名与短方法名；ctx 未携带 deadline 时施加默认超时；返回强类型响应。
+func Call[Resp any](ctx context.Context, client transport.Client, fullMethod string, req any) (*Resp, error) {
+	service, method, err := splitFullMethod(fullMethod)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return client.Call(ctx, service, method, req, resp)
+	if _, ok := ctx.Deadline(); !ok {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, defaultRPCTimeout)
+		defer cancel()
+	}
+	resp := new(Resp)
+	if err := client.Call(ctx, service, method, req, resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
 }
 
-// Call 一次并发调用的描述。
-type Call struct {
-	Service string
-	Method  string
-	Req     any
-	Resp    any
-}
-
-// InvokeAll 并发执行多次调用，返回与 calls 顺序一致的错误切片（nil 表示成功）。
-func InvokeAll(ctx context.Context, calls ...Call) []error {
-	errs := make([]error, len(calls))
-	var wg sync.WaitGroup
-	wg.Add(len(calls))
-	for i := range calls {
-		go func(i int) {
-			defer wg.Done()
-			c := calls[i]
-			errs[i] = Invoke(ctx, c.Service, c.Method, c.Req, c.Resp)
-		}(i)
+// splitFullMethod 将 FullMethodName（/pkg.Service/Method）拆为 gRPC 服务名与短方法名。
+func splitFullMethod(fullMethod string) (service, method string, err error) {
+	fullMethod = strings.TrimPrefix(fullMethod, "/")
+	i := strings.LastIndex(fullMethod, "/")
+	if i <= 0 || i == len(fullMethod)-1 {
+		return "", "", fmt.Errorf("rpc: invalid full method %q", fullMethod)
 	}
-	wg.Wait()
-	return errs
+	return fullMethod[:i], fullMethod[i+1:], nil
 }
