@@ -1,8 +1,6 @@
 package repo
 
 import (
-	"time"
-
 	"gorm.io/gorm"
 
 	"server-cluster/share/consts"
@@ -64,7 +62,7 @@ func (r *Repo) UpdateActivityTime(id, startTime, endTime int64) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	now := time.Now().UnixMilli()
+	now := util.NowUnixMilli()
 	res := d.Model(&model.Activity{}).
 		Where("id = ? AND status = ?", id, consts.ActivityStatusNotStarted).
 		Updates(map[string]any{
@@ -82,7 +80,7 @@ func (r *Repo) TransitionActivityStatus(id int64, from, to int32) (bool, error) 
 	if err != nil {
 		return false, err
 	}
-	now := time.Now().UnixMilli()
+	now := util.NowUnixMilli()
 	res := d.Model(&model.Activity{}).
 		Where("id = ? AND status = ?", id, from).
 		Updates(map[string]any{

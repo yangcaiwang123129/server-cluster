@@ -2,6 +2,7 @@
 package handler
 
 import (
+	"server-cluster/share/pb"
 	"context"
 
 	"server-cluster/mesh/login/app/logic"
@@ -33,7 +34,7 @@ func RegisterPlayer(router http.Router) {
 func login(ctx http.Context) error {
 	req := &dto.PlayerLoginReq{}
 	if err := ctx.Bind().Body(req); err != nil {
-		return ctx.Failure(errs.CodeInvalidParams.Err())
+		return ctx.Failure(errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, ""))
 	}
 	// 把客户端 IP 注入 context，供 logic 写入 register_ip。
 	// due 的 http.Context.IP() 已内置代理链处理（X-Forwarded-For / X-Real-IP / RemoteAddr）。
@@ -56,7 +57,7 @@ func login(ctx http.Context) error {
 func sendPhoneCode(ctx http.Context) error {
 	req := &dto.PlayerPhoneSendCodeReq{}
 	if err := ctx.Bind().Body(req); err != nil {
-		return ctx.Failure(errs.CodeInvalidParams.Err())
+		return ctx.Failure(errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, ""))
 	}
 	if err := logic.Player().SendPhoneCode(ctx.Context(), req); err != nil {
 		return ctx.Failure(err)
@@ -75,7 +76,7 @@ func sendPhoneCode(ctx http.Context) error {
 func bind(ctx http.Context) error {
 	req := &dto.PlayerBindReq{}
 	if err := ctx.Bind().Body(req); err != nil {
-		return ctx.Failure(errs.CodeInvalidParams.Err())
+		return ctx.Failure(errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, ""))
 	}
 	if err := logic.Player().PlayerBind(ctx.Context(), req); err != nil {
 		return ctx.Failure(err)

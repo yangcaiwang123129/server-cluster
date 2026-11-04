@@ -8,10 +8,10 @@ import (
 	"github.com/dobyte/due/v2/cluster/node"
 	"github.com/dobyte/due/v2/etc"
 	"github.com/dobyte/due/v2/log"
-	"github.com/dobyte/due/v2/utils/xtime"
 
 	"server-cluster/node/game/app/logic"
 	"server-cluster/share/pb"
+	"server-cluster/share/util"
 )
 
 // route 客户端路由定义：仅 VERIFY 无状态，其余全部为按 uid 定位节点的有状态路由。
@@ -89,7 +89,7 @@ func Register(proxy *node.Proxy) {
 		if playerID <= 0 {
 			return
 		}
-		disconnectedAt := xtime.Now().Unix()
+		disconnectedAt := util.Now().Unix()
 		go func() {
 			time.Sleep(10 * time.Second)
 			_ = logic.PlayerLogic().PlayerDestroyActorIfOffline(context.Background(), playerID, disconnectedAt)

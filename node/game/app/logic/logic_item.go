@@ -35,11 +35,11 @@ func Item() global.ItemLogic { return itemLogicInst.MustGet() }
 func itemErr(err error) error {
 	switch {
 	case errors.Is(err, model.ErrItemNotFound):
-		return errs.CodeInvalidParams.WithMessage("物品不存在").Err()
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "物品不存在")
 	case errors.Is(err, model.ErrItemExists):
-		return errs.CodeInvalidParams.WithMessage("物品已存在").Err()
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "物品已存在")
 	case errors.Is(err, model.ErrPositionConflict):
-		return errs.CodeInvalidParams.WithMessage("目标位置不可放置").Err()
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "目标位置不可放置")
 	default:
 		return fmt.Errorf("logic: item op failed: %w", err)
 	}
@@ -74,11 +74,11 @@ func itemContainerOf(ctx context.Context, playerID int64, t pb.ContainerType) (*
 	}
 	typ, ok := convert.ContainerTypeToModel(t)
 	if !ok {
-		return nil, nil, errs.CodeInvalidParams.Err()
+		return nil, nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "")
 	}
 	c := pc.ByType(typ)
 	if c == nil {
-		return nil, nil, errs.CodeInvalidParams.Err()
+		return nil, nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "")
 	}
 	return pc, c, nil
 }
@@ -279,7 +279,7 @@ func (this *itemAssetHandler) AssetType() tpl.AssetType { return tpl.AssetType_I
 // Add 发放物品到背包；背包放不下返回错误。
 func (this *itemAssetHandler) Add(ctx context.Context, playerID int64, cfgID, count int32) error {
 	if !tpl.T().Item.Has(cfgID) {
-		return errs.CodeInvalidParams.WithMessage("物品配置不存在").Err()
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "物品配置不存在")
 	}
 	if count <= 0 {
 		count = 1
@@ -310,7 +310,7 @@ func (this *itemAssetHandler) Remove(ctx context.Context, playerID int64, cfgID,
 	}
 	c := pc.ByType(int32(pb.ContainerType_CONTAINER_TYPE_BACKPACK))
 	if owned := countItem(c, cfgID); owned < count {
-		return errs.CodeInvalidParams.WithMessage("物品数量不足").Err()
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "物品数量不足")
 	}
 
 	takeItemEntries(c, cfgID, count)
@@ -401,7 +401,7 @@ func placeItemEntry(c *model.ItemContainer, cfgID, count int32) error {
 			}
 		}
 	}
-	return errs.CodeInvalidParams.WithMessage("背包空间不足").Err()
+	return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "背包空间不足")
 }
 
 // takeItemEntries 按条目扣除数量：整条扣完直接移除，否则只改剩余数量。

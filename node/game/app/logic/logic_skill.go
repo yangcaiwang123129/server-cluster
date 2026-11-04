@@ -82,11 +82,11 @@ func skillOwned(ctx context.Context, playerID int64, cfgID int32) (*model.Player
 	}
 	s, ok := row.Skills.Get(cfgID)
 	if !ok {
-		return nil, model.SkillInfo{}, 0, errs.CodeInvalidParams.WithMessage("技能未拥有").Err()
+		return nil, model.SkillInfo{}, 0, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "技能未拥有")
 	}
 	heroID, ok := heroIDBySkill(cfgID)
 	if !ok {
-		return nil, model.SkillInfo{}, 0, errs.CodeInvalidParams.WithMessage("技能未绑定英雄").Err()
+		return nil, model.SkillInfo{}, 0, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "技能未绑定英雄")
 	}
 	return row, s, heroID, nil
 }
@@ -105,7 +105,7 @@ func skillDimGrow(ctx context.Context, playerID int64, cfgID int32,
 	dim := cur(s)
 	material, use, ok := rowOf(dim)
 	if !ok {
-		return model.SkillInfo{}, 0, errs.CodeInvalidParams.WithMessage("技能维度配置不存在").Err()
+		return model.SkillInfo{}, 0, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "技能维度配置不存在")
 	}
 	_, _, hasNext := rowOf(dim + 1)
 	if err := dimConsume(ctx, playerID, material, use, hasNext, fullMsg); err != nil {
@@ -113,7 +113,7 @@ func skillDimGrow(ctx context.Context, playerID int64, cfgID int32,
 	}
 	set(&s, dim+1)
 	if !row.UpdateSkill(s) {
-		return model.SkillInfo{}, 0, errs.CodeInvalidParams.WithMessage("技能未拥有").Err()
+		return model.SkillInfo{}, 0, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "技能未拥有")
 	}
 	global.PlayerSkillCache.Set(playerID, row)
 	notifyHero(ctx, playerID, heroID)
@@ -299,7 +299,7 @@ func (this *skillAssetHandler) AssetType() tpl.AssetType { return tpl.AssetType_
 // Add 发放技能：已拥有视为成功（技能随英雄自动补建，避免奖励重复发放失败）。
 func (this *skillAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _ int32) error {
 	if !tpl.T().Skill.Has(cfgID) {
-		return errs.CodeInvalidParams.WithMessage("技能配置不存在").Err()
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "技能配置不存在")
 	}
 	row, err := loadPlayerSkill(ctx, playerID)
 	if err != nil {
@@ -309,7 +309,7 @@ func (this *skillAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _
 		return nil
 	}
 	if !row.AddSkill(newSkillInfo(cfgID)) {
-		return errs.CodeInvalidParams.WithMessage("技能已拥有").Err()
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "技能已拥有")
 	}
 
 	global.PlayerSkillCache.Set(playerID, row)
@@ -325,7 +325,7 @@ func (this *skillAssetHandler) Remove(ctx context.Context, playerID int64, cfgID
 		return err
 	}
 	if !row.Skills.Delete(cfgID) {
-		return errs.CodeInvalidParams.WithMessage("技能未拥有").Err()
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "技能未拥有")
 	}
 
 	global.PlayerSkillCache.Set(playerID, row)

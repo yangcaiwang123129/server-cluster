@@ -1,9 +1,7 @@
 /**
- * Operations activities: instance list and template configurations.
+ * Activity management: instance list and strategy viewer.
  */
 export default {
-  instanceTitle: 'Activity Instances',
-  configTitle: 'Activity Configs',
   cfgId: 'Config ID',
   cfgIdPlaceholder: 'Filter by config ID',
   status: 'Status',
@@ -17,9 +15,6 @@ export default {
   endTime: 'End time',
   source: 'Source',
   remark: 'Remark',
-  createdAt: 'Created at',
-  updatedAt: 'Updated at',
-  actions: 'Actions',
   editTime: 'Edit time',
   endNow: 'End now',
   timeTitle: 'Edit activity time',
@@ -27,19 +22,30 @@ export default {
   endConfirm: 'End this activity now? This cannot be undone.',
   endOk: 'Activity ended',
   invalidTime: 'Pick a start and end time; the end must be later than the start',
-  id: 'Config ID',
+  strategyTitle: 'Activity Strategy',
+  sourceConfig: 'Auto (config)',
+  strategyDaily: 'Daily {time}',
+  strategyWeekly: 'Every {day} {time}',
+  strategyMonthly: 'Monthly on day {day} {time}',
+  strategyMonthlyLast: 'Last day of month {time}',
+  weekdays: {
+    1: 'Mon',
+    2: 'Tue',
+    3: 'Wed',
+    4: 'Thu',
+    5: 'Fri',
+    6: 'Sat',
+    7: 'Sun'
+  },
   name: 'Name',
   desc: 'Description',
-  icon: 'Icon',
   strategyType: 'Strategy',
   strategyStartValue: 'Strategy start',
   strategyEndValue: 'Strategy end',
   roundCount: 'Max rounds',
-  triggerLogicType: 'Trigger logic',
   triggerConditions: 'Trigger conditions',
   rewards: 'Rewards',
   taskCount: 'Tasks',
-  empty: '-',
   unlimited: 'Unlimited',
   strategies: {
     1: 'Specified time',

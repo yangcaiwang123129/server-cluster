@@ -10,6 +10,7 @@ import (
 	"server-cluster/share/dto"
 	"server-cluster/share/model"
 	"server-cluster/share/singleton"
+	"server-cluster/share/util"
 
 	"github.com/dobyte/due/v2/log"
 )
@@ -73,7 +74,7 @@ func (this *activityLogic) Start(ctx context.Context) error {
 		this.mu.Unlock()
 		return nil
 	}
-	now := time.Now().UnixMilli()
+	now := util.NowUnixMilli()
 	list, err := repo.R().ListAllActivities()
 	if err != nil {
 		this.mu.Unlock()
@@ -126,7 +127,7 @@ func (this *activityLogic) loop(ctx context.Context) {
 
 // tick 单次推进：周期 key → 配置实例生成 → 到点开启/结束。
 func (this *activityLogic) tick(ctx context.Context) {
-	now := time.Now().UnixMilli()
+	now := util.NowUnixMilli()
 	changed := this.syncPeriodKeys(now)
 	if this.generate(now) {
 		changed = true

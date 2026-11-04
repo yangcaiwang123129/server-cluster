@@ -83,11 +83,11 @@ func weaponOwned(ctx context.Context, playerID int64, cfgID int32) (*model.Playe
 	}
 	w, ok := row.Weapons.Get(cfgID)
 	if !ok {
-		return nil, model.WeaponInfo{}, 0, errs.CodeInvalidParams.WithMessage("武器未拥有").Err()
+		return nil, model.WeaponInfo{}, 0, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "武器未拥有")
 	}
 	heroID, ok := heroIDByWeapon(cfgID)
 	if !ok {
-		return nil, model.WeaponInfo{}, 0, errs.CodeInvalidParams.WithMessage("武器未绑定英雄").Err()
+		return nil, model.WeaponInfo{}, 0, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "武器未绑定英雄")
 	}
 	return row, w, heroID, nil
 }
@@ -107,7 +107,7 @@ func weaponDimGrow(ctx context.Context, playerID int64, cfgID int32,
 	dim := cur(w)
 	material, use, ok := rowOf(dim)
 	if !ok {
-		return nil, model.WeaponInfo{}, 0, errs.CodeInvalidParams.WithMessage("武器维度配置不存在").Err()
+		return nil, model.WeaponInfo{}, 0, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "武器维度配置不存在")
 	}
 	_, _, hasNext := rowOf(dim + 1)
 	if err := dimConsume(ctx, playerID, material, use, hasNext, fullMsg); err != nil {
@@ -115,7 +115,7 @@ func weaponDimGrow(ctx context.Context, playerID int64, cfgID int32,
 	}
 	set(&w, dim+1)
 	if !row.UpdateWeapon(w) {
-		return nil, model.WeaponInfo{}, 0, errs.CodeInvalidParams.WithMessage("武器未拥有").Err()
+		return nil, model.WeaponInfo{}, 0, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "武器未拥有")
 	}
 	global.PlayerWeaponCache.Set(playerID, row)
 	notifyHero(ctx, playerID, heroID)
@@ -296,7 +296,7 @@ func (this *weaponAssetHandler) AssetType() tpl.AssetType { return tpl.AssetType
 // Add 发放武器：已拥有视为成功（武器随英雄自动补建，避免奖励重复发放失败）。
 func (this *weaponAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _ int32) error {
 	if !tpl.T().Weapon.Has(cfgID) {
-		return errs.CodeInvalidParams.WithMessage("武器配置不存在").Err()
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "武器配置不存在")
 	}
 	row, err := loadPlayerWeapon(ctx, playerID)
 	if err != nil {
@@ -306,7 +306,7 @@ func (this *weaponAssetHandler) Add(ctx context.Context, playerID int64, cfgID, 
 		return nil
 	}
 	if !row.AddWeapon(newWeaponInfo(cfgID)) {
-		return errs.CodeInvalidParams.WithMessage("武器已拥有").Err()
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "武器已拥有")
 	}
 
 	global.PlayerWeaponCache.Set(playerID, row)
@@ -322,7 +322,7 @@ func (this *weaponAssetHandler) Remove(ctx context.Context, playerID int64, cfgI
 		return err
 	}
 	if !row.Weapons.Delete(cfgID) {
-		return errs.CodeInvalidParams.WithMessage("武器未拥有").Err()
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "武器未拥有")
 	}
 
 	global.PlayerWeaponCache.Set(playerID, row)

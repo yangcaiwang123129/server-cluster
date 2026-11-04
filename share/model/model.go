@@ -4,9 +4,10 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"gorm.io/gorm"
+
+	"server-cluster/share/util"
 )
 
 // Serializable 实体序列化契约：JSON 编解码 + gorm Scan/Value（整实体 JSON 落库/缓存的统一出入口）。
@@ -40,7 +41,7 @@ type TableModel struct {
 // BeforeCreate GORM Hook：新建 → Version=0, CreatedAt/UpdatedAt=now；
 // cache upsert 冲突行（Version>0）→ Version+=1, UpdatedAt=now, CreatedAt 保持。
 func (t *TableModel) BeforeCreate(tx *gorm.DB) error {
-	now := time.Now().UnixMilli()
+	now := util.NowUnixMilli()
 	if t.Version == 0 {
 		// 全新创建行 —— CreatedAt/UpdatedAt 都设 now，Version 保持 0
 		t.CreatedAt = now
@@ -56,7 +57,7 @@ func (t *TableModel) BeforeCreate(tx *gorm.DB) error {
 // BeforeUpdate GORM Hook：常规 Update/Save → Version+=1, UpdatedAt=now, CreatedAt 不变。
 func (t *TableModel) BeforeUpdate(tx *gorm.DB) error {
 	t.Version += 1
-	t.UpdatedAt = time.Now().UnixMilli()
+	t.UpdatedAt = util.NowUnixMilli()
 	return nil
 }
 

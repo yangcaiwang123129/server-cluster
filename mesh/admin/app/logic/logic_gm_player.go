@@ -17,6 +17,7 @@ import (
 	"server-cluster/share/dto"
 	"server-cluster/share/pb"
 	"server-cluster/share/singleton"
+	"server-cluster/share/util"
 
 	"github.com/dobyte/due/v2/codes"
 )
@@ -151,7 +152,7 @@ func (this *playerLogic) PlayerBan(req dto.PlayerBanReq) error {
 	// 计算到期时间：0 表示永久
 	var banUntil int64
 	if req.Duration > 0 {
-		banUntil = time.Now().Unix() + int64(req.Duration)
+		banUntil = util.NowUnix() + int64(req.Duration)
 	}
 	if err := repo.R().BanPlayer(req.PlayerID, banUntil, req.Reason); err != nil {
 		return err

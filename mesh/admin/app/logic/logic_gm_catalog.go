@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"server-cluster/share/pb"
 	"strconv"
 	"strings"
 
@@ -61,7 +62,7 @@ func (this *catalogLogic) Catalog(typ, keyword string, pageIndex, pageSize int) 
 			})
 		}
 	default:
-		return nil, 0, errs.CodeInvalidParams.Err()
+		return nil, 0, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "")
 	}
 	// keyword 过滤
 	if keyword != "" {

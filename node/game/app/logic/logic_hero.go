@@ -111,7 +111,7 @@ func heroEntry(ctx context.Context, playerID int64, heroID int32) (*pb.HeroEntry
 			return entry, nil
 		}
 	}
-	return nil, errs.CodeInvalidParams.WithMessage("英雄未拥有").Err()
+	return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "英雄未拥有")
 }
 
 // newHeroInfo 按英雄配置初始化持有状态。
@@ -135,7 +135,7 @@ func addHeroWithBound(ctx context.Context, playerID int64, cfgID int32) (model.H
 		return model.HeroInfo{}, err
 	}
 	if _, ok := row.Heroes.Get(cfgID); ok {
-		return model.HeroInfo{}, errs.CodeInvalidParams.WithMessage("英雄已拥有").Err()
+		return model.HeroInfo{}, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "英雄已拥有")
 	}
 
 	if err := grantHeroBound(ctx, playerID, int64(cfgID)); err != nil {
@@ -144,7 +144,7 @@ func addHeroWithBound(ctx context.Context, playerID int64, cfgID int32) (model.H
 
 	h := newHeroInfo(cfgID)
 	if !row.AddHero(h) {
-		return model.HeroInfo{}, errs.CodeInvalidParams.WithMessage("英雄已拥有").Err()
+		return model.HeroInfo{}, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "英雄已拥有")
 	}
 	global.PlayerHeroCache.Set(playerID, row)
 	record.Record(ctx, model.RecordModuleHero, playerID, model.RecordActionGain, cfgID, 1)
@@ -365,7 +365,7 @@ func (this *heroAssetHandler) AssetType() tpl.AssetType { return tpl.AssetType_H
 // Add 发放英雄；已拥有返回错误。
 func (this *heroAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _ int32) error {
 	if !tpl.T().RoleInfo.Has(cfgID) {
-		return errs.CodeInvalidParams.WithMessage("英雄配置不存在").Err()
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "英雄配置不存在")
 	}
 	h, err := addHeroWithBound(ctx, playerID, cfgID)
 	if err != nil {
@@ -382,7 +382,7 @@ func (this *heroAssetHandler) Remove(ctx context.Context, playerID int64, cfgID,
 		return err
 	}
 	if !row.Heroes.Delete(cfgID) {
-		return errs.CodeInvalidParams.WithMessage("英雄未拥有").Err()
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "英雄未拥有")
 	}
 
 	global.PlayerHeroCache.Set(playerID, row)
@@ -438,7 +438,7 @@ func (this *heroAssetHandler) List(ctx context.Context, playerID int64) ([]*tpl.
 func heroBaseAttribute(h model.HeroInfo) (*pb.HeroAttribute, error) {
 	cfg := tpl.T().AttributeRole.Get(h.HeroID + clampTier(h.Star))
 	if cfg == nil {
-		return nil, errs.CodeInvalidParams.WithMessage("英雄属性配置不存在").Err()
+		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "英雄属性配置不存在")
 	}
 	lo, hi := levelBounds(0, 0, false)
 	if cfg.Level != nil {

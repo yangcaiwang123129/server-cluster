@@ -9,9 +9,8 @@ package main
 
 import (
 	"context"
-	"net"
 	"server-cluster/share/consts"
-	"strings"
+	"server-cluster/share/util"
 	"time"
 
 	"github.com/dobyte/due/component/http/v2"
@@ -19,9 +18,7 @@ import (
 	"github.com/dobyte/due/transport/grpc/v2"
 	"github.com/dobyte/due/v2"
 	"github.com/dobyte/due/v2/cluster"
-	"github.com/dobyte/due/v2/etc"
 	"github.com/dobyte/due/v2/log"
-	"github.com/dobyte/due/v2/registry"
 
 	"server-cluster/internal/singleinstance"
 	"server-cluster/internal/svc"
@@ -67,7 +64,7 @@ func main() {
 	// 添加组件到容器
 	container.Add(httpComponent)
 	// 注册名必须与其余 mesh 实例一致使用 "mesh"，否则查询 /services/mesh/ 时枚举不到 admin。
-	if ins := buildMeshInstance(consts.MeshInstanceID(), cluster.Mesh.String(), extractHTTPAddr()); ins != nil {
+	if ins := util.BuildMeshInstance(consts.MeshInstanceID(), cluster.Mesh.String(), util.ExtractHTTPAddr()); ins != nil {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		if err := reg.Register(ctx, ins); err != nil {
 			log.Warnf("admin: register to mesh failed: %v", err)
@@ -85,42 +82,4 @@ func main() {
 	container.Serve()
 	// 释放资源
 	global.Destroy()
-}
-
-// extractHTTPAddr 从 etc.http.addr 提取 host:port（给 mesh 注册用 endpoint）。
-// etc.http.addr 形如 "127.0.0.1:8081" 或 ":8081"。
-func extractHTTPAddr() string {
-	addr := etc.Get("etc.http.addr").String()
-	if addr == "" {
-		return ""
-	}
-	host, port, err := net.SplitHostPort(addr)
-	if err != nil {
-		return addr
-	}
-	if host == "" || host == "0.0.0.0" {
-		host = "127.0.0.1"
-	}
-	return host + ":" + port
-}
-
-// buildMeshInstance 构造一个 mesh kind 的 ServiceInstance。
-// name 须为集群服务名（"mesh"），alias 由 id 前缀推导（admin-1 → admin）。
-func buildMeshInstance(id, name, endpoint string) *registry.ServiceInstance {
-	if id == "" {
-		return nil
-	}
-	alias := name
-	if i := strings.LastIndex(id, "-"); i > 0 && i+1 < len(id) {
-		alias = id[:i] // admin-1 → admin, login-1 → login
-	}
-	return &registry.ServiceInstance{
-		ID:       id,
-		Name:     name,
-		Kind:     cluster.Mesh.String(),
-		Alias:    alias,
-		State:    "work",
-		Endpoint: "http://" + endpoint,
-		Weight:   1,
-	}
 }

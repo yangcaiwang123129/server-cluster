@@ -3,7 +3,6 @@ package logic
 import (
 	"context"
 	"sort"
-	"time"
 
 	"github.com/dobyte/due/v2/log"
 
@@ -79,7 +78,7 @@ func (this *taskLogic) collect(ctx context.Context, playerID int64, taskType, ac
 		return nil, 0, err
 	}
 	snap := ActivitySync().Snapshot()
-	now := time.Now().UnixMilli()
+	now := util.NowUnixMilli()
 	entries := make([]*pb.TaskEntry, 0, tpl.T().Task.Len())
 	claimable := int32(0)
 	for _, cfg := range sortedTaskCfgs() {
@@ -114,7 +113,7 @@ func (this *taskLogic) TaskClaim(ctx context.Context, playerID int64, req *pb.Ta
 	if cfg == nil {
 		return &pb.TaskClaimResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_TASK_NOT_FOUND, "")}, nil
 	}
-	now := time.Now().UnixMilli()
+	now := util.NowUnixMilli()
 	key, ok := resolvePeriodKey(cfg, ActivitySync().Snapshot(), now)
 	if !ok {
 		return &pb.TaskClaimResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_TASK_EXPIRED, "")}, nil
@@ -178,7 +177,7 @@ func (this *taskLogic) TaskAccept(ctx context.Context, playerID int64, req *pb.T
 	if cfg.AcceptType != tpl.AcceptType_Manual {
 		return &pb.TaskAcceptResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "该任务无需手动接取")}, nil
 	}
-	now := time.Now().UnixMilli()
+	now := util.NowUnixMilli()
 	key, ok := resolvePeriodKey(cfg, ActivitySync().Snapshot(), now)
 	if !ok {
 		return &pb.TaskAcceptResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_TASK_EXPIRED, "")}, nil
@@ -217,7 +216,7 @@ func (this *taskLogic) EmitTaskEvent(ctx context.Context, e global.TaskEvent) {
 		return
 	}
 	snap := ActivitySync().Snapshot()
-	now := time.Now().UnixMilli()
+	now := util.NowUnixMilli()
 	pt, err := loadPlayerTasks(ctx, e.PlayerID)
 	if err != nil {
 		log.Warnf("game: task event load failed, player=%d target=%d: %v", e.PlayerID, e.TargetTaskType, err)

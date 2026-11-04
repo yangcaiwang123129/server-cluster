@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strconv"
 	"time"
+
+	"server-cluster/share/util"
 )
 
 // 活动/任务系统常量：状态、来源、玩家任务状态、周期 key 与活动快照通道。
@@ -51,19 +53,18 @@ const (
 
 // DailyKey 返回毫秒时间戳对应的日常周期 key（形如 20261102）。
 func DailyKey(ms int64) string {
-	t := time.UnixMilli(ms).In(time.Local)
-	return t.Format("20060102")
+	return util.UnixMilli(ms).Format(util.DateCompact)
 }
 
 // WeeklyKey 返回毫秒时间戳对应的周常周期 key（ISO 周，形如 2026W44）。
 func WeeklyKey(ms int64) string {
-	year, week := time.UnixMilli(ms).In(time.Local).ISOWeek()
+	year, week := util.UnixMilli(ms).ISOWeek()
 	return fmt.Sprintf("%dW%02d", year, week)
 }
 
 // MonthlyKey 返回毫秒时间戳对应的月常周期 key（形如 202611）。
 func MonthlyKey(ms int64) string {
-	return time.UnixMilli(ms).In(time.Local).Format("200601")
+	return util.UnixMilli(ms).Format(util.MonthCompact)
 }
 
 // MainPeriodKey 主线任务的周期 key。

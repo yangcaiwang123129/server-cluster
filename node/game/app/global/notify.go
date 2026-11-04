@@ -8,7 +8,6 @@ import (
 	"github.com/dobyte/due/v2/cluster"
 	"github.com/dobyte/due/v2/errors"
 	"github.com/dobyte/due/v2/log"
-	"github.com/dobyte/due/v2/session"
 
 	"server-cluster/internal/svc"
 	"server-cluster/share/pb"
@@ -42,7 +41,7 @@ func NotifyTask(ctx context.Context, playerID int64, entries []*pb.TaskEntry) {
 // 避免玩家换网关/跨节点重连后仍向旧网关推送导致静默丢失。
 func pushToPlayer(ctx context.Context, playerID int64, message *cluster.Message, tag string) {
 	if err := svc.NodeProxy().Push(ctx, &cluster.PushArgs{
-		Kind:    session.User,
+		Kind:    cluster.User,
 		Target:  playerID,
 		Ack:     true,
 		Message: message,

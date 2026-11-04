@@ -2,8 +2,6 @@
 package handler
 
 import (
-	"context"
-
 	"server-cluster/internal/router"
 	"server-cluster/internal/svc"
 	"server-cluster/node/game/app/logic"
@@ -13,19 +11,6 @@ import (
 	"github.com/dobyte/due/v2/cluster/node"
 	"github.com/dobyte/due/v2/log"
 )
-
-// loginIPKey context 中 loginIP 的 key（字符串 key，logic 侧用同样的字符串取值即可跨包）。
-const loginIPKey = "player_login_ip"
-
-// injectLoginIP 从 node.Context.GetIP() 取客户端 IP，塞入标准 context 供下游 logic 读取。
-// 取不到时注入空字符串让 logic 侧兜底。
-func injectLoginIP(ctx context.Context, nc node.Context) context.Context {
-	ip, err := nc.GetIP()
-	if err != nil || ip == "" {
-		return context.WithValue(ctx, loginIPKey, "")
-	}
-	return context.WithValue(ctx, loginIPKey, ip)
-}
 
 // init 注册玩家入口路由：仅 VERIFY 无状态，ENTER/LEAVE 为有状态且由节点直接处理；
 // 礼包购买/兑换/充值属于玩家资产消费，统一在玩家 actor 内串行执行。
@@ -39,7 +24,8 @@ func init() {
 	router.OnActor(pb.RouteCode_ROUTE_CODE_ATTR_OPERATE, handleAttrOperate)
 }
 
-// handleVerify 首包：校验 login 服签发的 JWT，绑定网关与节点（proto 注释明确这是绑定入口）。
+// handleVerify 首包：校验 login 服签发的 JWT，绑定网关与节点（proto 注释明确这是绑定入口），
+// 绑定成功后创建玩家 actor（已在线则幂等复用）。
 func handleVerify(ctx node.Context) {
 	req := &pb.VerifyReq{}
 	if err := ctx.Parse(req); err != nil {
@@ -65,6 +51,17 @@ func handleVerify(ctx node.Context) {
 		_ = ctx.Response(&pb.VerifyResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
 		return
 	}
+	// 创建玩家 actor（已在线则复用），在线登记由 actor 生命周期驱动。
+	// loginIP 从 node.Context.GetIP() 取，取不到时留空由 logic 兜底。
+	loginIP := ""
+	if ip, ipErr := ctx.GetIP(); ipErr == nil && ip != "" {
+		loginIP = ip
+	}
+	if err := logic.PlayerLogic().PlayerCreateActor(ctx.Context(), playerID, loginIP); err != nil {
+		log.Errorf("handler: verify create actor uid=%d failed: %v", playerID, err)
+		_ = ctx.Response(&pb.VerifyResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
+		return
+	}
 	_ = ctx.Response(&pb.VerifyResp{Result: errs.BuildOKResult()})
 }
 
@@ -76,10 +73,9 @@ func handleEnterGame(ctx node.Context) {
 		_ = ctx.Response(&pb.EnterGameResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
 		return
 	}
-	// 把客户端 IP 注入 context 供下游 logic 存入 PlayerActor
-	stdCtx := injectLoginIP(ctx.Context(), ctx)
+	// 玩家 actor 已在首包 verify 时创建，这里直接驱动各模块进入游戏
 	resp := &pb.EnterGameResp{}
-	if err := logic.PlayerLogic().EnterGame(stdCtx, ctx.UID(), req, resp); err != nil {
+	if err := logic.PlayerLogic().EnterGame(ctx.Context(), ctx.UID(), req, resp); err != nil {
 		log.Errorf("handler: enter game logic failed, uid=%d: %v", ctx.UID(), err)
 		resp.Result = errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())
 		_ = ctx.Response(resp)

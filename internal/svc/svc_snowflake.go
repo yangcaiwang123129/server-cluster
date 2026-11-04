@@ -3,7 +3,8 @@ package svc
 import (
 	"fmt"
 	"sync"
-	"time"
+
+	"server-cluster/share/util"
 )
 
 // 雪花 ID 生成器：41bit 毫秒时间戳 | 10bit 节点 | 12bit 序列，单节点每毫秒 4096 个。
@@ -35,12 +36,12 @@ func newSnowflake(nodeID int64) (*Snowflake, error) {
 func (this *Snowflake) Next() int64 {
 	this.mu.Lock()
 	defer this.mu.Unlock()
-	now := time.Now().UnixMilli() - epochMilli
+	now := util.NowUnixMilli() - epochMilli
 	switch {
 	case now < this.last:
 		// 时钟回拨（如 NTP 校时）：等待时钟追平，避免生成重复 ID。
 		for now <= this.last {
-			now = time.Now().UnixMilli() - epochMilli
+			now = util.NowUnixMilli() - epochMilli
 		}
 		this.seq = 0
 	case now == this.last:
@@ -48,7 +49,7 @@ func (this *Snowflake) Next() int64 {
 		if this.seq == 0 {
 			// 序列耗尽，自旋到下一毫秒。
 			for now <= this.last {
-				now = time.Now().UnixMilli() - epochMilli
+				now = util.NowUnixMilli() - epochMilli
 			}
 		}
 	default:

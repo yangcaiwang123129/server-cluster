@@ -4,14 +4,15 @@ go 1.27.0
 
 require (
 	github.com/Yiling-J/theine-go v0.6.2
-	github.com/dobyte/due/component/http/v2 v2.0.0-20261022054807-a7ed9b4593a2
-	github.com/dobyte/due/locate/redis/v2 v2.0.0-20261022054807-a7ed9b4593a2
-	github.com/dobyte/due/network/ws/v2 v2.0.0-20261022054807-a7ed9b4593a2
-	github.com/dobyte/due/registry/etcd/v2 v2.0.0-20261022054807-a7ed9b4593a2
-	github.com/dobyte/due/transport/grpc/v2 v2.0.0-20261022054807-a7ed9b4593a2
-	github.com/dobyte/due/v2 v2.6.4
+	github.com/dobyte/due/component/http/v2 v2.0.0-20261026101530-19482404cd0d
+	github.com/dobyte/due/locate/redis/v2 v2.0.0-20261026101530-19482404cd0d
+	github.com/dobyte/due/network/ws/v2 v2.0.0-20261026101530-19482404cd0d
+	github.com/dobyte/due/registry/etcd/v2 v2.0.0-20261026101530-19482404cd0d
+	github.com/dobyte/due/transport/grpc/v2 v2.0.0-20261026101530-19482404cd0d
+	github.com/dobyte/due/v2 v2.6.5
 	github.com/dobyte/jwt v0.1.4
 	github.com/gofiber/fiber/v3 v3.5.0
+	github.com/pkg/sftp v1.13.12
 	github.com/redis/go-redis/v9 v9.22.0
 	github.com/shopspring/decimal v1.6.0
 	github.com/swaggo/swag v1.16.6
@@ -81,7 +82,6 @@ require (
 	github.com/petermattis/goid v0.0.0-20260820044319-269ab09b5261 // indirect
 	github.com/philhofer/fwd v1.2.0 // indirect
 	github.com/pires/go-proxyproto v0.15.0 // indirect
-	github.com/pkg/sftp v1.13.12 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/shamaton/msgpack/v2 v2.4.1 // indirect
 	github.com/stretchr/testify v1.11.1 // indirect

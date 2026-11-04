@@ -2,14 +2,15 @@ package logic
 
 import (
 	"context"
-	"time"
 
 	"server-cluster/mesh/admin/app/repo"
 	"server-cluster/share/consts"
 	"server-cluster/share/dto"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
+	"server-cluster/share/pb"
 	"server-cluster/share/tpl"
+	"server-cluster/share/util"
 )
 
 // Configs GM 活动模板列表：展示策略、触发条件、奖励与关联任务数。
@@ -93,20 +94,20 @@ func (this *activityLogic) List(ctx context.Context, q dto.GmActivityQuery, page
 // UpdateTime GM 修改活动时间（仅未开启）。
 func (this *activityLogic) UpdateTime(ctx context.Context, id int64, req dto.GmActivityTimeReq) (*dto.GmActivityResp, error) {
 	if req.StartTime <= 0 || req.EndTime <= req.StartTime {
-		return nil, errs.CodeInvalidParams.WithMessage("活动时间不合法").Err()
+		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "活动时间不合法")
 	}
 	ok, err := repo.R().UpdateActivityTime(id, req.StartTime, req.EndTime)
 	if err != nil {
 		return nil, err
 	}
 	if !ok {
-		return nil, errs.CodeInvalidParams.WithMessage("仅未开启的活动允许修改时间").Err()
+		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "仅未开启的活动允许修改时间")
 	}
 	this.mu.Lock()
 	if inst := this.insts[id]; inst != nil {
 		inst.StartTime = req.StartTime
 		inst.EndTime = req.EndTime
-		inst.UpdatedAt = time.Now().UnixMilli()
+		inst.UpdatedAt = util.NowUnixMilli()
 		inst.Version++
 	}
 	this.mu.Unlock()
@@ -116,12 +117,12 @@ func (this *activityLogic) UpdateTime(ctx context.Context, id int64, req dto.GmA
 // End GM 提前结束活动。
 func (this *activityLogic) End(ctx context.Context, id int64, operator string) (*dto.GmActivityResp, error) {
 	remark := operatorRemark(operator, "提前结束")
-	ok, err := this.transit(id, consts.ActivityStatusRunning, consts.ActivityStatusEnded, time.Now().UnixMilli(), remark)
+	ok, err := this.transit(id, consts.ActivityStatusRunning, consts.ActivityStatusEnded, util.NowUnixMilli(), remark)
 	if err != nil {
 		return nil, err
 	}
 	if !ok {
-		return nil, errs.CodeActivityNotRunning.WithMessage("活动未开启或已结束").Err()
+		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_ACTIVITY_NOT_RUNNING, "活动未开启或已结束")
 	}
 	this.publishSafe(ctx, "end")
 	return this.getResp(id)
@@ -141,7 +142,7 @@ func (this *activityLogic) getResp(id int64) (*dto.GmActivityResp, error) {
 	defer this.mu.RUnlock()
 	inst := this.insts[id]
 	if inst == nil {
-		return nil, errs.CodeActivityNotFound.Err()
+		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_ACTIVITY_NOT_FOUND, "activity not found")
 	}
 	return toActivityResp(inst), nil
 }

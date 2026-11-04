@@ -1,9 +1,7 @@
 /**
- * 运营活动：活动实例与模板配置两个页面。
+ * 活动管理：活动实例列表与活动策略查看。
  */
 export default {
-  instanceTitle: '活动实例',
-  configTitle: '活动配置',
   cfgId: '活动模板ID',
   cfgIdPlaceholder: '输入模板ID筛选',
   status: '状态',
@@ -17,9 +15,6 @@ export default {
   endTime: '结束时间',
   source: '来源',
   remark: '备注',
-  createdAt: '创建时间',
-  updatedAt: '更新时间',
-  actions: '操作',
   editTime: '修改时间',
   endNow: '提前结束',
   timeTitle: '修改活动时间',
@@ -27,19 +22,30 @@ export default {
   endConfirm: '确认提前结束该活动？结束后不可恢复。',
   endOk: '活动已结束',
   invalidTime: '请选择开始和结束时间，且结束时间必须晚于开始时间',
-  id: '模板ID',
+  strategyTitle: '活动策略',
+  sourceConfig: '配置生成',
+  strategyDaily: '每天 {time}',
+  strategyWeekly: '每周{day} {time}',
+  strategyMonthly: '每月{day}号 {time}',
+  strategyMonthlyLast: '每月月底 {time}',
+  weekdays: {
+    1: '一',
+    2: '二',
+    3: '三',
+    4: '四',
+    5: '五',
+    6: '六',
+    7: '日'
+  },
   name: '活动名称',
   desc: '描述',
-  icon: '图标',
   strategyType: '开服策略',
   strategyStartValue: '策略起始',
   strategyEndValue: '策略结束',
   roundCount: '轮次上限',
-  triggerLogicType: '触发逻辑',
   triggerConditions: '触发条件',
   rewards: '奖励',
   taskCount: '关联任务',
-  empty: '-',
   unlimited: '无限',
   strategies: {
     1: '指定时间',

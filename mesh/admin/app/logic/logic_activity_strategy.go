@@ -7,6 +7,7 @@ import (
 
 	"server-cluster/share/model"
 	"server-cluster/share/tpl"
+	"server-cluster/share/util"
 )
 
 // nextWindow 计算下一轮时间窗口（start/end 均为毫秒时间戳）。
@@ -193,15 +194,10 @@ func monthlyWindow(base int64, openDay, openSec, closeDay, closeSec int) (int64,
 
 // dayAt 取 year-month 第 day 天 daySec 时刻；day<=0（月底）或超出当月天数时取当月最后一天。
 func dayAt(year int, month time.Month, day, daySec int, loc *time.Location) time.Time {
-	if max := daysInMonth(year, month); day <= 0 || day > max {
+	if max := util.DaysInMonth(year, month); day <= 0 || day > max {
 		day = max
 	}
 	return time.Date(year, month, day, 0, 0, 0, 0, loc).Add(time.Duration(daySec) * time.Second)
-}
-
-// daysInMonth 返回某年某月的天数。
-func daysInMonth(year int, month time.Month) int {
-	return time.Date(year, month+1, 0, 0, 0, 0, 0, time.Local).Day()
 }
 
 // addMonths 保持日时分秒加 n 个月；日超出目标月天数时取最后一天。
@@ -210,7 +206,7 @@ func addMonths(t time.Time, months int) time.Time {
 	newY := t.Year() + monthIndex/12
 	newMonth := time.Month(monthIndex%12 + 1)
 	day := t.Day()
-	if max := daysInMonth(newY, newMonth); day > max {
+	if max := util.DaysInMonth(newY, newMonth); day > max {
 		day = max
 	}
 	return time.Date(newY, newMonth, day, t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), t.Location())

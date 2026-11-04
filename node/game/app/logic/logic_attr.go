@@ -74,7 +74,7 @@ func updateNickname(core *model.PlayerExtra, value *pb.ObjectValue) (*pb.ObjectV
 	name := strings.TrimSpace(value.GetStringValue())
 	n := utf8.RuneCountInString(name)
 	if n == 0 || n > consts.MaxNicknameLen {
-		return nil, errs.CodeInvalidParams.WithMessage("昵称长度不合法").Err()
+		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "昵称长度不合法")
 	}
 	core.Nickname = name
 	return &pb.ObjectValue{Kind: &pb.ObjectValue_StringValue{StringValue: core.Nickname}}, nil
@@ -84,7 +84,7 @@ func updateNickname(core *model.PlayerExtra, value *pb.ObjectValue) (*pb.ObjectV
 func updateSignature(core *model.PlayerExtra, value *pb.ObjectValue) (*pb.ObjectValue, error) {
 	signature := strings.TrimSpace(value.GetStringValue())
 	if utf8.RuneCountInString(signature) > consts.MaxSignatureLen {
-		return nil, errs.CodeInvalidParams.WithMessage("个性签名过长").Err()
+		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "个性签名过长")
 	}
 	core.Signature = signature
 	return &pb.ObjectValue{Kind: &pb.ObjectValue_StringValue{StringValue: core.Signature}}, nil
@@ -94,11 +94,11 @@ func updateSignature(core *model.PlayerExtra, value *pb.ObjectValue) (*pb.Object
 func updateSettingsJSON(core *model.PlayerExtra, value *pb.ObjectValue) (*pb.ObjectValue, error) {
 	raw := strings.TrimSpace(value.GetStringValue())
 	if raw == "" || len(raw) > consts.MaxSettingsJSONLen {
-		return nil, errs.CodeInvalidParams.WithMessage("个人设置长度不合法").Err()
+		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "个人设置长度不合法")
 	}
 	var obj map[string]json.RawMessage
 	if err := json.Unmarshal([]byte(raw), &obj); err != nil || obj == nil {
-		return nil, errs.CodeInvalidParams.WithMessage("个人设置必须是 JSON 对象").Err()
+		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "个人设置必须是 JSON 对象")
 	}
 	core.SettingsJSON = raw
 	return &pb.ObjectValue{Kind: &pb.ObjectValue_StringValue{StringValue: core.SettingsJSON}}, nil

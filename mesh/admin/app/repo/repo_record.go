@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"server-cluster/share/pb"
 	"gorm.io/gorm"
 
 	"server-cluster/internal/svc"
@@ -23,7 +24,7 @@ type RecordQuery struct {
 func (r *Repo) ListRecords(module string, action int8, q RecordQuery, pageIndex, pageSize int) ([]model.RecordFields, int64, error) {
 	table, ok := recordTable(module)
 	if !ok {
-		return nil, 0, errs.CodeInvalidParams.Err()
+		return nil, 0, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "")
 	}
 	d, err := r.recordDB()
 	if err != nil {

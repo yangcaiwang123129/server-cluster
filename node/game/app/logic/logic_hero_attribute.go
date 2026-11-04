@@ -104,7 +104,7 @@ func clampDim(v, min int32) int32 {
 // hasNext 为 false 表示已达上限（返回 fullMsg）；否则扣除当前维度行的素材消耗（use<=0 不扣）。
 func dimConsume(ctx context.Context, playerID int64, material, use int32, hasNext bool, fullMsg string) error {
 	if !hasNext {
-		return errs.CodeInvalidParams.WithMessage(fullMsg).Err()
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, fullMsg)
 	}
 	if use <= 0 {
 		return nil
@@ -136,7 +136,7 @@ func equippedHero(ctx context.Context, playerID int64) (*model.PlayerHero, model
 		})
 	}
 	if !found {
-		return nil, model.HeroInfo{}, errs.CodeInvalidParams.WithMessage("请先出战英雄").Err()
+		return nil, model.HeroInfo{}, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "请先出战英雄")
 	}
 	return row, hero, nil
 }
@@ -152,7 +152,7 @@ func ownedHero(ctx context.Context, playerID int64, heroID int32) (*model.Player
 	}
 	hero, ok := row.Heroes.Get(heroID)
 	if !ok {
-		return nil, model.HeroInfo{}, errs.CodeInvalidParams.WithMessage("英雄未拥有").Err()
+		return nil, model.HeroInfo{}, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "英雄未拥有")
 	}
 	return row, hero, nil
 }

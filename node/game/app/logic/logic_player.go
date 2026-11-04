@@ -10,8 +10,6 @@ import (
 	"github.com/dobyte/due/v2/codes"
 	dueerrors "github.com/dobyte/due/v2/errors"
 	"github.com/dobyte/due/v2/log"
-	"github.com/dobyte/due/v2/session"
-	"github.com/dobyte/due/v2/utils/xtime"
 	"gorm.io/gorm"
 
 	"server-cluster/internal/cache"
@@ -49,13 +47,9 @@ func moduleLogics() []global.ModuleLogic {
 // PlayerLogic 获取玩家模块业务单例。
 func PlayerLogic() global.PlayerLogic { return playerLogicInst.MustGet() }
 
-// EnterGame 进入游戏：playerID 由 handler 层从 ctx.UID() 取得（首包 verify 已完成绑定）。
-// 先加载核心数据并驱动各玩家模块预热/建档，全部成功后才创建在线 actor。
-// loginIP 由 handler 通过 context value 注入（key 见 loginIPKey）。
+// EnterGame 进入游戏：playerID 由 handler 层从 ctx.UID() 取得（首包 verify 已完成绑定与 actor 创建）。
+// 加载核心数据并驱动各玩家模块预热/建档。
 func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.EnterGameReq, resp *pb.EnterGameResp) error {
-	// 从 context 取 handler 注入的登录 IP（key 与 handler_player.go 中 injectLoginIP 一致）
-	loginIP, _ := ctx.Value("player_login_ip").(string)
-
 	core, err := global.PlayerExtraCache.Get(ctx, playerID)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		// 首次进入，建档并异步落库
@@ -86,19 +80,11 @@ func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.
 		}
 	}
 
-	// 创建玩家 actor（已在线则复用），在线登记由 actor 生命周期驱动。
-	if err := this.PlayerCreateActor(ctx, playerID, loginIP); err != nil {
-		return err
-	}
-
 	resp.Activities = ActivitySync().Activities()
 	resp.Result = errs.BuildOKResult()
-	resp.ServerTime = xtime.Now().UnixMilli()
+	resp.ServerTime = util.Now().UnixMilli()
 	return nil
 }
-
-// loginIPKey context 中 loginIP 的 key（handler 注入，EnterGame 读取）。
-// 注意：用字符串 key 避免跨包 type 不匹配。
 
 // 玩家属性表组装：见 convert.PlayerAttr。
 
@@ -248,7 +234,7 @@ func (this *playerLogic) PlayerGetActor(ctx context.Context, playerID int64) (*g
 	if pa, ok := this.PlayerActors.Get(playerID); ok {
 		return pa, nil
 	}
-	return nil, errs.CodePlayerNotFound.WithMessage("player actor not found").Err()
+	return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_PLAYER_NOT_FOUND, "player actor not found")
 }
 
 // PlayerGetActors 获取全部在线玩家 actor（快照，可在遍历外安全使用）。
@@ -269,7 +255,7 @@ func (this *playerLogic) PlayerCreateActor(ctx context.Context, playerID int64, 
 		// 已在线：幂等更新登录 IP 与重连时间（断线重连可能换 IP；ReconnectAt 供断线延迟销毁豁免判断）
 		if pa, ok := this.PlayerActors.Get(playerID); ok {
 			pa.LoginIP = loginIP
-			pa.ReconnectAt = xtime.Now().Unix()
+			pa.ReconnectAt = util.Now().Unix()
 		}
 		return nil
 	}
@@ -293,7 +279,7 @@ func (this *playerLogic) PlayerCreateActor(ctx context.Context, playerID int64, 
 	this.PlayerActors.Set(playerID, &global.PlayerActor{
 		Actor:     pa,
 		PlayerID:  playerID,
-		EnterTime: xtime.Now().Unix(),
+		EnterTime: util.Now().Unix(),
 		LoginIP:   loginIP,
 	})
 	return nil
@@ -329,7 +315,7 @@ func (this *playerLogic) PlayerDestroyActorIfOffline(ctx context.Context, player
 // PlayerKick 踢玩家下线：销毁 actor（注销在线登记）并强制断开网关连接。
 func (this *playerLogic) PlayerKick(ctx context.Context, playerID int64) error {
 	if !this.PlayerActors.Has(playerID) {
-		return errs.CodePlayerNotFound.WithMessage("player is not online").Err()
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_PLAYER_NOT_FOUND, "player is not online")
 	}
 	if err := this.PlayerDestroyActor(ctx, playerID); err != nil {
 		return err
@@ -341,7 +327,7 @@ func (this *playerLogic) PlayerKick(ctx context.Context, playerID int64) error {
 	}
 	return svc.NodeProxy().Disconnect(ctx, &cluster.DisconnectArgs{
 		GID:    gid,
-		Kind:   session.User,
+		Kind:   cluster.User,
 		Target: playerID,
 		Force:  true,
 	})
@@ -393,7 +379,7 @@ func (p *playerProcessor) Start() {
 	playerActorMap().Set(p.playerID, &global.PlayerActor{
 		Actor:     p.actor,
 		PlayerID:  p.playerID,
-		EnterTime: xtime.Now().Unix(),
+		EnterTime: util.Now().Unix(),
 		LoginIP:   p.loginIP,
 	})
 

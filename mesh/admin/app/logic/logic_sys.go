@@ -12,12 +12,14 @@ import (
 
 	"github.com/dobyte/jwt"
 
-	"github.com/dobyte/due/v2/codes"
 	"server-cluster/internal/svc"
 	"server-cluster/mesh/admin/app/repo"
 	"server-cluster/share/consts"
 	"server-cluster/share/dto"
 	"server-cluster/share/model"
+	"server-cluster/share/util"
+
+	"github.com/dobyte/due/v2/codes"
 )
 
 // ApiList 接口分页列表。
@@ -479,7 +481,7 @@ func RecordLogin(username, ip, ua string, success bool, msg string) {
 		Platform:      "Web",
 		Status:        status,
 		Msg:           msg,
-		LoginTime:     time.Now(),
+		LoginTime:     util.Now(),
 	})
 }
 

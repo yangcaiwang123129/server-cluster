@@ -9,23 +9,18 @@ package main
 
 import (
 	"context"
-	"net"
-	"strings"
 	"time"
 
 	// "server-cluster/internal/singleinstance" // TODO: 临时跳过
 	"server-cluster/mesh/login/app/handler"
-	"server-cluster/share/consts"
-
 	"server-cluster/mesh/login/app/global"
+	"server-cluster/share/consts"
+	"server-cluster/share/util"
 
 	"github.com/dobyte/due/component/http/v2"
 	"github.com/dobyte/due/registry/etcd/v2"
 	"github.com/dobyte/due/v2"
-	"github.com/dobyte/due/v2/cluster"
-	"github.com/dobyte/due/v2/etc"
 	"github.com/dobyte/due/v2/log"
-	"github.com/dobyte/due/v2/registry"
 )
 
 func main() {
@@ -49,7 +44,7 @@ func main() {
 	// 添加组件到容器
 	container.Add(httpComponent)
 	// 手动注册 login 到 etcd mesh kind
-	if ins := buildMeshInstance(consts.MeshInstanceID(), consts.MeshName(), extractHTTPAddr()); ins != nil {
+	if ins := util.BuildMeshInstance(consts.MeshInstanceID(), consts.MeshName(), util.ExtractHTTPAddr()); ins != nil {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		if err := reg.Register(ctx, ins); err != nil {
 			log.Warnf("login: register to mesh failed: %v", err)
@@ -67,38 +62,4 @@ func main() {
 	container.Serve()
 	// 释放资源
 	global.Destroy()
-}
-
-func extractHTTPAddr() string {
-	addr := etc.Get("etc.http.addr").String()
-	if addr == "" {
-		return ""
-	}
-	host, port, err := net.SplitHostPort(addr)
-	if err != nil {
-		return addr
-	}
-	if host == "" || host == "0.0.0.0" {
-		host = "127.0.0.1"
-	}
-	return host + ":" + port
-}
-
-func buildMeshInstance(id, name, endpoint string) *registry.ServiceInstance {
-	if id == "" {
-		return nil
-	}
-	alias := name
-	if i := strings.LastIndex(id, "-"); i > 0 && i+1 < len(id) {
-		alias = id[:i]
-	}
-	return &registry.ServiceInstance{
-		ID:       id,
-		Name:     name,
-		Kind:     cluster.Mesh.String(),
-		Alias:    alias,
-		State:    "work",
-		Endpoint: "http://" + endpoint,
-		Weight:   1,
-	}
 }

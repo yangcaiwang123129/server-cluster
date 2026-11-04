@@ -147,7 +147,7 @@ func (this *equipLogic) EquipWear(ctx context.Context, playerID int64, req *pb.E
 
 	if err := row.Equips.UpdateAll(func(m map[int64]model.EquipInfo) error {
 		if _, exists := m[g.EquipID]; !exists {
-			return errs.CodeInvalidParams.WithMessage("装备未拥有").Err()
+			return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备未拥有")
 		}
 		// 同英雄同配置互斥：先卸载该英雄已穿戴的同款，再写入本次穿戴
 		for id, other := range m {
@@ -232,16 +232,16 @@ func equipDimGrow(ctx context.Context, playerID int64, id int64,
 	}
 	g, ok := row.Equips.Get(id)
 	if !ok {
-		return model.EquipInfo{}, errs.CodeInvalidParams.WithMessage("装备未拥有").Err()
+		return model.EquipInfo{}, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备未拥有")
 	}
 	if g.HeroID <= 0 {
-		return model.EquipInfo{}, errs.CodeInvalidParams.WithMessage("请先将装备穿戴到英雄").Err()
+		return model.EquipInfo{}, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "请先将装备穿戴到英雄")
 	}
 
 	dim := cur(g)
 	material, use, ok := rowOf(g.CfgID, dim)
 	if !ok {
-		return model.EquipInfo{}, errs.CodeInvalidParams.WithMessage("装备维度配置不存在").Err()
+		return model.EquipInfo{}, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备维度配置不存在")
 	}
 	_, _, hasNext := rowOf(g.CfgID, dim+1)
 	if err := dimConsume(ctx, playerID, material, use, hasNext, fullMsg); err != nil {
@@ -250,7 +250,7 @@ func equipDimGrow(ctx context.Context, playerID int64, id int64,
 
 	set(&g, dim+1)
 	if !row.UpdateEquip(g) {
-		return model.EquipInfo{}, errs.CodeInvalidParams.WithMessage("装备未拥有").Err()
+		return model.EquipInfo{}, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备未拥有")
 	}
 	global.PlayerEquipCache.Set(playerID, row)
 	notifyHero(ctx, playerID, g.HeroID)
@@ -392,7 +392,7 @@ func (this *equipAssetHandler) AssetType() tpl.AssetType { return tpl.AssetType_
 // Add 发放装备：生成新的实例ID，默认归属当前出战英雄（未出战则未分配）。
 func (this *equipAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _ int32) error {
 	if !tpl.T().Equip.Has(cfgID) {
-		return errs.CodeInvalidParams.WithMessage("装备配置不存在").Err()
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备配置不存在")
 	}
 
 	row, err := loadPlayerEquip(ctx, playerID)
@@ -401,7 +401,7 @@ func (this *equipAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _
 	}
 	g := model.EquipInfo{EquipID: svc.NextID(), CfgID: cfgID, HeroID: equippedHeroID(ctx, playerID), Level: 1, Quality: 1}
 	if !row.AddEquip(g) {
-		return errs.CodeInvalidParams.WithMessage("装备实例已存在").Err()
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备实例已存在")
 	}
 
 	global.PlayerEquipCache.Set(playerID, row)
@@ -427,7 +427,7 @@ func (this *equipAssetHandler) Remove(ctx context.Context, playerID int64, cfgID
 		return true
 	})
 	if !found {
-		return errs.CodeInvalidParams.WithMessage("装备未拥有").Err()
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备未拥有")
 	}
 	row.DeleteEquip(target)
 

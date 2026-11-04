@@ -2,6 +2,7 @@
 package logic
 
 import (
+	"server-cluster/share/pb"
 	"context"
 	"errors"
 	"fmt"
@@ -16,6 +17,7 @@ import (
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/singleton"
+	"server-cluster/share/util"
 
 	"github.com/dobyte/due/v2/etc"
 	"github.com/dobyte/jwt"
@@ -80,10 +82,10 @@ func (this *playerLogic) issueToken(pid int64) (string, error) {
 // checkNotBanned 校验玩家未被封号。
 func (this *playerLogic) checkNotBanned(m *model.Player) error {
 	if m.Status == model.PlayerStatusBanned {
-		return errs.CodePlayerBanned.Err()
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_PLAYER_BANNED, "")
 	}
-	if m.BanUntil > 0 && time.Now().Unix() < m.BanUntil {
-		return errs.CodePlayerBanned.Err()
+	if m.BanUntil > 0 && util.NowUnix() < m.BanUntil {
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_PLAYER_BANNED, "")
 	}
 	return nil
 }
@@ -92,7 +94,7 @@ func (this *playerLogic) checkNotBanned(m *model.Player) error {
 
 func (this *playerLogic) PlayerLogin(ctx context.Context, req *dto.PlayerLoginReq) (*dto.PlayerLoginResp, error) {
 	if req.DeviceId == "" {
-		return nil, errs.CodeInvalidParams.WithMessage("deviceId is required").Err()
+		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "deviceId is required")
 	}
 
 	var (
@@ -113,7 +115,7 @@ func (this *playerLogic) PlayerLogin(ctx context.Context, req *dto.PlayerLoginRe
 	case consts.LoginTypeApple:
 		token, isNew, err = this.appleLogin(ctx, req)
 	default:
-		return nil, errs.CodeInvalidParams.WithMessage("unknown loginType").Err()
+		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "unknown loginType")
 	}
 
 	if err != nil {
@@ -157,7 +159,7 @@ func (this *playerLogic) guestLogin(ctx context.Context, req *dto.PlayerLoginReq
 // 未找到时自动注册（player + player_auth）。
 func (this *playerLogic) accountLogin(ctx context.Context, req *dto.PlayerLoginReq) (string, bool, error) {
 	if req.Username == "" || req.Password == "" {
-		return "", false, errs.CodeInvalidParams.WithMessage("username and password are required").Err()
+		return "", false, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "username and password are required")
 	}
 
 	auth, err := repo.AuthRepo().FindByTypeAndIdentifier(ctx, consts.LoginTypeAccount, req.Username)
@@ -168,7 +170,7 @@ func (this *playerLogic) accountLogin(ctx context.Context, req *dto.PlayerLoginR
 	if auth != nil {
 		// 已有账号 → 校验密码
 		if err := bcrypt.CompareHashAndPassword([]byte(auth.AuthSecret), []byte(req.Password)); err != nil {
-			return "", false, errs.CodePasswordWrong.Err()
+			return "", false, errs.ErrOf(pb.ErrCode_ERR_CODE_PASSWORD_WRONG, "")
 		}
 		// 查 player → 校验状态 → 发 token
 		m, err := repo.Repo().GetByID(ctx, auth.PlayerID)
@@ -210,15 +212,15 @@ func (this *playerLogic) accountLogin(ctx context.Context, req *dto.PlayerLoginR
 // phoneLogin 手机号验证码：Redis 验码 → player_auth(type=2, identifier=phone) 查/建。
 func (this *playerLogic) phoneLogin(ctx context.Context, req *dto.PlayerLoginReq) (string, bool, error) {
 	if req.PhoneNumber == "" || req.SmsCode == "" {
-		return "", false, errs.CodeInvalidParams.WithMessage("phoneNumber and smsCode are required").Err()
+		return "", false, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "phoneNumber and smsCode are required")
 	}
 
 	// 1. Redis 验验证码
 	if rdb, err := svc.Ctx().Redis.Default(); err == nil {
-		key := sprintf(keySmsCode, req.PhoneNumber)
+		key := fmt.Sprintf(keySmsCode, req.PhoneNumber)
 		stored, err := rdb.Get(ctx, key).Result()
 		if err != nil || stored != req.SmsCode {
-			return "", false, errs.CodeSmsCodeInvalid.Err()
+			return "", false, errs.ErrOf(pb.ErrCode_ERR_CODE_SMS_CODE_INVALID, "")
 		}
 		// 一次性：用完删掉
 		_ = rdb.Del(ctx, key).Err()
@@ -265,7 +267,7 @@ func (this *playerLogic) phoneLogin(ctx context.Context, req *dto.PlayerLoginReq
 // code2session 依赖微信开放平台 API，开发阶段暂以 wechatCode 直接当 openid mock。
 func (this *playerLogic) wechatLogin(ctx context.Context, req *dto.PlayerLoginReq) (string, bool, error) {
 	if req.WechatCode == "" {
-		return "", false, errs.CodeInvalidParams.WithMessage("wechatCode is required").Err()
+		return "", false, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "wechatCode is required")
 	}
 
 	openid, err := this.wechatCode2Openid(ctx, req.WechatCode)
@@ -312,7 +314,7 @@ func (this *playerLogic) wechatLogin(ctx context.Context, req *dto.PlayerLoginRe
 // Apple 验签依赖 .well-known/jwks 公钥本地缓存，开发阶段暂 mock。
 func (this *playerLogic) appleLogin(ctx context.Context, req *dto.PlayerLoginReq) (string, bool, error) {
 	if req.AppleIdentityToken == "" {
-		return "", false, errs.CodeInvalidParams.WithMessage("appleIdentityToken is required").Err()
+		return "", false, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "appleIdentityToken is required")
 	}
 
 	sub, err := this.appleVerifyAndExtractSub(ctx, req.AppleIdentityToken, req.AppleNonce)
@@ -378,7 +380,7 @@ func (this *playerLogic) appleVerifyAndExtractSub(_ context.Context, identityTok
 
 func (this *playerLogic) SendPhoneCode(ctx context.Context, req *dto.PlayerPhoneSendCodeReq) error {
 	if req.PhoneNumber == "" {
-		return errs.CodeInvalidParams.WithMessage("phoneNumber is required").Err()
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "phoneNumber is required")
 	}
 
 	rdb, err := svc.Ctx().Redis.Default()
@@ -388,19 +390,19 @@ func (this *playerLogic) SendPhoneCode(ctx context.Context, req *dto.PlayerPhone
 	}
 
 	// 60s 防刷
-	cooldownKey := sprintf(keySmsCooldown, req.PhoneNumber)
+	cooldownKey := fmt.Sprintf(keySmsCooldown, req.PhoneNumber)
 	if wait, err := rdb.TTL(ctx, cooldownKey).Result(); err == nil && wait > 0 {
-		return errs.CodeSmsCooldown.Err()
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_SMS_COOLDOWN, "")
 	}
 
 	// 生成 6 位随机码（TODO: 替换为 crypto/rand）
-	code := strconv.Itoa(int(time.Now().UnixNano() % 1000000))
+	code := strconv.Itoa(int(util.NowUnixNano() % 1000000))
 	// 补前导零
 	for len(code) < 6 {
 		code = "0" + code
 	}
 
-	codeKey := sprintf(keySmsCode, req.PhoneNumber)
+	codeKey := fmt.Sprintf(keySmsCode, req.PhoneNumber)
 	if err := rdb.Set(ctx, codeKey, code, smsCodeTTL).Err(); err != nil {
 		return err
 	}
@@ -415,23 +417,23 @@ func (this *playerLogic) SendPhoneCode(ctx context.Context, req *dto.PlayerPhone
 
 func (this *playerLogic) PlayerBind(ctx context.Context, req *dto.PlayerBindReq) error {
 	if req.PlayerId == 0 {
-		return errs.CodeInvalidParams.WithMessage("playerId is required").Err()
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "playerId is required")
 	}
 	m, err := repo.Repo().GetByID(ctx, req.PlayerId)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return errs.CodePlayerNotFound.Err()
+			return errs.ErrOf(pb.ErrCode_ERR_CODE_PLAYER_NOT_FOUND, "")
 		}
 		return err
 	}
 	switch req.AuthType {
 	case consts.LoginTypeAccount:
 		if req.Username == "" || req.Password == "" {
-			return errs.CodeInvalidParams.WithMessage("username and password are required").Err()
+			return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "username and password are required")
 		}
 		// 检查 username 没被别人用
 		if _, err := repo.AuthRepo().FindByTypeAndIdentifier(ctx, consts.LoginTypeAccount, req.Username); err == nil {
-			return errs.CodePlayerExists.WithMessage("username already taken").Err()
+			return errs.ErrOf(pb.ErrCode_ERR_CODE_PLAYER_EXISTS, "username already taken")
 		}
 		hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 		if err != nil {
@@ -446,18 +448,18 @@ func (this *playerLogic) PlayerBind(ctx context.Context, req *dto.PlayerBindReq)
 		})
 	case consts.LoginTypePhoneSMS:
 		if req.PhoneNumber == "" || req.SmsCode == "" {
-			return errs.CodeInvalidParams.WithMessage("phoneNumber and smsCode are required").Err()
+			return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "phoneNumber and smsCode are required")
 		}
 		if rdb, err := svc.Ctx().Redis.Default(); err == nil {
-			stored, _ := rdb.Get(ctx, sprintf(keySmsCode, req.PhoneNumber)).Result()
+			stored, _ := rdb.Get(ctx, fmt.Sprintf(keySmsCode, req.PhoneNumber)).Result()
 			if stored != req.SmsCode {
-				return errs.CodeSmsCodeInvalid.Err()
+				return errs.ErrOf(pb.ErrCode_ERR_CODE_SMS_CODE_INVALID, "")
 			}
-			_ = rdb.Del(ctx, sprintf(keySmsCode, req.PhoneNumber)).Err()
+			_ = rdb.Del(ctx, fmt.Sprintf(keySmsCode, req.PhoneNumber)).Err()
 		}
 		// 检查手机号没被别人绑
 		if _, err := repo.AuthRepo().FindByTypeAndIdentifier(ctx, consts.LoginTypePhoneSMS, req.PhoneNumber); err == nil {
-			return errs.CodePlayerExists.WithMessage("phone already bound").Err()
+			return errs.ErrOf(pb.ErrCode_ERR_CODE_PLAYER_EXISTS, "phone already bound")
 		}
 		return repo.AuthRepo().Create(ctx, &model.PlayerAuth{
 			PlayerID:       m.PlayerID,
@@ -471,7 +473,7 @@ func (this *playerLogic) PlayerBind(ctx context.Context, req *dto.PlayerBindReq)
 			return err
 		}
 		if _, err := repo.AuthRepo().FindByTypeAndIdentifier(ctx, consts.LoginTypeWechat, openid); err == nil {
-			return errs.CodePlayerExists.WithMessage("wechat already bound").Err()
+			return errs.ErrOf(pb.ErrCode_ERR_CODE_PLAYER_EXISTS, "wechat already bound")
 		}
 		return repo.AuthRepo().Create(ctx, &model.PlayerAuth{
 			PlayerID:       m.PlayerID,
@@ -485,7 +487,7 @@ func (this *playerLogic) PlayerBind(ctx context.Context, req *dto.PlayerBindReq)
 			return err
 		}
 		if _, err := repo.AuthRepo().FindByTypeAndIdentifier(ctx, consts.LoginTypeApple, sub); err == nil {
-			return errs.CodePlayerExists.WithMessage("apple id already bound").Err()
+			return errs.ErrOf(pb.ErrCode_ERR_CODE_PLAYER_EXISTS, "apple id already bound")
 		}
 		return repo.AuthRepo().Create(ctx, &model.PlayerAuth{
 			PlayerID:       m.PlayerID,
@@ -494,12 +496,6 @@ func (this *playerLogic) PlayerBind(ctx context.Context, req *dto.PlayerBindReq)
 			Verified:       1,
 		})
 	default:
-		return errs.CodeAuthTypeUnknown.Err()
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_AUTH_TYPE_UNKNOWN, "")
 	}
-}
-
-// ──── fmt.Sprintf 简化（避免 import fmt 只为 Sprintf） ────
-
-func sprintf(format string, args ...any) string {
-	return fmt.Sprintf(format, args...)
 }

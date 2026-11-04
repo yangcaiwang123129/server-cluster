@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"sort"
-	"time"
 
 	"github.com/dobyte/due/v2/log"
 	"gorm.io/gorm"
@@ -87,7 +86,7 @@ func (this *mailLogic) MailRead(ctx context.Context, playerID int64, req *pb.Mai
 	}
 	if m.Status == model.MailStatusUnread {
 		m.Status = model.MailStatusRead
-		m.ReadAt = time.Now().UnixMilli()
+		m.ReadAt = util.NowUnixMilli()
 		if !row.UpdateMail(m) {
 			return &pb.MailReadResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "邮件不存在")}, nil
 		}
@@ -102,7 +101,7 @@ func (this *mailLogic) MailReadAll(ctx context.Context, playerID int64, _ *pb.Ma
 	if err != nil {
 		return nil, err
 	}
-	now := time.Now().UnixMilli()
+	now := util.NowUnixMilli()
 	if err := row.Mails.UpdateAll(func(m map[int64]model.MailInfo) error {
 		for id, mail := range m {
 			if mail.Status == model.MailStatusUnread {
@@ -135,7 +134,7 @@ func (this *mailLogic) MailClaim(ctx context.Context, playerID int64, req *pb.Ma
 	}
 	originStatus, originClaimedAt := m.Status, m.ClaimedAt
 	m.Status = model.MailStatusClaimed
-	m.ClaimedAt = time.Now().UnixMilli()
+	m.ClaimedAt = util.NowUnixMilli()
 	if !row.UpdateMail(m) {
 		return &pb.MailClaimResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "邮件不存在")}, nil
 	}
@@ -183,7 +182,7 @@ func (this *mailLogic) MailClaimAll(ctx context.Context, playerID int64, _ *pb.M
 	if err != nil {
 		return nil, err
 	}
-	now := time.Now().UnixMilli()
+	now := util.NowUnixMilli()
 	pending := make([]pendingClaim, 0, row.Mails.Len())
 	if err := row.Mails.UpdateAll(func(m map[int64]model.MailInfo) error {
 		for id, mail := range m {
@@ -283,7 +282,7 @@ func (this *mailLogic) MailDeleteClean(ctx context.Context, playerID int64, _ *p
 // MailSend 后台发送邮件（可带附件）：生成实例ID，状态未读。
 func (this *mailLogic) MailSend(ctx context.Context, playerID int64, req *pb.GmMailSendReq) (*pb.MailEntry, error) {
 	if req.GetTitle() == "" {
-		return nil, errs.CodeInvalidParams.WithMessage("邮件标题不能为空").Err()
+		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "邮件标题不能为空")
 	}
 	row, err := loadPlayerMail(ctx, playerID)
 	if err != nil {
@@ -299,10 +298,10 @@ func (this *mailLogic) MailSend(ctx context.Context, playerID int64, req *pb.GmM
 		Content:     req.GetContent(),
 		Attachments: atts,
 		Status:      model.MailStatusUnread,
-		CreatedAt:   time.Now().UnixMilli(),
+		CreatedAt:   util.NowUnixMilli(),
 	}
 	if !row.AddMail(m) {
-		return nil, errs.CodeInternalError.WithMessage("邮件创建失败").Err()
+		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, "邮件创建失败")
 	}
 	global.PlayerMailCache.Set(playerID, row)
 	return convert.MailEntry(m), nil

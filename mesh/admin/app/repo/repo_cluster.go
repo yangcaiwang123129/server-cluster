@@ -2,7 +2,6 @@ package repo
 
 import (
 	"strings"
-	"time"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -82,7 +81,7 @@ func (r *Repo) SyncClusterNodes(instances []*registry.ServiceInstance) error {
 	if err != nil {
 		return err
 	}
-	now := time.Now()
+	now := util.Now()
 	// 1. 构造 Upsert 数据；只写动态字段
 	rows := make([]map[string]any, 0, len(instances))
 	for _, ins := range instances {
@@ -122,7 +121,7 @@ func (r *Repo) markOffline(d *gorm.DB, rows []map[string]any) error {
 	if len(rows) == 0 {
 		// etcd 里一个节点都没有：所有 DB 记录都应该置 offline
 		return d.Model(&model.ClusterNode{}).Where("online = ?", 1).
-			Updates(map[string]any{"online": int8(0), "updated_at": time.Now()}).Error
+			Updates(map[string]any{"online": int8(0), "updated_at": util.Now()}).Error
 	}
 	ids := make([]string, 0, len(rows))
 	for _, row := range rows {
@@ -135,7 +134,7 @@ func (r *Repo) markOffline(d *gorm.DB, rows []map[string]any) error {
 	}
 	return d.Model(&model.ClusterNode{}).
 		Where("online = ? AND node_id NOT IN ?", 1, ids).
-		Updates(map[string]any{"online": int8(0), "updated_at": time.Now()}).Error
+		Updates(map[string]any{"online": int8(0), "updated_at": util.Now()}).Error
 }
 
 // EnsureClusterNodesTable 确保集群节点表存在（admin AutoMigrate 已覆盖，这里兜底）。

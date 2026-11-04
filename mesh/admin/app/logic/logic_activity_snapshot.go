@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"sort"
-	"time"
 
 	"server-cluster/internal/svc"
 	"server-cluster/share/consts"
 	"server-cluster/share/dto"
+	"server-cluster/share/util"
 
 	"github.com/dobyte/due/v2/log"
 	redis "github.com/redis/go-redis/v9"
@@ -73,7 +73,7 @@ func (this *activityLogic) Snapshot() *dto.ActivitySnapshot {
 
 // buildSnapshotLocked 构造快照；调用方需持有锁。
 func (this *activityLogic) buildSnapshotLocked() *dto.ActivitySnapshot {
-	now := time.Now().UnixMilli()
+	now := util.NowUnixMilli()
 	list := make([]dto.ActivityState, 0, len(this.insts))
 	for _, inst := range this.insts {
 		list = append(list, dto.ActivityState{

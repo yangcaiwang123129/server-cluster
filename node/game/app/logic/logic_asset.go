@@ -39,7 +39,7 @@ func registerAsset(h global.AssetHandler) {
 func assetHandler(t tpl.AssetType) (global.AssetHandler, error) {
 	h, ok := assetHandlers[t]
 	if !ok {
-		return nil, errs.CodeInvalidParams.WithMessage(fmt.Sprintf("不支持的资产类型: %d", t)).Err()
+		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, fmt.Sprintf("不支持的资产类型: %d", t))
 	}
 	return h, nil
 }
@@ -48,7 +48,7 @@ func assetHandler(t tpl.AssetType) (global.AssetHandler, error) {
 func (this *assetLogic) apply(ctx context.Context, playerID int64, asset *tpl.Asset,
 	op func(h global.AssetHandler, ctx context.Context, playerID int64, cfgID, count int32) error) error {
 	if asset == nil {
-		return errs.CodeInvalidParams.WithMessage("资产为空").Err()
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "资产为空")
 	}
 	h, err := assetHandler(asset.Type)
 	if err != nil {

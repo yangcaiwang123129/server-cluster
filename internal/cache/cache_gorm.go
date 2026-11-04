@@ -5,10 +5,10 @@ import (
 	"errors"
 	"reflect"
 	"sync"
-	"time"
 
 	"server-cluster/internal/svc"
 	"server-cluster/share/consts"
+	"server-cluster/share/util"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -66,7 +66,7 @@ func fillTimestamps[T any](meta *tableMeta, rows []T) {
 	if meta.createdAt == nil && meta.updatedAt == nil {
 		return
 	}
-	now := time.Now().UnixMilli()
+	now := util.NowUnixMilli()
 	ctx := context.Background()
 	for i := range rows {
 		// rows 可能是结构体或其指针，统一取到结构体本身（保持可寻址）

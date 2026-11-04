@@ -2,7 +2,7 @@ import request from '@/utils/request'
 import type { ApiResponse, PageQuery, PageResult } from '@/types/api'
 import type { GmActivity, GmActivityCfg, GmActivityQuery } from '@/types/admin'
 
-/** 运营活动管理：活动实例列表 / 模板配置 / 修改时间 / 提前结束。 */
+/** 活动管理：活动实例列表 / 模板策略（实例行点击查看）/ 修改时间 / 提前结束。 */
 
 export function listActivities(query: GmActivityQuery & Partial<PageQuery>) {
   return request<ApiResponse<PageResult<GmActivity>>>({

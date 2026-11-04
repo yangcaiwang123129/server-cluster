@@ -25,7 +25,7 @@ type PlayerLogic interface {
 	PlayerGetActor(ctx context.Context, playerID int64) (*PlayerActor, error)
 	// PlayerGetActors 玩家获取所有actor
 	PlayerGetActors(ctx context.Context) ([]*PlayerActor, error)
-	// PlayerCreateActor 玩家创建actor；loginIP 从 node.Context.GetIP() 取，内存维护
+	// PlayerCreateActor 玩家创建actor（verify 首包绑定后调用）；loginIP 由 handler 从 node.Context.GetIP() 取后传入，内存维护
 	PlayerCreateActor(ctx context.Context, playerID int64, loginIP string) error
 	// PlayerDestroyActor 玩家销毁actor
 	PlayerDestroyActor(ctx context.Context, playerID int64) error

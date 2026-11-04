@@ -30,7 +30,7 @@ func (p *GmProvider) GetOnlinePlayers(ctx context.Context, req *pb.GetOnlinePlay
 // KickPlayer 批量踢玩家下线（主动踢/封号踢），销毁 actor 并断开网关连接；失败（不在线等）玩家回列。
 func (p *GmProvider) KickPlayer(ctx context.Context, req *pb.KickPlayerReq) (*pb.KickPlayerResp, error) {
 	if len(req.PlayerIds) == 0 {
-		return nil, errs.CodeInvalidParams.WithMessage("invalid player ids").Err()
+		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "invalid player ids")
 	}
 	resp := &pb.KickPlayerResp{}
 	for _, id := range req.PlayerIds {
