@@ -196,7 +196,7 @@ export const usePermissionStore = defineStore('permission', {
     async generateRoutes(): Promise<AppRoute[]> {
       const response = await getRoutes()
 
-      if (response.code !== 200) {
+      if (response.code !== 0) {
         // The server's message still wins here, unlike the success toasts:
         // a failure carries a reason only the backend knows, and dropping it
         // would leave the user with a sentence that never varies.

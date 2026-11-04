@@ -31,7 +31,7 @@ func RegisterEquip(router http.Router) {
 func handleGmEquipWear(ctx http.Context) error {
 	var req dto.GmEquipWearReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.ID <= 0 {
-		return errs.Fail(ctx, 400, "请求参数错误")
+		return errs.FailParams(ctx, "请求参数错误")
 	}
 	entry, err := logic.GmEquip().EquipWear(req)
 	if err != nil {
@@ -50,7 +50,7 @@ func handleGmEquipWear(ctx http.Context) error {
 func handleGmEquipUnwear(ctx http.Context) error {
 	var req dto.GmEquipUnwearReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.ID <= 0 {
-		return errs.Fail(ctx, 400, "请求参数错误")
+		return errs.FailParams(ctx, "请求参数错误")
 	}
 	entry, err := logic.GmEquip().EquipUnwear(req)
 	if err != nil {
@@ -69,7 +69,7 @@ func handleGmEquipUnwear(ctx http.Context) error {
 func handleGmEquipList(ctx http.Context) error {
 	req := dto.GmPlayerReq{PlayerID: queryPlayerID(ctx)}
 	if req.PlayerID <= 0 {
-		return errs.Fail(ctx, 400, "请求参数错误")
+		return errs.FailParams(ctx, "请求参数错误")
 	}
 	list, err := logic.GmEquip().EquipList(req)
 	if err != nil {
@@ -88,7 +88,7 @@ func handleGmEquipList(ctx http.Context) error {
 func handleGmEquipAdd(ctx http.Context) error {
 	var req dto.GmEquipAddReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.EquipID <= 0 {
-		return errs.Fail(ctx, 400, "请求参数错误")
+		return errs.FailParams(ctx, "请求参数错误")
 	}
 	entry, err := logic.GmEquip().EquipAdd(req)
 	if err != nil {
@@ -107,7 +107,7 @@ func handleGmEquipAdd(ctx http.Context) error {
 func handleGmEquipUpdate(ctx http.Context) error {
 	var req dto.GmEquipUpdateReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.ID <= 0 {
-		return errs.Fail(ctx, 400, "请求参数错误")
+		return errs.FailParams(ctx, "请求参数错误")
 	}
 	entry, err := logic.GmEquip().EquipUpdate(req)
 	if err != nil {
@@ -126,7 +126,7 @@ func handleGmEquipUpdate(ctx http.Context) error {
 func handleGmEquipUpgrade(ctx http.Context) error {
 	var req dto.GmUpgradeReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.EquipID <= 0 {
-		return errs.Fail(ctx, 400, "请求参数错误")
+		return errs.FailParams(ctx, "请求参数错误")
 	}
 	resp, err := logic.GmEquip().EquipUpgrade(req)
 	if err != nil {
@@ -145,7 +145,7 @@ func handleGmEquipUpgrade(ctx http.Context) error {
 func handleGmEquipUpQuality(ctx http.Context) error {
 	var req dto.GmUpgradeReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.EquipID <= 0 {
-		return errs.Fail(ctx, 400, "请求参数错误")
+		return errs.FailParams(ctx, "请求参数错误")
 	}
 	resp, err := logic.GmEquip().EquipUpQuality(req)
 	if err != nil {
@@ -164,7 +164,7 @@ func handleGmEquipUpQuality(ctx http.Context) error {
 func handleGmEquipBreakthrough(ctx http.Context) error {
 	var req dto.GmUpgradeReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.EquipID <= 0 {
-		return errs.Fail(ctx, 400, "请求参数错误")
+		return errs.FailParams(ctx, "请求参数错误")
 	}
 	resp, err := logic.GmEquip().EquipBreakthrough(req)
 	if err != nil {

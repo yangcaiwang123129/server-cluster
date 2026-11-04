@@ -2,13 +2,13 @@
 package handler
 
 import (
+	"server-cluster/internal/router"
+	"server-cluster/node/game/app/logic"
+	"server-cluster/share/errs"
+	"server-cluster/share/pb"
+
 	"github.com/dobyte/due/v2/cluster/node"
 	"github.com/dobyte/due/v2/log"
-
-	"server-cluster/internal/router"
-
-	"server-cluster/node/game/app/logic"
-	"server-cluster/share/pb"
 )
 
 // init 注册物品容器路由（业务在玩家 actor 内串行执行）。
@@ -25,13 +25,13 @@ func handleItemList(ctx node.Context) {
 	req := &pb.ItemContainerListReq{}
 	if err := ctx.Parse(req); err != nil {
 		log.Errorf("handler: item list parse failed, uid=%d: %v", ctx.UID(), err)
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.ItemContainerListResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp, err := logic.Item().ItemContainerList(ctx.Context(), ctx.UID(), req)
 	if err != nil {
 		log.Errorf("handler: item list logic failed, uid=%d: %v", ctx.UID(), err)
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.ItemContainerListResp{Result: errs.ErrResult(err)})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -41,12 +41,12 @@ func handleItemList(ctx node.Context) {
 func handleItemMove(ctx node.Context) {
 	req := &pb.ItemMoveReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.ItemMoveResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp, err := logic.Item().ItemMove(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.ItemMoveResp{Result: errs.ErrResult(err)})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -56,12 +56,12 @@ func handleItemMove(ctx node.Context) {
 func handleItemRotate(ctx node.Context) {
 	req := &pb.ItemRotateReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.ItemRotateResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp, err := logic.Item().ItemRotate(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.ItemRotateResp{Result: errs.ErrResult(err)})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -71,12 +71,12 @@ func handleItemRotate(ctx node.Context) {
 func handleItemSort(ctx node.Context) {
 	req := &pb.ItemSortReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.ItemSortResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp, err := logic.Item().ItemSort(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.ItemSortResp{Result: errs.ErrResult(err)})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -86,12 +86,12 @@ func handleItemSort(ctx node.Context) {
 func handleItemTransfer(ctx node.Context) {
 	req := &pb.ItemTransferReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.ItemTransferResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp, err := logic.Item().ItemTransfer(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.ItemTransferResp{Result: errs.ErrResult(err)})
 		return
 	}
 	_ = ctx.Response(resp)

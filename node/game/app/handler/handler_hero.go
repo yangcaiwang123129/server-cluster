@@ -8,6 +8,7 @@ import (
 	"server-cluster/internal/router"
 
 	"server-cluster/node/game/app/logic"
+	"server-cluster/share/errs"
 	"server-cluster/share/pb"
 )
 
@@ -25,13 +26,13 @@ func handleHeroList(ctx node.Context) {
 	req := &pb.HeroListReq{}
 	if err := ctx.Parse(req); err != nil {
 		log.Errorf("handler: hero list parse failed, uid=%d: %v", ctx.UID(), err)
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.HeroListResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp, err := logic.Hero().HeroList(ctx.Context(), ctx.UID())
 	if err != nil {
 		log.Errorf("handler: hero list logic failed, uid=%d: %v", ctx.UID(), err)
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.HeroListResp{Result: errs.ErrResult(err)})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -41,12 +42,12 @@ func handleHeroList(ctx node.Context) {
 func handleHeroAdd(ctx node.Context) {
 	req := &pb.HeroAddReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.HeroAddResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp, err := logic.Hero().HeroAdd(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.HeroAddResp{Result: errs.ErrResult(err)})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -56,12 +57,12 @@ func handleHeroAdd(ctx node.Context) {
 func handleHeroUpdate(ctx node.Context) {
 	req := &pb.HeroUpdateReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.HeroUpdateResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp, err := logic.Hero().HeroUpdate(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.HeroUpdateResp{Result: errs.ErrResult(err)})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -71,12 +72,12 @@ func handleHeroUpdate(ctx node.Context) {
 func handleHeroAttribute(ctx node.Context) {
 	req := &pb.HeroAttributeReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.HeroAttributeResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp, err := logic.Hero().HeroAttribute(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.HeroAttributeResp{Result: errs.ErrResult(err)})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -86,12 +87,12 @@ func handleHeroAttribute(ctx node.Context) {
 func handleHeroUpgrade(ctx node.Context) {
 	req := &pb.HeroUpgradeReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.HeroUpgradeResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp, err := logic.Hero().HeroUpgrade(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.HeroUpgradeResp{Result: errs.ErrResult(err)})
 		return
 	}
 	_ = ctx.Response(resp)

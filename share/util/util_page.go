@@ -1,23 +1,13 @@
-// Package util gorm 查询辅助：模糊匹配、排序回退、泛型分页查询与分页响应体。
 package util
 
-import (
-	"gorm.io/gorm"
-)
+import "gorm.io/gorm"
 
 // 分页参数默认值/上限。
 const (
-	DefaultPageSize = 10
-	MaxPageSize     = 10000
+	DefaultPageIndex = 1
+	DefaultPageSize  = 10
+	MaxPageSize      = 10000
 )
-
-// PageResp 分页响应体。
-type PageResp[T any] struct {
-	List      []T   `json:"list"`
-	Count     int64 `json:"count"`
-	PageIndex int   `json:"pageIndex"`
-	PageSize  int   `json:"pageSize"`
-}
 
 // PageQuery 分页查询：先 count 再 offset/limit 取数；order 为空时回退 fallback。
 // db 须已带 Model 与过滤条件。
@@ -37,7 +27,7 @@ func PageQuery[T any](db *gorm.DB, pageIndex, pageSize int, order, fallback stri
 // NormalizePage 归一化分页参数。
 func NormalizePage(pageIndex, pageSize int) (offset, limit int) {
 	if pageIndex <= 0 {
-		pageIndex = 1
+		pageIndex = DefaultPageIndex
 	}
 	if pageSize <= 0 {
 		pageSize = DefaultPageSize
@@ -57,4 +47,17 @@ func DefaultOrder(order, fallback string) string {
 		return fallback
 	}
 	return order
+}
+
+// PageResp 分页响应体。
+type PageResp[T any] struct {
+	List      []T   `json:"list"`
+	Count     int64 `json:"count"`
+	PageIndex int   `json:"pageIndex"`
+	PageSize  int   `json:"pageSize"`
+}
+
+// Page 组装分页 data（admin handler 通用）。
+func Page[T any](list []T, total int64, pageIndex, pageSize int) PageResp[T] {
+	return PageResp[T]{List: list, Count: total, PageIndex: pageIndex, PageSize: pageSize}
 }

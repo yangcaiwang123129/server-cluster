@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"server-cluster/share/util"
+
 	"github.com/dobyte/due/component/http/v2"
 
 	"server-cluster/mesh/admin/app/logic"
@@ -50,7 +52,7 @@ func handleClientVersionList(ctx http.Context) error {
 	if err != nil {
 		return errs.FailErr(ctx, err)
 	}
-	return errs.OK(ctx, errs.Page(list, total, req.PageIndex, req.PageSize))
+	return errs.OK(ctx, util.Page(list, total, req.PageIndex, req.PageSize))
 }
 
 // handleClientVersionGet 客户端版本详情。
@@ -79,7 +81,7 @@ func handleClientVersionGet(ctx http.Context) error {
 func handleClientVersionCreate(ctx http.Context) error {
 	var req dto.ClientVersionSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, 400, "请求参数错误")
+		return errs.FailParams(ctx, "请求参数错误")
 	}
 	m, err := logic.ClientVersionCreate(req)
 	if err != nil {
@@ -100,7 +102,7 @@ func handleClientVersionCreate(ctx http.Context) error {
 func handleClientVersionUpdate(ctx http.Context) error {
 	var req dto.ClientVersionSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, 400, "请求参数错误")
+		return errs.FailParams(ctx, "请求参数错误")
 	}
 	m, err := logic.ClientVersionUpdate(paramInt(ctx, "id"), req)
 	if err != nil {
@@ -120,7 +122,7 @@ func handleClientVersionUpdate(ctx http.Context) error {
 func handleClientVersionDelete(ctx http.Context) error {
 	var req dto.IdsReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, 400, "请求参数错误")
+		return errs.FailParams(ctx, "请求参数错误")
 	}
 	if err := logic.ClientVersionDelete(req.Ids); err != nil {
 		return errs.FailErr(ctx, err)
@@ -139,7 +141,7 @@ func handleClientVersionDelete(ctx http.Context) error {
 func handleClientVersionStatus(ctx http.Context) error {
 	var req dto.ClientVersionStatusReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, 400, "请求参数错误")
+		return errs.FailParams(ctx, "请求参数错误")
 	}
 	if err := logic.ClientVersionUpdateStatus(req); err != nil {
 		return errs.FailErr(ctx, err)
@@ -168,7 +170,7 @@ func handleSimOptions(ctx http.Context) error {
 func handleSimLogin(ctx http.Context) error {
 	var req dto.SimLoginReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, 400, "请求参数错误")
+		return errs.FailParams(ctx, "请求参数错误")
 	}
 	resp, err := logic.SimLogin(req)
 	if err != nil {
@@ -188,7 +190,7 @@ func handleSimLogin(ctx http.Context) error {
 func handleSimConnect(ctx http.Context) error {
 	var req dto.SimSessionReq
 	if err := bindBody(ctx, &req); err != nil || req.SessionID == "" {
-		return errs.Fail(ctx, 400, "请求参数错误")
+		return errs.FailParams(ctx, "请求参数错误")
 	}
 	resp, err := logic.SimConnect(req.SessionID)
 	if err != nil {
@@ -208,7 +210,7 @@ func handleSimConnect(ctx http.Context) error {
 func handleSimStep(ctx http.Context) error {
 	var req dto.SimStepReq
 	if err := bindBody(ctx, &req); err != nil || req.SessionID == "" {
-		return errs.Fail(ctx, 400, "请求参数错误")
+		return errs.FailParams(ctx, "请求参数错误")
 	}
 	resp, err := logic.SimStep(req)
 	if err != nil {
@@ -228,7 +230,7 @@ func handleSimStep(ctx http.Context) error {
 func handleSimClose(ctx http.Context) error {
 	var req dto.SimSessionReq
 	if err := bindBody(ctx, &req); err != nil || req.SessionID == "" {
-		return errs.Fail(ctx, 400, "请求参数错误")
+		return errs.FailParams(ctx, "请求参数错误")
 	}
 	if err := logic.SimClose(req.SessionID); err != nil {
 		return errs.FailErr(ctx, err)

@@ -7,6 +7,7 @@ import (
 	"github.com/dobyte/due/v2/cluster/node"
 
 	"server-cluster/node/game/app/logic"
+	"server-cluster/share/errs"
 	"server-cluster/share/pb"
 )
 
@@ -22,12 +23,12 @@ func init() {
 func handleSkillUpdate(ctx node.Context) {
 	req := &pb.SkillUpdateReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.SkillUpdateResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp, err := logic.Skill().SkillUpdate(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.SkillUpdateResp{Result: errs.ErrResult(err)})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -37,12 +38,12 @@ func handleSkillUpdate(ctx node.Context) {
 func handleSkillUpgrade(ctx node.Context) {
 	req := &pb.SkillUpgradeReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.SkillUpgradeResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp, err := logic.Skill().SkillUpgrade(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.SkillUpgradeResp{Result: errs.ErrResult(err)})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -52,12 +53,12 @@ func handleSkillUpgrade(ctx node.Context) {
 func handleSkillUpQuality(ctx node.Context) {
 	req := &pb.SkillUpQualityReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.SkillUpQualityResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp, err := logic.Skill().SkillUpQuality(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.SkillUpQualityResp{Result: errs.ErrResult(err)})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -67,12 +68,12 @@ func handleSkillUpQuality(ctx node.Context) {
 func handleSkillBreakthrough(ctx node.Context) {
 	req := &pb.SkillBreakthroughReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.SkillBreakthroughResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp, err := logic.Skill().SkillBreakthrough(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.SkillBreakthroughResp{Result: errs.ErrResult(err)})
 		return
 	}
 	_ = ctx.Response(resp)

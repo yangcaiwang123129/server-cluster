@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"server-cluster/share/util"
+
 	"github.com/dobyte/due/component/http/v2"
 
 	"server-cluster/mesh/admin/app/logic"
@@ -34,5 +36,5 @@ func handleCatalog(ctx http.Context) error {
 	if pageSize <= 0 {
 		return errs.OK(ctx, list)
 	}
-	return errs.OK(ctx, errs.Page(list, total, pageIndex, pageSize))
+	return errs.OK(ctx, util.Page(list, total, pageIndex, pageSize))
 }

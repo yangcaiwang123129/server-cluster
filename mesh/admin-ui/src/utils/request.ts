@@ -12,7 +12,7 @@ import type { ApiResponse } from '@/types/api'
 /**
  * The HTTP client, and the contract every caller is written against:
  *
- *   1. A resolved response ALWAYS means code === 200. Every other code rejects.
+ *   1. A resolved response ALWAYS means code === 0. Every other code rejects.
  *   2. A rejection carrying `reported: true` has already been shown to the user
  *      by this file. Callers catch it to restore their own state, but must not
  *      show a second message.
@@ -101,7 +101,8 @@ service.interceptors.response.use(
   (response: AxiosResponse<ApiResponse>) => {
     const { code, msg } = response.data
 
-    if (code === 401) {
+    // 1002 = pb.ErrCode_ERR_CODE_UNAUTHORIZED（未登录/令牌失效）→ 重新登录
+    if (code === 1002) {
       if (location.href.indexOf('login') !== -1) {
         useUserStore().resetToken()
         location.reload() // 为了重新实例化vue-router对象 避免bug
@@ -111,17 +112,12 @@ service.interceptors.response.use(
       return Promise.reject(reported(new Error('Unauthorized')))
     }
 
-    if (code === 6401) {
-      promptRelogin()
-      return Promise.reject(reported(new Error(i18n.global.t('common.sessionExpired'))))
-    }
-
-    if (code !== 200) {
+    if (code !== 0) {
       ElMessage({
         message: msg,
         type: 'error',
-        // 400/403 carry a message worth reading twice as long
-        duration: code === 400 || code === 403 ? 5 * 1000 : 3 * 1000
+        // 403（无接口权限）附带具体原因，值得让用户多看一会
+        duration: code === 403 ? 5 * 1000 : 3 * 1000
       })
       return Promise.reject(reported(new Error(msg || 'error')))
     }

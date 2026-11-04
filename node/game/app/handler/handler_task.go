@@ -6,6 +6,7 @@ import (
 	"github.com/dobyte/due/v2/cluster/node"
 
 	"server-cluster/node/game/app/logic"
+	"server-cluster/share/errs"
 	"server-cluster/share/pb"
 )
 
@@ -20,12 +21,12 @@ func init() {
 func handleTaskList(ctx node.Context) {
 	req := &pb.TaskListReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.TaskListResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp, err := logic.Task().TaskList(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.TaskListResp{Result: errs.ErrResult(err)})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -35,12 +36,12 @@ func handleTaskList(ctx node.Context) {
 func handleTaskClaim(ctx node.Context) {
 	req := &pb.TaskClaimReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.TaskClaimResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp, err := logic.Task().TaskClaim(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.TaskClaimResp{Result: errs.ErrResult(err)})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -50,12 +51,12 @@ func handleTaskClaim(ctx node.Context) {
 func handleTaskAccept(ctx node.Context) {
 	req := &pb.TaskAcceptReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.TaskAcceptResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp, err := logic.Task().TaskAccept(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.TaskAcceptResp{Result: errs.ErrResult(err)})
 		return
 	}
 	_ = ctx.Response(resp)

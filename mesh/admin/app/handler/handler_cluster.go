@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"server-cluster/share/util"
 	"strconv"
 	"strings"
 
@@ -52,7 +53,7 @@ func handleClusterList(ctx http.Context) error {
 	if err != nil {
 		return errs.FailErr(ctx, err)
 	}
-	return errs.OK(ctx, errs.Page(list, total, req.PageIndex, req.PageSize))
+	return errs.OK(ctx, util.Page(list, total, req.PageIndex, req.PageSize))
 }
 
 // handleClusterDetail 单个集群节点详情（带完整 SSH 配置）。
@@ -64,7 +65,7 @@ func handleClusterList(ctx http.Context) error {
 func handleClusterDetail(ctx http.Context) error {
 	nodeID := ctx.Params("nodeId")
 	if nodeID == "" {
-		return errs.Fail(ctx, 400, "nodeId required")
+		return errs.FailParams(ctx, "nodeId required")
 	}
 	resp, err := logic.Cluster().Get(ctx.Context(), nodeID)
 	if err != nil {
@@ -83,11 +84,11 @@ func handleClusterDetail(ctx http.Context) error {
 func handleClusterUpdate(ctx http.Context) error {
 	nodeID := ctx.Params("nodeId")
 	if nodeID == "" {
-		return errs.Fail(ctx, 400, "nodeId required")
+		return errs.FailParams(ctx, "nodeId required")
 	}
 	var req dto.ClusterNodeUpdateReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, 400, "invalid body")
+		return errs.FailParams(ctx, "invalid body")
 	}
 	m := &model.ClusterNode{
 		NodeID:     nodeID,
@@ -99,7 +100,7 @@ func handleClusterUpdate(ctx http.Context) error {
 		Remark:     strings.TrimSpace(req.Remark),
 	}
 	if m.SSHHost == "" || m.SSHUser == "" {
-		return errs.Fail(ctx, 400, "sshHost and sshUser required")
+		return errs.FailParams(ctx, "sshHost and sshUser required")
 	}
 	if err := logic.Cluster().UpdateSSH(ctx.Context(), m); err != nil {
 		return errs.FailErr(ctx, err)
@@ -117,17 +118,17 @@ func handleClusterUpdate(ctx http.Context) error {
 func handleClusterExec(ctx http.Context) error {
 	nodeID := ctx.Params("nodeId")
 	if nodeID == "" {
-		return errs.Fail(ctx, 400, "nodeId required")
+		return errs.FailParams(ctx, "nodeId required")
 	}
 	var req dto.ClusterExecReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, 400, "invalid body")
+		return errs.FailParams(ctx, "invalid body")
 	}
 	action := strings.ToLower(strings.TrimSpace(req.Action))
 	switch action {
 	case "start", "stop", "restart", "deploy":
 	default:
-		return errs.Fail(ctx, 400, "action must be start/stop/restart/deploy")
+		return errs.FailParams(ctx, "action must be start/stop/restart/deploy")
 	}
 	resp, err := logic.Cluster().Exec(ctx.Context(), nodeID, action)
 	if err != nil {
@@ -135,5 +136,3 @@ func handleClusterExec(ctx http.Context) error {
 	}
 	return errs.OK(ctx, resp)
 }
-
-

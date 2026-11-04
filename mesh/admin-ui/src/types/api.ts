@@ -4,10 +4,10 @@
  *
  * READ THIS BEFORE WRITING A CALLER. The response interceptor in
  * utils/request.js unwraps the axios envelope and rejects on any code other
- * than 200, after showing an ElMessage itself. Two consequences follow, and
+ * than 0, after showing an ElMessage itself. Two consequences follow, and
  * most of the existing pages get both of them wrong:
  *
- *   1. A resolved response ALWAYS means code === 200. The `if (res.code === 200)`
+ *   1. A resolved response ALWAYS means code === 0. The `if (res.code === 0)`
  *      checks scattered through the views are dead branches -- their `else` can
  *      never run.
  *   2. A failed call arrives as a rejection that has ALREADY been reported to

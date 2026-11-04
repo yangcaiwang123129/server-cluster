@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"server-cluster/share/util"
 	"strconv"
 
 	"server-cluster/mesh/admin/app/logic"
@@ -60,7 +61,7 @@ func handleActivityList(ctx http.Context) error {
 	if err != nil {
 		return errs.FailErr(ctx, err)
 	}
-	return errs.OK(ctx, errs.Page(list, total, pageIndex, pageSize))
+	return errs.OK(ctx, util.Page(list, total, pageIndex, pageSize))
 }
 
 // handleActivityUpdateTime 修改活动时间（仅未开启）。
@@ -74,11 +75,11 @@ func handleActivityList(ctx http.Context) error {
 func handleActivityUpdateTime(ctx http.Context) error {
 	id, err := strconv.ParseInt(ctx.Params("id"), 10, 64)
 	if err != nil || id <= 0 {
-		return errs.Fail(ctx, 400, "invalid activity id")
+		return errs.FailParams(ctx, "invalid activity id")
 	}
 	var req dto.GmActivityTimeReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, 400, "invalid body")
+		return errs.FailParams(ctx, "invalid body")
 	}
 	resp, err := logic.Activity().UpdateTime(ctx.Context(), id, req)
 	if err != nil {
@@ -96,7 +97,7 @@ func handleActivityUpdateTime(ctx http.Context) error {
 func handleActivityEnd(ctx http.Context) error {
 	id, err := strconv.ParseInt(ctx.Params("id"), 10, 64)
 	if err != nil || id <= 0 {
-		return errs.Fail(ctx, 400, "invalid activity id")
+		return errs.FailParams(ctx, "invalid activity id")
 	}
 	resp, err := logic.Activity().End(ctx.Context(), id, "")
 	if err != nil {

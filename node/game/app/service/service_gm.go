@@ -23,7 +23,7 @@ type playerCache interface {
 // checkPlayerID 校验玩家ID。
 func checkPlayerID(playerID int64) error {
 	if playerID <= 0 {
-		return errs.NewError(int(pb.ErrCode_ERR_CODE_INVALID_PARAMS), "invalid player id")
+		return errs.CodeInvalidParams.WithMessage("invalid player id").Err()
 	}
 	return nil
 }

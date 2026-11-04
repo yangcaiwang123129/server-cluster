@@ -71,7 +71,7 @@ export default {
       this.$refs['form'].validate(valid => {
         if (valid) {
           updateUserProfile(this.userForm).then(response => {
-            if (response.code === 200) {
+            if (response.code === 0) {
               this.msgSuccess(response.msg)
             } else {
               this.msgError(response.msg)

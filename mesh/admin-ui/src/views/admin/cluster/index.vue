@@ -268,7 +268,7 @@ const kindType = (kind?: string): 'primary' | 'success' | 'warning' | 'info' | '
 }
 
 const canExec = (row: ClusterNode) =>
-  !!row.endpoint && row.nodeName !== 'admin'
+  !!row.endpoint && row.alias !== 'admin'
 
 // ── 远程执行 ────────────────────────────────────────────
 

@@ -66,8 +66,8 @@ func main() {
 	handler.RegisterActivity(httpComponent.Proxy().Router())
 	// 添加组件到容器
 	container.Add(httpComponent)
-	// 手动注册 admin 到 etcd mesh kind（due 的 HTTP 组件不会自动注册）
-	if ins := buildMeshInstance(consts.MeshInstanceID(), consts.MeshName(), extractHTTPAddr()); ins != nil {
+	// 注册名必须与其余 mesh 实例一致使用 "mesh"，否则查询 /services/mesh/ 时枚举不到 admin。
+	if ins := buildMeshInstance(consts.MeshInstanceID(), cluster.Mesh.String(), extractHTTPAddr()); ins != nil {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		if err := reg.Register(ctx, ins); err != nil {
 			log.Warnf("admin: register to mesh failed: %v", err)
@@ -105,6 +105,7 @@ func extractHTTPAddr() string {
 }
 
 // buildMeshInstance 构造一个 mesh kind 的 ServiceInstance。
+// name 须为集群服务名（"mesh"），alias 由 id 前缀推导（admin-1 → admin）。
 func buildMeshInstance(id, name, endpoint string) *registry.ServiceInstance {
 	if id == "" {
 		return nil

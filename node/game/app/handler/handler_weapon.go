@@ -7,6 +7,7 @@ import (
 	"github.com/dobyte/due/v2/cluster/node"
 
 	"server-cluster/node/game/app/logic"
+	"server-cluster/share/errs"
 	"server-cluster/share/pb"
 )
 
@@ -22,12 +23,12 @@ func init() {
 func handleWeaponUpdate(ctx node.Context) {
 	req := &pb.WeaponUpdateReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.WeaponUpdateResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp, err := logic.Weapon().WeaponUpdate(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.WeaponUpdateResp{Result: errs.ErrResult(err)})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -37,12 +38,12 @@ func handleWeaponUpdate(ctx node.Context) {
 func handleWeaponUpgrade(ctx node.Context) {
 	req := &pb.WeaponUpgradeReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.WeaponUpgradeResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp, err := logic.Weapon().WeaponUpgrade(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.WeaponUpgradeResp{Result: errs.ErrResult(err)})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -52,12 +53,12 @@ func handleWeaponUpgrade(ctx node.Context) {
 func handleWeaponUpQuality(ctx node.Context) {
 	req := &pb.WeaponUpQualityReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.WeaponUpQualityResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp, err := logic.Weapon().WeaponUpQuality(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.WeaponUpQualityResp{Result: errs.ErrResult(err)})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -67,12 +68,12 @@ func handleWeaponUpQuality(ctx node.Context) {
 func handleWeaponBreakthrough(ctx node.Context) {
 	req := &pb.WeaponBreakthroughReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.WeaponBreakthroughResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp, err := logic.Weapon().WeaponBreakthrough(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.WeaponBreakthroughResp{Result: errs.ErrResult(err)})
 		return
 	}
 	_ = ctx.Response(resp)

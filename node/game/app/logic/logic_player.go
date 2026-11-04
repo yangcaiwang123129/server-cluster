@@ -91,7 +91,7 @@ func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.
 	}
 
 	resp.Activities = ActivitySync().Activities()
-	resp.Result = &pb.Result{Code: pb.ErrCode_ERR_CODE_OK}
+	resp.Result = errs.BuildOKResult()
 	resp.ServerTime = xtime.Now().UnixMilli()
 	return nil
 }
@@ -220,7 +220,7 @@ func (this *playerLogic) PlayerGetActor(ctx context.Context, playerID int64) (*g
 	if pa, ok := this.PlayerActors.Get(playerID); ok {
 		return pa, nil
 	}
-	return nil, errs.NewError(int(pb.ErrCode_ERR_CODE_PLAYER_NOT_FOUND), "player actor not found")
+	return nil, errs.CodePlayerNotFound.WithMessage("player actor not found").Err()
 }
 
 // PlayerGetActors 获取全部在线玩家 actor（快照，可在遍历外安全使用）。
@@ -301,7 +301,7 @@ func (this *playerLogic) PlayerDestroyActorIfOffline(ctx context.Context, player
 // PlayerKick 踢玩家下线：销毁 actor（注销在线登记）并强制断开网关连接。
 func (this *playerLogic) PlayerKick(ctx context.Context, playerID int64) error {
 	if !this.PlayerActors.Has(playerID) {
-		return errs.NewError(int(pb.ErrCode_ERR_CODE_PLAYER_NOT_FOUND), "player is not online")
+		return errs.CodePlayerNotFound.WithMessage("player is not online").Err()
 	}
 	if err := this.PlayerDestroyActor(ctx, playerID); err != nil {
 		return err

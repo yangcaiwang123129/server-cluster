@@ -5,13 +5,13 @@ import (
 	"context"
 
 	"server-cluster/internal/router"
-	"server-cluster/node/game/app/logic"
-
-	"github.com/dobyte/due/v2/cluster/node"
-
 	"server-cluster/internal/svc"
+	"server-cluster/node/game/app/logic"
 	"server-cluster/share/errs"
 	"server-cluster/share/pb"
+
+	"github.com/dobyte/due/v2/cluster/node"
+	"github.com/dobyte/due/v2/log"
 )
 
 // loginIPKey context 中 loginIP 的 key（字符串 key，logic 侧用同样的字符串取值即可跨包）。
@@ -43,39 +43,46 @@ func init() {
 func handleVerify(ctx node.Context) {
 	req := &pb.VerifyReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		log.Errorf("handler: verify parse failed: %v", err)
+		_ = ctx.Response(&pb.VerifyResp{Result: errs.ErrResult(err)})
 		return
 	}
 	playerID, err := svc.ParseToken(req.Token)
 	if err != nil {
-		_ = ctx.Response(errs.ErrTokenInvalid)
+		log.Warnf("handler: verify invalid token: %v", err)
+		_ = ctx.Response(&pb.VerifyResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_TOKEN_INVALID, "token invalid or expired")})
 		return
 	}
 	// 绑定网关连接与 uid（后续按 uid 推送经此连接下发）
 	if err := ctx.BindGate(playerID); err != nil {
-		_ = ctx.Response(err)
+		log.Errorf("handler: verify bind gate uid=%d failed: %v", playerID, err)
+		_ = ctx.Response(&pb.VerifyResp{Result: errs.ErrResult(err)})
 		return
 	}
 	// 绑定当前 game 节点与 uid（用于跨节点路由到玩家所在节点）
 	if err := ctx.BindNode(playerID); err != nil {
-		_ = ctx.Response(err)
+		log.Errorf("handler: verify bind node uid=%d failed: %v", playerID, err)
+		_ = ctx.Response(&pb.VerifyResp{Result: errs.ErrResult(err)})
 		return
 	}
-	_ = ctx.Response(&pb.VerifyResp{})
+	_ = ctx.Response(&pb.VerifyResp{Result: errs.BuildOKResult()})
 }
 
 // handleEnterGame 进入游戏：依赖首包 verify 完成的 uid 绑定，playerID 直接取 ctx.UID()。
 func handleEnterGame(ctx node.Context) {
 	req := &pb.EnterGameReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		log.Errorf("handler: enter game parse failed, uid=%d: %v", ctx.UID(), err)
+		_ = ctx.Response(&pb.EnterGameResp{Result: errs.ErrResult(err)})
 		return
 	}
 	// 把客户端 IP 注入 context 供下游 logic 存入 PlayerActor
 	stdCtx := injectLoginIP(ctx.Context(), ctx)
 	resp := &pb.EnterGameResp{}
 	if err := logic.PlayerLogic().EnterGame(stdCtx, ctx.UID(), req, resp); err != nil {
-		_ = ctx.Response(err)
+		log.Errorf("handler: enter game logic failed, uid=%d: %v", ctx.UID(), err)
+		resp.Result = errs.ErrResult(err)
+		_ = ctx.Response(resp)
 		return
 	}
 	_ = ctx.Response(resp)
@@ -85,12 +92,15 @@ func handleEnterGame(ctx node.Context) {
 func handleLeaveGame(ctx node.Context) {
 	req := &pb.LeaveGameReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		log.Errorf("handler: leave game parse failed, uid=%d: %v", ctx.UID(), err)
+		_ = ctx.Response(&pb.LeaveGameResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp := &pb.LeaveGameResp{}
 	if err := logic.PlayerLogic().LeaveGame(ctx.Context(), ctx.UID(), req, resp); err != nil {
-		_ = ctx.Response(err)
+		log.Errorf("handler: leave game logic failed, uid=%d: %v", ctx.UID(), err)
+		resp.Result = errs.ErrResult(err)
+		_ = ctx.Response(resp)
 		return
 	}
 	_ = ctx.Response(resp)
@@ -101,12 +111,13 @@ func handleLeaveGame(ctx node.Context) {
 func handleGiftBuy(ctx node.Context) {
 	req := &pb.GiftBuyReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.GiftBuyResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp, err := logic.PlayerLogic().GiftBuy(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(err)
+		resp.Result = errs.ErrResult(err)
+		_ = ctx.Response(resp)
 		return
 	}
 	_ = ctx.Response(resp)
@@ -116,12 +127,13 @@ func handleGiftBuy(ctx node.Context) {
 func handleExchange(ctx node.Context) {
 	req := &pb.ExchangeReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.ExchangeResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp, err := logic.PlayerLogic().Exchange(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(err)
+		resp.Result = errs.ErrResult(err)
+		_ = ctx.Response(resp)
 		return
 	}
 	_ = ctx.Response(resp)
@@ -131,12 +143,13 @@ func handleExchange(ctx node.Context) {
 func handleRecharge(ctx node.Context) {
 	req := &pb.RechargeReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.RechargeResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp, err := logic.PlayerLogic().Recharge(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(err)
+		resp.Result = errs.ErrResult(err)
+		_ = ctx.Response(resp)
 		return
 	}
 	_ = ctx.Response(resp)
@@ -146,12 +159,13 @@ func handleRecharge(ctx node.Context) {
 func handleAttrOperate(ctx node.Context) {
 	req := &pb.AttrOperateReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(err)
+		_ = ctx.Response(&pb.AttrOperateResp{Result: errs.ErrResult(err)})
 		return
 	}
 	resp, err := logic.PlayerLogic().AttrOperate(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(err)
+		resp.Result = errs.ErrResult(err)
+		_ = ctx.Response(resp)
 		return
 	}
 	_ = ctx.Response(resp)

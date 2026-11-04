@@ -7,7 +7,7 @@ import (
 )
 
 // 业务错误码：数值与 common.proto ErrCode 枚举一致（pb 为唯一定义点，客户端同用）。
-// 号段约定：0 成功；1xxx 通用；2xxx 账号；3xxx 玩家。
+// 号段约定：0 成功；1xxx 通用；2xxx 账号；3xxx 玩家；4xxx 活动/任务。
 //
 // 用法（logic 层）：
 //
@@ -42,15 +42,31 @@ var (
 	CodeActivityUnavailable    = codes.NewCode(int(pb.ErrCode_ERR_CODE_ACTIVITY_UNAVAILABLE), "activity snapshot unavailable")
 )
 
-// ErrXxx 便捷入口：直接拿到 error（CodeXxx.Err()）。
-// 优先级：logic 层推荐 CodeXxx.WithMessage("xxx").Err() 链式覆盖；旧代码可用 ErrXxx。
-var (
-	ErrOK             = CodeOK.Err()
-	ErrInternalError  = CodeInternalError.Err()
-	ErrInvalidParams  = CodeInvalidParams.Err()
-	ErrUnauthorized   = CodeUnauthorized.Err()
-	ErrPlayerNotFound = CodePlayerNotFound.Err()
-	ErrPlayerExists   = CodePlayerExists.Err()
-	ErrPasswordWrong  = CodePasswordWrong.Err()
-	ErrTokenInvalid   = CodeTokenInvalid.Err()
-)
+// BuildOKResult 构造成功 Result（Code = ERR_CODE_OK）。
+func BuildOKResult() *pb.Result {
+	return &pb.Result{Code: pb.ErrCode_ERR_CODE_OK}
+}
+
+// BuildErrResult 手动构造业务错误 Result（logic/handler 层通用）。
+//
+//	code: pb 业务码枚举值
+//	msg:  自定义消息（传 "" 则客户端使用 code 对应默认文案）
+//	args: 可变参数（可选，透传给客户端做参数替换）
+func BuildErrResult(code pb.ErrCode, msg string, args ...string) *pb.Result {
+	return &pb.Result{
+		Code: code,
+		Msg:  msg,
+		Args: args,
+	}
+}
+
+// ErrResult error → pb.Result（handler 层唯一出口，due proto codec 不能序列化裸 error）。
+//
+//	codes.Convert(err) != nil → BuildErrCode(pb.ErrCode(c.Code()), c.Message())
+//	普通 error               → BuildErrCode(ERR_CODE_INTERNAL_ERROR, err.Error())
+func ErrResult(err error) *pb.Result {
+	if c := codes.Convert(err); c != nil {
+		return BuildErrResult(pb.ErrCode(c.Code()), c.Message())
+	}
+	return BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())
+}

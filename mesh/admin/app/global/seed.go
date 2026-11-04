@@ -1,8 +1,6 @@
 package global
 
 import (
-	"errors"
-
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 
@@ -25,7 +23,23 @@ type seedMenu struct {
 	Children []seedMenu
 }
 
-// seed 首次启动时写入管理员、菜单、字典与系统配置；已有账号时视为已初始化。
+// menuAPIRule 菜单-接口关系行（sys_menu_api_rule）。
+type menuAPIRule struct {
+	MenuID int `gorm:"column:menu_id"`
+	APIID  int `gorm:"column:api_id"`
+}
+
+// pendingMenu 菜单树遍历中间态：parent 为已确定的父菜单 ID。
+type pendingMenu struct {
+	node   *seedMenu
+	parent int
+	id     int
+}
+
+// seed 首次启动时写入管理员、字典与系统配置；已有账号时视为已初始化。
+//
+// 菜单/接口/关系不在本函数内写入，统一交给启动流程中紧随其后的 syncMenus 处理，
+// 避免同一份种子逻辑维护两套（逐条 vs 批量）。
 func seed(gdb *gorm.DB) error {
 	var count int64
 	if err := gdb.Model(&model.SysUser{}).Count(&count).Error; err != nil {
@@ -58,10 +72,7 @@ func seed(gdb *gorm.DB) error {
 			Status:   consts.StatusEnabled,
 			Remark:   "初始超级管理员",
 		}
-		if err := tx.Create(&admin).Error; err != nil {
-			return err
-		}
-		return seedMenus(tx, defaultMenus, 0)
+		return tx.Create(&admin).Error
 	})
 }
 
@@ -109,113 +120,174 @@ func seedDicts(tx *gorm.DB) error {
 	return tx.Create(&data).Error
 }
 
-// seedMenus 递归写入菜单与接口关系。
-func seedMenus(tx *gorm.DB, items []seedMenu, parentId int) error {
-	for i := range items {
-		m := items[i].Menu
-		m.ParentId = parentId
-		if err := tx.Create(&m).Error; err != nil {
-			return err
-		}
-		for _, api := range items[i].Apis {
-			var record model.SysApi
-			err := tx.Where("path = ? AND action = ?", api.Path, api.Action).First(&record).Error
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				record = model.SysApi{Path: api.Path, Action: api.Action, Title: api.Title, Type: "BUS"}
-				if err := tx.Create(&record).Error; err != nil {
-					return err
-				}
-			} else if err != nil {
-				return err
-			}
-			if err := tx.Table(enum.TableSysMenuApiRule.String()).
-				Create(map[string]any{"menu_id": m.MenuId, "api_id": record.ApiId}).Error; err != nil {
-				return err
-			}
-		}
-		if err := seedMenus(tx, items[i].Children, m.MenuId); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 // syncMenus 为已初始化的库补齐新增菜单与接口（按 menu_name 幂等，不覆盖既有菜单配置）。
 func syncMenus(gdb *gorm.DB) error {
 	return gdb.Transaction(func(tx *gorm.DB) error {
-		return syncMenuNodes(tx, defaultMenus, 0)
+		return syncMenuNodes(tx, defaultMenus)
 	})
 }
 
-// syncMenuNodes 递归补齐菜单节点：已存在的菜单沿用原 ID 与接口关系，归属/路由/标题以种子为准。
-func syncMenuNodes(tx *gorm.DB, items []seedMenu, parentId int) error {
-	for i := range items {
-		var menu model.SysMenu
-		err := tx.Where("menu_name = ?", items[i].Menu.MenuName).First(&menu).Error
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			menu = items[i].Menu
-			menu.ParentId = parentId
-			if err := tx.Create(&menu).Error; err != nil {
+// syncMenuNodes 批量补齐菜单树、接口与菜单-接口关系。
+//
+// 实现要点（把逐条 SELECT/INSERT 收敛为固定几条 SQL）：
+//  1. 一次性预加载现有菜单、接口、关系三份字典；
+//  2. 菜单按层级遍历：父 ID 确定后再处理子节点，同层新菜单合并为一次 CreateInBatches；
+//  3. 新接口按 (path, action) 去重后一次批量插入；
+//  4. 新关系按 (menu_id, api_id) 去重后一次批量插入；
+//  5. 既有菜单仅在归属/路由/标题/排序/图标有差异时逐条更新（稳定库上为 0 条）。
+func syncMenuNodes(tx *gorm.DB, roots []seedMenu) error {
+	menusByName := make(map[string]model.SysMenu)
+	var menus []model.SysMenu
+	if err := tx.Find(&menus).Error; err != nil {
+		return err
+	}
+	for _, m := range menus {
+		menusByName[m.MenuName] = m
+	}
+
+	apisByKey := make(map[string]model.SysApi)
+	var apis []model.SysApi
+	if err := tx.Find(&apis).Error; err != nil {
+		return err
+	}
+	for _, a := range apis {
+		apisByKey[apiKey(a.Path, a.Action)] = a
+	}
+
+	rules := make(map[[2]int]struct{})
+	var rels []menuAPIRule
+	if err := tx.Table(enum.TableSysMenuApiRule.String()).
+		Select("menu_id", "api_id").Find(&rels).Error; err != nil {
+		return err
+	}
+	for _, r := range rels {
+		rules[[2]int{r.MenuID, r.APIID}] = struct{}{}
+	}
+
+	// 1. 分层解析/创建菜单
+	level := make([]pendingMenu, 0, len(roots))
+	for i := range roots {
+		level = append(level, pendingMenu{node: &roots[i]})
+	}
+	resolved := make([]pendingMenu, 0)
+	for len(level) > 0 {
+		var (
+			toCreate  []model.SysMenu
+			createIdx []int
+		)
+		for i := range level {
+			pm := &level[i]
+			want := pm.node.Menu
+			if cur, ok := menusByName[want.MenuName]; ok {
+				pm.id = cur.MenuId
+				if updates := menuUpdates(cur, want, pm.parent); len(updates) > 0 {
+					if err := tx.Model(&model.SysMenu{}).
+						Where("menu_id = ?", cur.MenuId).Updates(updates).Error; err != nil {
+						return err
+					}
+				}
+				continue
+			}
+			created := want
+			created.ParentId = pm.parent
+			toCreate = append(toCreate, created)
+			createIdx = append(createIdx, i)
+		}
+		if len(toCreate) > 0 {
+			if err := tx.CreateInBatches(&toCreate, 100).Error; err != nil {
 				return err
 			}
-		} else if err != nil {
+			for j := range toCreate {
+				level[createIdx[j]].id = toCreate[j].MenuId
+				menusByName[toCreate[j].MenuName] = toCreate[j]
+			}
+		}
+		resolved = append(resolved, level...)
+		next := make([]pendingMenu, 0)
+		for i := range level {
+			for c := range level[i].node.Children {
+				next = append(next, pendingMenu{node: &level[i].node.Children[c], parent: level[i].id})
+			}
+		}
+		level = next
+	}
+
+	// 2. 批量创建新接口：(path, action) 幂等
+	var newAPIs []model.SysApi
+	newAPIKeys := make(map[string]struct{})
+	for i := range resolved {
+		for _, api := range resolved[i].node.Apis {
+			k := apiKey(api.Path, api.Action)
+			if _, ok := apisByKey[k]; ok {
+				continue
+			}
+			if _, ok := newAPIKeys[k]; ok {
+				continue
+			}
+			newAPIKeys[k] = struct{}{}
+			newAPIs = append(newAPIs, model.SysApi{
+				Path:   api.Path,
+				Action: api.Action,
+				Title:  api.Title,
+				Type:   "BUS",
+			})
+		}
+	}
+	if len(newAPIs) > 0 {
+		if err := tx.CreateInBatches(&newAPIs, 100).Error; err != nil {
 			return err
-		} else {
-			// 内置模块被移动到别的目录或改名时，把既有菜单一并调整过来；
-			// 排序同样以种子为准，保证同一目录下方的内置页面顺序稳定。
-			updates := map[string]any{}
-			if menu.ParentId != parentId {
-				updates["parent_id"] = parentId
-			}
-			if menu.Path != items[i].Menu.Path {
-				updates["path"] = items[i].Menu.Path
-			}
-			if menu.Title != items[i].Menu.Title {
-				updates["title"] = items[i].Menu.Title
-			}
-			if menu.Sort != items[i].Menu.Sort {
-				updates["sort"] = items[i].Menu.Sort
-			}
-			if items[i].Menu.Icon != "" && menu.Icon == "" {
-				updates["icon"] = items[i].Menu.Icon
-			}
-			if len(updates) > 0 {
-				if err := tx.Model(&model.SysMenu{}).Where("menu_id = ?", menu.MenuId).
-					Updates(updates).Error; err != nil {
-					return err
-				}
-			}
 		}
-
-		for _, api := range items[i].Apis {
-			var record model.SysApi
-			err := tx.Where("path = ? AND action = ?", api.Path, api.Action).First(&record).Error
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				record = model.SysApi{Path: api.Path, Action: api.Action, Title: api.Title, Type: "BUS"}
-				if err := tx.Create(&record).Error; err != nil {
-					return err
-				}
-			} else if err != nil {
-				return err
-			}
-
-			var count int64
-			if err := tx.Table(enum.TableSysMenuApiRule.String()).
-				Where("menu_id = ? AND api_id = ?", menu.MenuId, record.ApiId).
-				Count(&count).Error; err != nil {
-				return err
-			}
-			if count == 0 {
-				if err := tx.Table(enum.TableSysMenuApiRule.String()).
-					Create(map[string]any{"menu_id": menu.MenuId, "api_id": record.ApiId}).Error; err != nil {
-					return err
-				}
-			}
+		for i := range newAPIs {
+			apisByKey[apiKey(newAPIs[i].Path, newAPIs[i].Action)] = newAPIs[i]
 		}
+	}
 
-		if err := syncMenuNodes(tx, items[i].Children, menu.MenuId); err != nil {
+	// 3. 批量创建菜单-接口关系：(menu_id, api_id) 幂等
+	var newRules []menuAPIRule
+	for i := range resolved {
+		pm := &resolved[i]
+		for _, api := range pm.node.Apis {
+			record, ok := apisByKey[apiKey(api.Path, api.Action)]
+			if !ok {
+				continue
+			}
+			key := [2]int{pm.id, record.ApiId}
+			if _, ok := rules[key]; ok {
+				continue
+			}
+			rules[key] = struct{}{}
+			newRules = append(newRules, menuAPIRule{MenuID: pm.id, APIID: record.ApiId})
+		}
+	}
+	if len(newRules) > 0 {
+		if err := tx.Table(enum.TableSysMenuApiRule.String()).
+			CreateInBatches(&newRules, 100).Error; err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+// apiKey 接口幂等键：路径 + 方法。
+func apiKey(path, action string) string { return path + "\x00" + action }
+
+// menuUpdates 对比既有菜单与种子，只返回需要更新的字段。
+func menuUpdates(cur, want model.SysMenu, parentID int) map[string]any {
+	updates := make(map[string]any)
+	if cur.ParentId != parentID {
+		updates["parent_id"] = parentID
+	}
+	if cur.Path != want.Path {
+		updates["path"] = want.Path
+	}
+	if cur.Title != want.Title {
+		updates["title"] = want.Title
+	}
+	if cur.Sort != want.Sort {
+		updates["sort"] = want.Sort
+	}
+	if want.Icon != "" && cur.Icon == "" {
+		updates["icon"] = want.Icon
+	}
+	return updates
 }

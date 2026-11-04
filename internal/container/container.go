@@ -136,7 +136,7 @@ func NewContainer[T Grid](typ, gridW, gridH int32, globalID, ownerID int64, owne
 // ============ JSON 序列化：兼容老版本数组格式 ============
 
 // MarshalJSON 实现 json.Marshaler。
-func (c *BaseContainer[T]) MarshalJSON() ([]byte, error) {
+func (this *BaseContainer[T]) MarshalJSON() ([]byte, error) {
 	type alias struct {
 		Type  int32       `json:"type"`
 		GridW int32       `json:"gridW"`
@@ -145,17 +145,17 @@ func (c *BaseContainer[T]) MarshalJSON() ([]byte, error) {
 		Items map[int64]T `json:"items"`
 	}
 	return json.Marshal(alias{
-		Type:  c.Type,
-		GridW: c.GridW,
-		GridH: c.GridH,
-		Ver:   c.Ver,
-		Items: c.EntryMap.Snapshot(),
+		Type:  this.Type,
+		GridW: this.GridW,
+		GridH: this.GridH,
+		Ver:   this.Ver,
+		Items: this.EntryMap.Snapshot(),
 	})
 }
 
 // UnmarshalJSON 实现 json.Unmarshaler。
 // 同时兼容老版本数组格式（[{"itemID":1,...}]）和新版本 object 格式（{"1":{...}}）。
-func (c *BaseContainer[T]) UnmarshalJSON(data []byte) error {
+func (this *BaseContainer[T]) UnmarshalJSON(data []byte) error {
 	var obj struct {
 		Type  int32       `json:"type"`
 		GridW int32       `json:"gridW"`
@@ -164,11 +164,11 @@ func (c *BaseContainer[T]) UnmarshalJSON(data []byte) error {
 		Items map[int64]T `json:"items"`
 	}
 	if err := json.Unmarshal(data, &obj); err == nil && obj.Items != nil {
-		c.Type = obj.Type
-		c.GridW = obj.GridW
-		c.GridH = obj.GridH
-		c.Ver = obj.Ver
-		c.EntryMap.Replace(obj.Items)
+		this.Type = obj.Type
+		this.GridW = obj.GridW
+		this.GridH = obj.GridH
+		this.Ver = obj.Ver
+		this.EntryMap.Replace(obj.Items)
 		return nil
 	}
 	var arr struct {
@@ -181,53 +181,53 @@ func (c *BaseContainer[T]) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &arr); err != nil {
 		return fmt.Errorf("container: BaseContainer unmarshal failed: %w", err)
 	}
-	c.Type = arr.Type
-	c.GridW = arr.GridW
-	c.GridH = arr.GridH
-	c.Ver = arr.Ver
+	this.Type = arr.Type
+	this.GridW = arr.GridW
+	this.GridH = arr.GridH
+	this.Ver = arr.Ver
 	m := make(map[int64]T, len(arr.Items))
 	for _, it := range arr.Items {
 		m[it.ID()] = it
 	}
-	c.EntryMap.Replace(m)
+	this.EntryMap.Replace(m)
 	return nil
 }
 
 // EnsureInit 确保 SafeMap 内部 map 非 nil；从 DB/JSON 加载后调用。
-func (c *BaseContainer[T]) EnsureInit() {
-	if c.EntryMap.Snapshot() == nil {
-		c.EntryMap.Replace(map[int64]T{})
+func (this *BaseContainer[T]) EnsureInit() {
+	if this.EntryMap.Snapshot() == nil {
+		this.EntryMap.Replace(map[int64]T{})
 	}
 }
 
 // ============ 方法实现 ============
 
 // Meta 返回容器元信息。
-func (c *BaseContainer[T]) Meta() ContainerMeta {
+func (this *BaseContainer[T]) Meta() ContainerMeta {
 	return ContainerMeta{
-		Type:      c.Type,
-		GridW:     c.GridW,
-		GridH:     c.GridH,
-		Ver:       c.Ver,
-		OwnerID:   c.OwnerID,
-		OwnerType: c.OwnerType,
-		GlobalID:  c.GlobalID,
+		Type:      this.Type,
+		GridW:     this.GridW,
+		GridH:     this.GridH,
+		Ver:       this.Ver,
+		OwnerID:   this.OwnerID,
+		OwnerType: this.OwnerType,
+		GlobalID:  this.GlobalID,
 	}
 }
 
 // EntryCount 返回对象数量。
-func (c *BaseContainer[T]) EntryCount() int { return c.EntryMap.Len() }
+func (this *BaseContainer[T]) EntryCount() int { return this.EntryMap.Len() }
 
 // GetEntry 按 id 查对象；不存在返回零值 T（nil）。
-func (c *BaseContainer[T]) GetEntry(id int64) T {
-	it, _ := c.EntryMap.Get(id)
+func (this *BaseContainer[T]) GetEntry(id int64) T {
+	it, _ := this.EntryMap.Get(id)
 	return it
 }
 
 // Entries 返回所有对象的浅拷贝切片。
-func (c *BaseContainer[T]) Entries() []T {
-	out := make([]T, 0, c.EntryMap.Len())
-	c.EntryMap.Range(func(id int64, it T) bool {
+func (this *BaseContainer[T]) Entries() []T {
+	out := make([]T, 0, this.EntryMap.Len())
+	this.EntryMap.Range(func(id int64, it T) bool {
 		out = append(out, it)
 		return true
 	})
@@ -235,18 +235,18 @@ func (c *BaseContainer[T]) Entries() []T {
 }
 
 // BumpVersion 版本号 +1。
-func (c *BaseContainer[T]) BumpVersion() int32 { c.Ver++; return c.Ver }
+func (this *BaseContainer[T]) BumpVersion() int32 { this.Ver++; return this.Ver }
 
 // BuildOccupied 构建临时一维占用表（rel 口径）。
 // occ[y*GridW+x] = id，0 为空。每次调用重新构建，不落库。
-func (c *BaseContainer[T]) BuildOccupied() []int64 {
-	occ := make([]int64, c.GridW*c.GridH)
-	c.EntryMap.Range(func(id int64, it T) bool {
-		w, h := c.invokeSizeOf(it)
+func (this *BaseContainer[T]) BuildOccupied() []int64 {
+	occ := make([]int64, this.GridW*this.GridH)
+	this.EntryMap.Range(func(id int64, it T) bool {
+		w, h := this.invokeSizeOf(it)
 		px, py := it.Pos()
 		for dx := int32(0); dx < w; dx++ {
 			for dy := int32(0); dy < h; dy++ {
-				occ[(py+dy)*c.GridW+(px+dx)] = id
+				occ[(py+dy)*this.GridW+(px+dx)] = id
 			}
 		}
 		return true
@@ -254,38 +254,38 @@ func (c *BaseContainer[T]) BuildOccupied() []int64 {
 	return occ
 }
 
-func (c *BaseContainer[T]) invokeSizeOf(it T) (w, h int32) {
-	if c.SizeOf == nil {
+func (this *BaseContainer[T]) invokeSizeOf(it T) (w, h int32) {
+	if this.SizeOf == nil {
 		panic("container: BaseContainer.SizeOf not injected")
 	}
-	return c.SizeOf(it)
+	return this.SizeOf(it)
 }
 
-func (c *BaseContainer[T]) invokeRawSizeOf(it T) (w, h int32) {
-	if c.RawSizeOf == nil {
+func (this *BaseContainer[T]) invokeRawSizeOf(it T) (w, h int32) {
+	if this.RawSizeOf == nil {
 		panic("container: BaseContainer.RawSizeOf not injected")
 	}
-	return c.RawSizeOf(it)
+	return this.RawSizeOf(it)
 }
 
 // canPlace 检查对象能否放在 (x,y)（朝向 rotated）：边界 + 碰撞（排除自身）。
-func (c *BaseContainer[T]) canPlace(occ []int64, it T, x, y int32, rotated bool) bool {
-	return c.canPlaceExcept(occ, it, x, y, rotated, 0)
+func (this *BaseContainer[T]) canPlace(occ []int64, it T, x, y int32, rotated bool) bool {
+	return this.canPlaceExcept(occ, it, x, y, rotated, 0)
 }
 
 // canPlaceExcept 与 canPlace 相同，但把 exceptID 的占用单元格视为空（用于交换/腾挪校验）。
-func (c *BaseContainer[T]) canPlaceExcept(occ []int64, it T, x, y int32, rotated bool, exceptID int64) bool {
-	w, h := c.invokeRawSizeOf(it)
+func (this *BaseContainer[T]) canPlaceExcept(occ []int64, it T, x, y int32, rotated bool, exceptID int64) bool {
+	w, h := this.invokeRawSizeOf(it)
 	if rotated {
 		w, h = h, w
 	}
-	if x < 0 || y < 0 || x+w > c.GridW || y+h > c.GridH {
+	if x < 0 || y < 0 || x+w > this.GridW || y+h > this.GridH {
 		return false
 	}
 	selfID := it.ID()
 	for dx := int32(0); dx < w; dx++ {
 		for dy := int32(0); dy < h; dy++ {
-			owner := occ[(y+dy)*c.GridW+(x+dx)]
+			owner := occ[(y+dy)*this.GridW+(x+dx)]
 			if owner != 0 && owner != selfID && owner != exceptID {
 				return false
 			}
@@ -296,19 +296,19 @@ func (c *BaseContainer[T]) canPlaceExcept(occ []int64, it T, x, y int32, rotated
 
 // swapTarget 判断目标区域是否整块被同一件物品占据（满足时才允许两件物品交换）。
 // 返回占据者 id；目标区域有空格、越界或被多件物品占据时返回 false。
-func (c *BaseContainer[T]) swapTarget(occ []int64, it T, x, y int32, rotated bool) (int64, bool) {
-	w, h := c.invokeRawSizeOf(it)
+func (this *BaseContainer[T]) swapTarget(occ []int64, it T, x, y int32, rotated bool) (int64, bool) {
+	w, h := this.invokeRawSizeOf(it)
 	if rotated {
 		w, h = h, w
 	}
-	if x < 0 || y < 0 || x+w > c.GridW || y+h > c.GridH {
+	if x < 0 || y < 0 || x+w > this.GridW || y+h > this.GridH {
 		return 0, false
 	}
 	selfID := it.ID()
 	var blocker int64
 	for dx := int32(0); dx < w; dx++ {
 		for dy := int32(0); dy < h; dy++ {
-			owner := occ[(y+dy)*c.GridW+(x+dx)]
+			owner := occ[(y+dy)*this.GridW+(x+dx)]
 			if owner == 0 || owner == selfID {
 				return 0, false
 			}
@@ -322,96 +322,96 @@ func (c *BaseContainer[T]) swapTarget(occ []int64, it T, x, y int32, rotated boo
 }
 
 // AddEntry 放入对象：校验 id 唯一、边界与碰撞后存入。
-func (c *BaseContainer[T]) AddEntry(it T) error {
+func (this *BaseContainer[T]) AddEntry(it T) error {
 	id := it.ID()
-	if c.EntryMap.Has(id) {
+	if this.EntryMap.Has(id) {
 		return ErrItemExists
 	}
-	occ := c.BuildOccupied()
+	occ := this.BuildOccupied()
 	px, py := it.Pos()
-	if !c.canPlace(occ, it, px, py, it.IsRotated()) {
+	if !this.canPlace(occ, it, px, py, it.IsRotated()) {
 		return ErrPositionConflict
 	}
-	c.EntryMap.Set(id, it)
-	c.BumpVersion()
+	this.EntryMap.Set(id, it)
+	this.BumpVersion()
 	return nil
 }
 
 // RemoveEntry 删除对象 id，返回被移除的对象。
-func (c *BaseContainer[T]) RemoveEntry(id int64) (T, error) {
-	it, ok := c.EntryMap.Get(id)
+func (this *BaseContainer[T]) RemoveEntry(id int64) (T, error) {
+	it, ok := this.EntryMap.Get(id)
 	if !ok {
 		var zero T
 		return zero, ErrItemNotFound
 	}
-	c.EntryMap.Delete(id)
-	c.BumpVersion()
+	this.EntryMap.Delete(id)
+	this.BumpVersion()
 	return it, nil
 }
 
 // MoveEntry 将对象 id 移到 (toX,toY)，可选旋转。
 // 若目标区域整块被另一件物品占据、且该物品能放回 id 的原位置，则两件物品交换位置；
 // 其余情况（越界、含空格、被多件物品占据、对方放不回原位置）返回 ErrPositionConflict。
-func (c *BaseContainer[T]) MoveEntry(id int64, toX, toY int32, rotated bool) error {
-	it, ok := c.EntryMap.Get(id)
+func (this *BaseContainer[T]) MoveEntry(id int64, toX, toY int32, rotated bool) error {
+	it, ok := this.EntryMap.Get(id)
 	if !ok {
 		return ErrItemNotFound
 	}
-	occ := c.BuildOccupied()
-	if c.canPlace(occ, it, toX, toY, rotated) {
+	occ := this.BuildOccupied()
+	if this.canPlace(occ, it, toX, toY, rotated) {
 		it.SetPos(toX, toY, rotated)
-		c.BumpVersion()
+		this.BumpVersion()
 		return nil
 	}
-	blocker, ok := c.swapTarget(occ, it, toX, toY, rotated)
+	blocker, ok := this.swapTarget(occ, it, toX, toY, rotated)
 	if !ok {
 		return ErrPositionConflict
 	}
-	other, ok := c.EntryMap.Get(blocker)
+	other, ok := this.EntryMap.Get(blocker)
 	if !ok {
 		return ErrPositionConflict
 	}
 	// 被挡住的物品放回 id 的原位置（保持自身朝向），两件物品一次性交换
 	px, py := it.Pos()
 	orot := other.IsRotated()
-	if !c.canPlaceExcept(occ, other, px, py, orot, id) {
+	if !this.canPlaceExcept(occ, other, px, py, orot, id) {
 		return ErrPositionConflict
 	}
 	other.SetPos(px, py, orot)
 	it.SetPos(toX, toY, rotated)
-	c.BumpVersion()
+	this.BumpVersion()
 	return nil
 }
 
 // RotateEntry 原地旋转对象。
-func (c *BaseContainer[T]) RotateEntry(id int64) error {
-	it, ok := c.EntryMap.Get(id)
+func (this *BaseContainer[T]) RotateEntry(id int64) error {
+	it, ok := this.EntryMap.Get(id)
 	if !ok {
 		return ErrItemNotFound
 	}
-	occ := c.BuildOccupied()
+	occ := this.BuildOccupied()
 	px, py := it.Pos()
 	newRot := !it.IsRotated()
-	if !c.canPlace(occ, it, px, py, newRot) {
+	if !this.canPlace(occ, it, px, py, newRot) {
 		return ErrPositionConflict
 	}
 	it.SetPos(px, py, newRot)
-	c.BumpVersion()
+	this.BumpVersion()
 	return nil
 }
 
 // OnDeath 死亡结算：保险箱保留，其他容器清空所有对象。按需调用。
-func (c *BaseContainer[T]) OnDeath() {
-	if c.Type == TypeSecure {
+func (this *BaseContainer[T]) OnDeath() {
+	if this.Type == TypeSecure {
 		return
 	}
-	c.EntryMap.Replace(map[int64]T{})
-	c.BumpVersion()
+	this.EntryMap.Replace(map[int64]T{})
+	this.BumpVersion()
 }
 
 // AutoSort 一键整理：面积降序 → 双朝向扫描 → 放不下整体回滚。
-func (c *BaseContainer[T]) AutoSort() error {
-	all := c.Entries()
+func (this *BaseContainer[T]) AutoSort() error {
+	all := this.Entries()
 	if len(all) == 0 {
 		return nil
 	}
@@ -421,8 +421,8 @@ func (c *BaseContainer[T]) AutoSort() error {
 		snapshots[i] = itemSnap[T]{it: it, oldX: px, oldY: py, oldRot: it.IsRotated()}
 	}
 	sort.SliceStable(all, func(i, j int) bool {
-		wi, hi := c.invokeRawSizeOf(all[i])
-		wj, hj := c.invokeRawSizeOf(all[j])
+		wi, hi := this.invokeRawSizeOf(all[i])
+		wj, hj := this.invokeRawSizeOf(all[j])
 		ai, aj := wi*hi, wj*hj
 		if ai != aj {
 			return ai > aj
@@ -435,21 +435,21 @@ func (c *BaseContainer[T]) AutoSort() error {
 	for _, it := range all {
 		it.SetPos(0, 0, false)
 	}
-	occ := make([]int64, c.GridW*c.GridH)
+	occ := make([]int64, this.GridW*this.GridH)
 	for _, it := range all {
 		placed := false
-		baseW, baseH := c.invokeRawSizeOf(it)
+		baseW, baseH := this.invokeRawSizeOf(it)
 		for _, rot := range []bool{false, true} {
 			w, h := baseW, baseH
 			if rot {
 				w, h = baseH, baseW
 			}
-			for y := int32(0); y <= c.GridH-h && !placed; y++ {
-				for x := int32(0); x <= c.GridW-w && !placed; x++ {
+			for y := int32(0); y <= this.GridH-h && !placed; y++ {
+				for x := int32(0); x <= this.GridW-w && !placed; x++ {
 					free := true
 					for dx := int32(0); dx < w && free; dx++ {
 						for dy := int32(0); dy < h && free; dy++ {
-							if occ[(y+dy)*c.GridW+(x+dx)] != 0 {
+							if occ[(y+dy)*this.GridW+(x+dx)] != 0 {
 								free = false
 							}
 						}
@@ -459,7 +459,7 @@ func (c *BaseContainer[T]) AutoSort() error {
 						id := it.ID()
 						for dx := int32(0); dx < w; dx++ {
 							for dy := int32(0); dy < h; dy++ {
-								occ[(y+dy)*c.GridW+(x+dx)] = id
+								occ[(y+dy)*this.GridW+(x+dx)] = id
 							}
 						}
 						placed = true
@@ -471,15 +471,15 @@ func (c *BaseContainer[T]) AutoSort() error {
 			}
 		}
 		if !placed {
-			c.rollbackSnapshots(snapshots)
+			this.rollbackSnapshots(snapshots)
 			return ErrPositionConflict
 		}
 	}
-	c.BumpVersion()
+	this.BumpVersion()
 	return nil
 }
 
-func (c *BaseContainer[T]) rollbackSnapshots(snapshots []itemSnap[T]) {
+func (this *BaseContainer[T]) rollbackSnapshots(snapshots []itemSnap[T]) {
 	for _, s := range snapshots {
 		s.it.SetPos(s.oldX, s.oldY, s.oldRot)
 	}
@@ -488,26 +488,28 @@ func (c *BaseContainer[T]) rollbackSnapshots(snapshots []itemSnap[T]) {
 // TransferFrom 把源容器 from 里的 id 对象移到本容器的 (toX,toY,rotated) 位置。
 // 两个 BaseContainer[T] 按 GlobalID 升序加各自的 transMu，避免互搬死锁。
 // 目标放不下 / id 不在源容器 / id 已在本容器 时，两个容器均不做任何修改。
-func (c *BaseContainer[T]) TransferFrom(from *BaseContainer[T], id int64, toX, toY int32, rotated bool) error {
-	if from == c {
-		return c.MoveEntry(id, toX, toY, rotated)
+func (this *BaseContainer[T]) TransferFrom(from *BaseContainer[T], id int64, toX, toY int32, rotated bool) error {
+	if from == this {
+		return this.MoveEntry(id, toX, toY, rotated)
 	}
 	srcIt, ok := from.EntryMap.Get(id)
 	if !ok {
 		return ErrItemNotFound
 	}
-	if c.EntryMap.Has(id) {
+	if this.EntryMap.Has(id) {
 		return ErrItemExists
 	}
 	origX, origY := srcIt.Pos()
 	origRot := srcIt.IsRotated()
+	// 失败回滚：注意不能用 defer——成功路径也需要保留新坐标，
+	// defer 会在成功 return 时把物品坐标改回源容器旧位置（transfer 落点错乱 bug）。
 	srcIt.SetPos(toX, toY, rotated)
-	defer srcIt.SetPos(origX, origY, origRot)
-	occ := c.BuildOccupied()
-	if !c.canPlace(occ, srcIt, toX, toY, rotated) {
+	occ := this.BuildOccupied()
+	if !this.canPlace(occ, srcIt, toX, toY, rotated) {
+		srcIt.SetPos(origX, origY, origRot)
 		return ErrPositionConflict
 	}
-	first, second := c, from
+	first, second := this, from
 	if second.GlobalID < first.GlobalID {
 		first, second = second, first
 	}
@@ -517,18 +519,21 @@ func (c *BaseContainer[T]) TransferFrom(from *BaseContainer[T], id int64, toX, t
 	defer second.transMu.Unlock()
 	srcIt2, ok := from.EntryMap.Get(id)
 	if !ok {
+		srcIt.SetPos(origX, origY, origRot)
 		return ErrItemNotFound
 	}
-	if c.EntryMap.Has(id) {
+	if this.EntryMap.Has(id) {
+		srcIt.SetPos(origX, origY, origRot)
 		return ErrItemExists
 	}
-	occ2 := c.BuildOccupied()
-	if !c.canPlace(occ2, srcIt2, toX, toY, rotated) {
+	occ2 := this.BuildOccupied()
+	if !this.canPlace(occ2, srcIt2, toX, toY, rotated) {
+		srcIt.SetPos(origX, origY, origRot)
 		return ErrPositionConflict
 	}
 	from.EntryMap.Delete(id)
-	c.EntryMap.Set(id, srcIt2)
+	this.EntryMap.Set(id, srcIt2)
 	from.BumpVersion()
-	c.BumpVersion()
+	this.BumpVersion()
 	return nil
 }
