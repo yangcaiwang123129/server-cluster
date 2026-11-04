@@ -22,10 +22,10 @@ var (
 	CodePlayerExists    = codes.NewCode(int(pb.ErrCode_ERR_CODE_PLAYER_EXISTS), "player already exists")
 	CodePasswordWrong   = codes.NewCode(int(pb.ErrCode_ERR_CODE_PASSWORD_WRONG), "password wrong")
 	CodeTokenInvalid    = codes.NewCode(int(pb.ErrCode_ERR_CODE_TOKEN_INVALID), "token invalid")
-	CodePlayerBanned    = codes.NewCode(3001, "player is banned")
-	CodeSmsCodeInvalid  = codes.NewCode(3002, "sms code invalid or expired")
-	CodeSmsCooldown     = codes.NewCode(3003, "please wait before requesting another sms code")
-	CodeAuthTypeUnknown = codes.NewCode(3004, "unknown auth type")
+	CodePlayerBanned    = codes.NewCode(int(pb.ErrCode_ERR_CODE_PLAYER_BANNED), "player is banned")
+	CodeSmsCodeInvalid  = codes.NewCode(int(pb.ErrCode_ERR_CODE_SMS_CODE_INVALID), "sms code invalid or expired")
+	CodeSmsCooldown     = codes.NewCode(int(pb.ErrCode_ERR_CODE_SMS_COOLDOWN), "please wait before requesting another sms code")
+	CodeAuthTypeUnknown = codes.NewCode(int(pb.ErrCode_ERR_CODE_AUTH_TYPE_UNKNOWN), "unknown auth type")
 )
 
 // 活动/任务/活动快照错误码（数值与 common.proto ErrCode 一致）。

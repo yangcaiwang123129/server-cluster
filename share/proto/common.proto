@@ -89,6 +89,11 @@ enum ErrCode {
   ERR_CODE_PLAYER_EXISTS = 2001;
   ERR_CODE_PASSWORD_WRONG = 2002;
   ERR_CODE_TOKEN_INVALID = 2003;
+  // 登录鉴权
+  ERR_CODE_PLAYER_BANNED = 3001;    // 玩家已封禁
+  ERR_CODE_SMS_CODE_INVALID = 3002; // 短信验证码错误或已过期
+  ERR_CODE_SMS_COOLDOWN = 3003;     // 短信发送冷却中
+  ERR_CODE_AUTH_TYPE_UNKNOWN = 3004; // 未知鉴权类型
   // 活动
   ERR_CODE_ACTIVITY_NOT_FOUND = 4001;       // 活动不存在
   ERR_CODE_ACTIVITY_NOT_RUNNING = 4002;     // 活动未开启/已结束
