@@ -65,6 +65,14 @@ func (this TableModel) TableName() string {
 	return ""
 }
 
+// PlayerRow 玩家数据行约束：嵌入 TableModel 的行指针（如 *model.PlayerHero）经方法提升自动满足。
+// 用作 PlayerModule 的泛型约束，限定 Load 只能返回可持久化的玩家行。
+type PlayerRow interface {
+	TableName() string
+	BeforeCreate(*gorm.DB) error
+	BeforeUpdate(*gorm.DB) error
+}
+
 // ScanJSON sql.Scanner 通用实现：src 为 []byte/string 时按 JSON 解码到 dst。
 func ScanJSON(src, dst any) error {
 	if src == nil {

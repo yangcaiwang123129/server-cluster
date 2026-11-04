@@ -11,14 +11,14 @@ import (
 // RegisterEquip 注册 GM 装备管理路由。
 func RegisterEquip(router http.Router) {
 	g := gmGroup(router)
-	g.Get("/equip", handleGmEquipList)
-	g.Post("/equip", handleGmEquipAdd)
-	g.Put("/equip", handleGmEquipUpdate)
-	g.Post("/equip/upgrade", handleGmEquipUpgrade)
-	g.Post("/equip/up-quality", handleGmEquipUpQuality)
-	g.Post("/equip/breakthrough", handleGmEquipBreakthrough)
-	g.Post("/equip/wear", handleGmEquipWear)
-	g.Post("/equip/unwear", handleGmEquipUnwear)
+	g.Get("/equip", handle(handleGmEquipList))
+	g.Post("/equip", handle(handleGmEquipAdd))
+	g.Put("/equip", handle(handleGmEquipUpdate))
+	g.Post("/equip/upgrade", handle(handleGmEquipUpgrade))
+	g.Post("/equip/up-quality", handle(handleGmEquipUpQuality))
+	g.Post("/equip/breakthrough", handle(handleGmEquipBreakthrough))
+	g.Post("/equip/wear", handle(handleGmEquipWear))
+	g.Post("/equip/unwear", handle(handleGmEquipUnwear))
 }
 
 // handleGmEquipWear 穿戴装备（同英雄同配置自动顶替）。
@@ -28,16 +28,12 @@ func RegisterEquip(router http.Router) {
 // @Param body body dto.GmEquipWearReq true "穿戴参数（heroId 为 0 时取当前出战英雄）"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/equip/wear [post]
-func handleGmEquipWear(ctx http.Context) error {
+func handleGmEquipWear(ctx http.Context) (*dto.GmEquipEntry, error) {
 	var req dto.GmEquipWearReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.ID <= 0 {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	entry, err := logic.GmEquip().EquipWear(req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, entry)
+	return logic.GmEquip().EquipWear(req)
 }
 
 // handleGmEquipUnwear 卸载装备。
@@ -47,16 +43,12 @@ func handleGmEquipWear(ctx http.Context) error {
 // @Param body body dto.GmEquipUnwearReq true "卸载参数"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/equip/unwear [post]
-func handleGmEquipUnwear(ctx http.Context) error {
+func handleGmEquipUnwear(ctx http.Context) (*dto.GmEquipEntry, error) {
 	var req dto.GmEquipUnwearReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.ID <= 0 {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	entry, err := logic.GmEquip().EquipUnwear(req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, entry)
+	return logic.GmEquip().EquipUnwear(req)
 }
 
 // handleGmEquipList 装备列表。
@@ -66,16 +58,12 @@ func handleGmEquipUnwear(ctx http.Context) error {
 // @Param playerId query int true "玩家ID"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/equip [get]
-func handleGmEquipList(ctx http.Context) error {
+func handleGmEquipList(ctx http.Context) ([]dto.GmEquipEntry, error) {
 	req := dto.GmPlayerReq{PlayerID: queryPlayerID(ctx)}
 	if req.PlayerID <= 0 {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	list, err := logic.GmEquip().EquipList(req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, list)
+	return logic.GmEquip().EquipList(req)
 }
 
 // handleGmEquipAdd 新增装备。
@@ -85,16 +73,12 @@ func handleGmEquipList(ctx http.Context) error {
 // @Param body body dto.GmEquipAddReq true "新增参数"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/equip [post]
-func handleGmEquipAdd(ctx http.Context) error {
+func handleGmEquipAdd(ctx http.Context) (*dto.GmEquipEntry, error) {
 	var req dto.GmEquipAddReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.EquipID <= 0 {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	entry, err := logic.GmEquip().EquipAdd(req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, entry)
+	return logic.GmEquip().EquipAdd(req)
 }
 
 // handleGmEquipUpdate 更新装备。
@@ -104,16 +88,12 @@ func handleGmEquipAdd(ctx http.Context) error {
 // @Param body body dto.GmEquipUpdateReq true "更新参数"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/equip [put]
-func handleGmEquipUpdate(ctx http.Context) error {
+func handleGmEquipUpdate(ctx http.Context) (*dto.GmEquipEntry, error) {
 	var req dto.GmEquipUpdateReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.ID <= 0 {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	entry, err := logic.GmEquip().EquipUpdate(req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, entry)
+	return logic.GmEquip().EquipUpdate(req)
 }
 
 // handleGmEquipUpgrade 装备升级（消耗物品）。
@@ -123,16 +103,12 @@ func handleGmEquipUpdate(ctx http.Context) error {
 // @Param body body dto.GmUpgradeReq true "升级参数（equipId 装备实例ID）"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/equip/upgrade [post]
-func handleGmEquipUpgrade(ctx http.Context) error {
+func handleGmEquipUpgrade(ctx http.Context) (*dto.GmUpgradeResp, error) {
 	var req dto.GmUpgradeReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.EquipID <= 0 {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	resp, err := logic.GmEquip().EquipUpgrade(req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, resp)
+	return logic.GmEquip().EquipUpgrade(req)
 }
 
 // handleGmEquipUpQuality 装备升品（消耗升品素材）。
@@ -142,16 +118,12 @@ func handleGmEquipUpgrade(ctx http.Context) error {
 // @Param body body dto.GmUpgradeReq true "升品参数（equipId 装备实例ID）"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/equip/up-quality [post]
-func handleGmEquipUpQuality(ctx http.Context) error {
+func handleGmEquipUpQuality(ctx http.Context) (*dto.GmUpgradeResp, error) {
 	var req dto.GmUpgradeReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.EquipID <= 0 {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	resp, err := logic.GmEquip().EquipUpQuality(req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, resp)
+	return logic.GmEquip().EquipUpQuality(req)
 }
 
 // handleGmEquipBreakthrough 装备突破（消耗突破素材）。
@@ -161,14 +133,10 @@ func handleGmEquipUpQuality(ctx http.Context) error {
 // @Param body body dto.GmUpgradeReq true "突破参数（equipId 装备实例ID）"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/equip/breakthrough [post]
-func handleGmEquipBreakthrough(ctx http.Context) error {
+func handleGmEquipBreakthrough(ctx http.Context) (*dto.GmUpgradeResp, error) {
 	var req dto.GmUpgradeReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.EquipID <= 0 {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	resp, err := logic.GmEquip().EquipBreakthrough(req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, resp)
+	return logic.GmEquip().EquipBreakthrough(req)
 }

@@ -15,11 +15,6 @@ type GmProvider struct {
 	pb.UnimplementedGameAdminServiceServer
 }
 
-// playerCache 玩家内存缓存的最小落库接口（*cache.Cache[int64, V] 满足）。
-type playerCache interface {
-	FlushKey(ctx context.Context, key int64) error
-}
-
 // checkPlayerID 校验玩家ID。
 func checkPlayerID(playerID int64) error {
 	if playerID <= 0 {
@@ -28,9 +23,9 @@ func checkPlayerID(playerID int64) error {
 	return nil
 }
 
-// flushPlayer GM 操作后立即把该玩家的待写数据同步落库（在线玩家也会随后续操作继续更新）。
-func flushPlayer(ctx context.Context, playerID int64, c playerCache) {
-	if err := c.FlushKey(ctx, playerID); err != nil {
+// flushModule GM 操作后立即同步落库该玩家的模块数据并逐出缓存（在线玩家也会随后续操作继续更新）。
+func flushModule(ctx context.Context, playerID int64, flush func(context.Context, int64) error) {
+	if err := flush(ctx, playerID); err != nil {
 		log.Errorf("service: gm flush player data failed, playerID=%d: %v", playerID, err)
 	}
 }

@@ -15,9 +15,9 @@ import (
 	"strings"
 	"time"
 
+	sftp "github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/agent"
-	sftp "github.com/pkg/sftp"
 )
 
 // SSHConfig 连接远程主机的最小配置。
@@ -39,9 +39,9 @@ type SSHResult struct {
 
 // sshClient 封装单次连接，Run 后立即关闭。
 type sshClient struct {
-	cfg  SSHConfig
-	cli  *ssh.Client
-	ctx  context.Context
+	cfg SSHConfig
+	cli *ssh.Client
+	ctx context.Context
 }
 
 // Dial 建立 SSH 连接。

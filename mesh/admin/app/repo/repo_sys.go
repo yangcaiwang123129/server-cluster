@@ -801,10 +801,7 @@ func (r *Repo) fillMenuApis(menus []model.SysMenu) error {
 	if len(menus) == 0 {
 		return nil
 	}
-	ids := make([]int, 0, len(menus))
-	for _, m := range menus {
-		ids = append(ids, m.MenuId)
-	}
+	ids := util.MapSlice(menus, func(m model.SysMenu) int { return m.MenuId })
 	var apis []model.SysApi
 	if err := d.Table("sys_api").
 		Joins("JOIN sys_menu_api_rule ON sys_menu_api_rule.api_id = sys_api.api_id").
@@ -915,11 +912,7 @@ func buildMenuNodeTree(list []model.SysMenu, parentId int) []MenuNode {
 
 // apiIds 提取接口主键。
 func apiIds(apis []model.SysApi) []int {
-	ids := make([]int, 0, len(apis))
-	for _, a := range apis {
-		ids = append(ids, a.ApiId)
-	}
-	return ids
+	return util.MapSlice(apis, func(a model.SysApi) int { return a.ApiId })
 }
 
 // RoleQuery 角色列表过滤条件。
@@ -1149,11 +1142,7 @@ func SyncAllRoleRules(tx *gorm.DB) error {
 
 // menuIds 提取菜单主键。
 func menuIds(menus []model.SysMenu) []int {
-	ids := make([]int, 0, len(menus))
-	for _, m := range menus {
-		ids = append(ids, m.MenuId)
-	}
-	return ids
+	return util.MapSlice(menus, func(m model.SysMenu) int { return m.MenuId })
 }
 
 // UserQuery 用户列表过滤条件。

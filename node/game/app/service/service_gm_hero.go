@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 
-	"server-cluster/node/game/app/global"
 	"server-cluster/node/game/app/logic"
 	"server-cluster/share/pb"
 )
@@ -17,7 +16,7 @@ func (p *GmProvider) HeroList(ctx context.Context, req *pb.GmHeroListReq) (*pb.H
 	if err != nil {
 		return nil, err
 	}
-	flushPlayer(ctx, req.GetPlayerId(), global.PlayerHeroCache)
+	flushModule(ctx, req.GetPlayerId(), logic.Hero().Flush)
 	return resp, nil
 }
 
@@ -30,7 +29,7 @@ func (p *GmProvider) HeroAdd(ctx context.Context, req *pb.GmHeroAddReq) (*pb.Her
 	if err != nil {
 		return nil, err
 	}
-	flushPlayer(ctx, req.GetPlayerId(), global.PlayerHeroCache)
+	flushModule(ctx, req.GetPlayerId(), logic.Hero().Flush)
 	return resp, nil
 }
 
@@ -43,7 +42,7 @@ func (p *GmProvider) HeroUpdate(ctx context.Context, req *pb.GmHeroUpdateReq) (*
 	if err != nil {
 		return nil, err
 	}
-	flushPlayer(ctx, req.GetPlayerId(), global.PlayerHeroCache)
+	flushModule(ctx, req.GetPlayerId(), logic.Hero().Flush)
 	return resp, nil
 }
 
@@ -56,7 +55,7 @@ func (p *GmProvider) HeroAttribute(ctx context.Context, req *pb.GmHeroAttributeR
 	if err != nil {
 		return nil, err
 	}
-	flushPlayer(ctx, req.GetPlayerId(), global.PlayerHeroCache)
+	flushModule(ctx, req.GetPlayerId(), logic.Hero().Flush)
 	return resp, nil
 }
 
@@ -69,7 +68,7 @@ func (p *GmProvider) HeroUpgrade(ctx context.Context, req *pb.GmHeroUpgradeReq) 
 	if err != nil {
 		return nil, err
 	}
-	flushPlayer(ctx, req.GetPlayerId(), global.PlayerHeroCache)
-	flushPlayer(ctx, req.GetPlayerId(), global.PlayerItemCache)
+	flushModule(ctx, req.GetPlayerId(), logic.Hero().Flush)
+	flushModule(ctx, req.GetPlayerId(), logic.Item().Flush)
 	return resp, nil
 }

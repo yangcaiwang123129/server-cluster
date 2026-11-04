@@ -75,7 +75,7 @@ func handleEnterGame(ctx node.Context) {
 	}
 	// 玩家 actor 已在首包 verify 时创建，这里直接驱动各模块进入游戏
 	resp := &pb.EnterGameResp{}
-	if err := logic.PlayerLogic().EnterGame(ctx.Context(), ctx.UID(), req, resp); err != nil {
+	if err := logic.PlayerLogic().OnEnterGame(ctx.Context(), ctx.UID(), req, resp); err != nil {
 		log.Errorf("handler: enter game logic failed, uid=%d: %v", ctx.UID(), err)
 		resp.Result = errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())
 		_ = ctx.Response(resp)
@@ -93,7 +93,7 @@ func handleLeaveGame(ctx node.Context) {
 		return
 	}
 	resp := &pb.LeaveGameResp{}
-	if err := logic.PlayerLogic().LeaveGame(ctx.Context(), ctx.UID(), req, resp); err != nil {
+	if err := logic.PlayerLogic().OnLeaveGame(ctx.Context(), ctx.UID(), req, resp); err != nil {
 		log.Errorf("handler: leave game logic failed, uid=%d: %v", ctx.UID(), err)
 		resp.Result = errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())
 		_ = ctx.Response(resp)

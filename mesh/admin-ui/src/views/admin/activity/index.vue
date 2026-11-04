@@ -243,7 +243,7 @@ import DateCell from '@/components/DateCell/index.vue'
 import { useTable } from '@/composables'
 import { msgSuccess } from '@/utils/message'
 import { listActivities, listActivityConfigs, updateActivityTime, endActivity } from '@/api/admin/activity'
-import type { GmActivity, GmActivityAsset, GmActivityCfg, GmActivityQuery } from '@/types/admin'
+import type { GmActivity, GmActivityCfg, GmActivityQuery } from '@/types/admin'
 
 // Must match the menu_name the backend serves, or keep-alive silently misses
 defineOptions({ name: 'ActivityManage' })

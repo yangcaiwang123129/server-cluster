@@ -8,6 +8,7 @@ import (
 	"server-cluster/share/pb"
 	"server-cluster/share/singleton"
 	"server-cluster/share/tpl"
+	"server-cluster/share/util"
 )
 
 // GmItemLogic 后台 GM 物品容器模块业务接口。
@@ -156,11 +157,9 @@ func (this *gmItemLogic) ItemAddEntry(req dto.GmItemAddEntryReq) ([]dto.GmItemRe
 
 // toGmItemResps 物品容器条目转响应。
 func toGmItemResps(playerID int64, containers []*pb.ItemContainer) []dto.GmItemResp {
-	list := make([]dto.GmItemResp, 0, len(containers))
-	for _, e := range containers {
-		list = append(list, toGmItemResp(playerID, e))
-	}
-	return list
+	return util.MapSlice(containers, func(e *pb.ItemContainer) dto.GmItemResp {
+		return toGmItemResp(playerID, e)
+	})
 }
 
 // toGmItemResp 单个物品容器转响应（补齐物品名称/占格等展示信息）。

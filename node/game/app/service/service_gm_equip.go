@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 
-	"server-cluster/node/game/app/global"
 	"server-cluster/node/game/app/logic"
 	"server-cluster/share/pb"
 )
@@ -17,7 +16,7 @@ func (p *GmProvider) EquipList(ctx context.Context, req *pb.GmEquipListReq) (*pb
 	if err != nil {
 		return nil, err
 	}
-	flushPlayer(ctx, req.GetPlayerId(), global.PlayerEquipCache)
+	flushModule(ctx, req.GetPlayerId(), logic.Equip().Flush)
 	return &pb.GmEquipListResp{Entries: entries}, nil
 }
 
@@ -30,7 +29,7 @@ func (p *GmProvider) EquipAdd(ctx context.Context, req *pb.GmEquipAddReq) (*pb.E
 	if err != nil {
 		return nil, err
 	}
-	flushPlayer(ctx, req.GetPlayerId(), global.PlayerEquipCache)
+	flushModule(ctx, req.GetPlayerId(), logic.Equip().Flush)
 	return resp, nil
 }
 
@@ -43,7 +42,7 @@ func (p *GmProvider) EquipUpdate(ctx context.Context, req *pb.GmEquipUpdateReq) 
 	if err != nil {
 		return nil, err
 	}
-	flushPlayer(ctx, req.GetPlayerId(), global.PlayerEquipCache)
+	flushModule(ctx, req.GetPlayerId(), logic.Equip().Flush)
 	return resp, nil
 }
 
@@ -57,7 +56,7 @@ func (p *GmProvider) EquipWear(ctx context.Context, req *pb.GmEquipWearReq) (*pb
 	if err != nil {
 		return nil, err
 	}
-	flushPlayer(ctx, req.GetPlayerId(), global.PlayerEquipCache)
+	flushModule(ctx, req.GetPlayerId(), logic.Equip().Flush)
 	return resp, nil
 }
 
@@ -70,7 +69,7 @@ func (p *GmProvider) EquipUnwear(ctx context.Context, req *pb.GmEquipUnwearReq) 
 	if err != nil {
 		return nil, err
 	}
-	flushPlayer(ctx, req.GetPlayerId(), global.PlayerEquipCache)
+	flushModule(ctx, req.GetPlayerId(), logic.Equip().Flush)
 	return resp, nil
 }
 
@@ -83,8 +82,8 @@ func (p *GmProvider) EquipUpgrade(ctx context.Context, req *pb.GmEquipUpgradeReq
 	if err != nil {
 		return nil, err
 	}
-	flushPlayer(ctx, req.GetPlayerId(), global.PlayerEquipCache)
-	flushPlayer(ctx, req.GetPlayerId(), global.PlayerItemCache)
+	flushModule(ctx, req.GetPlayerId(), logic.Equip().Flush)
+	flushModule(ctx, req.GetPlayerId(), logic.Item().Flush)
 	return resp, nil
 }
 
@@ -97,8 +96,8 @@ func (p *GmProvider) EquipUpQuality(ctx context.Context, req *pb.GmEquipUpQualit
 	if err != nil {
 		return nil, err
 	}
-	flushPlayer(ctx, req.GetPlayerId(), global.PlayerEquipCache)
-	flushPlayer(ctx, req.GetPlayerId(), global.PlayerItemCache)
+	flushModule(ctx, req.GetPlayerId(), logic.Equip().Flush)
+	flushModule(ctx, req.GetPlayerId(), logic.Item().Flush)
 	return resp, nil
 }
 
@@ -111,7 +110,7 @@ func (p *GmProvider) EquipBreakthrough(ctx context.Context, req *pb.GmEquipBreak
 	if err != nil {
 		return nil, err
 	}
-	flushPlayer(ctx, req.GetPlayerId(), global.PlayerEquipCache)
-	flushPlayer(ctx, req.GetPlayerId(), global.PlayerItemCache)
+	flushModule(ctx, req.GetPlayerId(), logic.Equip().Flush)
+	flushModule(ctx, req.GetPlayerId(), logic.Item().Flush)
 	return resp, nil
 }

@@ -3,12 +3,13 @@ package cache
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"time"
 
 	"github.com/Yiling-J/theine-go"
-
 	"github.com/dobyte/due/v2/log"
+	"gorm.io/gorm"
 
 	"server-cluster/share/consts"
 )
@@ -99,6 +100,30 @@ func NewCache[K comparable, V any](cfg CacherConfig, loader Loader[K, V], saver 
 // Get 读缓存；miss 时回源并回填。
 func (this *Cache[K, V]) Get(ctx context.Context, key K) (V, error) {
 	return this.cache.Get(ctx, key)
+}
+
+// GetOrInit 读缓存；未建档（gorm.ErrRecordNotFound）时用 init 初始化新行并挂入缓存（异步落库）；
+// 命中后用 fix 修补 DB 中为 NULL 的集合字段（补空集合，避免业务写操作 panic），fix 可为 nil。
+func (this *Cache[K, V]) GetOrInit(
+	ctx context.Context,
+	key K,
+	init func(K) V,
+	fix func(V),
+) (V, error) {
+	row, err := this.cache.Get(ctx, key)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		row = init(key)
+		this.Set(key, row)
+		return row, nil
+	}
+	if err != nil {
+		var zero V
+		return zero, err
+	}
+	if fix != nil {
+		fix(row)
+	}
+	return row, nil
 }
 
 // Set 写缓存并挂入待落库队列（后台异步批量落库）。

@@ -6,6 +6,7 @@ import (
 	"server-cluster/share/model"
 	"server-cluster/share/singleton"
 	"server-cluster/share/tpl"
+	"server-cluster/share/util"
 )
 
 // GmRecordLogic 后台打点记录查询业务接口。
@@ -42,11 +43,9 @@ func (this *gmRecordLogic) RecordList(q dto.GmRecordQuery, pageIndex, pageSize i
 	if err != nil {
 		return nil, 0, err
 	}
-	list := make([]dto.GmRecordEntry, 0, len(rows))
-	for i := range rows {
-		m := &rows[i]
+	return util.MapSlice(rows, func(m model.RecordFields) dto.GmRecordEntry {
 		name, icon := recordDisplay(q.Module, m.CfgID)
-		list = append(list, dto.GmRecordEntry{
+		return dto.GmRecordEntry{
 			PlayerID:  m.PlayerID,
 			Action:    m.Action,
 			CfgID:     m.CfgID,
@@ -54,9 +53,8 @@ func (this *gmRecordLogic) RecordList(q dto.GmRecordQuery, pageIndex, pageSize i
 			Name:      name,
 			IconKey:   icon,
 			CreatedAt: m.CreatedAt,
-		})
-	}
-	return list, total, nil
+		}
+	}), total, nil
 }
 
 // recordDisplay 按模块从配置表回填名称与图标；配置缺失时名称回退为空。

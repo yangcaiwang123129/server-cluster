@@ -60,10 +60,7 @@ func (r *Repo) ListPlayers(q PlayerQuery, pageIndex, pageSize int) ([]dto.Player
 	}
 
 	// ──── 批量补齐 player_extra + player_auth ────
-	ids := make([]int64, 0, len(rows))
-	for i := range rows {
-		ids = append(ids, rows[i].PlayerID)
-	}
+	ids := util.MapSlice(rows, func(m model.Player) int64 { return m.PlayerID })
 
 	// player_extra (昵称/头像/等级/VIP)
 	extras := map[int64]*model.PlayerExtra{}

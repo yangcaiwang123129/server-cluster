@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"strconv"
+	"time"
 
 	"github.com/dobyte/due/v2/cluster"
 	"github.com/dobyte/due/v2/cluster/node"
@@ -17,6 +18,7 @@ import (
 	"server-cluster/node/game/app/global"
 	"server-cluster/share/consts"
 	"server-cluster/share/convert"
+	"server-cluster/share/enum"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
@@ -24,6 +26,12 @@ import (
 	"server-cluster/share/tpl"
 	"server-cluster/share/util"
 )
+
+// playerCache 玩家账号与货币（player，一玩家一行）；读走 LRU，写异步批量 upsert。
+var playerCache = cache.NewPlayerTableCache[model.Player](cache.CacherConfig{Name: enum.TablePlayer.String()})
+
+// playerExtraCache 玩家核心数值（player_extra，一玩家一行）。
+var playerExtraCache = cache.NewPlayerTableCache[model.PlayerExtra](cache.CacherConfig{Name: enum.TablePlayerExtra.String()})
 
 // actorKindPlayer 玩家 actor 类型。
 const actorKindPlayer = "player"
@@ -40,8 +48,8 @@ func init() {
 
 // moduleLogics 持有玩家数据的模块，按进入/离开的统一顺序驱动。
 // 延迟获取单例：各模块的 init 注册顺序不确定，不能在包初始化阶段调用。
-func moduleLogics() []global.ModuleLogic {
-	return []global.ModuleLogic{Item(), Hero(), Weapon(), Skill(), Equip(), Mail(), Task()}
+func moduleLogics() []global.Hook {
+	return []global.Hook{Item(), Hero(), Weapon(), Skill(), Equip(), Mail(), Task()}
 }
 
 // PlayerLogic 获取玩家模块业务单例。
@@ -49,8 +57,8 @@ func PlayerLogic() global.PlayerLogic { return playerLogicInst.MustGet() }
 
 // EnterGame 进入游戏：playerID 由 handler 层从 ctx.UID() 取得（首包 verify 已完成绑定与 actor 创建）。
 // 加载核心数据并驱动各玩家模块预热/建档。
-func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.EnterGameReq, resp *pb.EnterGameResp) error {
-	core, err := global.PlayerExtraCache.Get(ctx, playerID)
+func (this *playerLogic) OnEnterGame(ctx context.Context, playerID int64, req *pb.EnterGameReq, resp *pb.EnterGameResp) error {
+	core, err := playerExtraCache.Get(ctx, playerID)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		// 首次进入，建档并异步落库
 		core = &model.PlayerExtra{
@@ -59,13 +67,13 @@ func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.
 			Level:        consts.DefaultPlayerLevel,
 			SettingsJSON: consts.DefaultPlayerSettingsJSON,
 		}
-		global.PlayerExtraCache.Set(playerID, core)
+		playerExtraCache.Set(playerID, core)
 	} else if err != nil {
 		return err
 	}
 
 	// 账号行由 login 服建档；异常缺失时按全 0 货币处理，不阻断进入游戏
-	player, err := global.PlayerCache.Get(ctx, playerID)
+	player, err := playerCache.Get(ctx, playerID)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		player = &model.Player{PlayerID: playerID}
 	} else if err != nil {
@@ -75,7 +83,7 @@ func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.
 	// 玩家基础属性写入响应，再由各模块把各自的初始状态写入同一响应；任一失败则不进入游戏
 	resp.PlayerAttr = convert.PlayerAttr(core, player)
 	for _, mod := range moduleLogics() {
-		if err := mod.EnterGame(ctx, playerID, req, resp); err != nil {
+		if err := mod.OnEnterGame(ctx, playerID, req, resp); err != nil {
 			return err
 		}
 	}
@@ -90,7 +98,7 @@ func (this *playerLogic) EnterGame(ctx context.Context, playerID int64, req *pb.
 
 // LeaveGame 离开游戏：各模块待写数据同步落库并清缓存，再销毁玩家 actor。
 // 单个模块失败不阻断其余模块，返回首个错误。
-func (this *playerLogic) LeaveGame(ctx context.Context, playerID int64, req *pb.LeaveGameReq, resp *pb.LeaveGameResp) error {
+func (this *playerLogic) OnLeaveGame(ctx context.Context, playerID int64, req *pb.LeaveGameReq, resp *pb.LeaveGameResp) error {
 	var firstErr error
 	record := func(name string, err error) {
 		if err == nil {
@@ -104,11 +112,11 @@ func (this *playerLogic) LeaveGame(ctx context.Context, playerID int64, req *pb.
 
 	// 各玩家数据模块
 	for _, mod := range moduleLogics() {
-		record("module", mod.LeaveGame(ctx, playerID, req, resp))
+		record("module", mod.OnLeaveGame(ctx, playerID, req, resp))
 	}
 	// 无独立模块的玩家表：账号（含货币）、核心
-	record("player", flushAndEvict(ctx, global.PlayerCache, playerID))
-	record("player_core", flushAndEvict(ctx, global.PlayerExtraCache, playerID))
+	record("player", flushAndEvict(ctx, playerCache, playerID))
+	record("player_core", flushAndEvict(ctx, playerExtraCache, playerID))
 
 	record("player_actor", this.PlayerDestroyActor(ctx, playerID))
 	return firstErr
@@ -189,9 +197,9 @@ func (this *playerLogic) Recharge(ctx context.Context, playerID int64, req *pb.R
 		return nil, err
 	}
 	// 累计充值次数（player_extra），缓存未命中不阻断充值流程
-	if extra, err := global.PlayerExtraCache.Get(ctx, playerID); err == nil && extra != nil {
+	if extra, err := playerExtraCache.Get(ctx, playerID); err == nil && extra != nil {
 		extra.TotalRecharge++
-		global.PlayerExtraCache.Set(playerID, extra)
+		playerExtraCache.Set(playerID, extra)
 	}
 	// 固定充值（按配置ID匹配）与累计充值（全匹配）双事件
 	Task().EmitTaskEvent(ctx, global.TaskEvent{
@@ -396,4 +404,40 @@ func (p *playerProcessor) Start() {
 // Destroy 玩家 actor 销毁：注销在线登记。
 func (p *playerProcessor) Destroy() {
 	playerActorMap().Delete(p.playerID)
+}
+
+// CacheCloseStat 单个玩家数据缓存在停服刷盘时的统计，用于停服日志展示。
+type CacheCloseStat struct {
+	Name string
+	Rows int
+	Cost time.Duration
+}
+
+// cacheCloser 停服日志所需的缓存能力（泛型缓存实例的公共方法集合）。
+type cacheCloser interface {
+	Name() string
+	PendingLen() int
+	Close()
+}
+
+// CloseCaches 停止后台落库协程，把剩余待写数据刷入 MySQL，返回每个缓存的刷盘统计。
+func CloseCaches() []CacheCloseStat {
+	closeOne := func(c cacheCloser) CacheCloseStat {
+		begin := time.Now()
+		rows := c.PendingLen()
+		c.Close()
+		return CacheCloseStat{Name: c.Name(), Rows: rows, Cost: time.Since(begin)}
+	}
+	return []CacheCloseStat{
+		closeOne(playerCache),
+		closeOne(playerExtraCache),
+		closeOne(heroCache),
+		closeOne(weaponCache),
+		closeOne(skillCache),
+		closeOne(equipCache),
+		closeOne(itemCache),
+		closeOne(mailCache),
+		closeOne(taskCache),
+		closeOne(activityCache),
+	}
 }

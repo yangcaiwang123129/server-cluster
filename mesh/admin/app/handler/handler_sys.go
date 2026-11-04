@@ -10,6 +10,7 @@ import (
 	"server-cluster/mesh/admin/app/logic"
 	"server-cluster/share/dto"
 	"server-cluster/share/errs"
+	"server-cluster/share/model"
 )
 
 // RegisterSys 注册系统管理路由（鉴权 + 用户 + 角色 + 菜单 + 字典 + 配置 + 日志 + 接口）。
@@ -24,73 +25,73 @@ func RegisterSys(router http.Router) {
 
 	// --- 受保护的系统路由 ---
 	g.Post("/logout", handleLogout)
-	g.Get("/getinfo", handleGetInfo)
-	g.Get("/menurole", handleMenuRole)
+	g.Get("/getinfo", handle(handleGetInfo))
+	g.Get("/menurole", handle(handleMenuRole))
 
 	// 接口管理
-	g.Get("/sys-api", handleApiList)
-	g.Get("/sys-api/:id", handleApiGet)
-	g.Post("/sys-api", handleApiCreate)
-	g.Put("/sys-api/:id", handleApiUpdate)
+	g.Get("/sys-api", handle(handleApiList))
+	g.Get("/sys-api/:id", handle(handleApiGet))
+	g.Post("/sys-api", handle(handleApiCreate))
+	g.Put("/sys-api/:id", handle(handleApiUpdate))
 	g.Delete("/sys-api", handleApiDelete)
 
 	// 用户
-	g.Get("/sys-user", handleUserList)
-	g.Get("/sys-user/:userId", handleUserGet)
-	g.Post("/sys-user", handleUserCreate)
-	g.Put("/sys-user", handleUserUpdate)
+	g.Get("/sys-user", handle(handleUserList))
+	g.Get("/sys-user/:userId", handle(handleUserGet))
+	g.Post("/sys-user", handle(handleUserCreate))
+	g.Put("/sys-user", handle(handleUserUpdate))
 	g.Delete("/sys-user", handleUserDelete)
 	g.Put("/user/status", handleUserStatus)
 	g.Put("/user/pwd/reset", handleUserResetPwd)
-	g.Get("/user/profile", handleUserProfile)
-	g.Put("/sys-user/profile", handleUserProfileUpdate)
+	g.Get("/user/profile", handle(handleUserProfile))
+	g.Put("/sys-user/profile", handle(handleUserProfileUpdate))
 	g.Put("/user/pwd/set", handleUserPwdSet)
 
 	// 角色
-	g.Get("/role", handleRoleList)
-	g.Get("/role/:roleId", handleRoleGet)
-	g.Post("/role", handleRoleCreate)
-	g.Put("/role/:roleId", handleRoleUpdate)
+	g.Get("/role", handle(handleRoleList))
+	g.Get("/role/:roleId", handle(handleRoleGet))
+	g.Post("/role", handle(handleRoleCreate))
+	g.Put("/role/:roleId", handle(handleRoleUpdate))
 	g.Delete("/role", handleRoleDelete)
 	g.Put("/role-status", handleRoleStatus)
 
 	// 菜单
-	g.Get("/menu", handleMenuList)
-	g.Get("/menu/:menuId", handleMenuGet)
-	g.Get("/roleMenuTreeselect/:roleId", handleRoleMenuTreeselect)
-	g.Post("/menu", handleMenuCreate)
-	g.Put("/menu/:id", handleMenuUpdate)
+	g.Get("/menu", handle(handleMenuList))
+	g.Get("/menu/:menuId", handle(handleMenuGet))
+	g.Get("/roleMenuTreeselect/:roleId", handle(handleRoleMenuTreeselect))
+	g.Post("/menu", handle(handleMenuCreate))
+	g.Put("/menu/:id", handle(handleMenuUpdate))
 	g.Delete("/menu", handleMenuDelete)
 
 	// 字典
-	g.Get("/dict/type", handleDictTypeList)
-	g.Get("/dict/type/:id", handleDictTypeGet)
-	g.Post("/dict/type", handleDictTypeCreate)
-	g.Put("/dict/type/:id", handleDictTypeUpdate)
+	g.Get("/dict/type", handle(handleDictTypeList))
+	g.Get("/dict/type/:id", handle(handleDictTypeGet))
+	g.Post("/dict/type", handle(handleDictTypeCreate))
+	g.Put("/dict/type/:id", handle(handleDictTypeUpdate))
 	g.Delete("/dict/type", handleDictTypeDelete)
-	g.Get("/dict/type-option-select", handleDictTypeOptions)
-	g.Get("/dict/data", handleDictDataList)
-	g.Get("/dict/data/:dictCode", handleDictDataGet)
-	g.Post("/dict/data", handleDictDataCreate)
-	g.Put("/dict/data/:dictCode", handleDictDataUpdate)
+	g.Get("/dict/type-option-select", handle(handleDictTypeOptions))
+	g.Get("/dict/data", handle(handleDictDataList))
+	g.Get("/dict/data/:dictCode", handle(handleDictDataGet))
+	g.Post("/dict/data", handle(handleDictDataCreate))
+	g.Put("/dict/data/:dictCode", handle(handleDictDataUpdate))
 	g.Delete("/dict/data", handleDictDataDelete)
-	g.Get("/dict-data/option-select", handleDictDataOptions)
+	g.Get("/dict-data/option-select", handle(handleDictDataOptions))
 
 	// 系统配置
-	g.Get("/config", handleConfigList)
-	g.Get("/config/:id", handleConfigGet)
-	g.Get("/configKey/:key", handleConfigKey)
-	g.Post("/config", handleConfigCreate)
-	g.Put("/config/:id", handleConfigUpdate)
+	g.Get("/config", handle(handleConfigList))
+	g.Get("/config/:id", handle(handleConfigGet))
+	g.Get("/configKey/:key", handle(handleConfigKey))
+	g.Post("/config", handle(handleConfigCreate))
+	g.Put("/config/:id", handle(handleConfigUpdate))
 	g.Delete("/config", handleConfigDelete)
-	g.Get("/set-config", handleGetSetConfig)
+	g.Get("/set-config", handle(handleGetSetConfig))
 	g.Put("/set-config", handleUpdateSetConfig)
 
 	// 日志
-	g.Get("/sys-login-log", handleLoginLogList)
-	g.Get("/sys-login-log/:id", handleLoginLogGet)
+	g.Get("/sys-login-log", handle(handleLoginLogList))
+	g.Get("/sys-login-log/:id", handle(handleLoginLogGet))
 	g.Delete("/sys-login-log", handleLoginLogDelete)
-	g.Get("/sys-opera-log", handleOperaLogList)
+	g.Get("/sys-opera-log", handle(handleOperaLogList))
 	g.Delete("/sys-opera-log", handleOperaLogDelete)
 	g.Delete("/operlog/clean", handleOperaLogClean)
 }
@@ -107,7 +108,7 @@ func RegisterSys(router http.Router) {
 // @Param type query string false "接口类型"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/sys-api [get]
-func handleApiList(ctx http.Context) error {
+func handleApiList(ctx http.Context) (util.PageResp[model.SysApi], error) {
 	var req dto.ApiListReq
 	req.PageIndex, req.PageSize = pageParams(ctx)
 	req.Title = ctx.Query("title")
@@ -120,9 +121,9 @@ func handleApiList(ctx http.Context) error {
 	})
 	list, total, err := logic.ApiList(req)
 	if err != nil {
-		return errs.FailErr(ctx, err)
+		return util.PageResp[model.SysApi]{}, err
 	}
-	return errs.OK(ctx, util.Page(list, total, req.PageIndex, req.PageSize))
+	return util.Page(list, total, req.PageIndex, req.PageSize), nil
 }
 
 // handleApiGet 接口详情。
@@ -132,12 +133,8 @@ func handleApiList(ctx http.Context) error {
 // @Param id path int true "接口ID"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/sys-api/{id} [get]
-func handleApiGet(ctx http.Context) error {
-	m, err := logic.ApiGet(paramInt(ctx, "id"))
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+func handleApiGet(ctx http.Context) (*model.SysApi, error) {
+	return logic.ApiGet(paramInt(ctx, "id"))
 }
 
 // handleApiCreate 新增接口。
@@ -148,16 +145,12 @@ func handleApiGet(ctx http.Context) error {
 // @Param body body dto.ApiSaveReq true "请求体"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/sys-api [post]
-func handleApiCreate(ctx http.Context) error {
+func handleApiCreate(ctx http.Context) (*model.SysApi, error) {
 	var req dto.ApiSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	m, err := logic.ApiCreate(req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+	return logic.ApiCreate(req)
 }
 
 // handleApiUpdate 修改接口。
@@ -169,16 +162,12 @@ func handleApiCreate(ctx http.Context) error {
 // @Param body body dto.ApiSaveReq true "请求体"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/sys-api/{id} [put]
-func handleApiUpdate(ctx http.Context) error {
+func handleApiUpdate(ctx http.Context) (*model.SysApi, error) {
 	var req dto.ApiSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	m, err := logic.ApiUpdate(paramInt(ctx, "id"), req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+	return logic.ApiUpdate(paramInt(ctx, "id"), req)
 }
 
 // handleApiDelete 批量删除接口。
@@ -245,8 +234,8 @@ func handleLogout(ctx http.Context) error { return errs.OK(ctx, nil, "注销成�
 // @Produce json
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/getinfo [get]
-func handleGetInfo(ctx http.Context) error {
-	return errs.OK(ctx, logic.GetInfo(global.CurrentUser(ctx), global.CurrentRole(ctx)))
+func handleGetInfo(ctx http.Context) (dto.GetInfoResp, error) {
+	return logic.GetInfo(global.CurrentUser(ctx), global.CurrentRole(ctx)), nil
 }
 
 // handleMenuRole 当前用户的动态路由菜单树。
@@ -255,12 +244,8 @@ func handleGetInfo(ctx http.Context) error {
 // @Produce json
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/menurole [get]
-func handleMenuRole(ctx http.Context) error {
-	menus, err := logic.MenuRole(global.CurrentRole(ctx))
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, menus)
+func handleMenuRole(ctx http.Context) ([]model.SysMenu, error) {
+	return logic.MenuRole(global.CurrentRole(ctx))
 }
 
 // handleAppConfig 登录页/布局使用的品牌配置（无需鉴权）。
@@ -269,12 +254,8 @@ func handleMenuRole(ctx http.Context) error {
 // @Produce json
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/app-config [get]
-func handleAppConfig(ctx http.Context) error {
-	configs, err := logic.FrontendConfigs()
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, configs)
+func handleAppConfig(ctx http.Context) (map[string]string, error) {
+	return logic.FrontendConfigs()
 }
 
 // handleConfigList 系统配置分页列表。
@@ -288,7 +269,7 @@ func handleAppConfig(ctx http.Context) error {
 // @Param configType query string false "系统内置（Y/N）"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/config [get]
-func handleConfigList(ctx http.Context) error {
+func handleConfigList(ctx http.Context) (util.PageResp[model.SysConfig], error) {
 	var req dto.ConfigListReq
 	req.PageIndex, req.PageSize = pageParams(ctx)
 	req.ConfigName = ctx.Query("configName")
@@ -299,9 +280,9 @@ func handleConfigList(ctx http.Context) error {
 	})
 	list, total, err := logic.ConfigList(req)
 	if err != nil {
-		return errs.FailErr(ctx, err)
+		return util.PageResp[model.SysConfig]{}, err
 	}
-	return errs.OK(ctx, util.Page(list, total, req.PageIndex, req.PageSize))
+	return util.Page(list, total, req.PageIndex, req.PageSize), nil
 }
 
 // handleConfigGet 配置详情。
@@ -311,12 +292,8 @@ func handleConfigList(ctx http.Context) error {
 // @Param id path int true "配置ID"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/config/{id} [get]
-func handleConfigGet(ctx http.Context) error {
-	m, err := logic.ConfigGet(paramInt(ctx, "id"))
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+func handleConfigGet(ctx http.Context) (*model.SysConfig, error) {
+	return logic.ConfigGet(paramInt(ctx, "id"))
 }
 
 // handleConfigKey 按配置键取值。
@@ -326,12 +303,12 @@ func handleConfigGet(ctx http.Context) error {
 // @Param key path string true "配置键"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/configKey/{key} [get]
-func handleConfigKey(ctx http.Context) error {
+func handleConfigKey(ctx http.Context) (dto.ConfigValueResp, error) {
 	m, err := logic.ConfigGetByKey(ctx.Params("key"))
 	if err != nil {
-		return errs.FailErr(ctx, err)
+		return dto.ConfigValueResp{}, err
 	}
-	return errs.OK(ctx, dto.ConfigValueResp{ConfigValue: m.ConfigValue})
+	return dto.ConfigValueResp{ConfigValue: m.ConfigValue}, nil
 }
 
 // handleConfigCreate 新增配置。
@@ -342,16 +319,12 @@ func handleConfigKey(ctx http.Context) error {
 // @Param body body dto.ConfigSaveReq true "请求体"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/config [post]
-func handleConfigCreate(ctx http.Context) error {
+func handleConfigCreate(ctx http.Context) (*model.SysConfig, error) {
 	var req dto.ConfigSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	m, err := logic.ConfigCreate(req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+	return logic.ConfigCreate(req)
 }
 
 // handleConfigUpdate 修改配置。
@@ -363,16 +336,12 @@ func handleConfigCreate(ctx http.Context) error {
 // @Param body body dto.ConfigSaveReq true "请求体"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/config/{id} [put]
-func handleConfigUpdate(ctx http.Context) error {
+func handleConfigUpdate(ctx http.Context) (*model.SysConfig, error) {
 	var req dto.ConfigSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	m, err := logic.ConfigUpdate(paramInt(ctx, "id"), req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+	return logic.ConfigUpdate(paramInt(ctx, "id"), req)
 }
 
 // handleConfigDelete 批量删除配置。
@@ -400,12 +369,8 @@ func handleConfigDelete(ctx http.Context) error {
 // @Produce json
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/set-config [get]
-func handleGetSetConfig(ctx http.Context) error {
-	values, err := logic.SettingValues()
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, values)
+func handleGetSetConfig(ctx http.Context) (map[string]string, error) {
+	return logic.SettingValues()
 }
 
 // handleUpdateSetConfig 批量保存系统配置页的内置键。
@@ -438,7 +403,7 @@ func handleUpdateSetConfig(ctx http.Context) error {
 // @Param status query string false "状态"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/dict/type [get]
-func handleDictTypeList(ctx http.Context) error {
+func handleDictTypeList(ctx http.Context) (util.PageResp[model.SysDictType], error) {
 	var req dto.DictTypeListReq
 	req.PageIndex, req.PageSize = pageParams(ctx)
 	req.DictName = ctx.Query("dictName")
@@ -449,9 +414,9 @@ func handleDictTypeList(ctx http.Context) error {
 	})
 	list, total, err := logic.DictTypeList(req)
 	if err != nil {
-		return errs.FailErr(ctx, err)
+		return util.PageResp[model.SysDictType]{}, err
 	}
-	return errs.OK(ctx, util.Page(list, total, req.PageIndex, req.PageSize))
+	return util.Page(list, total, req.PageIndex, req.PageSize), nil
 }
 
 // handleDictTypeGet 字典类型详情。
@@ -461,12 +426,8 @@ func handleDictTypeList(ctx http.Context) error {
 // @Param id path int true "字典类型ID"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/dict/type/{id} [get]
-func handleDictTypeGet(ctx http.Context) error {
-	m, err := logic.DictTypeGet(paramInt(ctx, "id"))
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+func handleDictTypeGet(ctx http.Context) (*model.SysDictType, error) {
+	return logic.DictTypeGet(paramInt(ctx, "id"))
 }
 
 // handleDictTypeCreate 新增字典类型。
@@ -477,16 +438,12 @@ func handleDictTypeGet(ctx http.Context) error {
 // @Param body body dto.DictTypeSaveReq true "请求体"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/dict/type [post]
-func handleDictTypeCreate(ctx http.Context) error {
+func handleDictTypeCreate(ctx http.Context) (*model.SysDictType, error) {
 	var req dto.DictTypeSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	m, err := logic.DictTypeCreate(req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+	return logic.DictTypeCreate(req)
 }
 
 // handleDictTypeUpdate 修改字典类型。
@@ -498,16 +455,12 @@ func handleDictTypeCreate(ctx http.Context) error {
 // @Param body body dto.DictTypeSaveReq true "请求体"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/dict/type/{id} [put]
-func handleDictTypeUpdate(ctx http.Context) error {
+func handleDictTypeUpdate(ctx http.Context) (*model.SysDictType, error) {
 	var req dto.DictTypeSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	m, err := logic.DictTypeUpdate(paramInt(ctx, "id"), req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+	return logic.DictTypeUpdate(paramInt(ctx, "id"), req)
 }
 
 // handleDictTypeDelete 批量删除字典类型。
@@ -535,12 +488,8 @@ func handleDictTypeDelete(ctx http.Context) error {
 // @Produce json
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/dict/type-option-select [get]
-func handleDictTypeOptions(ctx http.Context) error {
-	options, err := logic.DictTypeOptions()
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, options)
+func handleDictTypeOptions(ctx http.Context) ([]dto.Option, error) {
+	return logic.DictTypeOptions()
 }
 
 // handleDictDataList 字典项分页列表。
@@ -554,7 +503,7 @@ func handleDictTypeOptions(ctx http.Context) error {
 // @Param status query string false "状态"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/dict/data [get]
-func handleDictDataList(ctx http.Context) error {
+func handleDictDataList(ctx http.Context) (util.PageResp[model.SysDictData], error) {
 	var req dto.DictDataListReq
 	req.PageIndex, req.PageSize = pageParams(ctx)
 	req.DictType = ctx.Query("dictType")
@@ -566,9 +515,9 @@ func handleDictDataList(ctx http.Context) error {
 	})
 	list, total, err := logic.DictDataList(req)
 	if err != nil {
-		return errs.FailErr(ctx, err)
+		return util.PageResp[model.SysDictData]{}, err
 	}
-	return errs.OK(ctx, util.Page(list, total, req.PageIndex, req.PageSize))
+	return util.Page(list, total, req.PageIndex, req.PageSize), nil
 }
 
 // handleDictDataGet 字典项详情。
@@ -578,12 +527,8 @@ func handleDictDataList(ctx http.Context) error {
 // @Param dictCode path int true "字典编码"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/dict/data/{dictCode} [get]
-func handleDictDataGet(ctx http.Context) error {
-	m, err := logic.DictDataGet(paramInt(ctx, "dictCode"))
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+func handleDictDataGet(ctx http.Context) (*model.SysDictData, error) {
+	return logic.DictDataGet(paramInt(ctx, "dictCode"))
 }
 
 // handleDictDataCreate 新增字典项。
@@ -594,16 +539,12 @@ func handleDictDataGet(ctx http.Context) error {
 // @Param body body dto.DictDataSaveReq true "请求体"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/dict/data [post]
-func handleDictDataCreate(ctx http.Context) error {
+func handleDictDataCreate(ctx http.Context) (*model.SysDictData, error) {
 	var req dto.DictDataSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	m, err := logic.DictDataCreate(req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+	return logic.DictDataCreate(req)
 }
 
 // handleDictDataUpdate 修改字典项。
@@ -615,16 +556,12 @@ func handleDictDataCreate(ctx http.Context) error {
 // @Param body body dto.DictDataSaveReq true "请求体"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/dict/data/{dictCode} [put]
-func handleDictDataUpdate(ctx http.Context) error {
+func handleDictDataUpdate(ctx http.Context) (*model.SysDictData, error) {
 	var req dto.DictDataSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	m, err := logic.DictDataUpdate(paramInt(ctx, "dictCode"), req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+	return logic.DictDataUpdate(paramInt(ctx, "dictCode"), req)
 }
 
 // handleDictDataDelete 批量删除字典项。
@@ -653,12 +590,8 @@ func handleDictDataDelete(ctx http.Context) error {
 // @Param dictType query string true "字典类型"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/dict-data/option-select [get]
-func handleDictDataOptions(ctx http.Context) error {
-	options, err := logic.DictDataOptions(ctx.Query("dictType"))
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, options)
+func handleDictDataOptions(ctx http.Context) ([]dto.Option, error) {
+	return logic.DictDataOptions(ctx.Query("dictType"))
 }
 
 // handleLoginLogList 登录日志分页列表。
@@ -674,7 +607,7 @@ func handleDictDataOptions(ctx http.Context) error {
 // @Param endTime query string false "结束时间"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/sys-login-log [get]
-func handleLoginLogList(ctx http.Context) error {
+func handleLoginLogList(ctx http.Context) (util.PageResp[model.SysLoginLog], error) {
 	var req dto.LoginLogListReq
 	req.PageIndex, req.PageSize = pageParams(ctx)
 	req.Username = ctx.Query("username")
@@ -687,9 +620,9 @@ func handleLoginLogList(ctx http.Context) error {
 	})
 	list, total, err := logic.LoginLogList(req)
 	if err != nil {
-		return errs.FailErr(ctx, err)
+		return util.PageResp[model.SysLoginLog]{}, err
 	}
-	return errs.OK(ctx, util.Page(list, total, req.PageIndex, req.PageSize))
+	return util.Page(list, total, req.PageIndex, req.PageSize), nil
 }
 
 // handleLoginLogGet 登录日志详情。
@@ -699,12 +632,8 @@ func handleLoginLogList(ctx http.Context) error {
 // @Param id path int true "日志ID"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/sys-login-log/{id} [get]
-func handleLoginLogGet(ctx http.Context) error {
-	m, err := logic.LoginLogGet(paramInt(ctx, "id"))
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+func handleLoginLogGet(ctx http.Context) (*model.SysLoginLog, error) {
+	return logic.LoginLogGet(paramInt(ctx, "id"))
 }
 
 // handleLoginLogDelete 批量删除登录日志。
@@ -739,7 +668,7 @@ func handleLoginLogDelete(ctx http.Context) error {
 // @Param endTime query string false "结束时间"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/sys-opera-log [get]
-func handleOperaLogList(ctx http.Context) error {
+func handleOperaLogList(ctx http.Context) (util.PageResp[model.SysOperaLog], error) {
 	var req dto.OperaLogListReq
 	req.PageIndex, req.PageSize = pageParams(ctx)
 	req.Title = ctx.Query("title")
@@ -752,9 +681,9 @@ func handleOperaLogList(ctx http.Context) error {
 	})
 	list, total, err := logic.OperaLogList(req)
 	if err != nil {
-		return errs.FailErr(ctx, err)
+		return util.PageResp[model.SysOperaLog]{}, err
 	}
-	return errs.OK(ctx, util.Page(list, total, req.PageIndex, req.PageSize))
+	return util.Page(list, total, req.PageIndex, req.PageSize), nil
 }
 
 // handleOperaLogDelete 批量删除操作日志。
@@ -798,16 +727,12 @@ func handleOperaLogClean(ctx http.Context) error {
 // @Param visible query string false "显示状态"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/menu [get]
-func handleMenuList(ctx http.Context) error {
-	menus, err := logic.MenuList(dto.MenuListReq{
+func handleMenuList(ctx http.Context) ([]model.SysMenu, error) {
+	return logic.MenuList(dto.MenuListReq{
 		Title:    ctx.Query("title"),
 		MenuName: ctx.Query("menuName"),
 		Visible:  ctx.Query("visible"),
 	})
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, menus)
 }
 
 // handleMenuGet 菜单详情（含已勾选接口）。
@@ -817,12 +742,8 @@ func handleMenuList(ctx http.Context) error {
 // @Param menuId path int true "菜单ID"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/menu/{menuId} [get]
-func handleMenuGet(ctx http.Context) error {
-	m, err := logic.MenuGet(paramInt(ctx, "menuId"))
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+func handleMenuGet(ctx http.Context) (*model.SysMenu, error) {
+	return logic.MenuGet(paramInt(ctx, "menuId"))
 }
 
 // handleRoleMenuTreeselect 角色授权树。
@@ -832,12 +753,8 @@ func handleMenuGet(ctx http.Context) error {
 // @Param roleId path int true "角色ID"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/roleMenuTreeselect/{roleId} [get]
-func handleRoleMenuTreeselect(ctx http.Context) error {
-	resp, err := logic.RoleMenuTreeselect(paramInt(ctx, "roleId"))
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, resp)
+func handleRoleMenuTreeselect(ctx http.Context) (dto.RoleMenuTreeselectResp, error) {
+	return logic.RoleMenuTreeselect(paramInt(ctx, "roleId"))
 }
 
 // handleMenuCreate 新增菜单。
@@ -848,16 +765,12 @@ func handleRoleMenuTreeselect(ctx http.Context) error {
 // @Param body body dto.MenuSaveReq true "请求体"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/menu [post]
-func handleMenuCreate(ctx http.Context) error {
+func handleMenuCreate(ctx http.Context) (*model.SysMenu, error) {
 	var req dto.MenuSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	m, err := logic.MenuCreate(req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+	return logic.MenuCreate(req)
 }
 
 // handleMenuUpdate 修改菜单。
@@ -869,16 +782,12 @@ func handleMenuCreate(ctx http.Context) error {
 // @Param body body dto.MenuSaveReq true "请求体"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/menu/{id} [put]
-func handleMenuUpdate(ctx http.Context) error {
+func handleMenuUpdate(ctx http.Context) (*model.SysMenu, error) {
 	var req dto.MenuSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	m, err := logic.MenuUpdate(paramInt(ctx, "id"), req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+	return logic.MenuUpdate(paramInt(ctx, "id"), req)
 }
 
 // handleMenuDelete 批量删除菜单（含子孙）。
@@ -911,7 +820,7 @@ func handleMenuDelete(ctx http.Context) error {
 // @Param status query string false "状态"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/role [get]
-func handleRoleList(ctx http.Context) error {
+func handleRoleList(ctx http.Context) (util.PageResp[model.SysRole], error) {
 	var req dto.RoleListReq
 	req.PageIndex, req.PageSize = pageParams(ctx)
 	req.RoleName = ctx.Query("roleName")
@@ -923,9 +832,9 @@ func handleRoleList(ctx http.Context) error {
 	})
 	list, total, err := logic.RoleList(req)
 	if err != nil {
-		return errs.FailErr(ctx, err)
+		return util.PageResp[model.SysRole]{}, err
 	}
-	return errs.OK(ctx, util.Page(list, total, req.PageIndex, req.PageSize))
+	return util.Page(list, total, req.PageIndex, req.PageSize), nil
 }
 
 // handleRoleGet 角色详情（含已分配菜单）。
@@ -935,12 +844,8 @@ func handleRoleList(ctx http.Context) error {
 // @Param roleId path int true "角色ID"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/role/{roleId} [get]
-func handleRoleGet(ctx http.Context) error {
-	m, err := logic.RoleGet(paramInt(ctx, "roleId"))
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+func handleRoleGet(ctx http.Context) (*model.SysRole, error) {
+	return logic.RoleGet(paramInt(ctx, "roleId"))
 }
 
 // handleRoleCreate 新增角色。
@@ -951,16 +856,12 @@ func handleRoleGet(ctx http.Context) error {
 // @Param body body dto.RoleSaveReq true "请求体"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/role [post]
-func handleRoleCreate(ctx http.Context) error {
+func handleRoleCreate(ctx http.Context) (*model.SysRole, error) {
 	var req dto.RoleSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	m, err := logic.RoleCreate(req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+	return logic.RoleCreate(req)
 }
 
 // handleRoleUpdate 修改角色与菜单授权。
@@ -972,16 +873,12 @@ func handleRoleCreate(ctx http.Context) error {
 // @Param body body dto.RoleSaveReq true "请求体"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/role/{roleId} [put]
-func handleRoleUpdate(ctx http.Context) error {
+func handleRoleUpdate(ctx http.Context) (*model.SysRole, error) {
 	var req dto.RoleSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	m, err := logic.RoleUpdate(paramInt(ctx, "roleId"), req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+	return logic.RoleUpdate(paramInt(ctx, "roleId"), req)
 }
 
 // handleRoleDelete 批量删除角色。
@@ -1033,7 +930,7 @@ func handleRoleStatus(ctx http.Context) error {
 // @Param status query string false "状态"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/sys-user [get]
-func handleUserList(ctx http.Context) error {
+func handleUserList(ctx http.Context) (util.PageResp[model.SysUser], error) {
 	var req dto.UserListReq
 	req.PageIndex, req.PageSize = pageParams(ctx)
 	req.Username = ctx.Query("username")
@@ -1046,9 +943,9 @@ func handleUserList(ctx http.Context) error {
 	})
 	list, total, err := logic.UserList(req)
 	if err != nil {
-		return errs.FailErr(ctx, err)
+		return util.PageResp[model.SysUser]{}, err
 	}
-	return errs.OK(ctx, util.Page(list, total, req.PageIndex, req.PageSize))
+	return util.Page(list, total, req.PageIndex, req.PageSize), nil
 }
 
 // handleUserGet 用户详情。
@@ -1058,12 +955,8 @@ func handleUserList(ctx http.Context) error {
 // @Param userId path int true "用户ID"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/sys-user/{userId} [get]
-func handleUserGet(ctx http.Context) error {
-	m, err := logic.UserGet(paramInt(ctx, "userId"))
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+func handleUserGet(ctx http.Context) (*model.SysUser, error) {
+	return logic.UserGet(paramInt(ctx, "userId"))
 }
 
 // handleUserCreate 新增用户。
@@ -1074,16 +967,12 @@ func handleUserGet(ctx http.Context) error {
 // @Param body body dto.UserSaveReq true "请求体"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/sys-user [post]
-func handleUserCreate(ctx http.Context) error {
+func handleUserCreate(ctx http.Context) (*model.SysUser, error) {
 	var req dto.UserSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	m, err := logic.UserCreate(req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+	return logic.UserCreate(req)
 }
 
 // handleUserUpdate 修改用户。
@@ -1094,16 +983,12 @@ func handleUserCreate(ctx http.Context) error {
 // @Param body body dto.UserSaveReq true "请求体"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/sys-user [put]
-func handleUserUpdate(ctx http.Context) error {
+func handleUserUpdate(ctx http.Context) (*model.SysUser, error) {
 	var req dto.UserSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	m, err := logic.UserUpdate(req.UserId, req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+	return logic.UserUpdate(req.UserId, req)
 }
 
 // handleUserDelete 批量删除用户。
@@ -1169,12 +1054,12 @@ func handleUserResetPwd(ctx http.Context) error {
 // @Produce json
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/user/profile [get]
-func handleUserProfile(ctx http.Context) error {
+func handleUserProfile(ctx http.Context) (dto.UserProfileResp, error) {
 	roleName := ""
 	if role := global.CurrentRole(ctx); role != nil {
 		roleName = role.RoleName
 	}
-	return errs.OK(ctx, dto.UserProfileResp{User: global.CurrentUser(ctx), RoleName: roleName})
+	return dto.UserProfileResp{User: global.CurrentUser(ctx), RoleName: roleName}, nil
 }
 
 // handleUserProfileUpdate 修改当前登录用户的资料。
@@ -1185,16 +1070,12 @@ func handleUserProfile(ctx http.Context) error {
 // @Param body body dto.UserProfileUpdateReq true "请求体"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/sys-user/profile [put]
-func handleUserProfileUpdate(ctx http.Context) error {
+func handleUserProfileUpdate(ctx http.Context) (*model.SysUser, error) {
 	var req dto.UserProfileUpdateReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	m, err := logic.UserUpdateProfile(global.CurrentUser(ctx).UserId, req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+	return logic.UserUpdateProfile(global.CurrentUser(ctx).UserId, req)
 }
 
 // handleUserPwdSet 当前登录用户修改密码。

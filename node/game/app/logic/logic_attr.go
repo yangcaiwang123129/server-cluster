@@ -6,7 +6,6 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"server-cluster/node/game/app/global"
 	"server-cluster/share/consts"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
@@ -38,7 +37,7 @@ func (this *playerLogic) AttrOperate(ctx context.Context, playerID int64, req *p
 		return &pb.AttrOperateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "不支持的属性类型")}, nil
 	}
 
-	core, err := global.PlayerExtraCache.Get(ctx, playerID)
+	core, err := playerExtraCache.Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +64,7 @@ func (this *playerLogic) AttrOperate(ctx context.Context, playerID int64, req *p
 		return nil, err
 	}
 
-	global.PlayerExtraCache.Set(playerID, core)
+	playerExtraCache.Set(playerID, core)
 	return &pb.AttrOperateResp{Values: map[int32]*pb.ObjectValue{int32(attr): out}}, nil
 }
 

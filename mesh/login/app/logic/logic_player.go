@@ -2,10 +2,10 @@
 package logic
 
 import (
-	"server-cluster/share/pb"
 	"context"
 	"errors"
 	"fmt"
+	"server-cluster/share/pb"
 	"strconv"
 	"time"
 
@@ -31,7 +31,7 @@ const clientIPKey = "client_ip"
 // redis key prefixes
 const (
 	keySmsCode     = "sms:%s"          // 验证码
-	keySmsCooldown = "sms_cooldown:%s"  // 60s 防刷
+	keySmsCooldown = "sms_cooldown:%s" // 60s 防刷
 	smsCodeTTL     = 5 * time.Minute
 	smsCooldownTTL = 60 * time.Second
 )
@@ -98,9 +98,9 @@ func (this *playerLogic) PlayerLogin(ctx context.Context, req *dto.PlayerLoginRe
 	}
 
 	var (
-		token       string
-		isNew       bool
-		err         error
+		token string
+		isNew bool
+		err   error
 	)
 
 	switch req.LoginType {

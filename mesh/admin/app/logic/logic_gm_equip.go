@@ -7,6 +7,7 @@ import (
 	"server-cluster/share/pb"
 	"server-cluster/share/singleton"
 	"server-cluster/share/tpl"
+	"server-cluster/share/util"
 )
 
 // GmEquipLogic 后台 GM 装备模块业务接口。
@@ -55,11 +56,7 @@ func (this *gmEquipLogic) EquipList(req dto.GmPlayerReq) ([]dto.GmEquipEntry, er
 		&pb.GmEquipListReq{PlayerId: req.PlayerID}, resp); err != nil {
 		return nil, err
 	}
-	list := make([]dto.GmEquipEntry, 0, len(resp.GetEntries()))
-	for _, e := range resp.GetEntries() {
-		list = append(list, toGmEquipEntry(e))
-	}
-	return list, nil
+	return util.MapSlice(resp.GetEntries(), toGmEquipEntry), nil
 }
 
 // EquipAdd 新增装备。

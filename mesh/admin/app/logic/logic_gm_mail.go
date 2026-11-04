@@ -6,6 +6,7 @@ import (
 	"server-cluster/share/dto"
 	"server-cluster/share/pb"
 	"server-cluster/share/singleton"
+	"server-cluster/share/util"
 )
 
 // GmMailLogic 后台 GM 邮件模块业务接口。
@@ -42,11 +43,7 @@ func (this *gmMailLogic) MailList(req dto.GmPlayerReq) ([]dto.GmMailEntry, error
 		&pb.GmMailListReq{PlayerId: req.PlayerID}, resp); err != nil {
 		return nil, err
 	}
-	list := make([]dto.GmMailEntry, 0, len(resp.GetEntries()))
-	for _, e := range resp.GetEntries() {
-		list = append(list, toGmMailEntry(e))
-	}
-	return list, nil
+	return util.MapSlice(resp.GetEntries(), toGmMailEntry), nil
 }
 
 // MailSend 发送邮件。
@@ -54,10 +51,9 @@ func (this *gmMailLogic) MailSend(req dto.GmMailSendReq) (*dto.GmMailEntry, erro
 	ctx, cancel := context.WithTimeout(context.Background(), rpcTimeout)
 	defer cancel()
 
-	atts := make([]*pb.AssetEntry, 0, len(req.Attachments))
-	for _, a := range req.Attachments {
-		atts = append(atts, &pb.AssetEntry{Type: a.Type, CfgId: a.CfgID, Count: a.Count})
-	}
+	atts := util.MapSlice(req.Attachments, func(a dto.GmMailAttachment) *pb.AssetEntry {
+		return &pb.AssetEntry{Type: a.Type, CfgId: a.CfgID, Count: a.Count}
+	})
 	resp := &pb.MailEntry{}
 	callReq := &pb.GmMailSendReq{
 		PlayerId:    req.PlayerID,

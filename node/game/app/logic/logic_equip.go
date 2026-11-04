@@ -2,15 +2,14 @@ package logic
 
 import (
 	"context"
-	"errors"
-	"server-cluster/internal/record"
 	"sort"
 
-	"gorm.io/gorm"
-
+	"server-cluster/internal/cache"
+	"server-cluster/internal/record"
 	"server-cluster/internal/svc"
 	"server-cluster/node/game/app/global"
 	"server-cluster/share/convert"
+	"server-cluster/share/enum"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
@@ -18,6 +17,9 @@ import (
 	"server-cluster/share/tpl"
 	"server-cluster/share/util"
 )
+
+// equipCache 玩家装备持有（player_equip，一玩家一行，装备 map JSON）；读走 LRU，写异步批量 upsert。
+var equipCache = cache.NewPlayerTableCache[model.PlayerEquip](cache.CacherConfig{Name: enum.TablePlayerEquip.String()})
 
 type equipLogic struct{}
 
@@ -33,7 +35,7 @@ func Equip() global.EquipLogic { return equipLogicInst.MustGet() }
 
 // EquipList 装备持有列表（供 HeroList 聚合下发与 GM 查询）。
 func (this *equipLogic) EquipList(ctx context.Context, playerID int64) ([]*pb.EquipEntry, error) {
-	row, err := loadPlayerEquip(ctx, playerID)
+	row, err := this.Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +64,7 @@ func (this *equipLogic) EquipAdd(ctx context.Context, playerID int64, req *pb.Eq
 		return nil, err
 	}
 
-	row, err := loadPlayerEquip(ctx, playerID)
+	row, err := this.Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +74,7 @@ func (this *equipLogic) EquipAdd(ctx context.Context, playerID int64, req *pb.Eq
 		return &pb.EquipAddResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备实例已存在")}, nil
 	}
 
-	global.PlayerEquipCache.Set(playerID, row)
+	this.Save(playerID, row)
 	record.Record(ctx, model.RecordModuleEquip, playerID, model.RecordActionGain, req.GetCfgId(), 1)
 	notifyHero(ctx, playerID, g.HeroID)
 	return &pb.EquipAddResp{EquipEntry: convert.EquipEntry(g)}, nil
@@ -80,7 +82,7 @@ func (this *equipLogic) EquipAdd(ctx context.Context, playerID int64, req *pb.Eq
 
 // EquipUpdate 更新装备：hero_id>0 时改归该英雄，0 保持原归属；按实例ID定位。
 func (this *equipLogic) EquipUpdate(ctx context.Context, playerID int64, req *pb.EquipUpdateReq) (*pb.EquipUpdateResp, error) {
-	row, err := loadPlayerEquip(ctx, playerID)
+	row, err := this.Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +117,7 @@ func (this *equipLogic) EquipUpdate(ctx context.Context, playerID int64, req *pb
 		return &pb.EquipUpdateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备未拥有")}, nil
 	}
 
-	global.PlayerEquipCache.Set(playerID, row)
+	this.Save(playerID, row)
 	if oldHeroID != heroID {
 		notifyHero(ctx, playerID, oldHeroID)
 	}
@@ -126,7 +128,7 @@ func (this *equipLogic) EquipUpdate(ctx context.Context, playerID int64, req *pb
 // EquipWear 穿戴装备：归属改到目标英雄（hero_id=0 取当前出战英雄）。
 // 同一英雄、同一装备配置ID只保留一件穿戴状态，重复穿戴时自动顶替旧的。
 func (this *equipLogic) EquipWear(ctx context.Context, playerID int64, req *pb.EquipWearReq) (*pb.EquipWearResp, error) {
-	row, err := loadPlayerEquip(ctx, playerID)
+	row, err := this.Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +169,7 @@ func (this *equipLogic) EquipWear(ctx context.Context, playerID int64, req *pb.E
 		return nil, err
 	}
 
-	global.PlayerEquipCache.Set(playerID, row)
+	this.Save(playerID, row)
 	if oldHeroID != hero.HeroID {
 		notifyHero(ctx, playerID, oldHeroID)
 	}
@@ -184,7 +186,7 @@ func (this *equipLogic) EquipWear(ctx context.Context, playerID int64, req *pb.E
 
 // EquipUnwear 卸载装备：清穿戴状态，归属英雄保留（0 表示未分配）。
 func (this *equipLogic) EquipUnwear(ctx context.Context, playerID int64, req *pb.EquipUnwearReq) (*pb.EquipUnwearResp, error) {
-	row, err := loadPlayerEquip(ctx, playerID)
+	row, err := this.Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -203,7 +205,7 @@ func (this *equipLogic) EquipUnwear(ctx context.Context, playerID int64, req *pb
 		return &pb.EquipUnwearResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备未拥有")}, nil
 	}
 
-	global.PlayerEquipCache.Set(playerID, row)
+	this.Save(playerID, row)
 	notifyHero(ctx, playerID, heroID)
 	attr := &pb.HeroAttribute{}
 	if heroID > 0 {
@@ -226,7 +228,7 @@ func equipDimGrow(ctx context.Context, playerID int64, id int64,
 	rowOf func(cfgID, dim int32) (material, use int32, ok bool),
 	fullMsg string,
 ) (model.EquipInfo, error) {
-	row, err := loadPlayerEquip(ctx, playerID)
+	row, err := Equip().Get(ctx, playerID)
 	if err != nil {
 		return model.EquipInfo{}, err
 	}
@@ -252,7 +254,7 @@ func equipDimGrow(ctx context.Context, playerID int64, id int64,
 	if !row.UpdateEquip(g) {
 		return model.EquipInfo{}, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备未拥有")
 	}
-	global.PlayerEquipCache.Set(playerID, row)
+	equipCache.Set(playerID, row)
 	notifyHero(ctx, playerID, g.HeroID)
 	return g, nil
 }
@@ -348,8 +350,8 @@ func (this *equipLogic) EquipBreakthrough(ctx context.Context, playerID int64, r
 }
 
 // EnterGame 进入游戏：加载玩家装备持有，未建档则初始化空集合。
-func (this *equipLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
-	if _, err := loadPlayerEquip(ctx, playerID); err != nil {
+func (this *equipLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
+	if _, err := this.Get(ctx, playerID); err != nil {
 		return err
 	}
 	// 装备数据由 EquipList 下发，这里只预热缓存
@@ -357,28 +359,34 @@ func (this *equipLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.Ent
 }
 
 // LeaveGame 离开游戏：装备持有数据同步落库，并逐出内存缓存。
-func (this *equipLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
-	if err := flushAndEvict(ctx, global.PlayerEquipCache, playerID); err != nil {
+func (this *equipLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
+	if err := flushAndEvict(ctx, equipCache, playerID); err != nil {
 		return err
 	}
 	return nil
 }
 
-// loadPlayerEquip 加载玩家装备持有；未建档则初始化空 map 并挂入缓存（异步落库）。
-func loadPlayerEquip(ctx context.Context, playerID int64) (*model.PlayerEquip, error) {
-	row, err := global.PlayerEquipCache.Get(ctx, playerID)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		row = &model.PlayerEquip{PlayerID: playerID, Equips: util.NewSafeMap[int64, model.EquipInfo]()}
-		global.PlayerEquipCache.Set(playerID, row)
-		return row, nil
-	}
-	if err != nil {
-		return nil, err
-	}
-	if row.Equips == nil {
-		row.Equips = util.NewSafeMap[int64, model.EquipInfo]()
-	}
-	return row, nil
+// LoadPlayer 加载玩家装备持有；未建档则初始化空 map 并挂入缓存（异步落库）。
+func (this *equipLogic) Get(ctx context.Context, playerID int64) (*model.PlayerEquip, error) {
+	return equipCache.GetOrInit(ctx, playerID,
+		func(id int64) *model.PlayerEquip {
+			return &model.PlayerEquip{PlayerID: id, Equips: util.NewSafeMap[int64, model.EquipInfo]()}
+		},
+		func(row *model.PlayerEquip) {
+			if row.Equips == nil {
+				row.Equips = util.NewSafeMap[int64, model.EquipInfo]()
+			}
+		})
+}
+
+// Save 写回玩家装备持有并挂入异步落库队列。
+func (this *equipLogic) Save(playerID int64, row *model.PlayerEquip) {
+	equipCache.Set(playerID, row)
+}
+
+// Flush 同步落库并逐出缓存（GM 直改 DB 后强制回源）。
+func (this *equipLogic) Flush(ctx context.Context, playerID int64) error {
+	return flushAndEvict(ctx, equipCache, playerID)
 }
 
 // ============ 资产接口实现（AssetHandler，可叠加型：同配置可多件） ============
@@ -395,7 +403,7 @@ func (this *equipAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备配置不存在")
 	}
 
-	row, err := loadPlayerEquip(ctx, playerID)
+	row, err := Equip().Get(ctx, playerID)
 	if err != nil {
 		return err
 	}
@@ -404,7 +412,7 @@ func (this *equipAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备实例已存在")
 	}
 
-	global.PlayerEquipCache.Set(playerID, row)
+	equipCache.Set(playerID, row)
 	record.Record(ctx, model.RecordModuleEquip, playerID, model.RecordActionGain, cfgID, 1)
 	notifyHero(ctx, playerID, g.HeroID)
 	return nil
@@ -412,28 +420,21 @@ func (this *equipAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _
 
 // Remove 扣除一件指定配置ID的装备实例；未拥有返回错误。
 func (this *equipAssetHandler) Remove(ctx context.Context, playerID int64, cfgID, _ int32) error {
-	row, err := loadPlayerEquip(ctx, playerID)
+	row, err := Equip().Get(ctx, playerID)
 	if err != nil {
 		return err
 	}
-	var target int64
-	var heroID int32
-	found := false
-	row.Equips.Range(func(equipID int64, g model.EquipInfo) bool {
-		if g.CfgID == cfgID {
-			target, heroID, found = equipID, g.HeroID, true
-			return false
-		}
-		return true
+	equipID, info, ok := row.Equips.First(func(_ int64, g model.EquipInfo) bool {
+		return g.CfgID == cfgID
 	})
-	if !found {
+	if !ok {
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备未拥有")
 	}
-	row.DeleteEquip(target)
+	row.DeleteEquip(equipID)
 
-	global.PlayerEquipCache.Set(playerID, row)
+	equipCache.Set(playerID, row)
 	record.Record(ctx, model.RecordModuleEquip, playerID, model.RecordActionConsume, cfgID, 1)
-	notifyHero(ctx, playerID, heroID)
+	notifyHero(ctx, playerID, info.HeroID)
 	return nil
 }
 
@@ -455,7 +456,7 @@ func (this *equipAssetHandler) Update(ctx context.Context, playerID int64, cfgID
 
 // Query 查询指定配置ID的装备持有数量。
 func (this *equipAssetHandler) Query(ctx context.Context, playerID int64, cfgID int32) (int32, error) {
-	row, err := loadPlayerEquip(ctx, playerID)
+	row, err := Equip().Get(ctx, playerID)
 	if err != nil {
 		return 0, err
 	}
@@ -471,7 +472,7 @@ func (this *equipAssetHandler) Query(ctx context.Context, playerID int64, cfgID 
 
 // List 列出全部装备（按配置ID聚合数量，再按配置ID升序）。
 func (this *equipAssetHandler) List(ctx context.Context, playerID int64) ([]*tpl.Asset, error) {
-	row, err := loadPlayerEquip(ctx, playerID)
+	row, err := Equip().Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -492,7 +493,7 @@ func (this *equipAssetHandler) List(ctx context.Context, playerID int64) ([]*tpl
 // AttributeBonus 装备模块对英雄的生命/护甲贡献：基础值 × 等级系数 × 品质系数 × 突破系数。
 // 基础值取 AttributeGear 的 1 星档行；只统计穿戴在该英雄身上的装备。
 func (this *equipLogic) AttributeBonus(ctx context.Context, playerID int64, heroID int32) (*pb.HeroAttribute, error) {
-	row, err := loadPlayerEquip(ctx, playerID)
+	row, err := this.Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}

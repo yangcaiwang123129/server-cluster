@@ -17,6 +17,7 @@ import (
 	"github.com/dobyte/due/v2/log"
 	"github.com/dobyte/due/v2/registry"
 )
+
 // ClusterLogic 集群管理业务接口。
 //
 // 节点数据源：每次列表前从 etcd 拉取当前在线实例 → 与 gm_cluster_node 表做 upsert。
@@ -207,11 +208,9 @@ func clusterNodeQuery(q dto.ClusterNodeQuery) repo.ClusterNodeQuery {
 }
 
 func toClusterNodeRespList(list []model.ClusterNode) []dto.ClusterNodeResp {
-	out := make([]dto.ClusterNodeResp, 0, len(list))
-	for i := range list {
-		out = append(out, *toClusterNodeResp(&list[i]))
-	}
-	return out
+	return util.MapSlice(list, func(m model.ClusterNode) dto.ClusterNodeResp {
+		return *toClusterNodeResp(&m)
+	})
 }
 
 func toClusterNodeResp(m *model.ClusterNode) *dto.ClusterNodeResp {

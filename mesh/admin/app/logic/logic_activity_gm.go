@@ -23,9 +23,8 @@ func (this *activityLogic) Configs() []dto.GmActivityCfgResp {
 		taskCount[task.TaskGroupID]++
 	}
 	cfgs := tpl.T().Activity.GetDataList()
-	out := make([]dto.GmActivityCfgResp, 0, len(cfgs))
-	for _, cfg := range cfgs {
-		out = append(out, dto.GmActivityCfgResp{
+	return util.MapSlice(cfgs, func(cfg *tpl.ActivityCfg) dto.GmActivityCfgResp {
+		return dto.GmActivityCfgResp{
 			ID:                 cfg.Id,
 			Name:               cfg.Name,
 			Desc:               cfg.Desc,
@@ -38,9 +37,8 @@ func (this *activityLogic) Configs() []dto.GmActivityCfgResp {
 			TriggerConditions:  toActivityConditionResp(cfg.TriggerConditionTypes),
 			Rewards:            toActivityAssetResp(cfg.AssetRewards),
 			TaskCount:          taskCount[cfg.Id],
-		})
-	}
-	return out
+		}
+	})
 }
 
 // toActivityConditionResp 触发条件转展示结构。
@@ -84,11 +82,9 @@ func (this *activityLogic) List(ctx context.Context, q dto.GmActivityQuery, page
 	if err != nil {
 		return nil, 0, err
 	}
-	out := make([]dto.GmActivityResp, 0, len(list))
-	for i := range list {
-		out = append(out, *toActivityResp(&list[i]))
-	}
-	return out, total, nil
+	return util.MapSlice(list, func(m model.Activity) dto.GmActivityResp {
+		return *toActivityResp(&m)
+	}), total, nil
 }
 
 // UpdateTime GM 修改活动时间（仅未开启）。

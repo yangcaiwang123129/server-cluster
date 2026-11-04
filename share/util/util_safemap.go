@@ -107,6 +107,39 @@ func (this *SafeMap[K, V]) Range(fn func(key K, val V) bool) {
 	}
 }
 
+// First 返回第一个满足 pred 的键值；无匹配或 nil 指针返回零值与 false。
+// 适合在持有集合上做「是否存在/取首个」判断，替代手写 found + Range。
+func (this *SafeMap[K, V]) First(pred func(key K, val V) bool) (K, V, bool) {
+	if this == nil {
+		var zk K
+		var zv V
+		return zk, zv, false
+	}
+	this.mu.RLock()
+	defer this.mu.RUnlock()
+	for k, v := range this.m {
+		if pred(k, v) {
+			return k, v, true
+		}
+	}
+	var zk K
+	var zv V
+	return zk, zv, false
+}
+
+// Collect 持读锁收集所有满足 pred 的键值到切片；无匹配或 nil 指针返回空切片。
+// 回调只读快照语义，结果可安全带出锁外。
+func (this *SafeMap[K, V]) Collect(pred func(key K, val V) bool) []V {
+	out := make([]V, 0, 8)
+	this.Range(func(key K, val V) bool {
+		if pred(key, val) {
+			out = append(out, val)
+		}
+		return true
+	})
+	return out
+}
+
 // Update 在写锁内对单个 key 执行"读-改-写"，加锁、执行处理函数、解锁一次完成，保证原子性。
 // fn 收到旧值与键是否存在标志，返回新值与是否保留（keep=false 时删除该键）。
 // 回调在锁内执行，内部不得再调用本 SafeMap 的任何方法，否则死锁。

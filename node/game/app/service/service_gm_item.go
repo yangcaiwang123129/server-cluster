@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 
-	"server-cluster/node/game/app/global"
 	"server-cluster/node/game/app/logic"
 	"server-cluster/share/pb"
 )
@@ -17,7 +16,7 @@ func (p *GmProvider) ItemList(ctx context.Context, req *pb.GmItemListReq) (*pb.I
 	if err != nil {
 		return nil, err
 	}
-	flushPlayer(ctx, req.GetPlayerId(), global.PlayerItemCache)
+	flushModule(ctx, req.GetPlayerId(), logic.Item().Flush)
 	return resp, nil
 }
 
@@ -30,7 +29,7 @@ func (p *GmProvider) ItemMove(ctx context.Context, req *pb.GmItemMoveReq) (*pb.I
 	if err != nil {
 		return nil, err
 	}
-	flushPlayer(ctx, req.GetPlayerId(), global.PlayerItemCache)
+	flushModule(ctx, req.GetPlayerId(), logic.Item().Flush)
 	return resp, nil
 }
 
@@ -43,7 +42,7 @@ func (p *GmProvider) ItemRotate(ctx context.Context, req *pb.GmItemRotateReq) (*
 	if err != nil {
 		return nil, err
 	}
-	flushPlayer(ctx, req.GetPlayerId(), global.PlayerItemCache)
+	flushModule(ctx, req.GetPlayerId(), logic.Item().Flush)
 	return resp, nil
 }
 
@@ -56,7 +55,7 @@ func (p *GmProvider) ItemSort(ctx context.Context, req *pb.GmItemSortReq) (*pb.I
 	if err != nil {
 		return nil, err
 	}
-	flushPlayer(ctx, req.GetPlayerId(), global.PlayerItemCache)
+	flushModule(ctx, req.GetPlayerId(), logic.Item().Flush)
 	return resp, nil
 }
 
@@ -69,7 +68,7 @@ func (p *GmProvider) ItemAddEntry(ctx context.Context, req *pb.GmItemAddEntryReq
 	if err != nil {
 		return nil, err
 	}
-	flushPlayer(ctx, req.GetPlayerId(), global.PlayerItemCache)
+	flushModule(ctx, req.GetPlayerId(), logic.Item().Flush)
 	return resp, nil
 }
 
@@ -82,6 +81,6 @@ func (p *GmProvider) ItemTransfer(ctx context.Context, req *pb.GmItemTransferReq
 	if err != nil {
 		return nil, err
 	}
-	flushPlayer(ctx, req.GetPlayerId(), global.PlayerItemCache)
+	flushModule(ctx, req.GetPlayerId(), logic.Item().Flush)
 	return resp, nil
 }

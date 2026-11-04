@@ -7,6 +7,7 @@ import (
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
 	"server-cluster/share/tpl"
+	"server-cluster/share/util"
 )
 
 // HeroEntry 英雄持有数据 → wire 条目（仅英雄状态；绑定的武器/技能/装备由业务层组装）。
@@ -57,19 +58,17 @@ func EquipEntry(g model.EquipInfo) *pb.EquipEntry {
 
 // MailEntry 邮件持有数据 → wire 条目。
 func MailEntry(m model.MailInfo) *pb.MailEntry {
-	atts := make([]*pb.AssetEntry, 0, len(m.Attachments))
-	for _, a := range m.Attachments {
-		atts = append(atts, &pb.AssetEntry{Type: a.Type, CfgId: a.CfgID, Count: a.Count})
-	}
 	return &pb.MailEntry{
-		Id:          m.MailID,
-		Title:       m.Title,
-		Content:     m.Content,
-		Attachments: atts,
-		Status:      pb.MailStatus(m.Status),
-		CreatedAt:   m.CreatedAt,
-		ReadAt:      m.ReadAt,
-		ClaimedAt:   m.ClaimedAt,
+		Id:      m.MailID,
+		Title:   m.Title,
+		Content: m.Content,
+		Attachments: util.MapSlice(m.Attachments, func(a model.MailAttachment) *pb.AssetEntry {
+			return &pb.AssetEntry{Type: a.Type, CfgId: a.CfgID, Count: a.Count}
+		}),
+		Status:    pb.MailStatus(m.Status),
+		CreatedAt: m.CreatedAt,
+		ReadAt:    m.ReadAt,
+		ClaimedAt: m.ClaimedAt,
 	}
 }
 

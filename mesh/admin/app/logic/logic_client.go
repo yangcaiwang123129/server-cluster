@@ -255,26 +255,26 @@ func SimLogin(req dto.SimLoginReq) (*dto.SimLoginResp, error) {
 
 	payload, err := json.Marshal(body)
 	if err != nil {
-		return nil, errs.NewError(errs.RespCodeInternal,err.Error())
+		return nil, errs.NewError(errs.RespCodeInternal, err.Error())
 	}
 
 	start := time.Now()
 	httpReq, err := http.NewRequest(http.MethodPost, loginAddr+path, bytes.NewReader(payload))
 	if err != nil {
-		return nil, errs.NewError(errs.RespCodeInternal,"登录服地址不合法: "+err.Error())
+		return nil, errs.NewError(errs.RespCodeInternal, "登录服地址不合法: "+err.Error())
 	}
 	httpReq.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{Timeout: simLoginTimeout}
 	resp, err := client.Do(httpReq)
 	if err != nil {
-		return nil, errs.NewError(errs.RespCodeInternal,"请求登录服失败: "+err.Error())
+		return nil, errs.NewError(errs.RespCodeInternal, "请求登录服失败: "+err.Error())
 	}
 	defer resp.Body.Close()
 
 	raw, err := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
 	if err != nil {
-		return nil, errs.NewError(errs.RespCodeInternal,"读取登录服响应失败: "+err.Error())
+		return nil, errs.NewError(errs.RespCodeInternal, "读取登录服响应失败: "+err.Error())
 	}
 
 	var env struct {
@@ -286,7 +286,7 @@ func SimLogin(req dto.SimLoginReq) (*dto.SimLoginResp, error) {
 		} `json:"data"`
 	}
 	if err := json.Unmarshal(raw, &env); err != nil {
-		return nil, errs.NewError(errs.RespCodeInternal,"登录服响应无法解析: "+err.Error())
+		return nil, errs.NewError(errs.RespCodeInternal, "登录服响应无法解析: "+err.Error())
 	}
 	if resp.StatusCode != http.StatusOK || env.Code != 0 {
 		msg := env.Message
@@ -379,7 +379,7 @@ func SimConnect(sessionID string) (*dto.SimConnectResp, error) {
 	start := time.Now()
 	conn, err := client.Dial(url)
 	if err != nil {
-		return nil, errs.NewError(errs.RespCodeInternal,"连接网关失败("+url+"): "+err.Error())
+		return nil, errs.NewError(errs.RespCodeInternal, "连接网关失败("+url+"): "+err.Error())
 	}
 	s.conn = conn
 
@@ -439,25 +439,25 @@ func SimStep(req dto.SimStepReq) (*dto.SimStepResp, error) {
 		reqP = &pb.LeaveGameReq{}
 		respP = &pb.LeaveGameResp{}
 	default:
-		return nil, errs.NewError(errs.RespCodeInternal,"未知步骤: "+req.Step)
+		return nil, errs.NewError(errs.RespCodeInternal, "未知步骤: "+req.Step)
 	}
 
 	payload, err := proto.Marshal(reqP)
 	if err != nil {
-		return nil, errs.NewError(errs.RespCodeInternal,"序列化请求失败: "+err.Error())
+		return nil, errs.NewError(errs.RespCodeInternal, "序列化请求失败: "+err.Error())
 	}
 
 	s.seq++
 	seq := s.seq
 	buf, err := s.packer.PackMessage(route, seq, payload)
 	if err != nil {
-		return nil, errs.NewError(errs.RespCodeInternal,"打包报文失败: "+err.Error())
+		return nil, errs.NewError(errs.RespCodeInternal, "打包报文失败: "+err.Error())
 	}
 
 	start := time.Now()
 	if err := s.conn.Push(buf); err != nil {
 		buf.Release()
-		return nil, errs.NewError(errs.RespCodeInternal,"发送报文失败: "+err.Error())
+		return nil, errs.NewError(errs.RespCodeInternal, "发送报文失败: "+err.Error())
 	}
 
 	timeout := simStepTimeout
@@ -475,7 +475,7 @@ func SimStep(req dto.SimStepReq) (*dto.SimStepResp, error) {
 	respJSON := json.RawMessage(`{}`)
 	if received {
 		if err := proto.Unmarshal(frame.payload, respP); err != nil {
-			return nil, errs.NewError(errs.RespCodeInternal,fmt.Sprintf("网关响应解析失败(route=%d seq=%d): %v", route, seq, err))
+			return nil, errs.NewError(errs.RespCodeInternal, fmt.Sprintf("网关响应解析失败(route=%d seq=%d): %v", route, seq, err))
 		}
 		respJSON = simProtoJSON(respP)
 	} else {

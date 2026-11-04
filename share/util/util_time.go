@@ -34,8 +34,8 @@ const (
 	YearOnly   = "2006"
 
 	// 业务周期 key 用的紧凑格式。
-	DateCompact   = "20060102"
-	MonthCompact  = "200601"
+	DateCompact  = "20060102"
+	MonthCompact = "200601"
 )
 
 const (

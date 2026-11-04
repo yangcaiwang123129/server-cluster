@@ -4,35 +4,51 @@ package global
 
 import (
 	"context"
+	"server-cluster/internal/cache"
+	"server-cluster/share/model"
 
 	"server-cluster/share/pb"
 	"server-cluster/share/tpl"
 )
 
-// ModuleLogic 玩家模块生命周期接口：进入游戏预热/建档该模块数据，离开游戏同步落库并清除缓存。
-// 所有持有玩家数据的模块都实现它，由 PlayerLogic 的 EnterGame/LeaveGame 统一驱动。
-type ModuleLogic interface {
-	// EnterGame 进入游戏：加载并预热该模块的玩家数据（未建档则初始化），初始状态写入 resp
-	EnterGame(ctx context.Context, playerID int64, req *pb.EnterGameReq, resp *pb.EnterGameResp) error
-	// LeaveGame 离开游戏：该玩家的待写数据同步落库，并逐出内存缓存
-	LeaveGame(ctx context.Context, playerID int64, req *pb.LeaveGameReq, resp *pb.LeaveGameResp) error
+// PlayerLifecycle 玩家数据模块进出场钩子：进入游戏预热/建档该模块数据，离开游戏同步落库并清除缓存。
+// 所有持有玩家数据的模块都实现它，由 PlayerLogic 的 EnterGame/LeaveGame 统一驱动
+// （模块行类型异构，遍历走非泛型接口）。
+type PlayerLifecycle interface {
+	// OnEnterGame 进入游戏：加载并预热该模块的玩家数据（未建档则初始化），初始状态写入 resp
+	OnEnterGame(ctx context.Context, playerID int64, req *pb.EnterGameReq, resp *pb.EnterGameResp) error
+	// OnLeaveGame 离开游戏：该玩家的待写数据同步落库，并逐出内存缓存
+	OnLeaveGame(ctx context.Context, playerID int64, req *pb.LeaveGameReq, resp *pb.LeaveGameResp) error
+}
+
+// PlayerModule 玩家数据模块接口：业务一律通过模块单例读写，不直接操作底层缓存实例。
+// T 为该模块的玩家行指针（如 *model.PlayerHero），约束 model.PlayerRow 保证可持久化。
+// 进出场行为复用 PlayerLifecycle（moduleLogics() 驱动异构模块遍历）。
+type PlayerModule[T model.PlayerRow] interface {
+	PlayerLifecycle
+	// Load 读缓存；未建档则初始化并挂入缓存（异步落库）。语义同 Cache.GetOrInit。
+	Load(ctx context.Context, playerID int64) (T, error)
+	// Save 写回该玩家的行并挂入异步落库队列。立即落库请调用方另行 Flush。
+	Save(playerID int64, row T)
+	// Flush 同步落库该玩家的行并逐出缓存（GM 直改 DB 后强制下次读回源）。
+	Flush(ctx context.Context, playerID int64) error
 }
 
 // PlayerLogic 玩家模块业务接口：玩家生命周期 + 玩家资产消费入口（礼包购买/兑换/充值）。
 type PlayerLogic interface {
-	ModuleLogic
-	// PlayerGetActor 获取玩家actor
-	PlayerGetActor(ctx context.Context, playerID int64) (*PlayerActor, error)
-	// PlayerGetActors 玩家获取所有actor
-	PlayerGetActors(ctx context.Context) ([]*PlayerActor, error)
-	// PlayerCreateActor 玩家创建actor（verify 首包绑定后调用）；loginIP 由 handler 从 node.Context.GetIP() 取后传入，内存维护
-	PlayerCreateActor(ctx context.Context, playerID int64, loginIP string) error
-	// PlayerDestroyActor 玩家销毁actor
-	PlayerDestroyActor(ctx context.Context, playerID int64) error
-	// PlayerDestroyActorIfOffline 断线延迟销毁：仅当玩家在 since 之后未重连时才销毁 actor
-	PlayerDestroyActorIfOffline(ctx context.Context, playerID int64, since int64) error
-	// PlayerKick 玩家踢下线
-	PlayerKick(ctx context.Context, playerID int64) error
+	PlayerLifecycle
+	// GetActor 获取玩家actor
+	GetActor(ctx context.Context, playerID int64) (*PlayerActor, error)
+	// GetActors 玩家获取所有actor
+	GetActors(ctx context.Context) ([]*PlayerActor, error)
+	// CreateActor 玩家创建actor（verify 首包绑定后调用）；loginIP 由 handler 从 node.Context.GetIP() 取后传入，内存维护
+	CreateActor(ctx context.Context, playerID int64, loginIP string) error
+	// DestroyActor 玩家销毁actor
+	DestroyActor(ctx context.Context, playerID int64) error
+	// DestroyActorIfOffline 断线延迟销毁：仅当玩家在 since 之后未重连时才销毁 actor
+	DestroyActorIfOffline(ctx context.Context, playerID int64, since int64) error
+	// Kick 玩家踢下线
+	Kick(ctx context.Context, playerID int64) error
 	// GiftBuy 购买礼包（按礼包配置扣除消耗资产并发放奖励）
 	GiftBuy(ctx context.Context, playerID int64, req *pb.GiftBuyReq) (*pb.GiftBuyResp, error)
 	// Exchange 兑换（按兑换配置扣除消耗资产并发放奖励）
@@ -45,7 +61,7 @@ type PlayerLogic interface {
 
 // ItemLogic 物品容器业务接口：
 type ItemLogic interface {
-	ModuleLogic
+	PlayerModule[*model.PlayerItem]
 	// ItemContainerList 物品容器列表
 	ItemContainerList(ctx context.Context, playerID int64, req *pb.ItemContainerListReq) (*pb.ItemContainerListResp, error)
 	// ItemMove 物品容器内移动物品
@@ -62,7 +78,7 @@ type ItemLogic interface {
 
 // HeroLogic 英雄业务接口：玩家英雄持有数据生命周期（武器/技能/装备为独立模块，由英雄配置表关联）。
 type HeroLogic interface {
-	ModuleLogic
+	PlayerModule[*model.PlayerHero]
 	// HeroList 英雄列表
 	HeroList(ctx context.Context, playerID int64) (*pb.HeroListResp, error)
 	// HeroAdd 新增英雄（获得英雄时由武器/技能模块按配置初始化固定绑定的武器/技能）
@@ -79,7 +95,7 @@ type HeroLogic interface {
 
 // WeaponLogic 武器业务接口：武器固定绑定英雄（配置表决定归属），持有 key 为武器配置ID。
 type WeaponLogic interface {
-	ModuleLogic
+	PlayerModule[*model.PlayerWeapon]
 	// WeaponList 武器持有列表（供 HeroList 聚合下发与 GM 查询）
 	WeaponList(ctx context.Context, playerID int64) ([]*pb.WeaponEntry, error)
 	// WeaponUpdate 更新武器
@@ -98,7 +114,7 @@ type WeaponLogic interface {
 
 // SkillLogic 技能业务接口：技能固定绑定英雄（配置表决定归属），持有 key 为技能配置ID。
 type SkillLogic interface {
-	ModuleLogic
+	PlayerModule[*model.PlayerSkill]
 	// SkillList 技能持有列表（供 HeroList 聚合下发与 GM 查询）
 	SkillList(ctx context.Context, playerID int64) ([]*pb.SkillEntry, error)
 	// SkillUpdate 更新技能
@@ -115,7 +131,7 @@ type SkillLogic interface {
 
 // EquipLogic 装备业务接口：玩家装备持有数据生命周期。
 type EquipLogic interface {
-	ModuleLogic
+	PlayerModule[*model.PlayerEquip]
 	// EquipList 装备持有列表（供 HeroList 聚合下发与 GM 查询）
 	EquipList(ctx context.Context, playerID int64) ([]*pb.EquipEntry, error)
 	// EquipAdd 新增装备
@@ -138,7 +154,7 @@ type EquipLogic interface {
 
 // MailLogic 邮件业务接口：系统通知/奖励邮件（可带附件），状态未读 → 已读 → 已领取。
 type MailLogic interface {
-	ModuleLogic
+	PlayerModule[*model.PlayerMail]
 	// MailList 邮件列表（未读优先，按创建时间倒序；含未读数用于红点）
 	MailList(ctx context.Context, playerID int64) (*pb.MailListResp, error)
 	// MailRead 标记单封已读
@@ -167,7 +183,7 @@ type TaskEvent struct {
 
 // TaskLogic 任务业务接口：列表/领奖 + 进度事件入口。
 type TaskLogic interface {
-	ModuleLogic
+	PlayerModule[*model.PlayerTask]
 	// TaskList 任务列表（按类型/活动过滤，含进度与红点）
 	TaskList(ctx context.Context, playerID int64, req *pb.TaskListReq) (*pb.TaskListResp, error)
 	// TaskClaim 任务领奖
@@ -193,8 +209,8 @@ type AssetLogic interface {
 	AssetList(ctx context.Context, playerID int64, assetType tpl.AssetType) ([]*tpl.Asset, error)
 }
 
-// AssetHandler 单类资产的增删改查实现：item / equip / weapon / skill / hero 各一个实现类。
-type AssetHandler interface {
+// AssetStore 单类资产的增删改查实现：item / equip / weapon / skill / hero 各一个实现类。
+type AssetStore interface {
 	// AssetType 该实现负责的资产类型
 	AssetType() tpl.AssetType
 	// Add 发放；Count<=0 按 1 处理

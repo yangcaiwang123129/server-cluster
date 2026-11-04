@@ -2,14 +2,13 @@ package logic
 
 import (
 	"context"
-	"errors"
-	"server-cluster/internal/record"
 	"sort"
 
-	"gorm.io/gorm"
-
+	"server-cluster/internal/cache"
+	"server-cluster/internal/record"
 	"server-cluster/node/game/app/global"
 	"server-cluster/share/convert"
+	"server-cluster/share/enum"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
@@ -17,6 +16,9 @@ import (
 	"server-cluster/share/tpl"
 	"server-cluster/share/util"
 )
+
+// skillCache 玩家技能持有（player_skill，一玩家一行，技能 map JSON）；读走 LRU，写异步批量 upsert。
+var skillCache = cache.NewPlayerTableCache[model.PlayerSkill](cache.CacherConfig{Name: enum.TablePlayerSkill.String()})
 
 type skillLogic struct{}
 
@@ -37,7 +39,7 @@ func newSkillInfo(cfgID int32) model.SkillInfo {
 
 // SkillList 技能持有列表（供 HeroList 聚合下发与 GM 查询）。
 func (this *skillLogic) SkillList(ctx context.Context, playerID int64) ([]*pb.SkillEntry, error) {
-	row, err := loadPlayerSkill(ctx, playerID)
+	row, err := this.Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +56,7 @@ func (this *skillLogic) SkillList(ctx context.Context, playerID int64) ([]*pb.Sk
 
 // SkillUpdate 更新技能：整体覆盖持有状态，未拥有返回错误。
 func (this *skillLogic) SkillUpdate(ctx context.Context, playerID int64, req *pb.SkillUpdateReq) (*pb.SkillUpdateResp, error) {
-	row, err := loadPlayerSkill(ctx, playerID)
+	row, err := this.Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -69,14 +71,14 @@ func (this *skillLogic) SkillUpdate(ctx context.Context, playerID int64, req *pb
 		return &pb.SkillUpdateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "技能未拥有")}, nil
 	}
 
-	global.PlayerSkillCache.Set(playerID, row)
+	this.Save(playerID, row)
 	notifyHeroBySkill(ctx, playerID, s.SkillID)
 	return &pb.SkillUpdateResp{SkillEntry: convert.SkillEntry(s)}, nil
 }
 
 // skillOwned 取玩家指定技能持有与其绑定英雄ID。
 func skillOwned(ctx context.Context, playerID int64, cfgID int32) (*model.PlayerSkill, model.SkillInfo, int32, error) {
-	row, err := loadPlayerSkill(ctx, playerID)
+	row, err := Skill().Get(ctx, playerID)
 	if err != nil {
 		return nil, model.SkillInfo{}, 0, err
 	}
@@ -115,7 +117,7 @@ func skillDimGrow(ctx context.Context, playerID int64, cfgID int32,
 	if !row.UpdateSkill(s) {
 		return model.SkillInfo{}, 0, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "技能未拥有")
 	}
-	global.PlayerSkillCache.Set(playerID, row)
+	skillCache.Set(playerID, row)
 	notifyHero(ctx, playerID, heroID)
 	return s, heroID, nil
 }
@@ -219,7 +221,7 @@ func (this *skillLogic) SkillEnsureForHero(ctx context.Context, playerID int64, 
 	if cfg == nil {
 		return nil
 	}
-	row, err := loadPlayerSkill(ctx, playerID)
+	row, err := this.Get(ctx, playerID)
 	if err != nil {
 		return err
 	}
@@ -233,17 +235,17 @@ func (this *skillLogic) SkillEnsureForHero(ctx context.Context, playerID int64, 
 		}
 	}
 	if changed {
-		global.PlayerSkillCache.Set(playerID, row)
+		this.Save(playerID, row)
 	}
 	return nil
 }
 
 // EnterGame 进入游戏：加载玩家技能持有，未建档则初始化空集合；并按已拥有英雄兜底补建绑定技能。
-func (this *skillLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
-	if _, err := loadPlayerSkill(ctx, playerID); err != nil {
+func (this *skillLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
+	if _, err := this.Get(ctx, playerID); err != nil {
 		return err
 	}
-	heroes, err := loadPlayerHero(ctx, playerID)
+	heroes, err := Hero().Get(ctx, playerID)
 	if err != nil {
 		return err
 	}
@@ -264,28 +266,34 @@ func (this *skillLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.Ent
 }
 
 // LeaveGame 离开游戏：技能持有数据同步落库，并逐出内存缓存。
-func (this *skillLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
-	if err := flushAndEvict(ctx, global.PlayerSkillCache, playerID); err != nil {
+func (this *skillLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
+	if err := flushAndEvict(ctx, skillCache, playerID); err != nil {
 		return err
 	}
 	return nil
 }
 
-// loadPlayerSkill 加载玩家技能持有；未建档则初始化空 map 并挂入缓存（异步落库）。
-func loadPlayerSkill(ctx context.Context, playerID int64) (*model.PlayerSkill, error) {
-	row, err := global.PlayerSkillCache.Get(ctx, playerID)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		row = &model.PlayerSkill{PlayerID: playerID, Skills: util.NewSafeMap[int32, model.SkillInfo]()}
-		global.PlayerSkillCache.Set(playerID, row)
-		return row, nil
-	}
-	if err != nil {
-		return nil, err
-	}
-	if row.Skills == nil {
-		row.Skills = util.NewSafeMap[int32, model.SkillInfo]()
-	}
-	return row, nil
+// Get 加载玩家技能持有；未建档则初始化空 map 并挂入缓存（异步落库）。
+func (this *skillLogic) Get(ctx context.Context, playerID int64) (*model.PlayerSkill, error) {
+	return skillCache.GetOrInit(ctx, playerID,
+		func(id int64) *model.PlayerSkill {
+			return &model.PlayerSkill{PlayerID: id, Skills: util.NewSafeMap[int32, model.SkillInfo]()}
+		},
+		func(row *model.PlayerSkill) {
+			if row.Skills == nil {
+				row.Skills = util.NewSafeMap[int32, model.SkillInfo]()
+			}
+		})
+}
+
+// Save 写回玩家技能持有并挂入异步落库队列。
+func (this *skillLogic) Save(playerID int64, row *model.PlayerSkill) {
+	skillCache.Set(playerID, row)
+}
+
+// Flush 同步落库并逐出缓存（GM 直改 DB 后强制回源）。
+func (this *skillLogic) Flush(ctx context.Context, playerID int64) error {
+	return flushAndEvict(ctx, skillCache, playerID)
 }
 
 // ============ 资产接口实现（AssetHandler，唯一持有型：key 为技能配置ID） ============
@@ -301,7 +309,7 @@ func (this *skillAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _
 	if !tpl.T().Skill.Has(cfgID) {
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "技能配置不存在")
 	}
-	row, err := loadPlayerSkill(ctx, playerID)
+	row, err := Skill().Get(ctx, playerID)
 	if err != nil {
 		return err
 	}
@@ -312,7 +320,7 @@ func (this *skillAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "技能已拥有")
 	}
 
-	global.PlayerSkillCache.Set(playerID, row)
+	skillCache.Set(playerID, row)
 	record.Record(ctx, model.RecordModuleSkill, playerID, model.RecordActionGain, cfgID, 1)
 	notifyHeroBySkill(ctx, playerID, cfgID)
 	return nil
@@ -320,7 +328,7 @@ func (this *skillAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _
 
 // Remove 扣除技能；未拥有返回错误。
 func (this *skillAssetHandler) Remove(ctx context.Context, playerID int64, cfgID, _ int32) error {
-	row, err := loadPlayerSkill(ctx, playerID)
+	row, err := Skill().Get(ctx, playerID)
 	if err != nil {
 		return err
 	}
@@ -328,7 +336,7 @@ func (this *skillAssetHandler) Remove(ctx context.Context, playerID int64, cfgID
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "技能未拥有")
 	}
 
-	global.PlayerSkillCache.Set(playerID, row)
+	skillCache.Set(playerID, row)
 	record.Record(ctx, model.RecordModuleSkill, playerID, model.RecordActionConsume, cfgID, 1)
 	notifyHeroBySkill(ctx, playerID, cfgID)
 	return nil
@@ -352,7 +360,7 @@ func (this *skillAssetHandler) Update(ctx context.Context, playerID int64, cfgID
 
 // Query 查询是否持有：持有 1，未持有 0。
 func (this *skillAssetHandler) Query(ctx context.Context, playerID int64, cfgID int32) (int32, error) {
-	row, err := loadPlayerSkill(ctx, playerID)
+	row, err := Skill().Get(ctx, playerID)
 	if err != nil {
 		return 0, err
 	}
@@ -364,7 +372,7 @@ func (this *skillAssetHandler) Query(ctx context.Context, playerID int64, cfgID 
 
 // List 列出全部技能（按配置ID升序）。
 func (this *skillAssetHandler) List(ctx context.Context, playerID int64) ([]*tpl.Asset, error) {
-	row, err := loadPlayerSkill(ctx, playerID)
+	row, err := Skill().Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}

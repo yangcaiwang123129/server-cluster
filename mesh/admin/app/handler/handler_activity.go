@@ -1,13 +1,13 @@
 package handler
 
 import (
-	"server-cluster/share/util"
 	"strconv"
 
 	"server-cluster/mesh/admin/app/logic"
 	"server-cluster/share/consts"
 	"server-cluster/share/dto"
 	"server-cluster/share/errs"
+	"server-cluster/share/util"
 
 	"github.com/dobyte/due/component/http/v2"
 )
@@ -15,10 +15,10 @@ import (
 // RegisterActivity 注册运营活动模块路由（内嵌活动模块，同进程直接调用）。
 func RegisterActivity(router http.Router) {
 	g := gmGroup(router)
-	g.Get("/activity", handleActivityList)
-	g.Get("/activity/configs", handleActivityConfigList)
-	g.Put("/activity/:id/time", handleActivityUpdateTime)
-	g.Post("/activity/:id/end", handleActivityEnd)
+	g.Get("/activity", handle(handleActivityList))
+	g.Get("/activity/configs", handle(handleActivityConfigList))
+	g.Put("/activity/:id/time", handle(handleActivityUpdateTime))
+	g.Post("/activity/:id/end", handle(handleActivityEnd))
 }
 
 // handleActivityConfigList 活动模板配置展示。
@@ -26,8 +26,8 @@ func RegisterActivity(router http.Router) {
 // @Tags activity
 // @Produce json
 // @Router /api/v1/gm/activity/configs [get]
-func handleActivityConfigList(ctx http.Context) error {
-	return errs.OK(ctx, logic.Activity().Configs())
+func handleActivityConfigList(ctx http.Context) ([]dto.GmActivityCfgResp, error) {
+	return logic.Activity().Configs(), nil
 }
 
 // handleActivityList 活动实例分页列表。
@@ -39,7 +39,7 @@ func handleActivityConfigList(ctx http.Context) error {
 // @Param pageIndex query int false "页码" default(1)
 // @Param pageSize query int false "每页条数" default(10)
 // @Router /api/v1/gm/activity [get]
-func handleActivityList(ctx http.Context) error {
+func handleActivityList(ctx http.Context) (util.PageResp[dto.GmActivityResp], error) {
 	req := dto.GmActivityQuery{
 		CfgID:  queryInt(ctx, "cfgId"),
 		Status: consts.ActivityStatusAll,
@@ -59,9 +59,9 @@ func handleActivityList(ctx http.Context) error {
 	pageIndex, pageSize := pageParams(ctx)
 	list, total, err := logic.Activity().List(ctx.Context(), req, pageIndex, pageSize)
 	if err != nil {
-		return errs.FailErr(ctx, err)
+		return util.PageResp[dto.GmActivityResp]{}, err
 	}
-	return errs.OK(ctx, util.Page(list, total, pageIndex, pageSize))
+	return util.Page(list, total, pageIndex, pageSize), nil
 }
 
 // handleActivityUpdateTime 修改活动时间（仅未开启）。
@@ -72,20 +72,16 @@ func handleActivityList(ctx http.Context) error {
 // @Param id path int true "活动实例ID"
 // @Param body body dto.GmActivityTimeReq true "时间"
 // @Router /api/v1/gm/activity/{id}/time [put]
-func handleActivityUpdateTime(ctx http.Context) error {
+func handleActivityUpdateTime(ctx http.Context) (*dto.GmActivityResp, error) {
 	id, err := strconv.ParseInt(ctx.Params("id"), 10, 64)
 	if err != nil || id <= 0 {
-		return errs.Fail(ctx, errs.RespCodeInternal, "invalid activity id")
+		return nil, errs.NewError(errs.RespCodeInternal, "invalid activity id")
 	}
 	var req dto.GmActivityTimeReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "invalid body")
+		return nil, errs.NewError(errs.RespCodeInternal, "invalid body")
 	}
-	resp, err := logic.Activity().UpdateTime(ctx.Context(), id, req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, resp)
+	return logic.Activity().UpdateTime(ctx.Context(), id, req)
 }
 
 // handleActivityEnd GM 提前结束活动。
@@ -94,14 +90,10 @@ func handleActivityUpdateTime(ctx http.Context) error {
 // @Produce json
 // @Param id path int true "活动实例ID"
 // @Router /api/v1/gm/activity/{id}/end [post]
-func handleActivityEnd(ctx http.Context) error {
+func handleActivityEnd(ctx http.Context) (*dto.GmActivityResp, error) {
 	id, err := strconv.ParseInt(ctx.Params("id"), 10, 64)
 	if err != nil || id <= 0 {
-		return errs.Fail(ctx, errs.RespCodeInternal, "invalid activity id")
+		return nil, errs.NewError(errs.RespCodeInternal, "invalid activity id")
 	}
-	resp, err := logic.Activity().End(ctx.Context(), id, "")
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, resp)
+	return logic.Activity().End(ctx.Context(), id, "")
 }

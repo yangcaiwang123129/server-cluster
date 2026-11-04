@@ -194,12 +194,11 @@
 import { reactive, ref, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useI18n } from 'vue-i18n'
-import { CopyDocument, Monitor, Refresh } from '@element-plus/icons-vue'
+import { CopyDocument, Refresh } from '@element-plus/icons-vue'
 
 import PageContainer from '@/components/PageContainer/index.vue'
 import ProTable from '@/components/ProTable/index.vue'
 import { useTable } from '@/composables'
-import { msgSuccess } from '@/utils/message'
 
 import { listClusterNodes, execClusterNode } from '@/api/admin/cluster'
 import type { ClusterNode, ClusterExecResp } from '@/types/admin'

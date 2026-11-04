@@ -50,15 +50,15 @@ func Record(ctx context.Context, module string, playerID int64, action int8, cfg
 func newRow(module string, f model.RecordFields) any {
 	switch module {
 	case model.RecordModuleItem:
-		return &model.ItemRecord{RecordFields: f}
+		return &model.RecordItem{RecordFields: f}
 	case model.RecordModuleEquip:
-		return &model.EquipRecord{RecordFields: f}
+		return &model.RecordEquip{RecordFields: f}
 	case model.RecordModuleWeapon:
-		return &model.WeaponRecord{RecordFields: f}
+		return &model.RecordWeapon{RecordFields: f}
 	case model.RecordModuleSkill:
-		return &model.SkillRecord{RecordFields: f}
+		return &model.RecordSkill{RecordFields: f}
 	case model.RecordModuleHero:
-		return &model.HeroRecord{RecordFields: f}
+		return &model.RecordHero{RecordFields: f}
 	default:
 		return nil
 	}

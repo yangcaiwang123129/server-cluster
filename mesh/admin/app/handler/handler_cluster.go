@@ -16,10 +16,10 @@ import (
 // RegisterCluster 注册集群管理路由（列表/详情/SSH配置更新/远程运维）。
 func RegisterCluster(router http.Router) {
 	g := gmGroup(router)
-	g.Get("/cluster", handleClusterList)
-	g.Get("/cluster/:nodeId", handleClusterDetail)
-	g.Put("/cluster/:nodeId", handleClusterUpdate)
-	g.Post("/cluster/:nodeId/exec", handleClusterExec)
+	g.Get("/cluster", handle(handleClusterList))
+	g.Get("/cluster/:nodeId", handle(handleClusterDetail))
+	g.Put("/cluster/:nodeId", handle(handleClusterUpdate))
+	g.Post("/cluster/:nodeId/exec", handle(handleClusterExec))
 }
 
 // handleClusterList 集群节点分页列表（自动触发 etcd → DB 同步）。
@@ -32,7 +32,7 @@ func RegisterCluster(router http.Router) {
 // @Param pageIndex query int false "页码" default(1)
 // @Param pageSize query int false "每页条数" default(10)
 // @Router /api/v1/gm/cluster [get]
-func handleClusterList(ctx http.Context) error {
+func handleClusterList(ctx http.Context) (util.PageResp[dto.ClusterNodeResp], error) {
 	var req dto.ClusterNodeQuery
 	req.NodeName = ctx.Query("nodeName")
 	req.NodeKind = ctx.Query("nodeKind")
@@ -51,9 +51,9 @@ func handleClusterList(ctx http.Context) error {
 	})
 	list, total, err := logic.Cluster().List(ctx.Context(), req, req.PageIndex, req.PageSize)
 	if err != nil {
-		return errs.FailErr(ctx, err)
+		return util.PageResp[dto.ClusterNodeResp]{}, err
 	}
-	return errs.OK(ctx, util.Page(list, total, req.PageIndex, req.PageSize))
+	return util.Page(list, total, req.PageIndex, req.PageSize), nil
 }
 
 // handleClusterDetail 单个集群节点详情（带完整 SSH 配置）。
@@ -62,16 +62,12 @@ func handleClusterList(ctx http.Context) error {
 // @Produce json
 // @Param nodeId path string true "实例ID(etcd key最后一段)"
 // @Router /api/v1/gm/cluster/{nodeId} [get]
-func handleClusterDetail(ctx http.Context) error {
+func handleClusterDetail(ctx http.Context) (*dto.ClusterNodeResp, error) {
 	nodeID := ctx.Params("nodeId")
 	if nodeID == "" {
-		return errs.Fail(ctx, errs.RespCodeInternal, "nodeId required")
+		return nil, errs.NewError(errs.RespCodeInternal, "nodeId required")
 	}
-	resp, err := logic.Cluster().Get(ctx.Context(), nodeID)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, resp)
+	return logic.Cluster().Get(ctx.Context(), nodeID)
 }
 
 // handleClusterUpdate 更新运维侧 SSH 配置。
@@ -81,14 +77,14 @@ func handleClusterDetail(ctx http.Context) error {
 // @Param nodeId path string true "实例ID"
 // @Param body body dto.ClusterNodeUpdateReq true "SSH 配置"
 // @Router /api/v1/gm/cluster/{nodeId} [put]
-func handleClusterUpdate(ctx http.Context) error {
+func handleClusterUpdate(ctx http.Context) (any, error) {
 	nodeID := ctx.Params("nodeId")
 	if nodeID == "" {
-		return errs.Fail(ctx, errs.RespCodeInternal, "nodeId required")
+		return nil, errs.NewError(errs.RespCodeInternal, "nodeId required")
 	}
 	var req dto.ClusterNodeUpdateReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "invalid body")
+		return nil, errs.NewError(errs.RespCodeInternal, "invalid body")
 	}
 	m := &model.ClusterNode{
 		NodeID:     nodeID,
@@ -100,12 +96,9 @@ func handleClusterUpdate(ctx http.Context) error {
 		Remark:     strings.TrimSpace(req.Remark),
 	}
 	if m.SSHHost == "" || m.SSHUser == "" {
-		return errs.Fail(ctx, errs.RespCodeInternal, "sshHost and sshUser required")
+		return nil, errs.NewError(errs.RespCodeInternal, "sshHost and sshUser required")
 	}
-	if err := logic.Cluster().UpdateSSH(ctx.Context(), m); err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, nil)
+	return nil, logic.Cluster().UpdateSSH(ctx.Context(), m)
 }
 
 // handleClusterExec 远程执行运维脚本并回显完整输出。
@@ -115,24 +108,20 @@ func handleClusterUpdate(ctx http.Context) error {
 // @Param nodeId path string true "实例ID"
 // @Param body body dto.ClusterExecReq true "{action:start|stop|restart|deploy}"
 // @Router /api/v1/gm/cluster/{nodeId}/exec [post]
-func handleClusterExec(ctx http.Context) error {
+func handleClusterExec(ctx http.Context) (*dto.ClusterExecResp, error) {
 	nodeID := ctx.Params("nodeId")
 	if nodeID == "" {
-		return errs.Fail(ctx, errs.RespCodeInternal, "nodeId required")
+		return nil, errs.NewError(errs.RespCodeInternal, "nodeId required")
 	}
 	var req dto.ClusterExecReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "invalid body")
+		return nil, errs.NewError(errs.RespCodeInternal, "invalid body")
 	}
 	action := strings.ToLower(strings.TrimSpace(req.Action))
 	switch action {
 	case "start", "stop", "restart", "deploy":
 	default:
-		return errs.Fail(ctx, errs.RespCodeInternal, "action must be start/stop/restart/deploy")
+		return nil, errs.NewError(errs.RespCodeInternal, "action must be start/stop/restart/deploy")
 	}
-	resp, err := logic.Cluster().Exec(ctx.Context(), nodeID, action)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, resp)
+	return logic.Cluster().Exec(ctx.Context(), nodeID, action)
 }

@@ -2,14 +2,13 @@ package logic
 
 import (
 	"context"
-	"errors"
-	"server-cluster/internal/record"
 	"sort"
 
-	"gorm.io/gorm"
-
+	"server-cluster/internal/cache"
+	"server-cluster/internal/record"
 	"server-cluster/node/game/app/global"
 	"server-cluster/share/convert"
+	"server-cluster/share/enum"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
@@ -17,6 +16,9 @@ import (
 	"server-cluster/share/tpl"
 	"server-cluster/share/util"
 )
+
+// heroCache 玩家英雄持有（player_hero，一玩家一行，英雄 map JSON）；读走 LRU，写异步批量 upsert。
+var heroCache = cache.NewPlayerTableCache[model.PlayerHero](cache.CacherConfig{Name: enum.TablePlayerHero.String()})
 
 type heroLogic struct{}
 
@@ -43,7 +45,7 @@ func (this *heroLogic) HeroList(ctx context.Context, playerID int64) (*pb.HeroLi
 // heroEntries 组装英雄完整持有视图：武器/技能按英雄配置的固定绑定反查，装备按所属英雄归组（仅已穿戴）。
 // 客户端以本结构为单位刷新，武器/技能/装备任一变化后重新下发即可整体替换。
 func heroEntries(ctx context.Context, playerID int64) ([]*pb.HeroEntry, error) {
-	row, err := loadPlayerHero(ctx, playerID)
+	row, err := Hero().Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +132,7 @@ func grantHeroBound(ctx context.Context, playerID, heroCfgID int64) error {
 // addHeroWithBound 新增英雄并初始化其固定绑定的武器/技能。
 // 先建武器/技能、再写入英雄，避免初始化失败后英雄已落进内存缓存造成脏数据。
 func addHeroWithBound(ctx context.Context, playerID int64, cfgID int32) (model.HeroInfo, error) {
-	row, err := loadPlayerHero(ctx, playerID)
+	row, err := Hero().Get(ctx, playerID)
 	if err != nil {
 		return model.HeroInfo{}, err
 	}
@@ -146,7 +148,7 @@ func addHeroWithBound(ctx context.Context, playerID int64, cfgID int32) (model.H
 	if !row.AddHero(h) {
 		return model.HeroInfo{}, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "英雄已拥有")
 	}
-	global.PlayerHeroCache.Set(playerID, row)
+	heroCache.Set(playerID, row)
 	record.Record(ctx, model.RecordModuleHero, playerID, model.RecordActionGain, cfgID, 1)
 	return h, nil
 }
@@ -178,7 +180,7 @@ func (this *heroLogic) HeroAdd(ctx context.Context, playerID int64, req *pb.Hero
 
 // HeroUpdate 更新英雄：整体覆盖持有状态，未拥有返回错误。
 func (this *heroLogic) HeroUpdate(ctx context.Context, playerID int64, req *pb.HeroUpdateReq) (*pb.HeroUpdateResp, error) {
-	row, err := loadPlayerHero(ctx, playerID)
+	row, err := this.Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -217,7 +219,7 @@ func (this *heroLogic) HeroUpdate(ctx context.Context, playerID int64, req *pb.H
 		return &pb.HeroUpdateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "英雄未拥有")}, nil
 	}
 
-	global.PlayerHeroCache.Set(playerID, row)
+	this.Save(playerID, row)
 	entry, err := heroEntry(ctx, playerID, h.HeroID)
 	if err != nil {
 		if r := codedResult(err); r != nil {
@@ -253,7 +255,7 @@ func (this *heroLogic) HeroAttribute(ctx context.Context, playerID int64, req *p
 
 // HeroUpgrade 英雄升级：消耗配置表升级素材，等级 +1，最多到等级区间上限。
 func (this *heroLogic) HeroUpgrade(ctx context.Context, playerID int64, req *pb.HeroUpgradeReq) (*pb.HeroUpgradeResp, error) {
-	row, err := loadPlayerHero(ctx, playerID)
+	row, err := this.Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -293,7 +295,7 @@ func (this *heroLogic) HeroUpgrade(ctx context.Context, playerID int64, req *pb.
 	if !row.UpdateHero(hero) {
 		return &pb.HeroUpgradeResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "英雄未拥有")}, nil
 	}
-	global.PlayerHeroCache.Set(playerID, row)
+	this.Save(playerID, row)
 
 	_, attr, err := computeHeroAttribute(ctx, playerID, hero.HeroID)
 	if err != nil {
@@ -314,7 +316,7 @@ func (this *heroLogic) HeroUpgrade(ctx context.Context, playerID int64, req *pb.
 }
 
 // EnterGame 进入游戏：加载玩家英雄持有，只下发当前出战英雄的完整持有状态。
-func (this *heroLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, resp *pb.EnterGameResp) error {
+func (this *heroLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, resp *pb.EnterGameResp) error {
 	entries, err := heroEntries(ctx, playerID)
 	if err != nil {
 		return err
@@ -329,29 +331,34 @@ func (this *heroLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.Ente
 }
 
 // LeaveGame 离开游戏：英雄持有数据同步落库，并逐出内存缓存。
-func (this *heroLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
-	if err := flushAndEvict(ctx, global.PlayerHeroCache, playerID); err != nil {
+func (this *heroLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
+	if err := flushAndEvict(ctx, heroCache, playerID); err != nil {
 		return err
 	}
 	return nil
 }
 
-// loadPlayerHero 加载玩家英雄持有；未建档则初始化空 map 并挂入缓存（异步落库）。
-func loadPlayerHero(ctx context.Context, playerID int64) (*model.PlayerHero, error) {
-	row, err := global.PlayerHeroCache.Get(ctx, playerID)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		row = &model.PlayerHero{PlayerID: playerID, Heroes: util.NewSafeMap[int32, model.HeroInfo]()}
-		global.PlayerHeroCache.Set(playerID, row)
-		return row, nil
-	}
-	if err != nil {
-		return nil, err
-	}
-	// DB 中该列为 NULL 时字段为 nil，补成空集合避免业务写操作 panic
-	if row.Heroes == nil {
-		row.Heroes = util.NewSafeMap[int32, model.HeroInfo]()
-	}
-	return row, nil
+// LoadPlayer 加载玩家英雄持有；未建档则初始化空 map 并挂入缓存（异步落库）。
+func (this *heroLogic) Get(ctx context.Context, playerID int64) (*model.PlayerHero, error) {
+	return heroCache.GetOrInit(ctx, playerID,
+		func(id int64) *model.PlayerHero {
+			return &model.PlayerHero{PlayerID: id, Heroes: util.NewSafeMap[int32, model.HeroInfo]()}
+		},
+		func(row *model.PlayerHero) {
+			if row.Heroes == nil {
+				row.Heroes = util.NewSafeMap[int32, model.HeroInfo]()
+			}
+		})
+}
+
+// Save 写回玩家英雄持有并挂入异步落库队列。
+func (this *heroLogic) Save(playerID int64, row *model.PlayerHero) {
+	heroCache.Set(playerID, row)
+}
+
+// Flush 同步落库并逐出缓存（GM 直改 DB 后强制回源）。
+func (this *heroLogic) Flush(ctx context.Context, playerID int64) error {
+	return flushAndEvict(ctx, heroCache, playerID)
 }
 
 // ============ 资产接口实现（AssetHandler，唯一持有型） ============
@@ -377,7 +384,7 @@ func (this *heroAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _ 
 
 // Remove 扣除英雄；未拥有返回错误。
 func (this *heroAssetHandler) Remove(ctx context.Context, playerID int64, cfgID, _ int32) error {
-	row, err := loadPlayerHero(ctx, playerID)
+	row, err := Hero().Get(ctx, playerID)
 	if err != nil {
 		return err
 	}
@@ -385,7 +392,7 @@ func (this *heroAssetHandler) Remove(ctx context.Context, playerID int64, cfgID,
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "英雄未拥有")
 	}
 
-	global.PlayerHeroCache.Set(playerID, row)
+	heroCache.Set(playerID, row)
 	record.Record(ctx, model.RecordModuleHero, playerID, model.RecordActionConsume, cfgID, 1)
 	return nil
 }
@@ -408,7 +415,7 @@ func (this *heroAssetHandler) Update(ctx context.Context, playerID int64, cfgID,
 
 // Query 查询是否持有：持有 1，未持有 0。
 func (this *heroAssetHandler) Query(ctx context.Context, playerID int64, cfgID int32) (int32, error) {
-	row, err := loadPlayerHero(ctx, playerID)
+	row, err := Hero().Get(ctx, playerID)
 	if err != nil {
 		return 0, err
 	}
@@ -420,7 +427,7 @@ func (this *heroAssetHandler) Query(ctx context.Context, playerID int64, cfgID i
 
 // List 列出全部英雄（按配置ID升序）。
 func (this *heroAssetHandler) List(ctx context.Context, playerID int64) ([]*tpl.Asset, error) {
-	row, err := loadPlayerHero(ctx, playerID)
+	row, err := Hero().Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -454,7 +461,7 @@ func heroBaseAttribute(h model.HeroInfo) (*pb.HeroAttribute, error) {
 
 // AttributeBonus 英雄本体属性贡献（未持有返回零值）。
 func (this *heroLogic) AttributeBonus(ctx context.Context, playerID int64, heroID int32) (*pb.HeroAttribute, error) {
-	row, err := loadPlayerHero(ctx, playerID)
+	row, err := this.Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}

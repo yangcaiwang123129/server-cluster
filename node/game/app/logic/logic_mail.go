@@ -2,15 +2,15 @@ package logic
 
 import (
 	"context"
-	"errors"
 	"sort"
 
 	"github.com/dobyte/due/v2/log"
-	"gorm.io/gorm"
 
+	"server-cluster/internal/cache"
 	"server-cluster/internal/svc"
 	"server-cluster/node/game/app/global"
 	"server-cluster/share/convert"
+	"server-cluster/share/enum"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
@@ -18,6 +18,9 @@ import (
 	"server-cluster/share/tpl"
 	"server-cluster/share/util"
 )
+
+// mailCache 玩家邮件（player_mail，一玩家一行，邮件 map JSON）；读走 LRU，写异步批量 upsert。
+var mailCache = cache.NewPlayerTableCache[model.PlayerMail](cache.CacherConfig{Name: enum.TablePlayerMail.String()})
 
 type mailLogic struct{}
 
@@ -31,16 +34,16 @@ func init() {
 func Mail() global.MailLogic { return mailLogicInst.MustGet() }
 
 // EnterGame 进入游戏：加载玩家邮件持有，未建档则初始化空集合（仅预热缓存）。
-func (this *mailLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
-	if _, err := loadPlayerMail(ctx, playerID); err != nil {
+func (this *mailLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
+	if _, err := this.Get(ctx, playerID); err != nil {
 		return err
 	}
 	return nil
 }
 
 // LeaveGame 离开游戏：邮件持有数据同步落库，并逐出内存缓存。
-func (this *mailLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
-	if err := flushAndEvict(ctx, global.PlayerMailCache, playerID); err != nil {
+func (this *mailLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
+	if err := flushAndEvict(ctx, mailCache, playerID); err != nil {
 		return err
 	}
 	return nil
@@ -48,7 +51,7 @@ func (this *mailLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.Leav
 
 // MailList 邮件列表：未读优先，同状态按创建时间倒序；返回未读数用于红点。
 func (this *mailLogic) MailList(ctx context.Context, playerID int64) (*pb.MailListResp, error) {
-	row, err := loadPlayerMail(ctx, playerID)
+	row, err := this.Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +79,7 @@ func (this *mailLogic) MailList(ctx context.Context, playerID int64) (*pb.MailLi
 
 // MailRead 标记单封已读；重复已读幂等。
 func (this *mailLogic) MailRead(ctx context.Context, playerID int64, req *pb.MailReadReq) (*pb.MailReadResp, error) {
-	row, err := loadPlayerMail(ctx, playerID)
+	row, err := this.Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -90,14 +93,14 @@ func (this *mailLogic) MailRead(ctx context.Context, playerID int64, req *pb.Mai
 		if !row.UpdateMail(m) {
 			return &pb.MailReadResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "邮件不存在")}, nil
 		}
-		global.PlayerMailCache.Set(playerID, row)
+		this.Save(playerID, row)
 	}
 	return &pb.MailReadResp{Entry: convert.MailEntry(m)}, nil
 }
 
 // MailReadAll 全部未读标记已读。
 func (this *mailLogic) MailReadAll(ctx context.Context, playerID int64, _ *pb.MailReadAllReq) (*pb.MailReadAllResp, error) {
-	row, err := loadPlayerMail(ctx, playerID)
+	row, err := this.Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -114,14 +117,14 @@ func (this *mailLogic) MailReadAll(ctx context.Context, playerID int64, _ *pb.Ma
 	}); err != nil {
 		return nil, err
 	}
-	global.PlayerMailCache.Set(playerID, row)
+	this.Save(playerID, row)
 	return &pb.MailReadAllResp{}, nil
 }
 
 // MailClaim 领取单封附件：先落库领取状态再发放资产，避免发放成功后状态落库失败导致重试重复发放。
 // 残余风险：进程若在资产发放与状态回滚之间崩溃，仍可能有个别附件不一致；彻底解决需资产与邮件同事务。
 func (this *mailLogic) MailClaim(ctx context.Context, playerID int64, req *pb.MailClaimReq) (*pb.MailClaimResp, error) {
-	row, err := loadPlayerMail(ctx, playerID)
+	row, err := this.Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +158,7 @@ func (this *mailLogic) MailClaim(ctx context.Context, playerID int64, req *pb.Ma
 			if !row.UpdateMail(m) {
 				log.Warnf("game: mail claim rollback failed, player=%d mail=%d", playerID, m.MailID)
 			}
-			global.PlayerMailCache.Set(playerID, row)
+			this.Save(playerID, row)
 			if r := codedResult(err); r != nil {
 				return &pb.MailClaimResp{Result: r}, nil
 			}
@@ -163,7 +166,7 @@ func (this *mailLogic) MailClaim(ctx context.Context, playerID int64, req *pb.Ma
 		}
 		granted = append(granted, &pb.AssetEntry{Type: a.Type, CfgId: a.CfgID, Count: count})
 	}
-	global.PlayerMailCache.Set(playerID, row)
+	this.Save(playerID, row)
 	return &pb.MailClaimResp{Entry: convert.MailEntry(m), Attachments: granted}, nil
 }
 
@@ -178,7 +181,7 @@ type pendingClaim struct {
 // 先在 UpdateAll 内把邮件标记为已领取并落库，再逐封发放，避免中途失败后邮件仍可重复领取。
 // 残余风险同 MailClaim：进程在发放与回滚之间崩溃仍可能不一致。
 func (this *mailLogic) MailClaimAll(ctx context.Context, playerID int64, _ *pb.MailClaimAllReq) (*pb.MailClaimAllResp, error) {
-	row, err := loadPlayerMail(ctx, playerID)
+	row, err := this.Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -226,14 +229,14 @@ func (this *mailLogic) MailClaimAll(ctx context.Context, playerID int64, _ *pb.M
 		}
 		claimed = append(claimed, convert.MailEntry(p.mail))
 	}
-	global.PlayerMailCache.Set(playerID, row)
+	this.Save(playerID, row)
 	return &pb.MailClaimAllResp{Entries: claimed}, nil
 }
 
 // MailDelete 删除单封邮件：仅置为已删除（逻辑删除），物理清理由玩家上线/定期任务处理。
 // 奖励邮件未领取时禁止删除；重复删除幂等。
 func (this *mailLogic) MailDelete(ctx context.Context, playerID int64, req *pb.MailDeleteReq) (*pb.MailDeleteResp, error) {
-	row, err := loadPlayerMail(ctx, playerID)
+	row, err := this.Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -251,13 +254,13 @@ func (this *mailLogic) MailDelete(ctx context.Context, playerID int64, req *pb.M
 	if !row.UpdateMail(m) {
 		return &pb.MailDeleteResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "邮件不存在")}, nil
 	}
-	global.PlayerMailCache.Set(playerID, row)
+	this.Save(playerID, row)
 	return &pb.MailDeleteResp{}, nil
 }
 
 // MailDeleteClean 清理全部可删除邮件（无附件或已领取），返回本次标记删除数量。
 func (this *mailLogic) MailDeleteClean(ctx context.Context, playerID int64, _ *pb.MailDeleteCleanReq) (*pb.MailDeleteCleanResp, error) {
-	row, err := loadPlayerMail(ctx, playerID)
+	row, err := this.Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -275,7 +278,7 @@ func (this *mailLogic) MailDeleteClean(ctx context.Context, playerID int64, _ *p
 	}); err != nil {
 		return nil, err
 	}
-	global.PlayerMailCache.Set(playerID, row)
+	this.Save(playerID, row)
 	return &pb.MailDeleteCleanResp{Count: count}, nil
 }
 
@@ -284,7 +287,7 @@ func (this *mailLogic) MailSend(ctx context.Context, playerID int64, req *pb.GmM
 	if req.GetTitle() == "" {
 		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "邮件标题不能为空")
 	}
-	row, err := loadPlayerMail(ctx, playerID)
+	row, err := this.Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -303,23 +306,29 @@ func (this *mailLogic) MailSend(ctx context.Context, playerID int64, req *pb.GmM
 	if !row.AddMail(m) {
 		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, "邮件创建失败")
 	}
-	global.PlayerMailCache.Set(playerID, row)
+	this.Save(playerID, row)
 	return convert.MailEntry(m), nil
 }
 
-// loadPlayerMail 加载玩家邮件；未建档则初始化空 map 并挂入缓存（异步落库）。
-func loadPlayerMail(ctx context.Context, playerID int64) (*model.PlayerMail, error) {
-	row, err := global.PlayerMailCache.Get(ctx, playerID)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		row = &model.PlayerMail{PlayerID: playerID, Mails: util.NewSafeMap[int64, model.MailInfo]()}
-		global.PlayerMailCache.Set(playerID, row)
-		return row, nil
-	}
-	if err != nil {
-		return nil, err
-	}
-	if row.Mails == nil {
-		row.Mails = util.NewSafeMap[int64, model.MailInfo]()
-	}
-	return row, nil
+// LoadPlayer 加载玩家邮件；未建档则初始化空 map 并挂入缓存（异步落库）。
+func (this *mailLogic) Get(ctx context.Context, playerID int64) (*model.PlayerMail, error) {
+	return mailCache.GetOrInit(ctx, playerID,
+		func(id int64) *model.PlayerMail {
+			return &model.PlayerMail{PlayerID: id, Mails: util.NewSafeMap[int64, model.MailInfo]()}
+		},
+		func(row *model.PlayerMail) {
+			if row.Mails == nil {
+				row.Mails = util.NewSafeMap[int64, model.MailInfo]()
+			}
+		})
+}
+
+// Save 写回玩家邮件并挂入异步落库队列。
+func (this *mailLogic) Save(playerID int64, row *model.PlayerMail) {
+	mailCache.Set(playerID, row)
+}
+
+// Flush 同步落库并逐出缓存（GM 直改 DB 后强制回源）。
+func (this *mailLogic) Flush(ctx context.Context, playerID int64) error {
+	return flushAndEvict(ctx, mailCache, playerID)
 }

@@ -8,22 +8,23 @@ import (
 	"server-cluster/mesh/admin/app/logic"
 	"server-cluster/share/dto"
 	"server-cluster/share/errs"
+	"server-cluster/share/model"
 )
 
 // RegisterClient 注册客户端版本管理路由。
 func RegisterClient(router http.Router) {
 	g := gmGroup(router)
-	g.Get("/client/version", handleClientVersionList)
-	g.Get("/client/version/:id", handleClientVersionGet)
-	g.Post("/client/version", handleClientVersionCreate)
-	g.Put("/client/version/:id", handleClientVersionUpdate)
+	g.Get("/client/version", handle(handleClientVersionList))
+	g.Get("/client/version/:id", handle(handleClientVersionGet))
+	g.Post("/client/version", handle(handleClientVersionCreate))
+	g.Put("/client/version/:id", handle(handleClientVersionUpdate))
 	g.Delete("/client/version", handleClientVersionDelete)
 	g.Put("/client/version-status", handleClientVersionStatus)
 
-	g.Get("/client/sim/options", handleSimOptions)
-	g.Post("/client/sim/login", handleSimLogin)
-	g.Post("/client/sim/connect", handleSimConnect)
-	g.Post("/client/sim/step", handleSimStep)
+	g.Get("/client/sim/options", handle(handleSimOptions))
+	g.Post("/client/sim/login", handle(handleSimLogin))
+	g.Post("/client/sim/connect", handle(handleSimConnect))
+	g.Post("/client/sim/step", handle(handleSimStep))
 	g.Post("/client/sim/close", handleSimClose)
 }
 
@@ -38,7 +39,7 @@ func RegisterClient(router http.Router) {
 // @Param status query string false "状态"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/client/version [get]
-func handleClientVersionList(ctx http.Context) error {
+func handleClientVersionList(ctx http.Context) (util.PageResp[model.ClientVersion], error) {
 	var req dto.ClientVersionListReq
 	req.PageIndex, req.PageSize = pageParams(ctx)
 	req.Version = ctx.Query("version")
@@ -50,9 +51,9 @@ func handleClientVersionList(ctx http.Context) error {
 	})
 	list, total, err := logic.ClientVersionList(req)
 	if err != nil {
-		return errs.FailErr(ctx, err)
+		return util.PageResp[model.ClientVersion]{}, err
 	}
-	return errs.OK(ctx, util.Page(list, total, req.PageIndex, req.PageSize))
+	return util.Page(list, total, req.PageIndex, req.PageSize), nil
 }
 
 // handleClientVersionGet 客户端版本详情。
@@ -62,12 +63,8 @@ func handleClientVersionList(ctx http.Context) error {
 // @Param id path int true "版本ID"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/client/version/{id} [get]
-func handleClientVersionGet(ctx http.Context) error {
-	m, err := logic.ClientVersionGet(paramInt(ctx, "id"))
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+func handleClientVersionGet(ctx http.Context) (*model.ClientVersion, error) {
+	return logic.ClientVersionGet(paramInt(ctx, "id"))
 }
 
 // handleClientVersionCreate 新增客户端版本。
@@ -78,16 +75,12 @@ func handleClientVersionGet(ctx http.Context) error {
 // @Param body body dto.ClientVersionSaveReq true "请求体"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/client/version [post]
-func handleClientVersionCreate(ctx http.Context) error {
+func handleClientVersionCreate(ctx http.Context) (*model.ClientVersion, error) {
 	var req dto.ClientVersionSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	m, err := logic.ClientVersionCreate(req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+	return logic.ClientVersionCreate(req)
 }
 
 // handleClientVersionUpdate 修改客户端版本。
@@ -99,16 +92,12 @@ func handleClientVersionCreate(ctx http.Context) error {
 // @Param body body dto.ClientVersionSaveReq true "请求体"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/client/version/{id} [put]
-func handleClientVersionUpdate(ctx http.Context) error {
+func handleClientVersionUpdate(ctx http.Context) (*model.ClientVersion, error) {
 	var req dto.ClientVersionSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	m, err := logic.ClientVersionUpdate(paramInt(ctx, "id"), req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, m)
+	return logic.ClientVersionUpdate(paramInt(ctx, "id"), req)
 }
 
 // handleClientVersionDelete 批量删除客户端版本。
@@ -155,8 +144,8 @@ func handleClientVersionStatus(ctx http.Context) error {
 // @Produce json
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/client/sim/options [get]
-func handleSimOptions(ctx http.Context) error {
-	return errs.OK(ctx, logic.SimOptions())
+func handleSimOptions(ctx http.Context) (dto.SimOptionsResp, error) {
+	return logic.SimOptions(), nil
 }
 
 // handleSimLogin 模拟客户端账号登录，返回 token 与网关地址。
@@ -167,16 +156,12 @@ func handleSimOptions(ctx http.Context) error {
 // @Param body body dto.SimLoginReq true "账号登录参数"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/client/sim/login [post]
-func handleSimLogin(ctx http.Context) error {
+func handleSimLogin(ctx http.Context) (*dto.SimLoginResp, error) {
 	var req dto.SimLoginReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	resp, err := logic.SimLogin(req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, resp)
+	return logic.SimLogin(req)
 }
 
 // handleSimConnect 模拟客户端与网关建立 WebSocket 连接。
@@ -187,16 +172,12 @@ func handleSimLogin(ctx http.Context) error {
 // @Param body body dto.SimSessionReq true "会话参数"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/client/sim/connect [post]
-func handleSimConnect(ctx http.Context) error {
+func handleSimConnect(ctx http.Context) (*dto.SimConnectResp, error) {
 	var req dto.SimSessionReq
 	if err := bindBody(ctx, &req); err != nil || req.SessionID == "" {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	resp, err := logic.SimConnect(req.SessionID)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, resp)
+	return logic.SimConnect(req.SessionID)
 }
 
 // handleSimStep 执行首包验证 / 进入游戏 / 退出游戏。
@@ -207,16 +188,12 @@ func handleSimConnect(ctx http.Context) error {
 // @Param body body dto.SimStepReq true "步骤参数"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/client/sim/step [post]
-func handleSimStep(ctx http.Context) error {
+func handleSimStep(ctx http.Context) (*dto.SimStepResp, error) {
 	var req dto.SimStepReq
 	if err := bindBody(ctx, &req); err != nil || req.SessionID == "" {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	resp, err := logic.SimStep(req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, resp)
+	return logic.SimStep(req)
 }
 
 // handleSimClose 关闭模拟器会话。

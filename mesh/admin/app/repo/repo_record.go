@@ -1,8 +1,8 @@
 package repo
 
 import (
-	"server-cluster/share/pb"
 	"gorm.io/gorm"
+	"server-cluster/share/pb"
 
 	"server-cluster/internal/svc"
 	"server-cluster/share/enum"

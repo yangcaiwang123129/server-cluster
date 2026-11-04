@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 
-	"server-cluster/node/game/app/global"
 	"server-cluster/node/game/app/logic"
 	"server-cluster/share/pb"
 )
@@ -29,6 +28,6 @@ func (p *GmProvider) MailSend(ctx context.Context, req *pb.GmMailSendReq) (*pb.M
 	if err != nil {
 		return nil, err
 	}
-	flushPlayer(ctx, req.GetPlayerId(), global.PlayerMailCache)
+	flushModule(ctx, req.GetPlayerId(), logic.Mail().Flush)
 	return entry, nil
 }

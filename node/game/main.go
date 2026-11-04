@@ -3,6 +3,9 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"strings"
+
 	"server-cluster/internal/router"
 	"server-cluster/internal/singleinstance"
 	_ "server-cluster/node/game/app/handler" // 触发 handler_gm_player.go 的 init() 注册路由到 routes 切片
@@ -12,6 +15,7 @@ import (
 
 	// "server-cluster/share/consts" // TODO: 临时跳过
 	"server-cluster/share/pb"
+	"server-cluster/share/util"
 
 	"github.com/dobyte/due/locate/redis/v2"
 	"github.com/dobyte/due/registry/etcd/v2"
@@ -61,5 +65,34 @@ func main() {
 	// 停止快照同步
 	logic.ActivitySync().Stop()
 	// 释放资源
-	global.Destroy()
+	destroy()
+}
+
+// destroy 进程退出后释放缓存刷盘、DB / Redis 等资源，并按统一停服日志输出。
+// 缓存实例收口在 logic 包（logic.CloseCaches），故此流程自 global 包迁至 main。
+func destroy() {
+	sl := util.NewShutdownLog(consts.NodeInstanceID(), 2)
+	sl.Start()
+
+	sl.Step("玩家数据缓存落盘", func() (string, error) {
+		stats := logic.CloseCaches()
+		rows := 0
+		lines := make([]string, 0, len(stats))
+		for _, s := range stats {
+			rows += s.Rows
+			lines = append(lines, fmt.Sprintf("%s · %d 条待写 · %s", s.Name, s.Rows, util.FormatDuration(s.Cost)))
+		}
+		detail := fmt.Sprintf("%d 个缓存 · %d 条待写", len(stats), rows)
+		if len(lines) > 0 {
+			detail += "\n" + strings.Join(lines, "\n")
+		}
+		return detail, nil
+	})
+
+	sl.Step("MySQL / Redis 连接关闭", func() (string, error) {
+		mysql, redis := svc.Counts()
+		return fmt.Sprintf("MySQL %d 实例 · Redis %d 实例", mysql, redis), svc.Close()
+	})
+
+	sl.End()
 }

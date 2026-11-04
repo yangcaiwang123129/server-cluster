@@ -2,14 +2,13 @@ package logic
 
 import (
 	"context"
-	"errors"
-	"server-cluster/internal/record"
 	"sort"
 
-	"gorm.io/gorm"
-
+	"server-cluster/internal/cache"
+	"server-cluster/internal/record"
 	"server-cluster/node/game/app/global"
 	"server-cluster/share/convert"
+	"server-cluster/share/enum"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
@@ -17,6 +16,9 @@ import (
 	"server-cluster/share/tpl"
 	"server-cluster/share/util"
 )
+
+// weaponCache 玩家武器持有（player_weapon，一玩家一行，武器 map JSON）；读走 LRU，写异步批量 upsert。
+var weaponCache = cache.NewPlayerTableCache[model.PlayerWeapon](cache.CacherConfig{Name: enum.TablePlayerWeapon.String()})
 
 type weaponLogic struct{}
 
@@ -37,7 +39,7 @@ func newWeaponInfo(cfgID int32) model.WeaponInfo {
 
 // WeaponList 武器持有列表（供 HeroList 聚合下发与 GM 查询）。
 func (this *weaponLogic) WeaponList(ctx context.Context, playerID int64) ([]*pb.WeaponEntry, error) {
-	row, err := loadPlayerWeapon(ctx, playerID)
+	row, err := this.Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +56,7 @@ func (this *weaponLogic) WeaponList(ctx context.Context, playerID int64) ([]*pb.
 
 // WeaponUpdate 更新武器：整体覆盖持有状态，未拥有返回错误。
 func (this *weaponLogic) WeaponUpdate(ctx context.Context, playerID int64, req *pb.WeaponUpdateReq) (*pb.WeaponUpdateResp, error) {
-	row, err := loadPlayerWeapon(ctx, playerID)
+	row, err := this.Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -70,14 +72,14 @@ func (this *weaponLogic) WeaponUpdate(ctx context.Context, playerID int64, req *
 		return &pb.WeaponUpdateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "武器未拥有")}, nil
 	}
 
-	global.PlayerWeaponCache.Set(playerID, row)
+	this.Save(playerID, row)
 	notifyHeroByWeapon(ctx, playerID, w.WeaponID)
 	return &pb.WeaponUpdateResp{WeaponEntry: convert.WeaponEntry(w)}, nil
 }
 
 // weaponOwned 取玩家指定武器持有与其绑定英雄ID。
 func weaponOwned(ctx context.Context, playerID int64, cfgID int32) (*model.PlayerWeapon, model.WeaponInfo, int32, error) {
-	row, err := loadPlayerWeapon(ctx, playerID)
+	row, err := Weapon().Get(ctx, playerID)
 	if err != nil {
 		return nil, model.WeaponInfo{}, 0, err
 	}
@@ -117,7 +119,7 @@ func weaponDimGrow(ctx context.Context, playerID int64, cfgID int32,
 	if !row.UpdateWeapon(w) {
 		return nil, model.WeaponInfo{}, 0, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "武器未拥有")
 	}
-	global.PlayerWeaponCache.Set(playerID, row)
+	weaponCache.Set(playerID, row)
 	notifyHero(ctx, playerID, heroID)
 	return row, w, heroID, nil
 }
@@ -221,7 +223,7 @@ func (this *weaponLogic) WeaponEnsureForHero(ctx context.Context, playerID int64
 	if cfg == nil || cfg.WeaponId <= 0 {
 		return nil
 	}
-	row, err := loadPlayerWeapon(ctx, playerID)
+	row, err := this.Get(ctx, playerID)
 	if err != nil {
 		return err
 	}
@@ -231,16 +233,16 @@ func (this *weaponLogic) WeaponEnsureForHero(ctx context.Context, playerID int64
 	if !row.AddWeapon(newWeaponInfo(cfg.WeaponId)) {
 		return nil
 	}
-	global.PlayerWeaponCache.Set(playerID, row)
+	this.Save(playerID, row)
 	return nil
 }
 
 // EnterGame 进入游戏：加载玩家武器持有，未建档则初始化空集合；并按已拥有英雄兜底补建绑定武器。
-func (this *weaponLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
-	if _, err := loadPlayerWeapon(ctx, playerID); err != nil {
+func (this *weaponLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
+	if _, err := this.Get(ctx, playerID); err != nil {
 		return err
 	}
-	heroes, err := loadPlayerHero(ctx, playerID)
+	heroes, err := Hero().Get(ctx, playerID)
 	if err != nil {
 		return err
 	}
@@ -261,28 +263,34 @@ func (this *weaponLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.En
 }
 
 // LeaveGame 离开游戏：武器持有数据同步落库，并逐出内存缓存。
-func (this *weaponLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
-	if err := flushAndEvict(ctx, global.PlayerWeaponCache, playerID); err != nil {
+func (this *weaponLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
+	if err := flushAndEvict(ctx, weaponCache, playerID); err != nil {
 		return err
 	}
 	return nil
 }
 
-// loadPlayerWeapon 加载玩家武器持有；未建档则初始化空 map 并挂入缓存（异步落库）。
-func loadPlayerWeapon(ctx context.Context, playerID int64) (*model.PlayerWeapon, error) {
-	row, err := global.PlayerWeaponCache.Get(ctx, playerID)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		row = &model.PlayerWeapon{PlayerID: playerID, Weapons: util.NewSafeMap[int32, model.WeaponInfo]()}
-		global.PlayerWeaponCache.Set(playerID, row)
-		return row, nil
-	}
-	if err != nil {
-		return nil, err
-	}
-	if row.Weapons == nil {
-		row.Weapons = util.NewSafeMap[int32, model.WeaponInfo]()
-	}
-	return row, nil
+// LoadPlayer 加载玩家武器持有；未建档则初始化空 map 并挂入缓存（异步落库）。
+func (this *weaponLogic) Get(ctx context.Context, playerID int64) (*model.PlayerWeapon, error) {
+	return weaponCache.GetOrInit(ctx, playerID,
+		func(id int64) *model.PlayerWeapon {
+			return &model.PlayerWeapon{PlayerID: id, Weapons: util.NewSafeMap[int32, model.WeaponInfo]()}
+		},
+		func(row *model.PlayerWeapon) {
+			if row.Weapons == nil {
+				row.Weapons = util.NewSafeMap[int32, model.WeaponInfo]()
+			}
+		})
+}
+
+// Save 写回玩家武器持有并挂入异步落库队列。
+func (this *weaponLogic) Save(playerID int64, row *model.PlayerWeapon) {
+	weaponCache.Set(playerID, row)
+}
+
+// Flush 同步落库并逐出缓存（GM 直改 DB 后强制回源）。
+func (this *weaponLogic) Flush(ctx context.Context, playerID int64) error {
+	return flushAndEvict(ctx, weaponCache, playerID)
 }
 
 // ============ 资产接口实现（AssetHandler，唯一持有型：key 为武器配置ID） ============
@@ -298,7 +306,7 @@ func (this *weaponAssetHandler) Add(ctx context.Context, playerID int64, cfgID, 
 	if !tpl.T().Weapon.Has(cfgID) {
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "武器配置不存在")
 	}
-	row, err := loadPlayerWeapon(ctx, playerID)
+	row, err := Weapon().Get(ctx, playerID)
 	if err != nil {
 		return err
 	}
@@ -309,7 +317,7 @@ func (this *weaponAssetHandler) Add(ctx context.Context, playerID int64, cfgID, 
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "武器已拥有")
 	}
 
-	global.PlayerWeaponCache.Set(playerID, row)
+	weaponCache.Set(playerID, row)
 	record.Record(ctx, model.RecordModuleWeapon, playerID, model.RecordActionGain, cfgID, 1)
 	notifyHeroByWeapon(ctx, playerID, cfgID)
 	return nil
@@ -317,7 +325,7 @@ func (this *weaponAssetHandler) Add(ctx context.Context, playerID int64, cfgID, 
 
 // Remove 扣除武器；未拥有返回错误。
 func (this *weaponAssetHandler) Remove(ctx context.Context, playerID int64, cfgID, _ int32) error {
-	row, err := loadPlayerWeapon(ctx, playerID)
+	row, err := Weapon().Get(ctx, playerID)
 	if err != nil {
 		return err
 	}
@@ -325,7 +333,7 @@ func (this *weaponAssetHandler) Remove(ctx context.Context, playerID int64, cfgI
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "武器未拥有")
 	}
 
-	global.PlayerWeaponCache.Set(playerID, row)
+	weaponCache.Set(playerID, row)
 	record.Record(ctx, model.RecordModuleWeapon, playerID, model.RecordActionConsume, cfgID, 1)
 	notifyHeroByWeapon(ctx, playerID, cfgID)
 	return nil
@@ -349,7 +357,7 @@ func (this *weaponAssetHandler) Update(ctx context.Context, playerID int64, cfgI
 
 // Query 查询是否持有：持有 1，未持有 0。
 func (this *weaponAssetHandler) Query(ctx context.Context, playerID int64, cfgID int32) (int32, error) {
-	row, err := loadPlayerWeapon(ctx, playerID)
+	row, err := Weapon().Get(ctx, playerID)
 	if err != nil {
 		return 0, err
 	}
@@ -361,7 +369,7 @@ func (this *weaponAssetHandler) Query(ctx context.Context, playerID int64, cfgID
 
 // List 列出全部武器（按配置ID升序）。
 func (this *weaponAssetHandler) List(ctx context.Context, playerID int64) ([]*tpl.Asset, error) {
-	row, err := loadPlayerWeapon(ctx, playerID)
+	row, err := Weapon().Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -382,7 +390,7 @@ func (this *weaponLogic) AttributeBonus(ctx context.Context, playerID int64, her
 	if cfg == nil || cfg.WeaponId <= 0 {
 		return &pb.HeroAttribute{}, nil
 	}
-	row, err := loadPlayerWeapon(ctx, playerID)
+	row, err := this.Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}

@@ -28,37 +28,37 @@ type RecordFields struct {
 	TableModel `gorm:"embedded"`
 }
 
-// ItemRecord 物品打点记录，对应 item_record 表。
-type ItemRecord struct {
+// RecordItem 物品打点记录，对应 item_record 表。
+type RecordItem struct {
 	RecordFields `gorm:"embedded"`
 }
 
-func (ItemRecord) TableName() string { return enum.TableRecordItem.String() }
+func (RecordItem) TableName() string { return enum.TableRecordItem.String() }
 
-// EquipRecord 装备打点记录，对应 equip_record 表。
-type EquipRecord struct {
+// RecordEquip 装备打点记录，对应 equip_record 表。
+type RecordEquip struct {
 	RecordFields `gorm:"embedded"`
 }
 
-func (EquipRecord) TableName() string { return enum.TableRecordEquip.String() }
+func (RecordEquip) TableName() string { return enum.TableRecordEquip.String() }
 
-// WeaponRecord 武器打点记录，对应 weapon_record 表。
-type WeaponRecord struct {
+// RecordWeapon 武器打点记录，对应 weapon_record 表。
+type RecordWeapon struct {
 	RecordFields `gorm:"embedded"`
 }
 
-func (WeaponRecord) TableName() string { return enum.TableRecordWeapon.String() }
+func (RecordWeapon) TableName() string { return enum.TableRecordWeapon.String() }
 
-// SkillRecord 技能打点记录，对应 skill_record 表。
-type SkillRecord struct {
+// RecordSkill 技能打点记录，对应 skill_record 表。
+type RecordSkill struct {
 	RecordFields `gorm:"embedded"`
 }
 
-func (SkillRecord) TableName() string { return enum.TableRecordSkill.String() }
+func (RecordSkill) TableName() string { return enum.TableRecordSkill.String() }
 
-// HeroRecord 英雄打点记录，对应 hero_record 表。
-type HeroRecord struct {
+// RecordHero 英雄打点记录，对应 hero_record 表。
+type RecordHero struct {
 	RecordFields `gorm:"embedded"`
 }
 
-func (HeroRecord) TableName() string { return enum.TableRecordHero.String() }
+func (RecordHero) TableName() string { return enum.TableRecordHero.String() }

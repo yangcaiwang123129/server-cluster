@@ -8,16 +8,21 @@ import (
 
 	"gorm.io/gorm"
 
+	"server-cluster/internal/cache"
 	"server-cluster/internal/record"
 	"server-cluster/internal/svc"
 	"server-cluster/node/game/app/global"
 	"server-cluster/share/convert"
+	"server-cluster/share/enum"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
 	"server-cluster/share/singleton"
 	"server-cluster/share/tpl"
 )
+
+// itemCache 玩家物品容器（player_item，一玩家一行）；读走 LRU，写异步批量 upsert。
+var itemCache = cache.NewPlayerTableCache[model.PlayerItem](cache.CacherConfig{Name: enum.TablePlayerItem.String()})
 
 type itemLogic struct{}
 
@@ -45,12 +50,12 @@ func itemErr(err error) error {
 	}
 }
 
-// loadItem 从缓存加载玩家物品容器集合；未建档则新建并挂入缓存（异步落库）。
-func loadItem(ctx context.Context, playerID int64) (*model.PlayerItem, error) {
-	pc, err := global.PlayerItemCache.Get(ctx, playerID)
+// LoadPlayer 加载玩家物品容器集合；未建档则初始化并挂入缓存（异步落库）。
+func (this *itemLogic) Get(ctx context.Context, playerID int64) (*model.PlayerItem, error) {
+	pc, err := itemCache.Get(ctx, playerID)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		pc = model.NewPlayerItem(playerID)
-		global.PlayerItemCache.Set(playerID, pc)
+		itemCache.Set(playerID, pc)
 		return pc, nil
 	}
 	if err != nil {
@@ -61,14 +66,19 @@ func loadItem(ctx context.Context, playerID int64) (*model.PlayerItem, error) {
 	return pc, nil
 }
 
-// saveItem 挂回缓存并异步批量落库。
-func saveItem(playerID int64, pc *model.PlayerItem) {
-	global.PlayerItemCache.Set(playerID, pc)
+// Save 写回玩家物品容器并挂入异步落库队列。
+func (this *itemLogic) Save(playerID int64, row *model.PlayerItem) {
+	itemCache.Set(playerID, row)
+}
+
+// Flush 同步落库并逐出缓存（GM 直改 DB 后强制回源）。
+func (this *itemLogic) Flush(ctx context.Context, playerID int64) error {
+	return flushAndEvict(ctx, itemCache, playerID)
 }
 
 // itemContainerOf 加载玩家物品容器集合并取出指定类型的容器（返回 *ItemContainer）。
 func itemContainerOf(ctx context.Context, playerID int64, t pb.ContainerType) (*model.PlayerItem, *model.ItemContainer, error) {
-	pc, err := loadItem(ctx, playerID)
+	pc, err := Item().Get(ctx, playerID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -84,8 +94,8 @@ func itemContainerOf(ctx context.Context, playerID int64, t pb.ContainerType) (*
 }
 
 // EnterGame 进入游戏：加载/建档玩家物品容器，未建档则初始化并挂入缓存。
-func (this *itemLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
-	if _, err := loadItem(ctx, playerID); err != nil {
+func (this *itemLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
+	if _, err := this.Get(ctx, playerID); err != nil {
 		return err
 	}
 	// 物品容器数据由 ItemContainerList 下发，这里只预热缓存
@@ -93,8 +103,8 @@ func (this *itemLogic) EnterGame(ctx context.Context, playerID int64, _ *pb.Ente
 }
 
 // LeaveGame 离开游戏：物品容器待写数据同步落库，并逐出内存缓存。
-func (this *itemLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
-	if err := flushAndEvict(ctx, global.PlayerItemCache, playerID); err != nil {
+func (this *itemLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
+	if err := flushAndEvict(ctx, itemCache, playerID); err != nil {
 		return err
 	}
 	return nil
@@ -102,7 +112,7 @@ func (this *itemLogic) LeaveGame(ctx context.Context, playerID int64, _ *pb.Leav
 
 // ItemContainerList 物品容器列表：指定类型返回该容器，UNSPECIFIED 返回全部容器。
 func (this *itemLogic) ItemContainerList(ctx context.Context, playerID int64, req *pb.ItemContainerListReq) (*pb.ItemContainerListResp, error) {
-	pc, err := loadItem(ctx, playerID)
+	pc, err := this.Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +151,7 @@ func (this *itemLogic) ItemMove(ctx context.Context, playerID int64, req *pb.Ite
 		return nil, err
 	}
 
-	saveItem(playerID, pc)
+	this.Save(playerID, pc)
 	return &pb.ItemMoveResp{}, nil
 }
 
@@ -163,7 +173,7 @@ func (this *itemLogic) ItemRotate(ctx context.Context, playerID int64, req *pb.I
 		return nil, err
 	}
 
-	saveItem(playerID, pc)
+	this.Save(playerID, pc)
 	return &pb.ItemRotateResp{}, nil
 }
 
@@ -185,7 +195,7 @@ func (this *itemLogic) ItemSort(ctx context.Context, playerID int64, req *pb.Ite
 		return nil, err
 	}
 
-	saveItem(playerID, pc)
+	this.Save(playerID, pc)
 	return &pb.ItemSortResp{}, nil
 }
 
@@ -198,7 +208,7 @@ func (this *itemLogic) ItemTransfer(ctx context.Context, playerID int64, req *pb
 		return &pb.ItemTransferResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "")}, nil
 	}
 
-	pc, err := loadItem(ctx, playerID)
+	pc, err := this.Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -216,7 +226,7 @@ func (this *itemLogic) ItemTransfer(ctx context.Context, playerID int64, req *pb
 		return nil, err
 	}
 
-	saveItem(playerID, pc)
+	this.Save(playerID, pc)
 	return &pb.ItemTransferResp{
 		FromContainer: convert.ItemContainer(playerID, fromC),
 		ToContainer:   convert.ItemContainer(playerID, toC),
@@ -263,7 +273,7 @@ func (this *itemLogic) ItemAddEntry(ctx context.Context, playerID int64, req *pb
 		return nil, err
 	}
 
-	saveItem(playerID, pc)
+	this.Save(playerID, pc)
 	record.Record(ctx, model.RecordModuleItem, playerID, model.RecordActionGain, req.GetCfgId(), count)
 	return &pb.ItemContainerListResp{ItemContainers: []*pb.ItemContainer{convert.ItemContainer(playerID, c)}}, nil
 }
@@ -285,7 +295,7 @@ func (this *itemAssetHandler) Add(ctx context.Context, playerID int64, cfgID, co
 		count = 1
 	}
 
-	pc, err := loadItem(ctx, playerID)
+	pc, err := Item().Get(ctx, playerID)
 	if err != nil {
 		return err
 	}
@@ -293,7 +303,7 @@ func (this *itemAssetHandler) Add(ctx context.Context, playerID int64, cfgID, co
 		return err
 	}
 
-	saveItem(playerID, pc)
+	itemCache.Set(playerID, pc)
 	record.Record(ctx, model.RecordModuleItem, playerID, model.RecordActionGain, cfgID, count)
 	return nil
 }
@@ -304,7 +314,7 @@ func (this *itemAssetHandler) Remove(ctx context.Context, playerID int64, cfgID,
 		count = 1
 	}
 
-	pc, err := loadItem(ctx, playerID)
+	pc, err := Item().Get(ctx, playerID)
 	if err != nil {
 		return err
 	}
@@ -314,7 +324,7 @@ func (this *itemAssetHandler) Remove(ctx context.Context, playerID int64, cfgID,
 	}
 
 	takeItemEntries(c, cfgID, count)
-	saveItem(playerID, pc)
+	itemCache.Set(playerID, pc)
 	record.Record(ctx, model.RecordModuleItem, playerID, model.RecordActionConsume, cfgID, count)
 	return nil
 }
@@ -339,7 +349,7 @@ func (this *itemAssetHandler) Update(ctx context.Context, playerID int64, cfgID,
 
 // Query 查询背包中该物品的持有总量。
 func (this *itemAssetHandler) Query(ctx context.Context, playerID int64, cfgID int32) (int32, error) {
-	pc, err := loadItem(ctx, playerID)
+	pc, err := Item().Get(ctx, playerID)
 	if err != nil {
 		return 0, err
 	}
@@ -348,7 +358,7 @@ func (this *itemAssetHandler) Query(ctx context.Context, playerID int64, cfgID i
 
 // List 列出背包中按配置ID汇总的物品（按配置ID升序）。
 func (this *itemAssetHandler) List(ctx context.Context, playerID int64) ([]*tpl.Asset, error) {
-	pc, err := loadItem(ctx, playerID)
+	pc, err := Item().Get(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}

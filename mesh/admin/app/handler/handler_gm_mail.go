@@ -11,8 +11,8 @@ import (
 // RegisterMail 注册 GM 邮件管理路由。
 func RegisterMail(router http.Router) {
 	g := gmGroup(router)
-	g.Get("/mail", handleGmMailList)
-	g.Post("/mail", handleGmMailSend)
+	g.Get("/mail", handle(handleGmMailList))
+	g.Post("/mail", handle(handleGmMailSend))
 }
 
 // handleGmMailList 玩家邮件列表。
@@ -22,16 +22,12 @@ func RegisterMail(router http.Router) {
 // @Param playerId query int true "玩家ID"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/mail [get]
-func handleGmMailList(ctx http.Context) error {
+func handleGmMailList(ctx http.Context) ([]dto.GmMailEntry, error) {
 	req := dto.GmPlayerReq{PlayerID: queryPlayerID(ctx)}
 	if req.PlayerID <= 0 {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	list, err := logic.GmMail().MailList(req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, list)
+	return logic.GmMail().MailList(req)
 }
 
 // handleGmMailSend 发送邮件（可带附件）。
@@ -41,14 +37,10 @@ func handleGmMailList(ctx http.Context) error {
 // @Param body body dto.GmMailSendReq true "发送参数（attachments 为空则为纯通知）"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/mail [post]
-func handleGmMailSend(ctx http.Context) error {
+func handleGmMailSend(ctx http.Context) (*dto.GmMailEntry, error) {
 	var req dto.GmMailSendReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.Title == "" {
-		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	entry, err := logic.GmMail().MailSend(req)
-	if err != nil {
-		return errs.FailErr(ctx, err)
-	}
-	return errs.OK(ctx, entry)
+	return logic.GmMail().MailSend(req)
 }
