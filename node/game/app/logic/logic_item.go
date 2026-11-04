@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"sort"
 
-	"gorm.io/gorm"
-
 	"server-cluster/internal/cache"
 	"server-cluster/internal/record"
 	"server-cluster/internal/svc"
@@ -30,7 +28,7 @@ var itemLogicInst = singleton.NewContainer[global.ItemLogic]("ItemLogic")
 
 func init() {
 	itemLogicInst.Register(&itemLogic{})
-	registerAsset(&itemAssetHandler{})
+	registerAsset(&itemAssetStore{})
 }
 
 // Item 获取玩家物品容器业务单例。
@@ -50,20 +48,16 @@ func itemErr(err error) error {
 	}
 }
 
-// LoadPlayer 加载玩家物品容器集合；未建档则初始化并挂入缓存（异步落库）。
-func (this *itemLogic) Get(ctx context.Context, playerID int64) (*model.PlayerItem, error) {
-	pc, err := itemCache.Get(ctx, playerID)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		pc = model.NewPlayerItem(playerID)
-		itemCache.Set(playerID, pc)
-		return pc, nil
-	}
-	if err != nil {
-		return nil, err
-	}
-	// JSON 反序列化后需回填运行时字段（GlobalID/OwnerID/OwnerType）
-	pc.Rebuild()
-	return pc, nil
+// Load 加载玩家物品容器集合；未建档则初始化并挂入缓存（异步落库）。
+func (this *itemLogic) Load(ctx context.Context, playerID int64) (*model.PlayerItem, error) {
+	return itemCache.GetOrInit(ctx, playerID,
+		func(id int64) *model.PlayerItem {
+			return model.NewPlayerItem(id)
+		},
+		func(pc *model.PlayerItem) {
+			// JSON 反序列化后需回填运行时字段（GlobalID/OwnerID/OwnerType）
+			pc.Rebuild()
+		})
 }
 
 // Save 写回玩家物品容器并挂入异步落库队列。
@@ -78,7 +72,7 @@ func (this *itemLogic) Flush(ctx context.Context, playerID int64) error {
 
 // itemContainerOf 加载玩家物品容器集合并取出指定类型的容器（返回 *ItemContainer）。
 func itemContainerOf(ctx context.Context, playerID int64, t pb.ContainerType) (*model.PlayerItem, *model.ItemContainer, error) {
-	pc, err := Item().Get(ctx, playerID)
+	pc, err := Item().Load(ctx, playerID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -95,7 +89,7 @@ func itemContainerOf(ctx context.Context, playerID int64, t pb.ContainerType) (*
 
 // EnterGame 进入游戏：加载/建档玩家物品容器，未建档则初始化并挂入缓存。
 func (this *itemLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
-	if _, err := this.Get(ctx, playerID); err != nil {
+	if _, err := this.Load(ctx, playerID); err != nil {
 		return err
 	}
 	// 物品容器数据由 ItemContainerList 下发，这里只预热缓存
@@ -112,7 +106,7 @@ func (this *itemLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.Le
 
 // ItemContainerList 物品容器列表：指定类型返回该容器，UNSPECIFIED 返回全部容器。
 func (this *itemLogic) ItemContainerList(ctx context.Context, playerID int64, req *pb.ItemContainerListReq) (*pb.ItemContainerListResp, error) {
-	pc, err := this.Get(ctx, playerID)
+	pc, err := this.Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -208,7 +202,7 @@ func (this *itemLogic) ItemTransfer(ctx context.Context, playerID int64, req *pb
 		return &pb.ItemTransferResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "")}, nil
 	}
 
-	pc, err := this.Get(ctx, playerID)
+	pc, err := this.Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -278,16 +272,16 @@ func (this *itemLogic) ItemAddEntry(ctx context.Context, playerID int64, req *pb
 	return &pb.ItemContainerListResp{ItemContainers: []*pb.ItemContainer{convert.ItemContainer(playerID, c)}}, nil
 }
 
-// ============ 资产接口实现（AssetHandler，可叠加型，落在背包容器） ============
+// ============ 资产接口实现（AssetStore，可叠加型，落在背包容器） ============
 
-// itemAssetHandler 物品资产实现：放在玩家背包的网格里。
-type itemAssetHandler struct{}
+// itemAssetStore 物品资产实现：放在玩家背包的网格里。
+type itemAssetStore struct{}
 
 // AssetType 资产类型：物品。
-func (this *itemAssetHandler) AssetType() tpl.AssetType { return tpl.AssetType_Item }
+func (this *itemAssetStore) AssetType() tpl.AssetType { return tpl.AssetType_Item }
 
 // Add 发放物品到背包；背包放不下返回错误。
-func (this *itemAssetHandler) Add(ctx context.Context, playerID int64, cfgID, count int32) error {
+func (this *itemAssetStore) Add(ctx context.Context, playerID int64, cfgID, count int32) error {
 	if !tpl.T().Item.Has(cfgID) {
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "物品配置不存在")
 	}
@@ -295,7 +289,7 @@ func (this *itemAssetHandler) Add(ctx context.Context, playerID int64, cfgID, co
 		count = 1
 	}
 
-	pc, err := Item().Get(ctx, playerID)
+	pc, err := Item().Load(ctx, playerID)
 	if err != nil {
 		return err
 	}
@@ -309,12 +303,12 @@ func (this *itemAssetHandler) Add(ctx context.Context, playerID int64, cfgID, co
 }
 
 // Remove 从背包扣除物品；数量不足返回错误且不改动数据。
-func (this *itemAssetHandler) Remove(ctx context.Context, playerID int64, cfgID, count int32) error {
+func (this *itemAssetStore) Remove(ctx context.Context, playerID int64, cfgID, count int32) error {
 	if count <= 0 {
 		count = 1
 	}
 
-	pc, err := Item().Get(ctx, playerID)
+	pc, err := Item().Load(ctx, playerID)
 	if err != nil {
 		return err
 	}
@@ -330,7 +324,7 @@ func (this *itemAssetHandler) Remove(ctx context.Context, playerID int64, cfgID,
 }
 
 // Update 覆盖持有数量：count<=0 全部移除，>0 补足/扣除差额。
-func (this *itemAssetHandler) Update(ctx context.Context, playerID int64, cfgID, count int32) error {
+func (this *itemAssetStore) Update(ctx context.Context, playerID int64, cfgID, count int32) error {
 	owned, err := this.Query(ctx, playerID, cfgID)
 	if err != nil {
 		return err
@@ -348,8 +342,8 @@ func (this *itemAssetHandler) Update(ctx context.Context, playerID int64, cfgID,
 }
 
 // Query 查询背包中该物品的持有总量。
-func (this *itemAssetHandler) Query(ctx context.Context, playerID int64, cfgID int32) (int32, error) {
-	pc, err := Item().Get(ctx, playerID)
+func (this *itemAssetStore) Query(ctx context.Context, playerID int64, cfgID int32) (int32, error) {
+	pc, err := Item().Load(ctx, playerID)
 	if err != nil {
 		return 0, err
 	}
@@ -357,8 +351,8 @@ func (this *itemAssetHandler) Query(ctx context.Context, playerID int64, cfgID i
 }
 
 // List 列出背包中按配置ID汇总的物品（按配置ID升序）。
-func (this *itemAssetHandler) List(ctx context.Context, playerID int64) ([]*tpl.Asset, error) {
-	pc, err := Item().Get(ctx, playerID)
+func (this *itemAssetStore) List(ctx context.Context, playerID int64) ([]*tpl.Asset, error) {
+	pc, err := Item().Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}

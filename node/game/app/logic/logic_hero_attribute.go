@@ -120,7 +120,7 @@ func dimConsume(ctx context.Context, playerID int64, material, use int32, hasNex
 
 // equippedHero 取出战英雄；未出战返回错误。
 func equippedHero(ctx context.Context, playerID int64) (*model.PlayerHero, model.HeroInfo, error) {
-	row, err := Hero().LoadPlayer(ctx, playerID)
+	row, err := Hero().Load(ctx, playerID)
 	if err != nil {
 		return nil, model.HeroInfo{}, err
 	}
@@ -139,7 +139,7 @@ func ownedHero(ctx context.Context, playerID int64, heroID int32) (*model.Player
 	if heroID <= 0 {
 		return equippedHero(ctx, playerID)
 	}
-	row, err := Hero().Get(ctx, playerID)
+	row, err := Hero().Load(ctx, playerID)
 	if err != nil {
 		return nil, model.HeroInfo{}, err
 	}
@@ -152,7 +152,7 @@ func ownedHero(ctx context.Context, playerID int64, heroID int32) (*model.Player
 
 // equippedHeroID 当前出战英雄ID；未出战返回 0（资产奖励按此默认归属，0 表示未分配）。
 func equippedHeroID(ctx context.Context, playerID int64) int32 {
-	row, err := Hero().Get(ctx, playerID)
+	row, err := Hero().Load(ctx, playerID)
 	if err != nil || row.Heroes == nil {
 		return 0
 	}

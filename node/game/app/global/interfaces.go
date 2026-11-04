@@ -4,7 +4,6 @@ package global
 
 import (
 	"context"
-	"server-cluster/internal/cache"
 	"server-cluster/share/model"
 
 	"server-cluster/share/pb"
@@ -34,9 +33,9 @@ type PlayerModule[T model.PlayerRow] interface {
 	Flush(ctx context.Context, playerID int64) error
 }
 
-// PlayerLogic 玩家模块业务接口：玩家生命周期 + 玩家资产消费入口（礼包购买/兑换/充值）。
+// PlayerLogic 玩家模块业务接口：玩家生命周期 + 核心数据（player_extra）模块能力 + 玩家资产消费入口（礼包购买/兑换/充值）。
 type PlayerLogic interface {
-	PlayerLifecycle
+	PlayerModule[*model.PlayerExtra]
 	// GetActor 获取玩家actor
 	GetActor(ctx context.Context, playerID int64) (*PlayerActor, error)
 	// GetActors 玩家获取所有actor

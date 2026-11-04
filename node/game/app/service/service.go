@@ -10,7 +10,7 @@ import (
 
 // GetOnlinePlayers 查看在线玩家列表（携带本实例 ID，供调用方按服分组）。
 func (p *GmProvider) GetOnlinePlayers(ctx context.Context, req *pb.GetOnlinePlayersReq) (*pb.GetOnlinePlayersResp, error) {
-	actors, err := logic.PlayerLogic().PlayerGetActors(ctx)
+	actors, err := logic.PlayerLogic().GetActors(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (p *GmProvider) KickPlayer(ctx context.Context, req *pb.KickPlayerReq) (*pb
 	}
 	resp := &pb.KickPlayerResp{}
 	for _, id := range req.PlayerIds {
-		if err := logic.PlayerLogic().PlayerKick(ctx, id); err != nil {
+		if err := logic.PlayerLogic().Kick(ctx, id); err != nil {
 			resp.FailedIds = append(resp.FailedIds, id)
 		}
 	}

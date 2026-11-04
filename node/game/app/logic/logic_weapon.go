@@ -26,7 +26,7 @@ var weaponLogicInst = singleton.NewContainer[global.WeaponLogic]("WeaponLogic")
 
 func init() {
 	weaponLogicInst.Register(&weaponLogic{})
-	registerAsset(&weaponAssetHandler{})
+	registerAsset(&weaponAssetStore{})
 }
 
 // Weapon 获取武器业务单例。
@@ -39,7 +39,7 @@ func newWeaponInfo(cfgID int32) model.WeaponInfo {
 
 // WeaponList 武器持有列表（供 HeroList 聚合下发与 GM 查询）。
 func (this *weaponLogic) WeaponList(ctx context.Context, playerID int64) ([]*pb.WeaponEntry, error) {
-	row, err := this.Get(ctx, playerID)
+	row, err := this.Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (this *weaponLogic) WeaponList(ctx context.Context, playerID int64) ([]*pb.
 
 // WeaponUpdate 更新武器：整体覆盖持有状态，未拥有返回错误。
 func (this *weaponLogic) WeaponUpdate(ctx context.Context, playerID int64, req *pb.WeaponUpdateReq) (*pb.WeaponUpdateResp, error) {
-	row, err := this.Get(ctx, playerID)
+	row, err := this.Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (this *weaponLogic) WeaponUpdate(ctx context.Context, playerID int64, req *
 
 // weaponOwned 取玩家指定武器持有与其绑定英雄ID。
 func weaponOwned(ctx context.Context, playerID int64, cfgID int32) (*model.PlayerWeapon, model.WeaponInfo, int32, error) {
-	row, err := Weapon().Get(ctx, playerID)
+	row, err := Weapon().Load(ctx, playerID)
 	if err != nil {
 		return nil, model.WeaponInfo{}, 0, err
 	}
@@ -223,7 +223,7 @@ func (this *weaponLogic) WeaponEnsureForHero(ctx context.Context, playerID int64
 	if cfg == nil || cfg.WeaponId <= 0 {
 		return nil
 	}
-	row, err := this.Get(ctx, playerID)
+	row, err := this.Load(ctx, playerID)
 	if err != nil {
 		return err
 	}
@@ -239,10 +239,10 @@ func (this *weaponLogic) WeaponEnsureForHero(ctx context.Context, playerID int64
 
 // EnterGame 进入游戏：加载玩家武器持有，未建档则初始化空集合；并按已拥有英雄兜底补建绑定武器。
 func (this *weaponLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
-	if _, err := this.Get(ctx, playerID); err != nil {
+	if _, err := this.Load(ctx, playerID); err != nil {
 		return err
 	}
-	heroes, err := Hero().Get(ctx, playerID)
+	heroes, err := Hero().Load(ctx, playerID)
 	if err != nil {
 		return err
 	}
@@ -270,8 +270,8 @@ func (this *weaponLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.
 	return nil
 }
 
-// LoadPlayer 加载玩家武器持有；未建档则初始化空 map 并挂入缓存（异步落库）。
-func (this *weaponLogic) Get(ctx context.Context, playerID int64) (*model.PlayerWeapon, error) {
+// Load 加载玩家武器持有；未建档则初始化空 map 并挂入缓存（异步落库）。
+func (this *weaponLogic) Load(ctx context.Context, playerID int64) (*model.PlayerWeapon, error) {
 	return weaponCache.GetOrInit(ctx, playerID,
 		func(id int64) *model.PlayerWeapon {
 			return &model.PlayerWeapon{PlayerID: id, Weapons: util.NewSafeMap[int32, model.WeaponInfo]()}
@@ -293,20 +293,20 @@ func (this *weaponLogic) Flush(ctx context.Context, playerID int64) error {
 	return flushAndEvict(ctx, weaponCache, playerID)
 }
 
-// ============ 资产接口实现（AssetHandler，唯一持有型：key 为武器配置ID） ============
+// ============ 资产接口实现（AssetStore，唯一持有型：key 为武器配置ID） ============
 
-// weaponAssetHandler 武器资产实现：落在 player_weapon。武器由英雄配置绑定，发放幂等。
-type weaponAssetHandler struct{}
+// weaponAssetStore 武器资产实现：落在 player_weapon。武器由英雄配置绑定，发放幂等。
+type weaponAssetStore struct{}
 
 // AssetType 资产类型：武器。
-func (this *weaponAssetHandler) AssetType() tpl.AssetType { return tpl.AssetType_Weapon }
+func (this *weaponAssetStore) AssetType() tpl.AssetType { return tpl.AssetType_Weapon }
 
 // Add 发放武器：已拥有视为成功（武器随英雄自动补建，避免奖励重复发放失败）。
-func (this *weaponAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _ int32) error {
+func (this *weaponAssetStore) Add(ctx context.Context, playerID int64, cfgID, _ int32) error {
 	if !tpl.T().Weapon.Has(cfgID) {
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "武器配置不存在")
 	}
-	row, err := Weapon().Get(ctx, playerID)
+	row, err := Weapon().Load(ctx, playerID)
 	if err != nil {
 		return err
 	}
@@ -324,8 +324,8 @@ func (this *weaponAssetHandler) Add(ctx context.Context, playerID int64, cfgID, 
 }
 
 // Remove 扣除武器；未拥有返回错误。
-func (this *weaponAssetHandler) Remove(ctx context.Context, playerID int64, cfgID, _ int32) error {
-	row, err := Weapon().Get(ctx, playerID)
+func (this *weaponAssetStore) Remove(ctx context.Context, playerID int64, cfgID, _ int32) error {
+	row, err := Weapon().Load(ctx, playerID)
 	if err != nil {
 		return err
 	}
@@ -340,7 +340,7 @@ func (this *weaponAssetHandler) Remove(ctx context.Context, playerID int64, cfgI
 }
 
 // Update 覆盖持有：count<=0 移除，>0 确保持有。
-func (this *weaponAssetHandler) Update(ctx context.Context, playerID int64, cfgID, count int32) error {
+func (this *weaponAssetStore) Update(ctx context.Context, playerID int64, cfgID, count int32) error {
 	owned, err := this.Query(ctx, playerID, cfgID)
 	if err != nil {
 		return err
@@ -356,8 +356,8 @@ func (this *weaponAssetHandler) Update(ctx context.Context, playerID int64, cfgI
 }
 
 // Query 查询是否持有：持有 1，未持有 0。
-func (this *weaponAssetHandler) Query(ctx context.Context, playerID int64, cfgID int32) (int32, error) {
-	row, err := Weapon().Get(ctx, playerID)
+func (this *weaponAssetStore) Query(ctx context.Context, playerID int64, cfgID int32) (int32, error) {
+	row, err := Weapon().Load(ctx, playerID)
 	if err != nil {
 		return 0, err
 	}
@@ -368,8 +368,8 @@ func (this *weaponAssetHandler) Query(ctx context.Context, playerID int64, cfgID
 }
 
 // List 列出全部武器（按配置ID升序）。
-func (this *weaponAssetHandler) List(ctx context.Context, playerID int64) ([]*tpl.Asset, error) {
-	row, err := Weapon().Get(ctx, playerID)
+func (this *weaponAssetStore) List(ctx context.Context, playerID int64) ([]*tpl.Asset, error) {
+	row, err := Weapon().Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -390,7 +390,7 @@ func (this *weaponLogic) AttributeBonus(ctx context.Context, playerID int64, her
 	if cfg == nil || cfg.WeaponId <= 0 {
 		return &pb.HeroAttribute{}, nil
 	}
-	row, err := this.Get(ctx, playerID)
+	row, err := this.Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}

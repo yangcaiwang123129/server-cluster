@@ -92,7 +92,7 @@ func Register(proxy *node.Proxy) {
 		disconnectedAt := util.Now().Unix()
 		go func() {
 			time.Sleep(10 * time.Second)
-			_ = logic.PlayerLogic().PlayerDestroyActorIfOffline(context.Background(), playerID, disconnectedAt)
+			_ = logic.PlayerLogic().DestroyActorIfOffline(context.Background(), playerID, disconnectedAt)
 		}()
 	})
 }

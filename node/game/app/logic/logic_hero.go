@@ -26,7 +26,7 @@ var heroLogicInst = singleton.NewContainer[global.HeroLogic]("HeroLogic")
 
 func init() {
 	heroLogicInst.Register(&heroLogic{})
-	registerAsset(&heroAssetHandler{})
+	registerAsset(&heroAssetStore{})
 }
 
 // Hero 获取英雄业务单例。
@@ -45,7 +45,7 @@ func (this *heroLogic) HeroList(ctx context.Context, playerID int64) (*pb.HeroLi
 // heroEntries 组装英雄完整持有视图：武器/技能按英雄配置的固定绑定反查，装备按所属英雄归组（仅已穿戴）。
 // 客户端以本结构为单位刷新，武器/技能/装备任一变化后重新下发即可整体替换。
 func heroEntries(ctx context.Context, playerID int64) ([]*pb.HeroEntry, error) {
-	row, err := Hero().Get(ctx, playerID)
+	row, err := Hero().Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +132,7 @@ func grantHeroBound(ctx context.Context, playerID, heroCfgID int64) error {
 // addHeroWithBound 新增英雄并初始化其固定绑定的武器/技能。
 // 先建武器/技能、再写入英雄，避免初始化失败后英雄已落进内存缓存造成脏数据。
 func addHeroWithBound(ctx context.Context, playerID int64, cfgID int32) (model.HeroInfo, error) {
-	row, err := Hero().Get(ctx, playerID)
+	row, err := Hero().Load(ctx, playerID)
 	if err != nil {
 		return model.HeroInfo{}, err
 	}
@@ -180,7 +180,7 @@ func (this *heroLogic) HeroAdd(ctx context.Context, playerID int64, req *pb.Hero
 
 // HeroUpdate 更新英雄：整体覆盖持有状态，未拥有返回错误。
 func (this *heroLogic) HeroUpdate(ctx context.Context, playerID int64, req *pb.HeroUpdateReq) (*pb.HeroUpdateResp, error) {
-	row, err := this.Get(ctx, playerID)
+	row, err := this.Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -255,7 +255,7 @@ func (this *heroLogic) HeroAttribute(ctx context.Context, playerID int64, req *p
 
 // HeroUpgrade 英雄升级：消耗配置表升级素材，等级 +1，最多到等级区间上限。
 func (this *heroLogic) HeroUpgrade(ctx context.Context, playerID int64, req *pb.HeroUpgradeReq) (*pb.HeroUpgradeResp, error) {
-	row, err := this.Get(ctx, playerID)
+	row, err := this.Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -338,8 +338,8 @@ func (this *heroLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.Le
 	return nil
 }
 
-// LoadPlayer 加载玩家英雄持有；未建档则初始化空 map 并挂入缓存（异步落库）。
-func (this *heroLogic) Get(ctx context.Context, playerID int64) (*model.PlayerHero, error) {
+// Load 加载玩家英雄持有；未建档则初始化空 map 并挂入缓存（异步落库）。
+func (this *heroLogic) Load(ctx context.Context, playerID int64) (*model.PlayerHero, error) {
 	return heroCache.GetOrInit(ctx, playerID,
 		func(id int64) *model.PlayerHero {
 			return &model.PlayerHero{PlayerID: id, Heroes: util.NewSafeMap[int32, model.HeroInfo]()}
@@ -361,16 +361,16 @@ func (this *heroLogic) Flush(ctx context.Context, playerID int64) error {
 	return flushAndEvict(ctx, heroCache, playerID)
 }
 
-// ============ 资产接口实现（AssetHandler，唯一持有型） ============
+// ============ 资产接口实现（AssetStore，唯一持有型） ============
 
-// heroAssetHandler 英雄资产实现：落在 player_hero。
-type heroAssetHandler struct{}
+// heroAssetStore 英雄资产实现：落在 player_hero。
+type heroAssetStore struct{}
 
 // AssetType 资产类型：英雄。
-func (this *heroAssetHandler) AssetType() tpl.AssetType { return tpl.AssetType_Hero }
+func (this *heroAssetStore) AssetType() tpl.AssetType { return tpl.AssetType_Hero }
 
 // Add 发放英雄；已拥有返回错误。
-func (this *heroAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _ int32) error {
+func (this *heroAssetStore) Add(ctx context.Context, playerID int64, cfgID, _ int32) error {
 	if !tpl.T().RoleInfo.Has(cfgID) {
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "英雄配置不存在")
 	}
@@ -383,8 +383,8 @@ func (this *heroAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _ 
 }
 
 // Remove 扣除英雄；未拥有返回错误。
-func (this *heroAssetHandler) Remove(ctx context.Context, playerID int64, cfgID, _ int32) error {
-	row, err := Hero().Get(ctx, playerID)
+func (this *heroAssetStore) Remove(ctx context.Context, playerID int64, cfgID, _ int32) error {
+	row, err := Hero().Load(ctx, playerID)
 	if err != nil {
 		return err
 	}
@@ -398,7 +398,7 @@ func (this *heroAssetHandler) Remove(ctx context.Context, playerID int64, cfgID,
 }
 
 // Update 覆盖持有：count<=0 移除，>0 确保持有。
-func (this *heroAssetHandler) Update(ctx context.Context, playerID int64, cfgID, count int32) error {
+func (this *heroAssetStore) Update(ctx context.Context, playerID int64, cfgID, count int32) error {
 	owned, err := this.Query(ctx, playerID, cfgID)
 	if err != nil {
 		return err
@@ -414,8 +414,8 @@ func (this *heroAssetHandler) Update(ctx context.Context, playerID int64, cfgID,
 }
 
 // Query 查询是否持有：持有 1，未持有 0。
-func (this *heroAssetHandler) Query(ctx context.Context, playerID int64, cfgID int32) (int32, error) {
-	row, err := Hero().Get(ctx, playerID)
+func (this *heroAssetStore) Query(ctx context.Context, playerID int64, cfgID int32) (int32, error) {
+	row, err := Hero().Load(ctx, playerID)
 	if err != nil {
 		return 0, err
 	}
@@ -426,8 +426,8 @@ func (this *heroAssetHandler) Query(ctx context.Context, playerID int64, cfgID i
 }
 
 // List 列出全部英雄（按配置ID升序）。
-func (this *heroAssetHandler) List(ctx context.Context, playerID int64) ([]*tpl.Asset, error) {
-	row, err := Hero().Get(ctx, playerID)
+func (this *heroAssetStore) List(ctx context.Context, playerID int64) ([]*tpl.Asset, error) {
+	row, err := Hero().Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -461,7 +461,7 @@ func heroBaseAttribute(h model.HeroInfo) (*pb.HeroAttribute, error) {
 
 // AttributeBonus 英雄本体属性贡献（未持有返回零值）。
 func (this *heroLogic) AttributeBonus(ctx context.Context, playerID int64, heroID int32) (*pb.HeroAttribute, error) {
-	row, err := this.Get(ctx, playerID)
+	row, err := this.Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}

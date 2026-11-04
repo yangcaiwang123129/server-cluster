@@ -39,7 +39,7 @@ func Task() global.TaskLogic { return taskLogicInst.MustGet() }
 
 // EnterGame 进入游戏：预热玩家任务缓存，上报登录事件，并随响应下发任务列表。
 func (this *taskLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, resp *pb.EnterGameResp) error {
-	if _, err := this.Get(ctx, playerID); err != nil {
+	if _, err := this.Load(ctx, playerID); err != nil {
 		return err
 	}
 	this.EmitTaskEvent(ctx, global.TaskEvent{
@@ -81,7 +81,7 @@ func (this *taskLogic) TaskList(ctx context.Context, playerID int64, req *pb.Tas
 
 // collect 组装玩家当前可见任务：只展示当前周期的进度，未建档按默认值展示。
 func (this *taskLogic) collect(ctx context.Context, playerID int64, taskType, activityCfgID int32) ([]*pb.TaskEntry, int32, error) {
-	pt, err := this.Get(ctx, playerID)
+	pt, err := this.Load(ctx, playerID)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -126,7 +126,7 @@ func (this *taskLogic) TaskClaim(ctx context.Context, playerID int64, req *pb.Ta
 	if !ok {
 		return &pb.TaskClaimResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_TASK_EXPIRED, "")}, nil
 	}
-	pt, err := this.Get(ctx, playerID)
+	pt, err := this.Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -190,7 +190,7 @@ func (this *taskLogic) TaskAccept(ctx context.Context, playerID int64, req *pb.T
 	if !ok {
 		return &pb.TaskAcceptResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_TASK_EXPIRED, "")}, nil
 	}
-	pt, err := this.Get(ctx, playerID)
+	pt, err := this.Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -225,7 +225,7 @@ func (this *taskLogic) EmitTaskEvent(ctx context.Context, e global.TaskEvent) {
 	}
 	snap := ActivitySync().Snapshot()
 	now := util.NowUnixMilli()
-	pt, err := this.Get(ctx, e.PlayerID)
+	pt, err := this.Load(ctx, e.PlayerID)
 	if err != nil {
 		log.Warnf("game: task event load failed, player=%d target=%d: %v", e.PlayerID, e.TargetTaskType, err)
 		return
@@ -302,8 +302,8 @@ func newTaskInfo(cfg *tpl.TaskCfg, key string) model.PlayerTaskInfo {
 	}
 }
 
-// LoadPlayer 加载玩家任务容器；未建档则初始化空 map 并挂入缓存。
-func (this *taskLogic) Get(ctx context.Context, playerID int64) (*model.PlayerTask, error) {
+// Load 加载玩家任务容器；未建档则初始化空 map 并挂入缓存。
+func (this *taskLogic) Load(ctx context.Context, playerID int64) (*model.PlayerTask, error) {
 	return taskCache.GetOrInit(ctx, playerID,
 		func(id int64) *model.PlayerTask {
 			return &model.PlayerTask{PlayerID: id, Tasks: util.NewSafeMap[string, model.PlayerTaskInfo]()}

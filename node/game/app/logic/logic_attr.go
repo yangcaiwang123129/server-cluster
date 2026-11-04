@@ -37,7 +37,7 @@ func (this *playerLogic) AttrOperate(ctx context.Context, playerID int64, req *p
 		return &pb.AttrOperateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "不支持的属性类型")}, nil
 	}
 
-	core, err := playerExtraCache.Get(ctx, playerID)
+	core, err := this.Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (this *playerLogic) AttrOperate(ctx context.Context, playerID int64, req *p
 		return nil, err
 	}
 
-	playerExtraCache.Set(playerID, core)
+	this.Save(playerID, core)
 	return &pb.AttrOperateResp{Values: map[int32]*pb.ObjectValue{int32(attr): out}}, nil
 }
 

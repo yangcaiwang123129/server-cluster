@@ -26,7 +26,7 @@ var skillLogicInst = singleton.NewContainer[global.SkillLogic]("SkillLogic")
 
 func init() {
 	skillLogicInst.Register(&skillLogic{})
-	registerAsset(&skillAssetHandler{})
+	registerAsset(&skillAssetStore{})
 }
 
 // Skill 获取技能业务单例。
@@ -39,7 +39,7 @@ func newSkillInfo(cfgID int32) model.SkillInfo {
 
 // SkillList 技能持有列表（供 HeroList 聚合下发与 GM 查询）。
 func (this *skillLogic) SkillList(ctx context.Context, playerID int64) ([]*pb.SkillEntry, error) {
-	row, err := this.Get(ctx, playerID)
+	row, err := this.Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (this *skillLogic) SkillList(ctx context.Context, playerID int64) ([]*pb.Sk
 
 // SkillUpdate 更新技能：整体覆盖持有状态，未拥有返回错误。
 func (this *skillLogic) SkillUpdate(ctx context.Context, playerID int64, req *pb.SkillUpdateReq) (*pb.SkillUpdateResp, error) {
-	row, err := this.Get(ctx, playerID)
+	row, err := this.Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (this *skillLogic) SkillUpdate(ctx context.Context, playerID int64, req *pb
 
 // skillOwned 取玩家指定技能持有与其绑定英雄ID。
 func skillOwned(ctx context.Context, playerID int64, cfgID int32) (*model.PlayerSkill, model.SkillInfo, int32, error) {
-	row, err := Skill().Get(ctx, playerID)
+	row, err := Skill().Load(ctx, playerID)
 	if err != nil {
 		return nil, model.SkillInfo{}, 0, err
 	}
@@ -221,7 +221,7 @@ func (this *skillLogic) SkillEnsureForHero(ctx context.Context, playerID int64, 
 	if cfg == nil {
 		return nil
 	}
-	row, err := this.Get(ctx, playerID)
+	row, err := this.Load(ctx, playerID)
 	if err != nil {
 		return err
 	}
@@ -242,10 +242,10 @@ func (this *skillLogic) SkillEnsureForHero(ctx context.Context, playerID int64, 
 
 // EnterGame 进入游戏：加载玩家技能持有，未建档则初始化空集合；并按已拥有英雄兜底补建绑定技能。
 func (this *skillLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
-	if _, err := this.Get(ctx, playerID); err != nil {
+	if _, err := this.Load(ctx, playerID); err != nil {
 		return err
 	}
-	heroes, err := Hero().Get(ctx, playerID)
+	heroes, err := Hero().Load(ctx, playerID)
 	if err != nil {
 		return err
 	}
@@ -273,8 +273,8 @@ func (this *skillLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.L
 	return nil
 }
 
-// Get 加载玩家技能持有；未建档则初始化空 map 并挂入缓存（异步落库）。
-func (this *skillLogic) Get(ctx context.Context, playerID int64) (*model.PlayerSkill, error) {
+// Load 加载玩家技能持有；未建档则初始化空 map 并挂入缓存（异步落库）。
+func (this *skillLogic) Load(ctx context.Context, playerID int64) (*model.PlayerSkill, error) {
 	return skillCache.GetOrInit(ctx, playerID,
 		func(id int64) *model.PlayerSkill {
 			return &model.PlayerSkill{PlayerID: id, Skills: util.NewSafeMap[int32, model.SkillInfo]()}
@@ -296,20 +296,20 @@ func (this *skillLogic) Flush(ctx context.Context, playerID int64) error {
 	return flushAndEvict(ctx, skillCache, playerID)
 }
 
-// ============ 资产接口实现（AssetHandler，唯一持有型：key 为技能配置ID） ============
+// ============ 资产接口实现（AssetStore，唯一持有型：key 为技能配置ID） ============
 
-// skillAssetHandler 技能资产实现：落在 player_skill。技能由英雄配置绑定，发放幂等。
-type skillAssetHandler struct{}
+// skillAssetStore 技能资产实现：落在 player_skill。技能由英雄配置绑定，发放幂等。
+type skillAssetStore struct{}
 
 // AssetType 资产类型：技能。
-func (this *skillAssetHandler) AssetType() tpl.AssetType { return tpl.AssetType_Skill }
+func (this *skillAssetStore) AssetType() tpl.AssetType { return tpl.AssetType_Skill }
 
 // Add 发放技能：已拥有视为成功（技能随英雄自动补建，避免奖励重复发放失败）。
-func (this *skillAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _ int32) error {
+func (this *skillAssetStore) Add(ctx context.Context, playerID int64, cfgID, _ int32) error {
 	if !tpl.T().Skill.Has(cfgID) {
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "技能配置不存在")
 	}
-	row, err := Skill().Get(ctx, playerID)
+	row, err := Skill().Load(ctx, playerID)
 	if err != nil {
 		return err
 	}
@@ -327,8 +327,8 @@ func (this *skillAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _
 }
 
 // Remove 扣除技能；未拥有返回错误。
-func (this *skillAssetHandler) Remove(ctx context.Context, playerID int64, cfgID, _ int32) error {
-	row, err := Skill().Get(ctx, playerID)
+func (this *skillAssetStore) Remove(ctx context.Context, playerID int64, cfgID, _ int32) error {
+	row, err := Skill().Load(ctx, playerID)
 	if err != nil {
 		return err
 	}
@@ -343,7 +343,7 @@ func (this *skillAssetHandler) Remove(ctx context.Context, playerID int64, cfgID
 }
 
 // Update 覆盖持有：count<=0 移除，>0 确保持有。
-func (this *skillAssetHandler) Update(ctx context.Context, playerID int64, cfgID, count int32) error {
+func (this *skillAssetStore) Update(ctx context.Context, playerID int64, cfgID, count int32) error {
 	owned, err := this.Query(ctx, playerID, cfgID)
 	if err != nil {
 		return err
@@ -359,8 +359,8 @@ func (this *skillAssetHandler) Update(ctx context.Context, playerID int64, cfgID
 }
 
 // Query 查询是否持有：持有 1，未持有 0。
-func (this *skillAssetHandler) Query(ctx context.Context, playerID int64, cfgID int32) (int32, error) {
-	row, err := Skill().Get(ctx, playerID)
+func (this *skillAssetStore) Query(ctx context.Context, playerID int64, cfgID int32) (int32, error) {
+	row, err := Skill().Load(ctx, playerID)
 	if err != nil {
 		return 0, err
 	}
@@ -371,8 +371,8 @@ func (this *skillAssetHandler) Query(ctx context.Context, playerID int64, cfgID 
 }
 
 // List 列出全部技能（按配置ID升序）。
-func (this *skillAssetHandler) List(ctx context.Context, playerID int64) ([]*tpl.Asset, error) {
-	row, err := Skill().Get(ctx, playerID)
+func (this *skillAssetStore) List(ctx context.Context, playerID int64) ([]*tpl.Asset, error) {
+	row, err := Skill().Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}

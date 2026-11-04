@@ -57,7 +57,7 @@ func handleVerify(ctx node.Context) {
 	if ip, ipErr := ctx.GetIP(); ipErr == nil && ip != "" {
 		loginIP = ip
 	}
-	if err := logic.PlayerLogic().PlayerCreateActor(ctx.Context(), playerID, loginIP); err != nil {
+	if err := logic.PlayerLogic().CreateActor(ctx.Context(), playerID, loginIP); err != nil {
 		log.Errorf("handler: verify create actor uid=%d failed: %v", playerID, err)
 		_ = ctx.Response(&pb.VerifyResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
 		return

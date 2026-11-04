@@ -27,7 +27,7 @@ var equipLogicInst = singleton.NewContainer[global.EquipLogic]("EquipLogic")
 
 func init() {
 	equipLogicInst.Register(&equipLogic{})
-	registerAsset(&equipAssetHandler{})
+	registerAsset(&equipAssetStore{})
 }
 
 // Equip 获取装备业务单例。
@@ -35,7 +35,7 @@ func Equip() global.EquipLogic { return equipLogicInst.MustGet() }
 
 // EquipList 装备持有列表（供 HeroList 聚合下发与 GM 查询）。
 func (this *equipLogic) EquipList(ctx context.Context, playerID int64) ([]*pb.EquipEntry, error) {
-	row, err := this.Get(ctx, playerID)
+	row, err := this.Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (this *equipLogic) EquipAdd(ctx context.Context, playerID int64, req *pb.Eq
 		return nil, err
 	}
 
-	row, err := this.Get(ctx, playerID)
+	row, err := this.Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +82,7 @@ func (this *equipLogic) EquipAdd(ctx context.Context, playerID int64, req *pb.Eq
 
 // EquipUpdate 更新装备：hero_id>0 时改归该英雄，0 保持原归属；按实例ID定位。
 func (this *equipLogic) EquipUpdate(ctx context.Context, playerID int64, req *pb.EquipUpdateReq) (*pb.EquipUpdateResp, error) {
-	row, err := this.Get(ctx, playerID)
+	row, err := this.Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +128,7 @@ func (this *equipLogic) EquipUpdate(ctx context.Context, playerID int64, req *pb
 // EquipWear 穿戴装备：归属改到目标英雄（hero_id=0 取当前出战英雄）。
 // 同一英雄、同一装备配置ID只保留一件穿戴状态，重复穿戴时自动顶替旧的。
 func (this *equipLogic) EquipWear(ctx context.Context, playerID int64, req *pb.EquipWearReq) (*pb.EquipWearResp, error) {
-	row, err := this.Get(ctx, playerID)
+	row, err := this.Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +186,7 @@ func (this *equipLogic) EquipWear(ctx context.Context, playerID int64, req *pb.E
 
 // EquipUnwear 卸载装备：清穿戴状态，归属英雄保留（0 表示未分配）。
 func (this *equipLogic) EquipUnwear(ctx context.Context, playerID int64, req *pb.EquipUnwearReq) (*pb.EquipUnwearResp, error) {
-	row, err := this.Get(ctx, playerID)
+	row, err := this.Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -228,7 +228,7 @@ func equipDimGrow(ctx context.Context, playerID int64, id int64,
 	rowOf func(cfgID, dim int32) (material, use int32, ok bool),
 	fullMsg string,
 ) (model.EquipInfo, error) {
-	row, err := Equip().Get(ctx, playerID)
+	row, err := Equip().Load(ctx, playerID)
 	if err != nil {
 		return model.EquipInfo{}, err
 	}
@@ -351,7 +351,7 @@ func (this *equipLogic) EquipBreakthrough(ctx context.Context, playerID int64, r
 
 // EnterGame 进入游戏：加载玩家装备持有，未建档则初始化空集合。
 func (this *equipLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
-	if _, err := this.Get(ctx, playerID); err != nil {
+	if _, err := this.Load(ctx, playerID); err != nil {
 		return err
 	}
 	// 装备数据由 EquipList 下发，这里只预热缓存
@@ -366,8 +366,8 @@ func (this *equipLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.L
 	return nil
 }
 
-// LoadPlayer 加载玩家装备持有；未建档则初始化空 map 并挂入缓存（异步落库）。
-func (this *equipLogic) Get(ctx context.Context, playerID int64) (*model.PlayerEquip, error) {
+// Load 加载玩家装备持有；未建档则初始化空 map 并挂入缓存（异步落库）。
+func (this *equipLogic) Load(ctx context.Context, playerID int64) (*model.PlayerEquip, error) {
 	return equipCache.GetOrInit(ctx, playerID,
 		func(id int64) *model.PlayerEquip {
 			return &model.PlayerEquip{PlayerID: id, Equips: util.NewSafeMap[int64, model.EquipInfo]()}
@@ -389,21 +389,21 @@ func (this *equipLogic) Flush(ctx context.Context, playerID int64) error {
 	return flushAndEvict(ctx, equipCache, playerID)
 }
 
-// ============ 资产接口实现（AssetHandler，可叠加型：同配置可多件） ============
+// ============ 资产接口实现（AssetStore，可叠加型：同配置可多件） ============
 
-// equipAssetHandler 装备资产实现：落在 player_equip。
-type equipAssetHandler struct{}
+// equipAssetStore 装备资产实现：落在 player_equip。
+type equipAssetStore struct{}
 
 // AssetType 资产类型：装备。
-func (this *equipAssetHandler) AssetType() tpl.AssetType { return tpl.AssetType_Equip }
+func (this *equipAssetStore) AssetType() tpl.AssetType { return tpl.AssetType_Equip }
 
 // Add 发放装备：生成新的实例ID，默认归属当前出战英雄（未出战则未分配）。
-func (this *equipAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _ int32) error {
+func (this *equipAssetStore) Add(ctx context.Context, playerID int64, cfgID, _ int32) error {
 	if !tpl.T().Equip.Has(cfgID) {
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备配置不存在")
 	}
 
-	row, err := Equip().Get(ctx, playerID)
+	row, err := Equip().Load(ctx, playerID)
 	if err != nil {
 		return err
 	}
@@ -419,8 +419,8 @@ func (this *equipAssetHandler) Add(ctx context.Context, playerID int64, cfgID, _
 }
 
 // Remove 扣除一件指定配置ID的装备实例；未拥有返回错误。
-func (this *equipAssetHandler) Remove(ctx context.Context, playerID int64, cfgID, _ int32) error {
-	row, err := Equip().Get(ctx, playerID)
+func (this *equipAssetStore) Remove(ctx context.Context, playerID int64, cfgID, _ int32) error {
+	row, err := Equip().Load(ctx, playerID)
 	if err != nil {
 		return err
 	}
@@ -439,7 +439,7 @@ func (this *equipAssetHandler) Remove(ctx context.Context, playerID int64, cfgID
 }
 
 // Update 覆盖持有：count<=0 移除一件，>0 不足时补一件。
-func (this *equipAssetHandler) Update(ctx context.Context, playerID int64, cfgID, count int32) error {
+func (this *equipAssetStore) Update(ctx context.Context, playerID int64, cfgID, count int32) error {
 	owned, err := this.Query(ctx, playerID, cfgID)
 	if err != nil {
 		return err
@@ -455,8 +455,8 @@ func (this *equipAssetHandler) Update(ctx context.Context, playerID int64, cfgID
 }
 
 // Query 查询指定配置ID的装备持有数量。
-func (this *equipAssetHandler) Query(ctx context.Context, playerID int64, cfgID int32) (int32, error) {
-	row, err := Equip().Get(ctx, playerID)
+func (this *equipAssetStore) Query(ctx context.Context, playerID int64, cfgID int32) (int32, error) {
+	row, err := Equip().Load(ctx, playerID)
 	if err != nil {
 		return 0, err
 	}
@@ -471,8 +471,8 @@ func (this *equipAssetHandler) Query(ctx context.Context, playerID int64, cfgID 
 }
 
 // List 列出全部装备（按配置ID聚合数量，再按配置ID升序）。
-func (this *equipAssetHandler) List(ctx context.Context, playerID int64) ([]*tpl.Asset, error) {
-	row, err := Equip().Get(ctx, playerID)
+func (this *equipAssetStore) List(ctx context.Context, playerID int64) ([]*tpl.Asset, error) {
+	row, err := Equip().Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -493,7 +493,7 @@ func (this *equipAssetHandler) List(ctx context.Context, playerID int64) ([]*tpl
 // AttributeBonus 装备模块对英雄的生命/护甲贡献：基础值 × 等级系数 × 品质系数 × 突破系数。
 // 基础值取 AttributeGear 的 1 星档行；只统计穿戴在该英雄身上的装备。
 func (this *equipLogic) AttributeBonus(ctx context.Context, playerID int64, heroID int32) (*pb.HeroAttribute, error) {
-	row, err := this.Get(ctx, playerID)
+	row, err := this.Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}

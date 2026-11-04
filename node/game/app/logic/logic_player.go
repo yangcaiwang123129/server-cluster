@@ -48,27 +48,42 @@ func init() {
 
 // moduleLogics 持有玩家数据的模块，按进入/离开的统一顺序驱动。
 // 延迟获取单例：各模块的 init 注册顺序不确定，不能在包初始化阶段调用。
-func moduleLogics() []global.Hook {
-	return []global.Hook{Item(), Hero(), Weapon(), Skill(), Equip(), Mail(), Task()}
+func moduleLogics() []global.PlayerLifecycle {
+	return []global.PlayerLifecycle{Item(), Hero(), Weapon(), Skill(), Equip(), Mail(), Task()}
 }
 
 // PlayerLogic 获取玩家模块业务单例。
 func PlayerLogic() global.PlayerLogic { return playerLogicInst.MustGet() }
 
-// EnterGame 进入游戏：playerID 由 handler 层从 ctx.UID() 取得（首包 verify 已完成绑定与 actor 创建）。
+// Load 读玩家核心数据（player_extra，一玩家一行）；未建档则初始化默认昵称/等级并挂入缓存（异步落库）。
+// 语义同 Cache.GetOrInit。
+func (this *playerLogic) Load(ctx context.Context, playerID int64) (*model.PlayerExtra, error) {
+	return playerExtraCache.GetOrInit(ctx, playerID,
+		func(id int64) *model.PlayerExtra {
+			return &model.PlayerExtra{
+				PlayerID:     id,
+				Nickname:     consts.DefaultNicknamePrefix + strconv.FormatInt(id, 10),
+				Level:        consts.DefaultPlayerLevel,
+				SettingsJSON: consts.DefaultPlayerSettingsJSON,
+			}
+		}, nil)
+}
+
+// Save 写回玩家核心数据并挂入异步落库队列。
+func (this *playerLogic) Save(playerID int64, row *model.PlayerExtra) {
+	playerExtraCache.Set(playerID, row)
+}
+
+// Flush 同步落库并逐出玩家核心数据缓存（GM 直改 DB 后强制回源）。
+func (this *playerLogic) Flush(ctx context.Context, playerID int64) error {
+	return flushAndEvict(ctx, playerExtraCache, playerID)
+}
+
+// OnEnterGame 进入游戏：playerID 由 handler 层从 ctx.UID() 取得（首包 verify 已完成绑定与 actor 创建）。
 // 加载核心数据并驱动各玩家模块预热/建档。
 func (this *playerLogic) OnEnterGame(ctx context.Context, playerID int64, req *pb.EnterGameReq, resp *pb.EnterGameResp) error {
-	core, err := playerExtraCache.Get(ctx, playerID)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		// 首次进入，建档并异步落库
-		core = &model.PlayerExtra{
-			PlayerID:     playerID,
-			Nickname:     consts.DefaultNicknamePrefix + strconv.FormatInt(playerID, 10),
-			Level:        consts.DefaultPlayerLevel,
-			SettingsJSON: consts.DefaultPlayerSettingsJSON,
-		}
-		playerExtraCache.Set(playerID, core)
-	} else if err != nil {
+	core, err := this.Load(ctx, playerID)
+	if err != nil {
 		return err
 	}
 
@@ -114,11 +129,12 @@ func (this *playerLogic) OnLeaveGame(ctx context.Context, playerID int64, req *p
 	for _, mod := range moduleLogics() {
 		record("module", mod.OnLeaveGame(ctx, playerID, req, resp))
 	}
-	// 无独立模块的玩家表：账号（含货币）、核心
+	// 无独立模块的玩家表：账号（含货币）
 	record("player", flushAndEvict(ctx, playerCache, playerID))
-	record("player_core", flushAndEvict(ctx, playerExtraCache, playerID))
+	// 核心数据（player_extra）走模块 Flush
+	record("player_core", this.Flush(ctx, playerID))
 
-	record("player_actor", this.PlayerDestroyActor(ctx, playerID))
+	record("player_actor", this.DestroyActor(ctx, playerID))
 	return firstErr
 }
 
@@ -196,10 +212,10 @@ func (this *playerLogic) Recharge(ctx context.Context, playerID int64, req *pb.R
 		}
 		return nil, err
 	}
-	// 累计充值次数（player_extra），缓存未命中不阻断充值流程
-	if extra, err := playerExtraCache.Get(ctx, playerID); err == nil && extra != nil {
+	// 累计充值次数（player_extra），加载失败不阻断充值流程
+	if extra, err := this.Load(ctx, playerID); err == nil && extra != nil {
 		extra.TotalRecharge++
-		playerExtraCache.Set(playerID, extra)
+		this.Save(playerID, extra)
 	}
 	// 固定充值（按配置ID匹配）与累计充值（全匹配）双事件
 	Task().EmitTaskEvent(ctx, global.TaskEvent{
@@ -237,16 +253,16 @@ func codedResult(err error) *pb.Result {
 	return errs.BuildErrResult(pb.ErrCode(c.Code()), c.Message())
 }
 
-// PlayerGetActor 获取玩家 actor；玩家不在线时返回玩家不存在。
-func (this *playerLogic) PlayerGetActor(ctx context.Context, playerID int64) (*global.PlayerActor, error) {
+// GetActor 获取玩家 actor；玩家不在线时返回玩家不存在。
+func (this *playerLogic) GetActor(ctx context.Context, playerID int64) (*global.PlayerActor, error) {
 	if pa, ok := this.PlayerActors.Get(playerID); ok {
 		return pa, nil
 	}
 	return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_PLAYER_NOT_FOUND, "player actor not found")
 }
 
-// PlayerGetActors 获取全部在线玩家 actor（快照，可在遍历外安全使用）。
-func (this *playerLogic) PlayerGetActors(ctx context.Context) ([]*global.PlayerActor, error) {
+// GetActors 获取全部在线玩家 actor（快照，可在遍历外安全使用）。
+func (this *playerLogic) GetActors(ctx context.Context) ([]*global.PlayerActor, error) {
 	actors := make([]*global.PlayerActor, 0, this.PlayerActors.Len())
 	this.PlayerActors.Range(func(_ int64, pa *global.PlayerActor) bool {
 		actors = append(actors, pa)
@@ -255,10 +271,10 @@ func (this *playerLogic) PlayerGetActors(ctx context.Context) ([]*global.PlayerA
 	return actors, nil
 }
 
-// PlayerCreateActor 创建玩家 actor（已在线则幂等复用）。
+// CreateActor 创建玩家 actor（已在线则幂等复用）。
 // loginIP 从 node.Context.GetIP() 取，存入内存，不落库。
 // 在线登记由 playerProcessor 的 Start/Destroy 生命周期维护。
-func (this *playerLogic) PlayerCreateActor(ctx context.Context, playerID int64, loginIP string) error {
+func (this *playerLogic) CreateActor(ctx context.Context, playerID int64, loginIP string) error {
 	if this.PlayerActors.Has(playerID) {
 		// 已在线：幂等更新登录 IP 与重连时间（断线重连可能换 IP；ReconnectAt 供断线延迟销毁豁免判断）
 		if pa, ok := this.PlayerActors.Get(playerID); ok {
@@ -293,10 +309,10 @@ func (this *playerLogic) PlayerCreateActor(ctx context.Context, playerID int64, 
 	return nil
 }
 
-// PlayerDestroyActor 销毁玩家 actor（幂等），Destroy 回调同步注销在线登记。
+// DestroyActor 销毁玩家 actor（幂等），Destroy 回调同步注销在线登记。
 // 同时解绑 redis locate（gate/node 路由），防止已删/已下线玩家的路由残留导致
 // locate 表只进不出、网关日志与后台玩家数据对不上。
-func (this *playerLogic) PlayerDestroyActor(ctx context.Context, playerID int64) error {
+func (this *playerLogic) DestroyActor(ctx context.Context, playerID int64) error {
 	svc.NodeProxy().Kill(actorKindPlayer, playerActorID(playerID))
 	this.PlayerActors.Delete(playerID)
 
@@ -307,9 +323,9 @@ func (this *playerLogic) PlayerDestroyActor(ctx context.Context, playerID int64)
 	return nil
 }
 
-// PlayerDestroyActorIfOffline 断线延迟销毁：仅当玩家在 since（断开时刻）之后未重连时才销毁 actor。
+// DestroyActorIfOffline 断线延迟销毁：仅当玩家在 since（断开时刻）之后未重连时才销毁 actor。
 // 同 uid 重连/互踢场景下旧连接的 Disconnect 不能删掉新连接正在使用的 actor。
-func (this *playerLogic) PlayerDestroyActorIfOffline(ctx context.Context, playerID int64, since int64) error {
+func (this *playerLogic) DestroyActorIfOffline(ctx context.Context, playerID int64, since int64) error {
 	pa, ok := this.PlayerActors.Get(playerID)
 	if !ok {
 		return nil // actor 已不存在（正常走 LeaveGame 清理），幂等
@@ -317,15 +333,15 @@ func (this *playerLogic) PlayerDestroyActorIfOffline(ctx context.Context, player
 	if pa.ReconnectAt >= since {
 		return nil // 断开后已重连（EnterGame 复用 actor 更新了 ReconnectAt），保留
 	}
-	return this.PlayerDestroyActor(ctx, playerID)
+	return this.DestroyActor(ctx, playerID)
 }
 
-// PlayerKick 踢玩家下线：销毁 actor（注销在线登记）并强制断开网关连接。
-func (this *playerLogic) PlayerKick(ctx context.Context, playerID int64) error {
+// Kick 踢玩家下线：销毁 actor（注销在线登记）并强制断开网关连接。
+func (this *playerLogic) Kick(ctx context.Context, playerID int64) error {
 	if !this.PlayerActors.Has(playerID) {
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_PLAYER_NOT_FOUND, "player is not online")
 	}
-	if err := this.PlayerDestroyActor(ctx, playerID); err != nil {
+	if err := this.DestroyActor(ctx, playerID); err != nil {
 		return err
 	}
 
