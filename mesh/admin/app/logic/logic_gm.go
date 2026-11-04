@@ -2,13 +2,15 @@ package logic
 
 import (
 	"context"
-	"sync"
+	"slices"
 
+	"github.com/dobyte/due/v2/cluster"
 	"github.com/dobyte/due/v2/registry"
 	"github.com/dobyte/due/v2/transport"
 
 	"github.com/dobyte/due/v2/codes"
 	"server-cluster/internal/rpc"
+	"server-cluster/internal/svc"
 	"server-cluster/share/pb"
 )
 
@@ -48,32 +50,40 @@ func onlineNodeID(ctx context.Context, playerID int64) string {
 	if err != nil {
 		return ""
 	}
-
-	var (
-		once   sync.Once
-		wg     sync.WaitGroup
-		nodeID string
-	)
-	for _, ins := range instances {
-		wg.Add(1)
-		go func(ins *registry.ServiceInstance) {
-			defer wg.Done()
-			client, err := rpc.NewDirectClient(ins.ID)
-			if err != nil {
-				return
+	for _, r := range rpc.CallAll[pb.GetOnlinePlayersResp](ctx, instanceIDs(instances),
+		pb.GameAdminService_GetOnlinePlayers_FullMethodName, &pb.GetOnlinePlayersReq{}) {
+		if r.Err != nil {
+			continue
+		}
+		for _, p := range r.Resp.Players {
+			if p.PlayerId == playerID {
+				return p.NodeId
 			}
-			resp, err := rpc.Call[pb.GetOnlinePlayersResp](ctx, client, pb.GameAdminService_GetOnlinePlayers_FullMethodName, &pb.GetOnlinePlayersReq{})
-			if err != nil {
-				return
-			}
-			for _, p := range resp.Players {
-				if p.PlayerId == playerID {
-					once.Do(func() { nodeID = p.NodeId })
-					return
-				}
-			}
-		}(ins)
+		}
 	}
-	wg.Wait()
-	return nodeID
+	return ""
+}
+
+// gameInstances 枚举提供指定内部服务的全部实例（mesh 实例按 services 字段过滤）。
+func gameInstances(ctx context.Context, serviceName string) ([]*registry.ServiceInstance, error) {
+	instances, err := svc.Registry().Services(ctx, cluster.Mesh.String())
+	if err != nil {
+		return nil, err
+	}
+	matched := make([]*registry.ServiceInstance, 0, len(instances))
+	for _, ins := range instances {
+		if slices.Contains(ins.Services, serviceName) {
+			matched = append(matched, ins)
+		}
+	}
+	return matched, nil
+}
+
+// instanceIDs 提取实例 ID 列表（供多实例扇出调用使用）。
+func instanceIDs(instances []*registry.ServiceInstance) []string {
+	ids := make([]string, 0, len(instances))
+	for _, ins := range instances {
+		ids = append(ids, ins.ID)
+	}
+	return ids
 }

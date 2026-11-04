@@ -111,12 +111,9 @@ func (this *gmHeroLogic) HeroAttribute(req dto.GmHeroAttributeReq) (*dto.GmHeroA
 
 // HeroUpgrade 英雄升级（消耗物品）。
 func (this *gmHeroLogic) HeroUpgrade(req dto.GmUpgradeReq) (*dto.GmUpgradeResp, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), rpcTimeout)
-	defer cancel()
-
-	resp := &pb.HeroUpgradeResp{}
 	callReq := &pb.GmHeroUpgradeReq{PlayerId: req.PlayerID, HeroId: req.CfgID}
-	if err := gmCall(ctx, req.PlayerID, pb.GameAdminService_HeroUpgrade_FullMethodName, callReq, resp); err != nil {
+	resp, err := gmCall[pb.HeroUpgradeResp](context.Background(), req.PlayerID, pb.GameAdminService_HeroUpgrade_FullMethodName, callReq)
+	if err != nil {
 		return nil, err
 	}
 	return toGmUpgradeResp(resp.GetHeroEntry().GetCfgId(), resp.GetHeroEntry().GetLevel(), resp.GetAttribute()), nil

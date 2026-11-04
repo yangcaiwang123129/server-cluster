@@ -4,14 +4,8 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
-	"slices"
-	"sync"
-
-	"github.com/dobyte/due/v2/cluster"
-	"github.com/dobyte/due/v2/registry"
 
 	"server-cluster/internal/rpc"
-	"server-cluster/internal/svc"
 	"server-cluster/mesh/admin/app/repo"
 	"server-cluster/share/dto"
 	"server-cluster/share/pb"
@@ -74,51 +68,21 @@ func (this *playerLogic) PlayerOnline() ([]dto.OnlinePlayerResp, error) {
 	}
 
 	list := make([]dto.OnlinePlayerResp, 0)
-	var (
-		mu sync.Mutex
-		wg sync.WaitGroup
-	)
-	for _, ins := range instances {
-		wg.Add(1)
-		go func(ins *registry.ServiceInstance) {
-			defer wg.Done()
-			client, err := rpc.NewDirectClient(ins.ID)
-			if err != nil {
-				return // 实例不可达：跳过，避免单实例故障拖垮整个列表
-			}
-			resp, err := rpc.Call[pb.GetOnlinePlayersResp](context.Background(), client, pb.GameAdminService_GetOnlinePlayers_FullMethodName, &pb.GetOnlinePlayersReq{})
-			if err != nil {
-				return
-			}
-			mu.Lock()
-			for _, p := range resp.Players {
-				list = append(list, dto.OnlinePlayerResp{
-					PlayerID:    p.PlayerId,
-					EnterTime:   p.EnterTime,
-					LobbyNodeID: p.NodeId,
-					LoginIP:     p.LoginIp,
-				})
-			}
-			mu.Unlock()
-		}(ins)
-	}
-	wg.Wait()
-	return list, nil
-}
-
-// gameInstances 枚举提供指定内部服务的全部实例（mesh 实例按 services 字段过滤）。
-func gameInstances(ctx context.Context, serviceName string) ([]*registry.ServiceInstance, error) {
-	instances, err := svc.Registry().Services(ctx, cluster.Mesh.String())
-	if err != nil {
-		return nil, err
-	}
-	matched := make([]*registry.ServiceInstance, 0, len(instances))
-	for _, ins := range instances {
-		if slices.Contains(ins.Services, serviceName) {
-			matched = append(matched, ins)
+	for _, r := range rpc.CallAll[pb.GetOnlinePlayersResp](context.Background(), instanceIDs(instances),
+		pb.GameAdminService_GetOnlinePlayers_FullMethodName, &pb.GetOnlinePlayersReq{}) {
+		if r.Err != nil {
+			continue // 实例不可达：跳过，避免单实例故障拖垮整个列表
+		}
+		for _, p := range r.Resp.Players {
+			list = append(list, dto.OnlinePlayerResp{
+				PlayerID:    p.PlayerId,
+				EnterTime:   p.EnterTime,
+				LobbyNodeID: p.NodeId,
+				LoginIP:     p.LoginIp,
+			})
 		}
 	}
-	return matched, nil
+	return list, nil
 }
 
 // PlayerKick 踢玩家下线：按玩家所在实例定向调用（协议按服批量，单踢为一批）。
@@ -150,14 +114,8 @@ func (this *playerLogic) PlayerBan(req dto.PlayerBanReq) error {
 	}
 	// 在线则按服踢下线：枚举 mesh 实例找玩家（简化版，逐实例尝试，失败忽略）
 	instances, _ := gameInstances(context.Background(), pb.GameAdminService_ServiceDesc.ServiceName)
-	for _, ins := range instances {
-		client, err := rpc.NewDirectClient(ins.ID)
-		if err != nil {
-			continue
-		}
-		_, _ = rpc.Call[pb.KickPlayerResp](context.Background(), client, pb.GameAdminService_KickPlayer_FullMethodName,
-			&pb.KickPlayerReq{PlayerIds: []int64{req.PlayerID}})
-	}
+	rpc.CallAll[pb.KickPlayerResp](context.Background(), instanceIDs(instances),
+		pb.GameAdminService_KickPlayer_FullMethodName, &pb.KickPlayerReq{PlayerIds: []int64{req.PlayerID}})
 	return nil
 }
 

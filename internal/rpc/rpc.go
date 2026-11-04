@@ -1,10 +1,12 @@
-// Package rpc 服务间 RPC 调用封装：基于 HTTP 组件代理创建 mesh 客户端，并提供泛型调用入口。
+// Package rpc due transport 泛型 RPC 封装：统一 mesh 客户端创建、超时控制与
+// FullMethodName 处理，并提供多实例并发扇出调用。
 package rpc
 
 import (
 	"context"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"server-cluster/internal/svc"
@@ -34,7 +36,8 @@ func NewDirectClient(instanceID string) (transport.Client, error) {
 }
 
 // Call 泛型远程调用：fullMethod 传 FullMethodName（/pkg.Service/Method），
-// 自动拆出 gRPC 服务名与短方法名；ctx 未携带 deadline 时施加默认超时；返回强类型响应。
+// 自动拆出 gRPC 服务名与短方法名；ctx 未携带 deadline 时施加默认超时。
+// 调用失败时返回 (nil, err)——gRPC 出错时 reply 可能被部分填充，直接弃用以避免调用方误读。
 func Call[Resp any](ctx context.Context, client transport.Client, fullMethod string, req any) (*Resp, error) {
 	service, method, err := splitFullMethod(fullMethod)
 	if err != nil {
@@ -60,4 +63,32 @@ func splitFullMethod(fullMethod string) (service, method string, err error) {
 		return "", "", fmt.Errorf("rpc: invalid full method %q", fullMethod)
 	}
 	return fullMethod[:i], fullMethod[i+1:], nil
+}
+
+// InstanceResult 单实例调用结果；Resp 仅在 Err 为 nil 时有效。
+type InstanceResult[T any] struct {
+	InstanceID string
+	Resp       *T
+	Err        error
+}
+
+// CallAll 并发调用全部指定实例；任一实例失败不中断其他实例，错误记录在对应结果中。
+func CallAll[T any](ctx context.Context, instanceIDs []string, fullMethod string, req any) []InstanceResult[T] {
+	results := make([]InstanceResult[T], len(instanceIDs))
+	var wg sync.WaitGroup
+	for i, id := range instanceIDs {
+		wg.Add(1)
+		go func(i int, id string) {
+			defer wg.Done()
+			results[i].InstanceID = id
+			client, err := NewDirectClient(id)
+			if err != nil {
+				results[i].Err = err
+				return
+			}
+			results[i].Resp, results[i].Err = Call[T](ctx, client, fullMethod, req)
+		}(i, id)
+	}
+	wg.Wait()
+	return results
 }
