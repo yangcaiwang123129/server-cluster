@@ -11,11 +11,10 @@ import (
 	"context"
 	"time"
 
+	"server-cluster/mesh/login/app/global"
 	// "server-cluster/internal/singleinstance" // TODO: 临时跳过
 	"server-cluster/mesh/login/app/handler"
-	"server-cluster/mesh/login/app/global"
 	"server-cluster/share/consts"
-	"server-cluster/share/util"
 
 	"github.com/dobyte/due/component/http/v2"
 	"github.com/dobyte/due/registry/etcd/v2"
@@ -44,7 +43,7 @@ func main() {
 	// 添加组件到容器
 	container.Add(httpComponent)
 	// 手动注册 login 到 etcd mesh kind
-	if ins := util.BuildMeshInstance(consts.MeshInstanceID(), consts.MeshName(), util.ExtractHTTPAddr()); ins != nil {
+	if ins := consts.BuildMeshInstance(consts.MeshInstanceID(), consts.MeshName(), consts.ExtractHTTPAddr()); ins != nil {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		if err := reg.Register(ctx, ins); err != nil {
 			log.Warnf("login: register to mesh failed: %v", err)

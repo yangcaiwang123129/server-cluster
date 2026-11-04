@@ -177,14 +177,10 @@
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('admin.activity.strategyStartValue')">
-          <span class="strategy-time">
-            {{ formatStrategyValue(strategyDrawer.cfg.strategyType, strategyDrawer.cfg.strategyStartValue) }}
-          </span>
+          <span class="strategy-time">{{ strategyDrawer.cfg.strategyStartValue || '-' }}</span>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('admin.activity.strategyEndValue')">
-          <span class="strategy-time">
-            {{ formatStrategyValue(strategyDrawer.cfg.strategyType, strategyDrawer.cfg.strategyEndValue) }}
-          </span>
+          <span class="strategy-time">{{ strategyDrawer.cfg.strategyEndValue || '-' }}</span>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('admin.activity.roundCount')">
           <el-tag
@@ -324,49 +320,6 @@ const strategyLabel = (strategyType?: number) => {
       return t('admin.activity.strategies.4')
     default:
       return '-'
-  }
-}
-
-const weekdayKey = (day: number) => {
-  switch (day) {
-    case 1:
-      return 'admin.activity.weekdays.1'
-    case 2:
-      return 'admin.activity.weekdays.2'
-    case 3:
-      return 'admin.activity.weekdays.3'
-    case 4:
-      return 'admin.activity.weekdays.4'
-    case 5:
-      return 'admin.activity.weekdays.5'
-    case 6:
-      return 'admin.activity.weekdays.6'
-    default:
-      return 'admin.activity.weekdays.7'
-  }
-}
-
-// 策略值 "前缀 时:分:秒" 转人类可读文案；解析失败原样返回。
-const formatStrategyValue = (type?: number, value?: string) => {
-  if (!value) return '-'
-  const parts = value.split(/[\s_]+/)
-  if (parts.length !== 2) return value
-  const [prefix, time] = parts
-  switch (type) {
-    case 2:
-      return t('admin.activity.strategyDaily', { time })
-    case 3: {
-      const day = Number(prefix)
-      if (!(day >= 1 && day <= 7)) return value
-      return t('admin.activity.strategyWeekly', { day: t(weekdayKey(day)), time })
-    }
-    case 4: {
-      const day = Number(prefix)
-      if (day <= 0) return t('admin.activity.strategyMonthlyLast', { time })
-      return t('admin.activity.strategyMonthly', { day: prefix, time })
-    }
-    default:
-      return value
   }
 }
 

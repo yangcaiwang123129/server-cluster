@@ -10,7 +10,6 @@ package main
 import (
 	"context"
 	"server-cluster/share/consts"
-	"server-cluster/share/util"
 	"time"
 
 	"github.com/dobyte/due/component/http/v2"
@@ -64,7 +63,7 @@ func main() {
 	// 添加组件到容器
 	container.Add(httpComponent)
 	// 注册名必须与其余 mesh 实例一致使用 "mesh"，否则查询 /services/mesh/ 时枚举不到 admin。
-	if ins := util.BuildMeshInstance(consts.MeshInstanceID(), cluster.Mesh.String(), util.ExtractHTTPAddr()); ins != nil {
+	if ins := consts.BuildMeshInstance(consts.MeshInstanceID(), cluster.Mesh.String(), consts.ExtractHTTPAddr()); ins != nil {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		if err := reg.Register(ctx, ins); err != nil {
 			log.Warnf("admin: register to mesh failed: %v", err)

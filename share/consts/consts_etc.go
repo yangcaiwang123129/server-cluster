@@ -1,6 +1,13 @@
 package consts
 
-import "github.com/dobyte/due/v2/etc"
+import (
+	"net"
+	"strings"
+
+	"github.com/dobyte/due/v2/cluster"
+	"github.com/dobyte/due/v2/etc"
+	"github.com/dobyte/due/v2/registry"
+)
 
 // GateInstanceID 网关服务器实例id
 func GateInstanceID() string {
@@ -32,4 +39,42 @@ func MeshName() string {
 		return name
 	}
 	return ""
+}
+
+// ExtractHTTPAddr 从 etc.http.addr 提取 host:port（给 mesh 注册用 endpoint）。
+// etc.http.addr 形如 "127.0.0.1:8081" 或 ":8081"。
+func ExtractHTTPAddr() string {
+	addr := etc.Get("etc.http.addr").String()
+	if addr == "" {
+		return ""
+	}
+	host, port, err := net.SplitHostPort(addr)
+	if err != nil {
+		return addr
+	}
+	if host == "" || host == "0.0.0.0" {
+		host = "127.0.0.1"
+	}
+	return host + ":" + port
+}
+
+// BuildMeshInstance 构造一个 mesh kind 的 ServiceInstance。
+// name 须为集群服务名（"mesh"），alias 由 id 前缀推导（admin-1 → admin）。
+func BuildMeshInstance(id, name, endpoint string) *registry.ServiceInstance {
+	if id == "" {
+		return nil
+	}
+	alias := name
+	if i := strings.LastIndex(id, "-"); i > 0 && i+1 < len(id) {
+		alias = id[:i] // admin-1 → admin, login-1 → login
+	}
+	return &registry.ServiceInstance{
+		ID:       id,
+		Name:     name,
+		Kind:     cluster.Mesh.String(),
+		Alias:    alias,
+		State:    "work",
+		Endpoint: "http://" + endpoint,
+		Weight:   1,
+	}
 }
