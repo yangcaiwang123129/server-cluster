@@ -26,12 +26,12 @@ func init() {
 func handleEquipWear(ctx node.Context) {
 	req := &pb.EquipWearReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.EquipWearResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.EquipWearResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
 		return
 	}
 	resp, err := logic.Equip().EquipWear(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(&pb.EquipWearResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.EquipWearResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -41,12 +41,12 @@ func handleEquipWear(ctx node.Context) {
 func handleEquipUnWear(ctx node.Context) {
 	req := &pb.EquipUnwearReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.EquipUnwearResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.EquipUnwearResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
 		return
 	}
 	resp, err := logic.Equip().EquipUnwear(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(&pb.EquipUnwearResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.EquipUnwearResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -56,12 +56,12 @@ func handleEquipUnWear(ctx node.Context) {
 func handleEquipUpQuality(ctx node.Context) {
 	req := &pb.EquipUpQualityReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.EquipUpQualityResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.EquipUpQualityResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
 		return
 	}
 	resp, err := logic.Equip().EquipUpQuality(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(&pb.EquipUpQualityResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.EquipUpQualityResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -71,12 +71,12 @@ func handleEquipUpQuality(ctx node.Context) {
 func handleEquipBreakthrough(ctx node.Context) {
 	req := &pb.EquipBreakthroughReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.EquipBreakthroughResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.EquipBreakthroughResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
 		return
 	}
 	resp, err := logic.Equip().EquipBreakthrough(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(&pb.EquipBreakthroughResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.EquipBreakthroughResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -86,12 +86,12 @@ func handleEquipBreakthrough(ctx node.Context) {
 func handleEquipUpgrade(ctx node.Context) {
 	req := &pb.EquipUpgradeReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.EquipUpgradeResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.EquipUpgradeResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
 		return
 	}
 	resp, err := logic.Equip().EquipUpgrade(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(&pb.EquipUpgradeResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.EquipUpgradeResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -101,12 +101,12 @@ func handleEquipUpgrade(ctx node.Context) {
 func handleEquipAdd(ctx node.Context) {
 	req := &pb.EquipAddReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.EquipAddResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.EquipAddResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
 		return
 	}
 	resp, err := logic.Equip().EquipAdd(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(&pb.EquipAddResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.EquipAddResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -116,12 +116,12 @@ func handleEquipAdd(ctx node.Context) {
 func handleEquipUpdate(ctx node.Context) {
 	req := &pb.EquipUpdateReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.EquipUpdateResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.EquipUpdateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
 		return
 	}
 	resp, err := logic.Equip().EquipUpdate(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(&pb.EquipUpdateResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.EquipUpdateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
 		return
 	}
 	_ = ctx.Response(resp)

@@ -28,7 +28,7 @@ func RegisterHero(router http.Router) {
 func handleGmHeroList(ctx http.Context) error {
 	req := dto.GmPlayerReq{PlayerID: queryPlayerID(ctx)}
 	if req.PlayerID <= 0 {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	list, err := logic.GmHero().HeroList(req)
 	if err != nil {
@@ -47,7 +47,7 @@ func handleGmHeroList(ctx http.Context) error {
 func handleGmHeroAdd(ctx http.Context) error {
 	var req dto.GmHeroAddReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.HeroID <= 0 {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	entry, err := logic.GmHero().HeroAdd(req)
 	if err != nil {
@@ -66,7 +66,7 @@ func handleGmHeroAdd(ctx http.Context) error {
 func handleGmHeroUpdate(ctx http.Context) error {
 	var req dto.GmHeroUpdateReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.HeroID <= 0 {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	entry, err := logic.GmHero().HeroUpdate(req)
 	if err != nil {
@@ -86,7 +86,7 @@ func handleGmHeroUpdate(ctx http.Context) error {
 func handleGmHeroAttribute(ctx http.Context) error {
 	req := dto.GmHeroAttributeReq{PlayerID: queryPlayerID(ctx), HeroID: queryInt(ctx, "heroId")}
 	if req.PlayerID <= 0 {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	attr, err := logic.GmHero().HeroAttribute(req)
 	if err != nil {
@@ -105,7 +105,7 @@ func handleGmHeroAttribute(ctx http.Context) error {
 func handleGmHeroUpgrade(ctx http.Context) error {
 	var req dto.GmUpgradeReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.CfgID <= 0 {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	resp, err := logic.GmHero().HeroUpgrade(req)
 	if err != nil {

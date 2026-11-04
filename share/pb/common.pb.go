@@ -219,7 +219,9 @@ func (RouteCode) EnumDescriptor() ([]byte, []int) {
 type ErrCode int32
 
 const (
-	ErrCode_ERR_CODE_OK               ErrCode = 0 // 成功
+	ErrCode_ERR_CODE_OK               ErrCode = 0   // 成功
+	ErrCode_ERR_CODE_FORBIDDEN        ErrCode = 403 // 无接口访问权限（admin HTTP RBAC 拒绝/账号停用）
+	ErrCode_ERR_CODE_INTERNAL         ErrCode = 500 // 内部错误兜底（admin HTTP 依赖故障/上游不可达）
 	ErrCode_ERR_CODE_INTERNAL_ERROR   ErrCode = 1000
 	ErrCode_ERR_CODE_INVALID_PARAMS   ErrCode = 1001
 	ErrCode_ERR_CODE_UNAUTHORIZED     ErrCode = 1002
@@ -246,6 +248,8 @@ const (
 var (
 	ErrCode_name = map[int32]string{
 		0:    "ERR_CODE_OK",
+		403:  "ERR_CODE_FORBIDDEN",
+		500:  "ERR_CODE_INTERNAL",
 		1000: "ERR_CODE_INTERNAL_ERROR",
 		1001: "ERR_CODE_INVALID_PARAMS",
 		1002: "ERR_CODE_UNAUTHORIZED",
@@ -266,6 +270,8 @@ var (
 	}
 	ErrCode_value = map[string]int32{
 		"ERR_CODE_OK":                       0,
+		"ERR_CODE_FORBIDDEN":                403,
+		"ERR_CODE_INTERNAL":                 500,
 		"ERR_CODE_INTERNAL_ERROR":           1000,
 		"ERR_CODE_INVALID_PARAMS":           1001,
 		"ERR_CODE_UNAUTHORIZED":             1002,
@@ -1570,9 +1576,11 @@ const file_common_proto_rawDesc = "" +
 	"\x14ROUTE_CODE_TASK_LIST\x10\xc0W\x12\x1b\n" +
 	"\x16ROUTE_CODE_TASK_NOTIFY\x10\xc1W\x12\x1a\n" +
 	"\x15ROUTE_CODE_TASK_CLAIM\x10\xc2W\x12\x1b\n" +
-	"\x16ROUTE_CODE_TASK_ACCEPT\x10\xc3W*\xbc\x04\n" +
+	"\x16ROUTE_CODE_TASK_ACCEPT\x10\xc3W*\xed\x04\n" +
 	"\aErrCode\x12\x0f\n" +
-	"\vERR_CODE_OK\x10\x00\x12\x1c\n" +
+	"\vERR_CODE_OK\x10\x00\x12\x17\n" +
+	"\x12ERR_CODE_FORBIDDEN\x10\x93\x03\x12\x16\n" +
+	"\x11ERR_CODE_INTERNAL\x10\xf4\x03\x12\x1c\n" +
 	"\x17ERR_CODE_INTERNAL_ERROR\x10\xe8\a\x12\x1c\n" +
 	"\x17ERR_CODE_INVALID_PARAMS\x10\xe9\a\x12\x1a\n" +
 	"\x15ERR_CODE_UNAUTHORIZED\x10\xea\a\x12\x1e\n" +

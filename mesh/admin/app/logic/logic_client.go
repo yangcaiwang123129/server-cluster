@@ -261,7 +261,7 @@ func SimLogin(req dto.SimLoginReq) (*dto.SimLoginResp, error) {
 	start := time.Now()
 	httpReq, err := http.NewRequest(http.MethodPost, loginAddr+path, bytes.NewReader(payload))
 	if err != nil {
-		return nil, errs.NewError(errs.CodeNumInvalidParams,"登录服地址不合法: "+err.Error())
+		return nil, errs.NewError(errs.RespCodeInternal,"登录服地址不合法: "+err.Error())
 	}
 	httpReq.Header.Set("Content-Type", "application/json")
 
@@ -410,7 +410,7 @@ func SimStep(req dto.SimStepReq) (*dto.SimStepResp, error) {
 	defer s.mu.Unlock()
 
 	if s.conn == nil {
-		return nil, codes.NewCode(errs.CodeNumInvalidParams, "请先连接网关").Err()
+		return nil, codes.NewCode(errs.RespCodeInternal, "请先连接网关").Err()
 	}
 
 	var (
@@ -426,20 +426,20 @@ func SimStep(req dto.SimStepReq) (*dto.SimStepResp, error) {
 		respP = &pb.VerifyResp{}
 	case "enter":
 		if !s.verified {
-			return nil, codes.NewCode(errs.CodeNumInvalidParams, "请先完成首包验证").Err()
+			return nil, codes.NewCode(errs.RespCodeInternal, "请先完成首包验证").Err()
 		}
 		route = int32(pb.RouteCode_ROUTE_CODE_ENTER_GAME)
 		reqP = &pb.EnterGameReq{Token: s.token}
 		respP = &pb.EnterGameResp{}
 	case "leave":
 		if !s.entered {
-			return nil, codes.NewCode(errs.CodeNumInvalidParams, "请先进入游戏").Err()
+			return nil, codes.NewCode(errs.RespCodeInternal, "请先进入游戏").Err()
 		}
 		route = int32(pb.RouteCode_ROUTE_CODE_LEAVE_GAME)
 		reqP = &pb.LeaveGameReq{}
 		respP = &pb.LeaveGameResp{}
 	default:
-		return nil, errs.NewError(errs.CodeNumInvalidParams,"未知步骤: "+req.Step)
+		return nil, errs.NewError(errs.RespCodeInternal,"未知步骤: "+req.Step)
 	}
 
 	payload, err := proto.Marshal(reqP)

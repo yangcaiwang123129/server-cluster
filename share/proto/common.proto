@@ -79,7 +79,9 @@ enum RouteCode {
 
 //  ========== 业务错误码枚举（1000~9999） ==========
 enum ErrCode {
-  ERR_CODE_OK = 0;    // 成功
+  ERR_CODE_OK = 0;           // 成功
+  ERR_CODE_FORBIDDEN = 403;  // 无接口访问权限（admin HTTP RBAC 拒绝/账号停用）
+  ERR_CODE_INTERNAL = 500;   // 内部错误兜底（admin HTTP 依赖故障/上游不可达）
   ERR_CODE_INTERNAL_ERROR = 1000;
   ERR_CODE_INVALID_PARAMS = 1001;
   ERR_CODE_UNAUTHORIZED = 1002;

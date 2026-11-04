@@ -59,14 +59,3 @@ func BuildErrResult(code pb.ErrCode, msg string, args ...string) *pb.Result {
 		Args: args,
 	}
 }
-
-// ErrResult error → pb.Result（handler 层唯一出口，due proto codec 不能序列化裸 error）。
-//
-//	codes.Convert(err) != nil → BuildErrCode(pb.ErrCode(c.Code()), c.Message())
-//	普通 error               → BuildErrCode(ERR_CODE_INTERNAL_ERROR, err.Error())
-func ErrResult(err error) *pb.Result {
-	if c := codes.Convert(err); c != nil {
-		return BuildErrResult(pb.ErrCode(c.Code()), c.Message())
-	}
-	return BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())
-}

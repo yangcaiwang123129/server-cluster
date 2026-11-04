@@ -151,7 +151,7 @@ func handleApiGet(ctx http.Context) error {
 func handleApiCreate(ctx http.Context) error {
 	var req dto.ApiSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	m, err := logic.ApiCreate(req)
 	if err != nil {
@@ -172,7 +172,7 @@ func handleApiCreate(ctx http.Context) error {
 func handleApiUpdate(ctx http.Context) error {
 	var req dto.ApiSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	m, err := logic.ApiUpdate(paramInt(ctx, "id"), req)
 	if err != nil {
@@ -192,12 +192,12 @@ func handleApiUpdate(ctx http.Context) error {
 func handleApiDelete(ctx http.Context) error {
 	var req dto.IdsReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.ApiDelete(req.Ids); err != nil {
 		return errs.FailErr(ctx, err)
 	}
-	return errs.OKMsg(ctx, "删除成功")
+	return errs.OK(ctx, nil, "删除成功")
 }
 
 // handleCaptcha 返回图形验证码。
@@ -222,7 +222,7 @@ func handleCaptcha(ctx http.Context) error {
 func handleLogin(ctx http.Context) error {
 	var req dto.AdminLoginReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	token, err := logic.Login(req, ctx.IP(), ctx.Get("User-Agent"))
 	if err != nil {
@@ -237,7 +237,7 @@ func handleLogin(ctx http.Context) error {
 // @Produce json
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/logout [post]
-func handleLogout(ctx http.Context) error { return errs.OKMsg(ctx, "注销成功") }
+func handleLogout(ctx http.Context) error { return errs.OK(ctx, nil, "注销成功") }
 
 // handleGetInfo 返回当前登录用户的角色、权限与资料。
 // @Summary 获取当前用户信息
@@ -345,7 +345,7 @@ func handleConfigKey(ctx http.Context) error {
 func handleConfigCreate(ctx http.Context) error {
 	var req dto.ConfigSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	m, err := logic.ConfigCreate(req)
 	if err != nil {
@@ -366,7 +366,7 @@ func handleConfigCreate(ctx http.Context) error {
 func handleConfigUpdate(ctx http.Context) error {
 	var req dto.ConfigSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	m, err := logic.ConfigUpdate(paramInt(ctx, "id"), req)
 	if err != nil {
@@ -386,12 +386,12 @@ func handleConfigUpdate(ctx http.Context) error {
 func handleConfigDelete(ctx http.Context) error {
 	var req dto.IdsReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.ConfigDelete(req.Ids); err != nil {
 		return errs.FailErr(ctx, err)
 	}
-	return errs.OKMsg(ctx, "删除成功")
+	return errs.OK(ctx, nil, "删除成功")
 }
 
 // handleGetSetConfig 系统配置页的内置键取值。
@@ -419,12 +419,12 @@ func handleGetSetConfig(ctx http.Context) error {
 func handleUpdateSetConfig(ctx http.Context) error {
 	var req dto.SetConfigReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.UpdateSettings(req); err != nil {
 		return errs.FailErr(ctx, err)
 	}
-	return errs.OKMsg(ctx, "保存成功")
+	return errs.OK(ctx, nil, "保存成功")
 }
 
 // handleDictTypeList 字典类型分页列表。
@@ -480,7 +480,7 @@ func handleDictTypeGet(ctx http.Context) error {
 func handleDictTypeCreate(ctx http.Context) error {
 	var req dto.DictTypeSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	m, err := logic.DictTypeCreate(req)
 	if err != nil {
@@ -501,7 +501,7 @@ func handleDictTypeCreate(ctx http.Context) error {
 func handleDictTypeUpdate(ctx http.Context) error {
 	var req dto.DictTypeSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	m, err := logic.DictTypeUpdate(paramInt(ctx, "id"), req)
 	if err != nil {
@@ -521,12 +521,12 @@ func handleDictTypeUpdate(ctx http.Context) error {
 func handleDictTypeDelete(ctx http.Context) error {
 	var req dto.IdsReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.DictTypeDelete(req.Ids); err != nil {
 		return errs.FailErr(ctx, err)
 	}
-	return errs.OKMsg(ctx, "删除成功")
+	return errs.OK(ctx, nil, "删除成功")
 }
 
 // handleDictTypeOptions 字典类型下拉项。
@@ -597,7 +597,7 @@ func handleDictDataGet(ctx http.Context) error {
 func handleDictDataCreate(ctx http.Context) error {
 	var req dto.DictDataSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	m, err := logic.DictDataCreate(req)
 	if err != nil {
@@ -618,7 +618,7 @@ func handleDictDataCreate(ctx http.Context) error {
 func handleDictDataUpdate(ctx http.Context) error {
 	var req dto.DictDataSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	m, err := logic.DictDataUpdate(paramInt(ctx, "dictCode"), req)
 	if err != nil {
@@ -638,12 +638,12 @@ func handleDictDataUpdate(ctx http.Context) error {
 func handleDictDataDelete(ctx http.Context) error {
 	var req dto.IdsReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.DictDataDelete(req.Ids); err != nil {
 		return errs.FailErr(ctx, err)
 	}
-	return errs.OKMsg(ctx, "删除成功")
+	return errs.OK(ctx, nil, "删除成功")
 }
 
 // handleDictDataOptions 指定字典类型的下拉项。
@@ -718,12 +718,12 @@ func handleLoginLogGet(ctx http.Context) error {
 func handleLoginLogDelete(ctx http.Context) error {
 	var req dto.IdsReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.LoginLogDelete(req.Ids); err != nil {
 		return errs.FailErr(ctx, err)
 	}
-	return errs.OKMsg(ctx, "删除成功")
+	return errs.OK(ctx, nil, "删除成功")
 }
 
 // handleOperaLogList 操作日志分页列表。
@@ -768,12 +768,12 @@ func handleOperaLogList(ctx http.Context) error {
 func handleOperaLogDelete(ctx http.Context) error {
 	var req dto.IdsReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.OperaLogDelete(req.Ids); err != nil {
 		return errs.FailErr(ctx, err)
 	}
-	return errs.OKMsg(ctx, "删除成功")
+	return errs.OK(ctx, nil, "删除成功")
 }
 
 // handleOperaLogClean 清空操作日志。
@@ -786,7 +786,7 @@ func handleOperaLogClean(ctx http.Context) error {
 	if err := logic.OperaLogClean(); err != nil {
 		return errs.FailErr(ctx, err)
 	}
-	return errs.OKMsg(ctx, "清空成功")
+	return errs.OK(ctx, nil, "清空成功")
 }
 
 // handleMenuList 菜单树（不分页）。
@@ -851,7 +851,7 @@ func handleRoleMenuTreeselect(ctx http.Context) error {
 func handleMenuCreate(ctx http.Context) error {
 	var req dto.MenuSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	m, err := logic.MenuCreate(req)
 	if err != nil {
@@ -872,7 +872,7 @@ func handleMenuCreate(ctx http.Context) error {
 func handleMenuUpdate(ctx http.Context) error {
 	var req dto.MenuSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	m, err := logic.MenuUpdate(paramInt(ctx, "id"), req)
 	if err != nil {
@@ -892,12 +892,12 @@ func handleMenuUpdate(ctx http.Context) error {
 func handleMenuDelete(ctx http.Context) error {
 	var req dto.IdsReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.MenuDelete(req.Ids); err != nil {
 		return errs.FailErr(ctx, err)
 	}
-	return errs.OKMsg(ctx, "删除成功")
+	return errs.OK(ctx, nil, "删除成功")
 }
 
 // handleRoleList 角色分页列表。
@@ -954,7 +954,7 @@ func handleRoleGet(ctx http.Context) error {
 func handleRoleCreate(ctx http.Context) error {
 	var req dto.RoleSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	m, err := logic.RoleCreate(req)
 	if err != nil {
@@ -975,7 +975,7 @@ func handleRoleCreate(ctx http.Context) error {
 func handleRoleUpdate(ctx http.Context) error {
 	var req dto.RoleSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	m, err := logic.RoleUpdate(paramInt(ctx, "roleId"), req)
 	if err != nil {
@@ -995,12 +995,12 @@ func handleRoleUpdate(ctx http.Context) error {
 func handleRoleDelete(ctx http.Context) error {
 	var req dto.IdsReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.RoleDelete(req.Ids); err != nil {
 		return errs.FailErr(ctx, err)
 	}
-	return errs.OKMsg(ctx, "删除成功")
+	return errs.OK(ctx, nil, "删除成功")
 }
 
 // handleRoleStatus 启用/停用角色。
@@ -1014,12 +1014,12 @@ func handleRoleDelete(ctx http.Context) error {
 func handleRoleStatus(ctx http.Context) error {
 	var req dto.RoleStatusReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.RoleUpdateStatus(req); err != nil {
 		return errs.FailErr(ctx, err)
 	}
-	return errs.OKMsg(ctx, "操作成功")
+	return errs.OK(ctx, nil, "操作成功")
 }
 
 // handleUserList 用户分页列表。
@@ -1077,7 +1077,7 @@ func handleUserGet(ctx http.Context) error {
 func handleUserCreate(ctx http.Context) error {
 	var req dto.UserSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	m, err := logic.UserCreate(req)
 	if err != nil {
@@ -1097,7 +1097,7 @@ func handleUserCreate(ctx http.Context) error {
 func handleUserUpdate(ctx http.Context) error {
 	var req dto.UserSaveReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	m, err := logic.UserUpdate(req.UserId, req)
 	if err != nil {
@@ -1117,12 +1117,12 @@ func handleUserUpdate(ctx http.Context) error {
 func handleUserDelete(ctx http.Context) error {
 	var req dto.IdsReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.UserDelete(req.Ids); err != nil {
 		return errs.FailErr(ctx, err)
 	}
-	return errs.OKMsg(ctx, "删除成功")
+	return errs.OK(ctx, nil, "删除成功")
 }
 
 // handleUserStatus 启用/停用用户。
@@ -1136,12 +1136,12 @@ func handleUserDelete(ctx http.Context) error {
 func handleUserStatus(ctx http.Context) error {
 	var req dto.UserStatusReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.UserUpdateStatus(req); err != nil {
 		return errs.FailErr(ctx, err)
 	}
-	return errs.OKMsg(ctx, "操作成功")
+	return errs.OK(ctx, nil, "操作成功")
 }
 
 // handleUserResetPwd 重置指定用户密码。
@@ -1155,12 +1155,12 @@ func handleUserStatus(ctx http.Context) error {
 func handleUserResetPwd(ctx http.Context) error {
 	var req dto.UserPasswordResetReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.UserResetPassword(req); err != nil {
 		return errs.FailErr(ctx, err)
 	}
-	return errs.OKMsg(ctx, "密码重置成功")
+	return errs.OK(ctx, nil, "密码重置成功")
 }
 
 // handleUserProfile 当前登录用户的资料。
@@ -1188,7 +1188,7 @@ func handleUserProfile(ctx http.Context) error {
 func handleUserProfileUpdate(ctx http.Context) error {
 	var req dto.UserProfileUpdateReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	m, err := logic.UserUpdateProfile(global.CurrentUser(ctx).UserId, req)
 	if err != nil {
@@ -1208,10 +1208,10 @@ func handleUserProfileUpdate(ctx http.Context) error {
 func handleUserPwdSet(ctx http.Context) error {
 	var req dto.UserPasswordSetReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.UserSetPassword(global.CurrentUser(ctx), req); err != nil {
 		return errs.FailErr(ctx, err)
 	}
-	return errs.OKMsg(ctx, "密码修改成功")
+	return errs.OK(ctx, nil, "密码修改成功")
 }

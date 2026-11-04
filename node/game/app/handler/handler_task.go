@@ -21,12 +21,12 @@ func init() {
 func handleTaskList(ctx node.Context) {
 	req := &pb.TaskListReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.TaskListResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.TaskListResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
 		return
 	}
 	resp, err := logic.Task().TaskList(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(&pb.TaskListResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.TaskListResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -36,12 +36,12 @@ func handleTaskList(ctx node.Context) {
 func handleTaskClaim(ctx node.Context) {
 	req := &pb.TaskClaimReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.TaskClaimResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.TaskClaimResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
 		return
 	}
 	resp, err := logic.Task().TaskClaim(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(&pb.TaskClaimResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.TaskClaimResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -51,12 +51,12 @@ func handleTaskClaim(ctx node.Context) {
 func handleTaskAccept(ctx node.Context) {
 	req := &pb.TaskAcceptReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.TaskAcceptResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.TaskAcceptResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
 		return
 	}
 	resp, err := logic.Task().TaskAccept(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(&pb.TaskAcceptResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.TaskAcceptResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
 		return
 	}
 	_ = ctx.Response(resp)

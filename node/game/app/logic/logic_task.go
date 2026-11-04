@@ -112,12 +112,12 @@ func (this *taskLogic) collect(ctx context.Context, playerID int64, taskType, ac
 func (this *taskLogic) TaskClaim(ctx context.Context, playerID int64, req *pb.TaskClaimReq) (*pb.TaskClaimResp, error) {
 	cfg := tpl.T().Task.Get(req.GetTaskId())
 	if cfg == nil {
-		return nil, errs.CodeTaskNotFound.Err()
+		return &pb.TaskClaimResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_TASK_NOT_FOUND, "")}, nil
 	}
 	now := time.Now().UnixMilli()
 	key, ok := resolvePeriodKey(cfg, ActivitySync().Snapshot(), now)
 	if !ok {
-		return nil, errs.CodeTaskExpired.Err()
+		return &pb.TaskClaimResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_TASK_EXPIRED, "")}, nil
 	}
 	pt, err := loadPlayerTasks(ctx, playerID)
 	if err != nil {
@@ -125,23 +125,23 @@ func (this *taskLogic) TaskClaim(ctx context.Context, playerID int64, req *pb.Ta
 	}
 	info, ok := pt.GetTask(cfg.Id, key)
 	if !ok {
-		return nil, errs.CodeTaskNotCompleted.Err()
+		return &pb.TaskClaimResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_TASK_NOT_COMPLETED, "")}, nil
 	}
 	if info.Status == consts.TaskStatusNotAccepted {
-		return nil, errs.CodeTaskNotAccepted.Err()
+		return &pb.TaskClaimResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_TASK_NOT_ACCEPTED, "")}, nil
 	}
 	if info.Status == consts.TaskStatusRunning {
-		return nil, errs.CodeTaskNotCompleted.Err()
+		return &pb.TaskClaimResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_TASK_NOT_COMPLETED, "")}, nil
 	}
 	if info.Status == consts.TaskStatusClaimed {
-		return nil, errs.CodeTaskAlreadyClaimed.Err()
+		return &pb.TaskClaimResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_TASK_ALREADY_CLAIMED, "")}, nil
 	}
 	// 自动领取任务正常自动发放；仅自动发放失败停留在可领取状态时允许手动补领。
 	if cfg.ClaimType != tpl.ClaimType_Manual && info.Status != consts.TaskStatusClaimable {
-		return nil, errs.CodeInvalidParams.WithMessage("该任务奖励自动发放，无需领取").Err()
+		return &pb.TaskClaimResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "该任务奖励自动发放，无需领取")}, nil
 	}
 	if !this.checkConditions(ctx, playerID, cfg.ClaimLogicType, cfg.ClaimConditionTypes) {
-		return nil, errs.CodeInvalidParams.WithMessage("领取条件不满足").Err()
+		return &pb.TaskClaimResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "领取条件不满足")}, nil
 	}
 
 	info.Status = consts.TaskStatusClaimed
@@ -161,6 +161,9 @@ func (this *taskLogic) TaskClaim(ctx context.Context, playerID int64, req *pb.Ta
 		if ferr := global.PlayerTaskCache.FlushKey(ctx, playerID); ferr != nil {
 			log.Warnf("game: task claim rollback failed, player=%d task=%d: %v", playerID, cfg.Id, ferr)
 		}
+		if r := codedResult(err); r != nil {
+			return &pb.TaskClaimResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	return &pb.TaskClaimResp{Entry: convert.TaskEntry(cfg, info), Rewards: rewards}, nil
@@ -170,15 +173,15 @@ func (this *taskLogic) TaskClaim(ctx context.Context, playerID int64, req *pb.Ta
 func (this *taskLogic) TaskAccept(ctx context.Context, playerID int64, req *pb.TaskAcceptReq) (*pb.TaskAcceptResp, error) {
 	cfg := tpl.T().Task.Get(req.GetTaskId())
 	if cfg == nil {
-		return nil, errs.CodeTaskNotFound.Err()
+		return &pb.TaskAcceptResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_TASK_NOT_FOUND, "")}, nil
 	}
 	if cfg.AcceptType != tpl.AcceptType_Manual {
-		return nil, errs.CodeInvalidParams.WithMessage("该任务无需手动接取").Err()
+		return &pb.TaskAcceptResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "该任务无需手动接取")}, nil
 	}
 	now := time.Now().UnixMilli()
 	key, ok := resolvePeriodKey(cfg, ActivitySync().Snapshot(), now)
 	if !ok {
-		return nil, errs.CodeTaskExpired.Err()
+		return &pb.TaskAcceptResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_TASK_EXPIRED, "")}, nil
 	}
 	pt, err := loadPlayerTasks(ctx, playerID)
 	if err != nil {
@@ -189,10 +192,10 @@ func (this *taskLogic) TaskAccept(ctx context.Context, playerID int64, req *pb.T
 		info = newTaskInfo(cfg, key)
 	}
 	if info.Status != consts.TaskStatusNotAccepted {
-		return nil, errs.CodeInvalidParams.WithMessage("任务已接取，不可重复接取").Err()
+		return &pb.TaskAcceptResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "任务已接取，不可重复接取")}, nil
 	}
 	if !this.checkConditions(ctx, playerID, cfg.AcceptLogicType, cfg.AcceptConditionTypes) {
-		return nil, errs.CodeInvalidParams.WithMessage("接取条件不满足").Err()
+		return &pb.TaskAcceptResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "接取条件不满足")}, nil
 	}
 	info.Status = consts.TaskStatusRunning
 	info.Progress = 0

@@ -51,11 +51,14 @@ func (this *equipLogic) EquipList(ctx context.Context, playerID int64) ([]*pb.Eq
 // EquipAdd 新增装备：配置ID必须存在，装备归属于指定英雄（0 表示出战英雄），生成新的实例ID。
 func (this *equipLogic) EquipAdd(ctx context.Context, playerID int64, req *pb.EquipAddReq) (*pb.EquipAddResp, error) {
 	if !tpl.T().Equip.Has(req.GetCfgId()) {
-		return nil, errs.CodeInvalidParams.Err()
+		return &pb.EquipAddResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "")}, nil
 	}
 
 	_, hero, err := ownedHero(ctx, playerID, req.GetHeroId())
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.EquipAddResp{Result: r}, nil
+		}
 		return nil, err
 	}
 
@@ -66,7 +69,7 @@ func (this *equipLogic) EquipAdd(ctx context.Context, playerID int64, req *pb.Eq
 
 	g := model.EquipInfo{EquipID: svc.NextID(), CfgID: req.GetCfgId(), HeroID: hero.HeroID, Level: 1, Quality: 1}
 	if !row.AddEquip(g) {
-		return nil, errs.CodeInvalidParams.WithMessage("装备实例已存在").Err()
+		return &pb.EquipAddResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备实例已存在")}, nil
 	}
 
 	global.PlayerEquipCache.Set(playerID, row)
@@ -84,13 +87,16 @@ func (this *equipLogic) EquipUpdate(ctx context.Context, playerID int64, req *pb
 
 	old, ok := row.Equips.Get(req.GetId())
 	if !ok {
-		return nil, errs.CodeInvalidParams.WithMessage("装备未拥有").Err()
+		return &pb.EquipUpdateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备未拥有")}, nil
 	}
 
 	oldHeroID := old.HeroID
 	heroID := oldHeroID
 	if req.GetHeroId() > 0 {
 		if _, _, err := ownedHero(ctx, playerID, req.GetHeroId()); err != nil {
+			if r := codedResult(err); r != nil {
+				return &pb.EquipUpdateResp{Result: r}, nil
+			}
 			return nil, err
 		}
 		heroID = req.GetHeroId()
@@ -106,7 +112,7 @@ func (this *equipLogic) EquipUpdate(ctx context.Context, playerID int64, req *pb
 		Breakthrough: clampDim(req.GetBreakthrough(), 0),
 	}
 	if !row.UpdateEquip(g) {
-		return nil, errs.CodeInvalidParams.WithMessage("装备未拥有").Err()
+		return &pb.EquipUpdateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备未拥有")}, nil
 	}
 
 	global.PlayerEquipCache.Set(playerID, row)
@@ -127,12 +133,15 @@ func (this *equipLogic) EquipWear(ctx context.Context, playerID int64, req *pb.E
 
 	g, ok := row.Equips.Get(req.GetId())
 	if !ok {
-		return nil, errs.CodeInvalidParams.WithMessage("装备未拥有").Err()
+		return &pb.EquipWearResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备未拥有")}, nil
 	}
 
 	oldHeroID := g.HeroID
 	_, hero, err := ownedHero(ctx, playerID, req.GetHeroId())
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.EquipWearResp{Result: r}, nil
+		}
 		return nil, err
 	}
 
@@ -152,6 +161,9 @@ func (this *equipLogic) EquipWear(ctx context.Context, playerID int64, req *pb.E
 		m[g.EquipID] = g
 		return nil
 	}); err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.EquipWearResp{Result: r}, nil
+		}
 		return nil, err
 	}
 
@@ -162,6 +174,9 @@ func (this *equipLogic) EquipWear(ctx context.Context, playerID int64, req *pb.E
 	notifyHero(ctx, playerID, hero.HeroID)
 	_, attr, err := computeHeroAttribute(ctx, playerID, hero.HeroID)
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.EquipWearResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	return &pb.EquipWearResp{EquipEntry: convert.EquipEntry(g), Attribute: attr}, nil
@@ -176,16 +191,16 @@ func (this *equipLogic) EquipUnwear(ctx context.Context, playerID int64, req *pb
 
 	g, ok := row.Equips.Get(req.GetId())
 	if !ok {
-		return nil, errs.CodeInvalidParams.WithMessage("装备未拥有").Err()
+		return &pb.EquipUnwearResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备未拥有")}, nil
 	}
 	if !g.Equipped {
-		return nil, errs.CodeInvalidParams.WithMessage("装备未穿戴").Err()
+		return &pb.EquipUnwearResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备未穿戴")}, nil
 	}
 
 	heroID := g.HeroID
 	g.Equipped = false
 	if !row.UpdateEquip(g) {
-		return nil, errs.CodeInvalidParams.WithMessage("装备未拥有").Err()
+		return &pb.EquipUnwearResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备未拥有")}, nil
 	}
 
 	global.PlayerEquipCache.Set(playerID, row)
@@ -194,6 +209,9 @@ func (this *equipLogic) EquipUnwear(ctx context.Context, playerID int64, req *pb
 	if heroID > 0 {
 		_, computed, cErr := computeHeroAttribute(ctx, playerID, heroID)
 		if cErr != nil {
+			if r := codedResult(cErr); r != nil {
+				return &pb.EquipUnwearResp{Result: r}, nil
+			}
 			return nil, cErr
 		}
 		attr = computed
@@ -253,11 +271,17 @@ func (this *equipLogic) EquipUpgrade(ctx context.Context, playerID int64, req *p
 		},
 		"装备已满级")
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.EquipUpgradeResp{Result: r}, nil
+		}
 		return nil, err
 	}
 
 	_, attr, err := computeHeroAttribute(ctx, playerID, g.HeroID)
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.EquipUpgradeResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	return &pb.EquipUpgradeResp{EquipEntry: convert.EquipEntry(g), Attribute: attr}, nil
@@ -277,11 +301,17 @@ func (this *equipLogic) EquipUpQuality(ctx context.Context, playerID int64, req 
 		},
 		"装备已满品质")
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.EquipUpQualityResp{Result: r}, nil
+		}
 		return nil, err
 	}
 
 	_, attr, err := computeHeroAttribute(ctx, playerID, g.HeroID)
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.EquipUpQualityResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	return &pb.EquipUpQualityResp{EquipEntry: convert.EquipEntry(g), Attribute: attr}, nil
@@ -301,11 +331,17 @@ func (this *equipLogic) EquipBreakthrough(ctx context.Context, playerID int64, r
 		},
 		"装备已满突破")
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.EquipBreakthroughResp{Result: r}, nil
+		}
 		return nil, err
 	}
 
 	_, attr, err := computeHeroAttribute(ctx, playerID, g.HeroID)
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.EquipBreakthroughResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	return &pb.EquipBreakthroughResp{EquipEntry: convert.EquipEntry(g), Attribute: attr}, nil

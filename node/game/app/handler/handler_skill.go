@@ -23,12 +23,12 @@ func init() {
 func handleSkillUpdate(ctx node.Context) {
 	req := &pb.SkillUpdateReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.SkillUpdateResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.SkillUpdateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
 		return
 	}
 	resp, err := logic.Skill().SkillUpdate(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(&pb.SkillUpdateResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.SkillUpdateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -38,12 +38,12 @@ func handleSkillUpdate(ctx node.Context) {
 func handleSkillUpgrade(ctx node.Context) {
 	req := &pb.SkillUpgradeReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.SkillUpgradeResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.SkillUpgradeResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
 		return
 	}
 	resp, err := logic.Skill().SkillUpgrade(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(&pb.SkillUpgradeResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.SkillUpgradeResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -53,12 +53,12 @@ func handleSkillUpgrade(ctx node.Context) {
 func handleSkillUpQuality(ctx node.Context) {
 	req := &pb.SkillUpQualityReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.SkillUpQualityResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.SkillUpQualityResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
 		return
 	}
 	resp, err := logic.Skill().SkillUpQuality(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(&pb.SkillUpQualityResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.SkillUpQualityResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -68,12 +68,12 @@ func handleSkillUpQuality(ctx node.Context) {
 func handleSkillBreakthrough(ctx node.Context) {
 	req := &pb.SkillBreakthroughReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.SkillBreakthroughResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.SkillBreakthroughResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
 		return
 	}
 	resp, err := logic.Skill().SkillBreakthrough(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(&pb.SkillBreakthroughResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.SkillBreakthroughResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
 		return
 	}
 	_ = ctx.Response(resp)

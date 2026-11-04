@@ -127,11 +127,18 @@ func (this *itemLogic) ItemContainerList(ctx context.Context, playerID int64, re
 func (this *itemLogic) ItemMove(ctx context.Context, playerID int64, req *pb.ItemMoveReq) (*pb.ItemMoveResp, error) {
 	pc, c, err := itemContainerOf(ctx, playerID, req.GetContainerType())
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.ItemMoveResp{Result: r}, nil
+		}
 		return nil, err
 	}
 
 	if err := c.MoveEntry(req.GetId(), req.GetToX(), req.GetToY(), req.GetRotated()); err != nil {
-		return nil, itemErr(err)
+		err = itemErr(err)
+		if r := codedResult(err); r != nil {
+			return &pb.ItemMoveResp{Result: r}, nil
+		}
+		return nil, err
 	}
 
 	saveItem(playerID, pc)
@@ -142,11 +149,18 @@ func (this *itemLogic) ItemMove(ctx context.Context, playerID int64, req *pb.Ite
 func (this *itemLogic) ItemRotate(ctx context.Context, playerID int64, req *pb.ItemRotateReq) (*pb.ItemRotateResp, error) {
 	pc, c, err := itemContainerOf(ctx, playerID, req.GetContainerType())
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.ItemRotateResp{Result: r}, nil
+		}
 		return nil, err
 	}
 
 	if err := c.RotateEntry(req.GetId()); err != nil {
-		return nil, itemErr(err)
+		err = itemErr(err)
+		if r := codedResult(err); r != nil {
+			return &pb.ItemRotateResp{Result: r}, nil
+		}
+		return nil, err
 	}
 
 	saveItem(playerID, pc)
@@ -157,11 +171,18 @@ func (this *itemLogic) ItemRotate(ctx context.Context, playerID int64, req *pb.I
 func (this *itemLogic) ItemSort(ctx context.Context, playerID int64, req *pb.ItemSortReq) (*pb.ItemSortResp, error) {
 	pc, c, err := itemContainerOf(ctx, playerID, req.GetContainerType())
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.ItemSortResp{Result: r}, nil
+		}
 		return nil, err
 	}
 
 	if err := c.AutoSort(); err != nil {
-		return nil, itemErr(err)
+		err = itemErr(err)
+		if r := codedResult(err); r != nil {
+			return &pb.ItemSortResp{Result: r}, nil
+		}
+		return nil, err
 	}
 
 	saveItem(playerID, pc)
@@ -174,7 +195,7 @@ func (this *itemLogic) ItemTransfer(ctx context.Context, playerID int64, req *pb
 	fromType, okFrom := convert.ContainerTypeToModel(req.GetFromType())
 	toType, okTo := convert.ContainerTypeToModel(req.GetToType())
 	if !okFrom || !okTo || fromType == toType {
-		return nil, errs.CodeInvalidParams.Err()
+		return &pb.ItemTransferResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "")}, nil
 	}
 
 	pc, err := loadItem(ctx, playerID)
@@ -183,12 +204,16 @@ func (this *itemLogic) ItemTransfer(ctx context.Context, playerID int64, req *pb
 	}
 	fromC, toC := pc.ByType(fromType), pc.ByType(toType)
 	if fromC == nil || toC == nil {
-		return nil, errs.CodeInvalidParams.Err()
+		return &pb.ItemTransferResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "")}, nil
 	}
 
 	// 目标容器调 TransferFrom 把源容器的物品搬过来
 	if err := toC.TransferFrom(fromC, req.GetId(), req.GetToX(), req.GetToY(), req.GetRotated()); err != nil {
-		return nil, itemErr(err)
+		err = itemErr(err)
+		if r := codedResult(err); r != nil {
+			return &pb.ItemTransferResp{Result: r}, nil
+		}
+		return nil, err
 	}
 
 	saveItem(playerID, pc)
@@ -201,17 +226,20 @@ func (this *itemLogic) ItemTransfer(ctx context.Context, playerID int64, req *pb
 // ItemAddEntry 向物品容器放入对象（GM）：校验配置与占格后挂缓存待落库。
 func (this *itemLogic) ItemAddEntry(ctx context.Context, playerID int64, req *pb.GmItemAddEntryReq) (*pb.ItemContainerListResp, error) {
 	if !tpl.T().Item.Has(req.GetCfgId()) {
-		return nil, errs.CodeInvalidParams.WithMessage("物品配置不存在").Err()
+		return &pb.ItemContainerListResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "物品配置不存在")}, nil
 	}
 
 	pc, c, err := itemContainerOf(ctx, playerID, pb.ContainerType(req.GetContainerType()))
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.ItemContainerListResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	// 存量脏数据缺配置时占格计算会 panic，先校验
 	for _, it := range c.Entries() {
 		if !tpl.T().Item.Has(it.ItemCfgID) {
-			return nil, errs.CodeInvalidParams.WithMessage(fmt.Sprintf("物品容器内物品配置缺失，物品配置ID: %d", it.ItemCfgID)).Err()
+			return &pb.ItemContainerListResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, fmt.Sprintf("物品容器内物品配置缺失，物品配置ID: %d", it.ItemCfgID))}, nil
 		}
 	}
 
@@ -228,7 +256,11 @@ func (this *itemLogic) ItemAddEntry(ctx context.Context, playerID int64, req *pb
 		GridY:     req.GetGridY(),
 		Rotated:   req.GetRotated(),
 	}); err != nil {
-		return nil, itemErr(err)
+		err = itemErr(err)
+		if r := codedResult(err); r != nil {
+			return &pb.ItemContainerListResp{Result: r}, nil
+		}
+		return nil, err
 	}
 
 	saveItem(playerID, pc)

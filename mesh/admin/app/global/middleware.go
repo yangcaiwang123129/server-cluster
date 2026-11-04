@@ -59,7 +59,7 @@ func CORSMiddleware() fiber.Handler {
 // RequireDB 数据库未配置时直接拒绝请求，避免空句柄穿透到业务层。
 func RequireDB(c fiber.Ctx) error {
 	if _, err := svc.Ctx().DB(); err != nil {
-		return errs.FailCtx(c, errs.RespCodeInternal, "数据库未配置")
+		return errs.Fail(c, errs.RespCodeInternal, "数据库未配置")
 	}
 	return c.Next()
 }
@@ -71,11 +71,11 @@ func AuthMiddleware(c fiber.Ctx) error {
 	}
 	token := strings.TrimSpace(strings.TrimPrefix(c.Get("Authorization"), "Bearer "))
 	if token == "" {
-		return errs.FailCtx(c, errs.CodeNumUnauthorized, "未登录或登录已过期")
+		return errs.Fail(c, errs.RespCodeInternal, "未登录或登录已过期")
 	}
 	user, role, err := Authenticate(token)
 	if err != nil {
-		return errs.FailCtxErr(c, err)
+		return errs.FailErr(c, err)
 	}
 	c.Locals(localUser, user)
 	c.Locals(localRole, role)
@@ -89,17 +89,17 @@ func PermissionMiddleware(c fiber.Ctx) error {
 	}
 	role, ok := c.Locals(localRole).(*model.SysRole)
 	if !ok {
-		return errs.FailCtx(c, errs.CodeNumUnauthorized, "未登录或登录已过期")
+		return errs.Fail(c, errs.RespCodeInternal, "未登录或登录已过期")
 	}
 	if _, skip := alwaysAllowed[c.Path()]; skip {
 		return c.Next()
 	}
 	allowed, err := Allow(role.RoleKey, c.Path(), c.Method())
 	if err != nil {
-		return errs.FailCtx(c, errs.RespCodeInternal, "权限校验失败")
+		return errs.Fail(c, errs.RespCodeInternal, "权限校验失败")
 	}
 	if !allowed {
-		return errs.FailCtx(c, errs.RespCodeForbidden, "无接口访问权限")
+		return errs.Fail(c, errs.RespCodeForbidden, "无接口访问权限")
 	}
 	return c.Next()
 }
@@ -139,11 +139,11 @@ func OperaLogMiddleware(c fiber.Ctx) error {
 func Authenticate(token string) (*model.SysUser, *model.SysRole, error) {
 	payload, err := svc.JWT().ExtractPayload(token)
 	if err != nil {
-		return nil, nil, codes.NewCode(errs.CodeNumUnauthorized, "未登录或登录已过期").Err()
+		return nil, nil, codes.NewCode(errs.RespCodeInternal, "未登录或登录已过期").Err()
 	}
 	uid, ok := payload[consts.PayloadAdminUID].(float64)
 	if !ok {
-		return nil, nil, codes.NewCode(errs.CodeNumUnauthorized, "令牌无效").Err()
+		return nil, nil, codes.NewCode(errs.RespCodeInternal, "令牌无效").Err()
 	}
 	d, err := svc.Ctx().DB()
 	if err != nil {
@@ -151,7 +151,7 @@ func Authenticate(token string) (*model.SysUser, *model.SysRole, error) {
 	}
 	var user model.SysUser
 	if err := d.First(&user, "user_id = ?", int(uid)).Error; err != nil {
-		return nil, nil, codes.NewCode(errs.CodeNumUnauthorized, "账号不存在").Err()
+		return nil, nil, codes.NewCode(errs.RespCodeInternal, "账号不存在").Err()
 	}
 	if user.Status != consts.StatusEnabled {
 		return nil, nil, codes.NewCode(errs.RespCodeForbidden, "账号已停用").Err()

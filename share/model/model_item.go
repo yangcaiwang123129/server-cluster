@@ -149,13 +149,35 @@ func defaultItemRawSizeOf(it *ItemEntry) (w, h int32) {
 	return itemSize(def)
 }
 
+// defaultItemQualityOf QualityOf 注入的默认实现：读配置稀有度。
+// Rarity 数值越大品质越高（红色为最高档，黄色次之，其余品质排后）。
+func defaultItemQualityOf(it *ItemEntry) int32 {
+	def := GetItemCfgById(it.ItemCfgID)
+	if def == nil {
+		return 0
+	}
+	return def.Rarity
+}
+
+// defaultItemSellPriceOf SellPriceOf 注入的默认实现：读配置出售价格。
+func defaultItemSellPriceOf(it *ItemEntry) int64 {
+	def := GetItemCfgById(it.ItemCfgID)
+	if def == nil {
+		return 0
+	}
+	return int64(def.SellingPrice)
+}
+
 // ============ NewItemContainer 构造包装 ============
 
 // NewItemContainer 构造 BaseContainer[*ItemEntry] 的便捷包装。
-// 内部调 container.NewContainer[*ItemEntry]，自动注入 SizeOf/RawSizeOf 依赖 tpl。
+// 内部调 container.NewContainer[*ItemEntry]，自动注入 SizeOf/RawSizeOf/QualityOf/SellPriceOf 依赖 tpl。
 func NewItemContainer(typ, gridW, gridH int32, globalID, ownerID int64, ownerType int32) *ItemContainer {
-	return container.NewContainer[*ItemEntry](typ, gridW, gridH, globalID, ownerID, ownerType,
+	c := container.NewContainer[*ItemEntry](typ, gridW, gridH, globalID, ownerID, ownerType,
 		defaultItemSizeOf, defaultItemRawSizeOf)
+	c.QualityOf = defaultItemQualityOf
+	c.SellPriceOf = defaultItemSellPriceOf
+	return c
 }
 
 // ============ PlayerItem（玩家物品容器聚合，持久化在一张表里） ============
@@ -177,9 +199,9 @@ func (PlayerItem) TableName() string { return enum.TablePlayerItem.String() }
 func NewPlayerItem(playerID int64) *PlayerItem {
 	return &PlayerItem{
 		PlayerID: playerID,
-		Backpack: newPlayerItemContainer(playerID, int32(pb.ContainerType_CONTAINER_TYPE_BACKPACK), 8, 12),
-		Stash:    newPlayerItemContainer(playerID, int32(pb.ContainerType_CONTAINER_TYPE_STASH), 20, 20),
-		Secure:   newPlayerItemContainer(playerID, int32(pb.ContainerType_CONTAINER_TYPE_SECURE), 4, 6),
+		Backpack: newPlayerItemContainer(playerID, int32(pb.ContainerType_CONTAINER_TYPE_BACKPACK), 6, 6),
+		Stash:    newPlayerItemContainer(playerID, int32(pb.ContainerType_CONTAINER_TYPE_STASH), 6, 6),
+		Secure:   newPlayerItemContainer(playerID, int32(pb.ContainerType_CONTAINER_TYPE_SECURE), 3, 3),
 	}
 }
 

@@ -65,7 +65,7 @@ func handleClusterList(ctx http.Context) error {
 func handleClusterDetail(ctx http.Context) error {
 	nodeID := ctx.Params("nodeId")
 	if nodeID == "" {
-		return errs.FailParams(ctx, "nodeId required")
+		return errs.Fail(ctx, errs.RespCodeInternal, "nodeId required")
 	}
 	resp, err := logic.Cluster().Get(ctx.Context(), nodeID)
 	if err != nil {
@@ -84,11 +84,11 @@ func handleClusterDetail(ctx http.Context) error {
 func handleClusterUpdate(ctx http.Context) error {
 	nodeID := ctx.Params("nodeId")
 	if nodeID == "" {
-		return errs.FailParams(ctx, "nodeId required")
+		return errs.Fail(ctx, errs.RespCodeInternal, "nodeId required")
 	}
 	var req dto.ClusterNodeUpdateReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "invalid body")
+		return errs.Fail(ctx, errs.RespCodeInternal, "invalid body")
 	}
 	m := &model.ClusterNode{
 		NodeID:     nodeID,
@@ -100,7 +100,7 @@ func handleClusterUpdate(ctx http.Context) error {
 		Remark:     strings.TrimSpace(req.Remark),
 	}
 	if m.SSHHost == "" || m.SSHUser == "" {
-		return errs.FailParams(ctx, "sshHost and sshUser required")
+		return errs.Fail(ctx, errs.RespCodeInternal, "sshHost and sshUser required")
 	}
 	if err := logic.Cluster().UpdateSSH(ctx.Context(), m); err != nil {
 		return errs.FailErr(ctx, err)
@@ -118,17 +118,17 @@ func handleClusterUpdate(ctx http.Context) error {
 func handleClusterExec(ctx http.Context) error {
 	nodeID := ctx.Params("nodeId")
 	if nodeID == "" {
-		return errs.FailParams(ctx, "nodeId required")
+		return errs.Fail(ctx, errs.RespCodeInternal, "nodeId required")
 	}
 	var req dto.ClusterExecReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "invalid body")
+		return errs.Fail(ctx, errs.RespCodeInternal, "invalid body")
 	}
 	action := strings.ToLower(strings.TrimSpace(req.Action))
 	switch action {
 	case "start", "stop", "restart", "deploy":
 	default:
-		return errs.FailParams(ctx, "action must be start/stop/restart/deploy")
+		return errs.Fail(ctx, errs.RespCodeInternal, "action must be start/stop/restart/deploy")
 	}
 	resp, err := logic.Cluster().Exec(ctx.Context(), nodeID, action)
 	if err != nil {

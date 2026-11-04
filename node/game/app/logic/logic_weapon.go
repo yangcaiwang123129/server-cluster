@@ -67,7 +67,7 @@ func (this *weaponLogic) WeaponUpdate(ctx context.Context, playerID int64, req *
 		Breakthrough: clampDim(req.GetBreakthrough(), 0),
 	}
 	if !row.UpdateWeapon(w) {
-		return nil, errs.CodeInvalidParams.WithMessage("武器未拥有").Err()
+		return &pb.WeaponUpdateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "武器未拥有")}, nil
 	}
 
 	global.PlayerWeaponCache.Set(playerID, row)
@@ -136,12 +136,18 @@ func (this *weaponLogic) WeaponUpgrade(ctx context.Context, playerID int64, req 
 		},
 		"武器已满级")
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.WeaponUpgradeResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	record.Record(ctx, model.RecordModuleWeapon, playerID, model.RecordActionConsume, req.GetCfgId(), 1)
 
 	_, attr, err := computeHeroAttribute(ctx, playerID, heroID)
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.WeaponUpgradeResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	return &pb.WeaponUpgradeResp{WeaponEntry: convert.WeaponEntry(w), Attribute: attr}, nil
@@ -161,12 +167,18 @@ func (this *weaponLogic) WeaponUpQuality(ctx context.Context, playerID int64, re
 		},
 		"武器已满品质")
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.WeaponUpQualityResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	record.Record(ctx, model.RecordModuleWeapon, playerID, model.RecordActionConsume, req.GetCfgId(), 1)
 
 	_, attr, err := computeHeroAttribute(ctx, playerID, heroID)
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.WeaponUpQualityResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	return &pb.WeaponUpQualityResp{WeaponEntry: convert.WeaponEntry(w), Attribute: attr}, nil
@@ -186,12 +198,18 @@ func (this *weaponLogic) WeaponBreakthrough(ctx context.Context, playerID int64,
 		},
 		"武器已满突破")
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.WeaponBreakthroughResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	record.Record(ctx, model.RecordModuleWeapon, playerID, model.RecordActionConsume, req.GetCfgId(), 1)
 
 	_, attr, err := computeHeroAttribute(ctx, playerID, heroID)
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.WeaponBreakthroughResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	return &pb.WeaponBreakthroughResp{WeaponEntry: convert.WeaponEntry(w), Attribute: attr}, nil

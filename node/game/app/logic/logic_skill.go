@@ -66,7 +66,7 @@ func (this *skillLogic) SkillUpdate(ctx context.Context, playerID int64, req *pb
 		Breakthrough: clampDim(req.GetBreakthrough(), 0),
 	}
 	if !row.UpdateSkill(s) {
-		return nil, errs.CodeInvalidParams.WithMessage("技能未拥有").Err()
+		return &pb.SkillUpdateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "技能未拥有")}, nil
 	}
 
 	global.PlayerSkillCache.Set(playerID, row)
@@ -134,12 +134,18 @@ func (this *skillLogic) SkillUpgrade(ctx context.Context, playerID int64, req *p
 		},
 		"技能已满级")
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.SkillUpgradeResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	record.Record(ctx, model.RecordModuleSkill, playerID, model.RecordActionConsume, req.GetCfgId(), 1)
 
 	_, attr, err := computeHeroAttribute(ctx, playerID, heroID)
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.SkillUpgradeResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	return &pb.SkillUpgradeResp{SkillEntry: convert.SkillEntry(s), Attribute: attr}, nil
@@ -159,12 +165,18 @@ func (this *skillLogic) SkillUpQuality(ctx context.Context, playerID int64, req 
 		},
 		"技能已满品质")
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.SkillUpQualityResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	record.Record(ctx, model.RecordModuleSkill, playerID, model.RecordActionConsume, req.GetCfgId(), 1)
 
 	_, attr, err := computeHeroAttribute(ctx, playerID, heroID)
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.SkillUpQualityResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	return &pb.SkillUpQualityResp{SkillEntry: convert.SkillEntry(s), Attribute: attr}, nil
@@ -184,12 +196,18 @@ func (this *skillLogic) SkillBreakthrough(ctx context.Context, playerID int64, r
 		},
 		"技能已满突破")
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.SkillBreakthroughResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	record.Record(ctx, model.RecordModuleSkill, playerID, model.RecordActionConsume, req.GetCfgId(), 1)
 
 	_, attr, err := computeHeroAttribute(ctx, playerID, heroID)
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.SkillBreakthroughResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	return &pb.SkillBreakthroughResp{SkillEntry: convert.SkillEntry(s), Attribute: attr}, nil

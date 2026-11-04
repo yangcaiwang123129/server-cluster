@@ -26,12 +26,12 @@ func init() {
 func handleMailList(ctx node.Context) {
 	req := &pb.MailListReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.MailListResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.MailListResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
 		return
 	}
 	resp, err := logic.Mail().MailList(ctx.Context(), ctx.UID())
 	if err != nil {
-		_ = ctx.Response(&pb.MailListResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.MailListResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -41,12 +41,12 @@ func handleMailList(ctx node.Context) {
 func handleMailRead(ctx node.Context) {
 	req := &pb.MailReadReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.MailReadResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.MailReadResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
 		return
 	}
 	resp, err := logic.Mail().MailRead(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(&pb.MailReadResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.MailReadResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -56,12 +56,12 @@ func handleMailRead(ctx node.Context) {
 func handleMailReadAll(ctx node.Context) {
 	req := &pb.MailReadAllReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.MailReadAllResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.MailReadAllResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
 		return
 	}
 	resp, err := logic.Mail().MailReadAll(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(&pb.MailReadAllResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.MailReadAllResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -71,12 +71,12 @@ func handleMailReadAll(ctx node.Context) {
 func handleMailClaim(ctx node.Context) {
 	req := &pb.MailClaimReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.MailClaimResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.MailClaimResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
 		return
 	}
 	resp, err := logic.Mail().MailClaim(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(&pb.MailClaimResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.MailClaimResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -86,12 +86,12 @@ func handleMailClaim(ctx node.Context) {
 func handleMailClaimAll(ctx node.Context) {
 	req := &pb.MailClaimAllReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.MailClaimAllResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.MailClaimAllResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
 		return
 	}
 	resp, err := logic.Mail().MailClaimAll(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(&pb.MailClaimAllResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.MailClaimAllResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -101,12 +101,12 @@ func handleMailClaimAll(ctx node.Context) {
 func handleMailDelete(ctx node.Context) {
 	req := &pb.MailDeleteReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.MailDeleteResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.MailDeleteResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
 		return
 	}
 	resp, err := logic.Mail().MailDelete(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(&pb.MailDeleteResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.MailDeleteResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
 		return
 	}
 	_ = ctx.Response(resp)
@@ -116,12 +116,12 @@ func handleMailDelete(ctx node.Context) {
 func handleMailDeleteClean(ctx node.Context) {
 	req := &pb.MailDeleteCleanReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.MailDeleteCleanResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.MailDeleteCleanResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
 		return
 	}
 	resp, err := logic.Mail().MailDeleteClean(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(&pb.MailDeleteCleanResp{Result: errs.ErrResult(err)})
+		_ = ctx.Response(&pb.MailDeleteCleanResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
 		return
 	}
 	_ = ctx.Response(resp)

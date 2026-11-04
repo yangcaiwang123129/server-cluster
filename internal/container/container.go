@@ -112,6 +112,11 @@ type BaseContainer[T Grid] struct {
 	SizeOf func(it T) (w, h int32) `json:"-"`
 	// RawSizeOf 对象原始（未旋转）占格（构造时注入；nil 时 panic）。
 	RawSizeOf func(it T) (w, h int32) `json:"-"`
+	// QualityOf 对象品质（AutoSort 用；构造时注入，nil 时排序视为 0）。
+	// 品质数值越大优先级越高（红色为最高档，黄色次之，其余品质排后）。
+	QualityOf func(it T) int32 `json:"-"`
+	// SellPriceOf 对象出售价（AutoSort 用；构造时注入，nil 时排序视为 0）。
+	SellPriceOf func(it T) int64 `json:"-"`
 }
 
 // NewContainer 构造空泛型容器。
@@ -268,6 +273,22 @@ func (this *BaseContainer[T]) invokeRawSizeOf(it T) (w, h int32) {
 	return this.RawSizeOf(it)
 }
 
+// invokeQualityOf 排序用品质；未注入时视为 0（不影响其余排序维度）。
+func (this *BaseContainer[T]) invokeQualityOf(it T) int32 {
+	if this.QualityOf == nil {
+		return 0
+	}
+	return this.QualityOf(it)
+}
+
+// invokeSellPriceOf 排序用出售价；未注入时视为 0。
+func (this *BaseContainer[T]) invokeSellPriceOf(it T) int64 {
+	if this.SellPriceOf == nil {
+		return 0
+	}
+	return this.SellPriceOf(it)
+}
+
 // canPlace 检查对象能否放在 (x,y)（朝向 rotated）：边界 + 碰撞（排除自身）。
 func (this *BaseContainer[T]) canPlace(occ []int64, it T, x, y int32, rotated bool) bool {
 	return this.canPlaceExcept(occ, it, x, y, rotated, 0)
@@ -409,7 +430,13 @@ func (this *BaseContainer[T]) OnDeath() {
 	this.BumpVersion()
 }
 
-// AutoSort 一键整理：面积降序 → 双朝向扫描 → 放不下整体回滚。
+// AutoSort 一键整理（L2 物品排序规则，稳定排序）：
+//  1. 占格面积大者靠前；
+//  2. 品质高者靠前（红色 > 黄色 > 其余品质，红色对应最高稀有度值）；
+//  3. 同面积同品质：出售价从高到低；
+//  4. 全部条件相同：保持原有相对顺序（SliceStable，相等比较返回 false 即可）。
+//
+// 排序后从 (0,0) 起逐个摆放，双朝向扫描；任一物品放不下则整体回滚。
 func (this *BaseContainer[T]) AutoSort() error {
 	all := this.Entries()
 	if len(all) == 0 {
@@ -425,12 +452,15 @@ func (this *BaseContainer[T]) AutoSort() error {
 		wj, hj := this.invokeRawSizeOf(all[j])
 		ai, aj := wi*hi, wj*hj
 		if ai != aj {
-			return ai > aj
+			return ai > aj // 1. 面积大者优先
 		}
-		if all[i].CfgID() != all[j].CfgID() {
-			return all[i].CfgID() < all[j].CfgID()
+		if qi, qj := this.invokeQualityOf(all[i]), this.invokeQualityOf(all[j]); qi != qj {
+			return qi > qj // 2. 品质高者优先（红 > 黄 > 其余）
 		}
-		return all[i].ID() < all[j].ID()
+		if pi, pj := this.invokeSellPriceOf(all[i]), this.invokeSellPriceOf(all[j]); pi != pj {
+			return pi > pj // 3. 出售价高者优先
+		}
+		return false // 4. 全部相同 → 稳定排序保持原有相对顺序
 	})
 	for _, it := range all {
 		it.SetPos(0, 0, false)

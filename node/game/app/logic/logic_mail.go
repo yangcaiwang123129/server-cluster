@@ -83,13 +83,13 @@ func (this *mailLogic) MailRead(ctx context.Context, playerID int64, req *pb.Mai
 	}
 	m, ok := row.Mails.Get(req.GetId())
 	if !ok || m.Status == model.MailStatusDeleted {
-		return nil, errs.CodeInvalidParams.WithMessage("邮件不存在").Err()
+		return &pb.MailReadResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "邮件不存在")}, nil
 	}
 	if m.Status == model.MailStatusUnread {
 		m.Status = model.MailStatusRead
 		m.ReadAt = time.Now().UnixMilli()
 		if !row.UpdateMail(m) {
-			return nil, errs.CodeInvalidParams.WithMessage("邮件不存在").Err()
+			return &pb.MailReadResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "邮件不存在")}, nil
 		}
 		global.PlayerMailCache.Set(playerID, row)
 	}
@@ -128,7 +128,7 @@ func (this *mailLogic) MailClaim(ctx context.Context, playerID int64, req *pb.Ma
 	}
 	m, ok := row.Mails.Get(req.GetId())
 	if !ok || m.Status == model.MailStatusDeleted {
-		return nil, errs.CodeInvalidParams.WithMessage("邮件不存在").Err()
+		return &pb.MailClaimResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "邮件不存在")}, nil
 	}
 	if m.Status == model.MailStatusClaimed || !m.HasAttachments() {
 		return &pb.MailClaimResp{Entry: convert.MailEntry(m)}, nil
@@ -137,7 +137,7 @@ func (this *mailLogic) MailClaim(ctx context.Context, playerID int64, req *pb.Ma
 	m.Status = model.MailStatusClaimed
 	m.ClaimedAt = time.Now().UnixMilli()
 	if !row.UpdateMail(m) {
-		return nil, errs.CodeInvalidParams.WithMessage("邮件不存在").Err()
+		return &pb.MailClaimResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "邮件不存在")}, nil
 	}
 	// 状态已落库，再发放全部附件；失败时尽量回滚状态以便重试
 	granted := make([]*pb.AssetEntry, 0, len(m.Attachments))
@@ -157,6 +157,9 @@ func (this *mailLogic) MailClaim(ctx context.Context, playerID int64, req *pb.Ma
 				log.Warnf("game: mail claim rollback failed, player=%d mail=%d", playerID, m.MailID)
 			}
 			global.PlayerMailCache.Set(playerID, row)
+			if r := codedResult(err); r != nil {
+				return &pb.MailClaimResp{Result: r}, nil
+			}
 			return nil, err
 		}
 		granted = append(granted, &pb.AssetEntry{Type: a.Type, CfgId: a.CfgID, Count: count})
@@ -237,17 +240,17 @@ func (this *mailLogic) MailDelete(ctx context.Context, playerID int64, req *pb.M
 	}
 	m, ok := row.Mails.Get(req.GetId())
 	if !ok {
-		return nil, errs.CodeInvalidParams.WithMessage("邮件不存在").Err()
+		return &pb.MailDeleteResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "邮件不存在")}, nil
 	}
 	if m.Status == model.MailStatusDeleted {
 		return &pb.MailDeleteResp{}, nil
 	}
 	if !m.CanDelete() {
-		return nil, errs.CodeInvalidParams.WithMessage("奖励邮件领取后才能删除").Err()
+		return &pb.MailDeleteResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "奖励邮件领取后才能删除")}, nil
 	}
 	m.Status = model.MailStatusDeleted
 	if !row.UpdateMail(m) {
-		return nil, errs.CodeInvalidParams.WithMessage("邮件不存在").Err()
+		return &pb.MailDeleteResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "邮件不存在")}, nil
 	}
 	global.PlayerMailCache.Set(playerID, row)
 	return &pb.MailDeleteResp{}, nil

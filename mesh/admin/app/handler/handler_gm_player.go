@@ -83,7 +83,7 @@ func handlePlayerOnline(ctx http.Context) error {
 func handlePlayerKick(ctx http.Context) error {
 	var req dto.PlayerKickReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.NodeID == "" {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.Player().PlayerKick(req); err != nil {
 		return errs.FailErr(ctx, err)
@@ -101,7 +101,7 @@ func handlePlayerKick(ctx http.Context) error {
 func handlePlayerBan(ctx http.Context) error {
 	var req dto.PlayerBanReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.Reason == "" {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.Player().PlayerBan(req); err != nil {
 		return errs.FailErr(ctx, err)
@@ -119,7 +119,7 @@ func handlePlayerBan(ctx http.Context) error {
 func handlePlayerUnban(ctx http.Context) error {
 	var req dto.PlayerUnbanReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.Player().PlayerUnban(req); err != nil {
 		return errs.FailErr(ctx, err)
@@ -137,7 +137,7 @@ func handlePlayerUnban(ctx http.Context) error {
 func handlePlayerResetPassword(ctx http.Context) error {
 	var req dto.PlayerResetPasswordReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.NewPassword == "" {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.Player().PlayerResetPassword(req); err != nil {
 		return errs.FailErr(ctx, err)

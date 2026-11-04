@@ -7,6 +7,7 @@ import (
 
 	"github.com/dobyte/due/v2/cluster"
 	"github.com/dobyte/due/v2/cluster/node"
+	"github.com/dobyte/due/v2/codes"
 	dueerrors "github.com/dobyte/due/v2/errors"
 	"github.com/dobyte/due/v2/log"
 	"github.com/dobyte/due/v2/session"
@@ -134,15 +135,21 @@ func (this *playerLogic) LeaveGame(ctx context.Context, playerID int64, req *pb.
 func (this *playerLogic) GiftBuy(ctx context.Context, playerID int64, req *pb.GiftBuyReq) (*pb.GiftBuyResp, error) {
 	cfg := tpl.T().Gift.Get(req.GetCfgId())
 	if cfg == nil {
-		return nil, errs.CodeInvalidParams.WithMessage("礼包配置不存在").Err()
+		return &pb.GiftBuyResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "礼包配置不存在")}, nil
 	}
 
 	costs, err := deductAssets(ctx, playerID, []*tpl.Asset{cfg.AssetCost})
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.GiftBuyResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	rewards, err := grantAssets(ctx, playerID, cfg.AssetRewards)
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.GiftBuyResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	return &pb.GiftBuyResp{Costs: costs, Rewards: rewards}, nil
@@ -153,15 +160,21 @@ func (this *playerLogic) GiftBuy(ctx context.Context, playerID int64, req *pb.Gi
 func (this *playerLogic) Exchange(ctx context.Context, playerID int64, req *pb.ExchangeReq) (*pb.ExchangeResp, error) {
 	cfg := tpl.T().Exchange.Get(req.GetCfgId())
 	if cfg == nil {
-		return nil, errs.CodeInvalidParams.WithMessage("兑换配置不存在").Err()
+		return &pb.ExchangeResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "兑换配置不存在")}, nil
 	}
 
 	costs, err := deductAssets(ctx, playerID, []*tpl.Asset{cfg.AssetCost})
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.ExchangeResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	rewards, err := grantAssets(ctx, playerID, cfg.AssetRewards)
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.ExchangeResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	return &pb.ExchangeResp{Costs: costs, Rewards: rewards}, nil
@@ -178,12 +191,15 @@ var notifyRechargeOrder = func(playerID int64, cfgID int32) {
 func (this *playerLogic) Recharge(ctx context.Context, playerID int64, req *pb.RechargeReq) (*pb.RechargeResp, error) {
 	cfg := tpl.T().Recharge.Get(req.GetCfgId())
 	if cfg == nil {
-		return nil, errs.CodeInvalidParams.WithMessage("充值配置不存在").Err()
+		return &pb.RechargeResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "充值配置不存在")}, nil
 	}
 
 	notifyRechargeOrder(playerID, req.GetCfgId())
 	rewards, err := grantAssets(ctx, playerID, []*tpl.Asset{cfg.AssetReward})
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.RechargeResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	// 累计充值次数（player_extra），缓存未命中不阻断充值流程
@@ -213,6 +229,18 @@ func flushAndEvict[V any](ctx context.Context, c *cache.Cache[int64, V], playerI
 	}
 	c.Evict(playerID)
 	return nil
+}
+
+// codedResult helper 链路上的业务码错误转 Result（仅 logic 层内部使用）。
+// 内部 helper 保留 errs.CodeXxx 错误返回，logic 方法在此统一转成客户端 Result；
+// 普通基础设施错误（codes.Convert 解析为 Unknown）返回 nil，由调用方原样上抛，
+// 最终由 handler 兜底为 INTERNAL_ERROR。
+func codedResult(err error) *pb.Result {
+	c := codes.Convert(err)
+	if c == nil || c.Code() == codes.OK.Code() || c.Code() == codes.Unknown.Code() {
+		return nil
+	}
+	return errs.BuildErrResult(pb.ErrCode(c.Code()), c.Message())
 }
 
 // PlayerGetActor 获取玩家 actor；玩家不在线时返回玩家不存在。

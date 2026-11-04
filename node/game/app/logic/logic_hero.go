@@ -155,15 +155,21 @@ func addHeroWithBound(ctx context.Context, playerID int64, cfgID int32) (model.H
 func (this *heroLogic) HeroAdd(ctx context.Context, playerID int64, req *pb.HeroAddReq) (*pb.HeroAddResp, error) {
 	cfgID := req.GetCfgId()
 	if !tpl.T().RoleInfo.Has(cfgID) {
-		return nil, errs.CodeInvalidParams.WithMessage("英雄配置不存在").Err()
+		return &pb.HeroAddResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "英雄配置不存在")}, nil
 	}
 
 	h, err := addHeroWithBound(ctx, playerID, cfgID)
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.HeroAddResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	entry, err := heroEntry(ctx, playerID, h.HeroID)
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.HeroAddResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	global.NotifyHero(ctx, playerID, entry)
@@ -179,7 +185,7 @@ func (this *heroLogic) HeroUpdate(ctx context.Context, playerID int64, req *pb.H
 
 	old, ok := row.Heroes.Get(req.GetCfgId())
 	if !ok {
-		return nil, errs.CodeInvalidParams.WithMessage("英雄未拥有").Err()
+		return &pb.HeroUpdateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "英雄未拥有")}, nil
 	}
 	h := old
 	h.Level = clampDim(req.GetLevel(), 1)
@@ -208,12 +214,15 @@ func (this *heroLogic) HeroUpdate(ctx context.Context, playerID int64, req *pb.H
 			return nil
 		})
 	} else if !row.UpdateHero(h) {
-		return nil, errs.CodeInvalidParams.WithMessage("英雄未拥有").Err()
+		return &pb.HeroUpdateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "英雄未拥有")}, nil
 	}
 
 	global.PlayerHeroCache.Set(playerID, row)
 	entry, err := heroEntry(ctx, playerID, h.HeroID)
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.HeroUpdateResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	for _, id := range unsetHeroIDs {
@@ -227,10 +236,16 @@ func (this *heroLogic) HeroUpdate(ctx context.Context, playerID int64, req *pb.H
 func (this *heroLogic) HeroAttribute(ctx context.Context, playerID int64, req *pb.HeroAttributeReq) (*pb.HeroAttributeResp, error) {
 	hero, attr, err := computeHeroAttribute(ctx, playerID, req.GetCfgId())
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.HeroAttributeResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	entry, err := heroEntry(ctx, playerID, hero.HeroID)
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.HeroAttributeResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	return &pb.HeroAttributeResp{HeroEntry: entry, Attribute: attr}, nil
@@ -244,12 +259,12 @@ func (this *heroLogic) HeroUpgrade(ctx context.Context, playerID int64, req *pb.
 	}
 	hero, ok := row.Heroes.Get(req.GetCfgId())
 	if !ok {
-		return nil, errs.CodeInvalidParams.WithMessage("英雄未拥有").Err()
+		return &pb.HeroUpgradeResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "英雄未拥有")}, nil
 	}
 
 	cfg := tpl.T().AttributeRole.Get(hero.HeroID + clampTier(hero.Star))
 	if cfg == nil {
-		return nil, errs.CodeInvalidParams.WithMessage("英雄属性配置不存在").Err()
+		return &pb.HeroUpgradeResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "英雄属性配置不存在")}, nil
 	}
 	lo, hi := levelBounds(0, 0, false)
 	if cfg.Level != nil {
@@ -257,7 +272,7 @@ func (this *heroLogic) HeroUpgrade(ctx context.Context, playerID int64, req *pb.
 	}
 	lvl := clampLevel(hero.Level, lo, hi)
 	if lvl >= hi {
-		return nil, errs.CodeInvalidParams.WithMessage("英雄已满级").Err()
+		return &pb.HeroUpgradeResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "英雄已满级")}, nil
 	}
 
 	cost := costAt(cfg.UpgradeUse, cfg.GrowUGMaterial, lvl, lo)
@@ -267,22 +282,31 @@ func (this *heroLogic) HeroUpgrade(ctx context.Context, playerID int64, req *pb.
 			Id:    cfg.UpgradeMaterial,
 			Count: cost,
 		}); err != nil {
+			if r := codedResult(err); r != nil {
+				return &pb.HeroUpgradeResp{Result: r}, nil
+			}
 			return nil, err
 		}
 	}
 
 	hero.Level = lvl + 1
 	if !row.UpdateHero(hero) {
-		return nil, errs.CodeInvalidParams.WithMessage("英雄未拥有").Err()
+		return &pb.HeroUpgradeResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "英雄未拥有")}, nil
 	}
 	global.PlayerHeroCache.Set(playerID, row)
 
 	_, attr, err := computeHeroAttribute(ctx, playerID, hero.HeroID)
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.HeroUpgradeResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	entry, err := heroEntry(ctx, playerID, hero.HeroID)
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.HeroUpgradeResp{Result: r}, nil
+		}
 		return nil, err
 	}
 	global.NotifyHero(ctx, playerID, entry)

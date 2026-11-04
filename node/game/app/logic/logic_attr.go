@@ -35,7 +35,7 @@ func (this *playerLogic) AttrOperate(ctx context.Context, playerID int64, req *p
 	attr := pb.Attr(req.GetAttr())
 	h, ok := attrHandlers[attr]
 	if !ok {
-		return nil, errs.CodeInvalidParams.WithMessage("不支持的属性类型").Err()
+		return &pb.AttrOperateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "不支持的属性类型")}, nil
 	}
 
 	core, err := global.PlayerExtraCache.Get(ctx, playerID)
@@ -47,18 +47,21 @@ func (this *playerLogic) AttrOperate(ctx context.Context, playerID int64, req *p
 	switch req.GetOperate() {
 	case pb.AttrOperate_UPDATE:
 		if h.update == nil {
-			return nil, errs.CodeInvalidParams.WithMessage("该属性不支持更新").Err()
+			return &pb.AttrOperateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "该属性不支持更新")}, nil
 		}
 		out, err = h.update(core, req.GetValue())
 	case pb.AttrOperate_CLAIM:
 		if h.claim == nil {
-			return nil, errs.CodeInvalidParams.WithMessage("该属性不支持领取").Err()
+			return &pb.AttrOperateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "该属性不支持领取")}, nil
 		}
 		out, err = h.claim(ctx, playerID, core)
 	default:
-		return nil, errs.CodeInvalidParams.WithMessage("不支持的操作类型").Err()
+		return &pb.AttrOperateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "不支持的操作类型")}, nil
 	}
 	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.AttrOperateResp{Result: r}, nil
+		}
 		return nil, err
 	}
 

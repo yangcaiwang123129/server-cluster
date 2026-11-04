@@ -43,7 +43,7 @@ func handleGmRecordList(ctx http.Context) error {
 	req.End, _ = strconv.ParseInt(ctx.Query("end"), 10, 64)
 	req.Order = orderBy(ctx, map[string]string{"createdAt": "created_at", "id": "id"})
 	if (req.Action != 1 && req.Action != 2) || req.Module == "" {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	list, total, err := logic.GmRecord().RecordList(req, req.PageIndex, req.PageSize)
 	if err != nil {

@@ -33,12 +33,12 @@ func handleGmItemList(ctx http.Context) error {
 	var req dto.GmItemListReq
 	req.PlayerID = queryPlayerID(ctx)
 	if req.PlayerID <= 0 {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	if v := ctx.Query("containerType"); v != "" {
 		typ, err := strconv.Atoi(v)
 		if err != nil || typ < 0 {
-			return errs.FailParams(ctx, "请求参数错误")
+			return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 		}
 		req.ContainerType = int32(typ)
 	}
@@ -59,7 +59,7 @@ func handleGmItemList(ctx http.Context) error {
 func handleGmItemMove(ctx http.Context) error {
 	var req dto.GmItemMoveReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.ContainerType <= 0 || req.ItemID <= 0 {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.GmItem().ItemMove(req); err != nil {
 		return errs.FailErr(ctx, err)
@@ -77,7 +77,7 @@ func handleGmItemMove(ctx http.Context) error {
 func handleGmItemRotate(ctx http.Context) error {
 	var req dto.GmItemRotateReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.ContainerType <= 0 || req.ItemID <= 0 {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.GmItem().ItemRotate(req); err != nil {
 		return errs.FailErr(ctx, err)
@@ -95,7 +95,7 @@ func handleGmItemRotate(ctx http.Context) error {
 func handleGmItemSort(ctx http.Context) error {
 	var req dto.GmItemSortReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.ContainerType <= 0 {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	if err := logic.GmItem().ItemSort(req); err != nil {
 		return errs.FailErr(ctx, err)
@@ -113,7 +113,7 @@ func handleGmItemSort(ctx http.Context) error {
 func handleGmItemTransfer(ctx http.Context) error {
 	var req dto.GmItemTransferReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.FromType <= 0 || req.ToType <= 0 || req.ItemID <= 0 {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	list, err := logic.GmItem().ItemTransfer(req)
 	if err != nil {
@@ -132,7 +132,7 @@ func handleGmItemTransfer(ctx http.Context) error {
 func handleGmItemAdd(ctx http.Context) error {
 	var req dto.GmItemAddEntryReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.ContainerType <= 0 || req.ItemCfgID <= 0 {
-		return errs.FailParams(ctx, "请求参数错误")
+		return errs.Fail(ctx, errs.RespCodeInternal, "请求参数错误")
 	}
 	list, err := logic.GmItem().ItemAddEntry(req)
 	if err != nil {

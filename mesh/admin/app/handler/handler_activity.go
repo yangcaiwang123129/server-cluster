@@ -75,11 +75,11 @@ func handleActivityList(ctx http.Context) error {
 func handleActivityUpdateTime(ctx http.Context) error {
 	id, err := strconv.ParseInt(ctx.Params("id"), 10, 64)
 	if err != nil || id <= 0 {
-		return errs.FailParams(ctx, "invalid activity id")
+		return errs.Fail(ctx, errs.RespCodeInternal, "invalid activity id")
 	}
 	var req dto.GmActivityTimeReq
 	if err := bindBody(ctx, &req); err != nil {
-		return errs.FailParams(ctx, "invalid body")
+		return errs.Fail(ctx, errs.RespCodeInternal, "invalid body")
 	}
 	resp, err := logic.Activity().UpdateTime(ctx.Context(), id, req)
 	if err != nil {
@@ -97,7 +97,7 @@ func handleActivityUpdateTime(ctx http.Context) error {
 func handleActivityEnd(ctx http.Context) error {
 	id, err := strconv.ParseInt(ctx.Params("id"), 10, 64)
 	if err != nil || id <= 0 {
-		return errs.FailParams(ctx, "invalid activity id")
+		return errs.Fail(ctx, errs.RespCodeInternal, "invalid activity id")
 	}
 	resp, err := logic.Activity().End(ctx.Context(), id, "")
 	if err != nil {
