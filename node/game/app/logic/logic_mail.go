@@ -49,6 +49,26 @@ func (this *mailLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.Le
 	return nil
 }
 
+func (this *mailLogic) Load(ctx context.Context, playerID int64) (*model.PlayerMail, error) {
+	return this.cache.GetOrInit(ctx, playerID,
+		func(id int64) *model.PlayerMail {
+			return &model.PlayerMail{PlayerID: id, Mails: util.NewSafeMap[int64, model.MailInfo]()}
+		},
+		func(row *model.PlayerMail) {
+			if row.Mails == nil {
+				row.Mails = util.NewSafeMap[int64, model.MailInfo]()
+			}
+		})
+}
+
+func (this *mailLogic) Save(playerID int64, row *model.PlayerMail) {
+	this.cache.Set(playerID, row)
+}
+
+func (this *mailLogic) Flush(ctx context.Context, playerID int64) error {
+	return flushAndEvict(ctx, this.cache, playerID)
+}
+
 func (this *mailLogic) MailList(ctx context.Context, playerID int64) (*pb.MailListResp, error) {
 	row, err := this.Load(ctx, playerID)
 	if err != nil {
@@ -296,24 +316,4 @@ func (this *mailLogic) MailSend(ctx context.Context, playerID int64, req *pb.GmM
 	}
 	this.Save(playerID, row)
 	return convert.MailEntry(m), nil
-}
-
-func (this *mailLogic) Load(ctx context.Context, playerID int64) (*model.PlayerMail, error) {
-	return this.cache.GetOrInit(ctx, playerID,
-		func(id int64) *model.PlayerMail {
-			return &model.PlayerMail{PlayerID: id, Mails: util.NewSafeMap[int64, model.MailInfo]()}
-		},
-		func(row *model.PlayerMail) {
-			if row.Mails == nil {
-				row.Mails = util.NewSafeMap[int64, model.MailInfo]()
-			}
-		})
-}
-
-func (this *mailLogic) Save(playerID int64, row *model.PlayerMail) {
-	this.cache.Set(playerID, row)
-}
-
-func (this *mailLogic) Flush(ctx context.Context, playerID int64) error {
-	return flushAndEvict(ctx, this.cache, playerID)
 }

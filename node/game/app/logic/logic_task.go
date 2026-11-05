@@ -61,6 +61,26 @@ func (this *taskLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.Le
 	return flushAndEvict(ctx, this.cache, playerID)
 }
 
+func (this *taskLogic) Load(ctx context.Context, playerID int64) (*model.PlayerTask, error) {
+	return this.cache.GetOrInit(ctx, playerID,
+		func(id int64) *model.PlayerTask {
+			return &model.PlayerTask{PlayerID: id, Tasks: util.NewSafeMap[string, model.PlayerTaskInfo]()}
+		},
+		func(row *model.PlayerTask) {
+			if row.Tasks == nil {
+				row.Tasks = util.NewSafeMap[string, model.PlayerTaskInfo]()
+			}
+		})
+}
+
+func (this *taskLogic) Save(playerID int64, row *model.PlayerTask) {
+	this.cache.Set(playerID, row)
+}
+
+func (this *taskLogic) Flush(ctx context.Context, playerID int64) error {
+	return flushAndEvict(ctx, this.cache, playerID)
+}
+
 func (this *taskLogic) TaskList(ctx context.Context, playerID int64, req *pb.TaskListReq) (*pb.TaskListResp, error) {
 	entries, claimable, err := this.collect(ctx, playerID, req.GetTaskType(), req.GetActivityCfgId())
 	if err != nil {
@@ -287,26 +307,6 @@ func newTaskInfo(cfg *tpl.TaskCfg, key string) model.PlayerTaskInfo {
 		Target:    targetOf(cfg),
 		Status:    status,
 	}
-}
-
-func (this *taskLogic) Load(ctx context.Context, playerID int64) (*model.PlayerTask, error) {
-	return this.cache.GetOrInit(ctx, playerID,
-		func(id int64) *model.PlayerTask {
-			return &model.PlayerTask{PlayerID: id, Tasks: util.NewSafeMap[string, model.PlayerTaskInfo]()}
-		},
-		func(row *model.PlayerTask) {
-			if row.Tasks == nil {
-				row.Tasks = util.NewSafeMap[string, model.PlayerTaskInfo]()
-			}
-		})
-}
-
-func (this *taskLogic) Save(playerID int64, row *model.PlayerTask) {
-	this.cache.Set(playerID, row)
-}
-
-func (this *taskLogic) Flush(ctx context.Context, playerID int64) error {
-	return flushAndEvict(ctx, this.cache, playerID)
 }
 
 // targetOf 目标数量兜底：未配置按 1 处理。

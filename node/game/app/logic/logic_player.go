@@ -64,26 +64,6 @@ func moduleLogics() []global.PlayerLifecycle {
 // PlayerLogic 获取玩家模块业务单例。
 func PlayerLogic() global.PlayerLogic { return playerLogicInst.MustGet() }
 
-func (this *playerLogic) Load(ctx context.Context, playerID int64) (*model.PlayerExtra, error) {
-	return this.cache.GetOrInit(ctx, playerID,
-		func(id int64) *model.PlayerExtra {
-			return &model.PlayerExtra{
-				PlayerID:     id,
-				Nickname:     consts.DefaultNicknamePrefix + strconv.FormatInt(id, 10),
-				Level:        consts.DefaultPlayerLevel,
-				SettingsJSON: consts.DefaultPlayerSettingsJSON,
-			}
-		}, nil)
-}
-
-func (this *playerLogic) Save(playerID int64, row *model.PlayerExtra) {
-	this.cache.Set(playerID, row)
-}
-
-func (this *playerLogic) Flush(ctx context.Context, playerID int64) error {
-	return flushAndEvict(ctx, this.cache, playerID)
-}
-
 func (this *playerLogic) OnEnterGame(ctx context.Context, playerID int64, req *pb.EnterGameReq, resp *pb.EnterGameResp) error {
 	core, err := this.Load(ctx, playerID)
 	if err != nil {
@@ -132,6 +112,26 @@ func (this *playerLogic) OnLeaveGame(ctx context.Context, playerID int64, req *p
 	record("player_extra", this.Flush(ctx, playerID))
 	record("player_actor", this.DestroyActor(ctx, playerID))
 	return firstErr
+}
+
+func (this *playerLogic) Load(ctx context.Context, playerID int64) (*model.PlayerExtra, error) {
+	return this.cache.GetOrInit(ctx, playerID,
+		func(id int64) *model.PlayerExtra {
+			return &model.PlayerExtra{
+				PlayerID:     id,
+				Nickname:     consts.DefaultNicknamePrefix + strconv.FormatInt(id, 10),
+				Level:        consts.DefaultPlayerLevel,
+				SettingsJSON: consts.DefaultPlayerSettingsJSON,
+			}
+		}, nil)
+}
+
+func (this *playerLogic) Save(playerID int64, row *model.PlayerExtra) {
+	this.cache.Set(playerID, row)
+}
+
+func (this *playerLogic) Flush(ctx context.Context, playerID int64) error {
+	return flushAndEvict(ctx, this.cache, playerID)
 }
 
 // ── 玩家资产消费：礼包购买 / 兑换 / 充值 ────────────────────────────

@@ -34,6 +34,41 @@ func init() {
 // Equip 获取装备业务单例。
 func Equip() global.EquipLogic { return equipLogicInst.MustGet() }
 
+func (this *equipLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
+	if _, err := this.Load(ctx, playerID); err != nil {
+		return err
+	}
+	// 装备数据由 EquipList 下发，这里只预热缓存
+	return nil
+}
+
+func (this *equipLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
+	if err := flushAndEvict(ctx, this.cache, playerID); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (this *equipLogic) Load(ctx context.Context, playerID int64) (*model.PlayerEquip, error) {
+	return this.cache.GetOrInit(ctx, playerID,
+		func(id int64) *model.PlayerEquip {
+			return &model.PlayerEquip{PlayerID: id, Equips: util.NewSafeMap[int64, model.EquipInfo]()}
+		},
+		func(row *model.PlayerEquip) {
+			if row.Equips == nil {
+				row.Equips = util.NewSafeMap[int64, model.EquipInfo]()
+			}
+		})
+}
+
+func (this *equipLogic) Save(playerID int64, row *model.PlayerEquip) {
+	this.cache.Set(playerID, row)
+}
+
+func (this *equipLogic) Flush(ctx context.Context, playerID int64) error {
+	return flushAndEvict(ctx, this.cache, playerID)
+}
+
 func (this *equipLogic) EquipList(ctx context.Context, playerID int64) ([]*pb.EquipEntry, error) {
 	row, err := this.Load(ctx, playerID)
 	if err != nil {
@@ -339,41 +374,6 @@ func (this *equipLogic) EquipBreakthrough(ctx context.Context, playerID int64, r
 		return nil, err
 	}
 	return &pb.EquipBreakthroughResp{EquipEntry: convert.EquipEntry(g), Attribute: attr}, nil
-}
-
-func (this *equipLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
-	if _, err := this.Load(ctx, playerID); err != nil {
-		return err
-	}
-	// 装备数据由 EquipList 下发，这里只预热缓存
-	return nil
-}
-
-func (this *equipLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
-	if err := flushAndEvict(ctx, this.cache, playerID); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (this *equipLogic) Load(ctx context.Context, playerID int64) (*model.PlayerEquip, error) {
-	return this.cache.GetOrInit(ctx, playerID,
-		func(id int64) *model.PlayerEquip {
-			return &model.PlayerEquip{PlayerID: id, Equips: util.NewSafeMap[int64, model.EquipInfo]()}
-		},
-		func(row *model.PlayerEquip) {
-			if row.Equips == nil {
-				row.Equips = util.NewSafeMap[int64, model.EquipInfo]()
-			}
-		})
-}
-
-func (this *equipLogic) Save(playerID int64, row *model.PlayerEquip) {
-	this.cache.Set(playerID, row)
-}
-
-func (this *equipLogic) Flush(ctx context.Context, playerID int64) error {
-	return flushAndEvict(ctx, this.cache, playerID)
 }
 
 // ============ 资产接口实现（AssetStore，可叠加型：同配置可多件） ============

@@ -39,6 +39,57 @@ func newWeaponInfo(cfgID int32) model.WeaponInfo {
 	return model.WeaponInfo{WeaponID: cfgID, Level: 1, Quality: 1}
 }
 
+func (this *weaponLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
+	if _, err := this.Load(ctx, playerID); err != nil {
+		return err
+	}
+	heroes, err := Hero().Load(ctx, playerID)
+	if err != nil {
+		return err
+	}
+	if heroes.Heroes != nil {
+		var ids []int32
+		heroes.Heroes.Range(func(id int32, _ model.HeroInfo) bool {
+			ids = append(ids, id)
+			return true
+		})
+		for _, id := range ids {
+			if err := this.WeaponEnsureForHero(ctx, playerID, id); err != nil {
+				return err
+			}
+		}
+	}
+	// 武器数据由 WeaponList 下发，这里只预热缓存
+	return nil
+}
+
+func (this *weaponLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
+	if err := flushAndEvict(ctx, this.cache, playerID); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (this *weaponLogic) Load(ctx context.Context, playerID int64) (*model.PlayerWeapon, error) {
+	return this.cache.GetOrInit(ctx, playerID,
+		func(id int64) *model.PlayerWeapon {
+			return &model.PlayerWeapon{PlayerID: id, Weapons: util.NewSafeMap[int32, model.WeaponInfo]()}
+		},
+		func(row *model.PlayerWeapon) {
+			if row.Weapons == nil {
+				row.Weapons = util.NewSafeMap[int32, model.WeaponInfo]()
+			}
+		})
+}
+
+func (this *weaponLogic) Save(playerID int64, row *model.PlayerWeapon) {
+	this.cache.Set(playerID, row)
+}
+
+func (this *weaponLogic) Flush(ctx context.Context, playerID int64) error {
+	return flushAndEvict(ctx, this.cache, playerID)
+}
+
 func (this *weaponLogic) WeaponList(ctx context.Context, playerID int64) ([]*pb.WeaponEntry, error) {
 	row, err := this.Load(ctx, playerID)
 	if err != nil {
@@ -230,57 +281,6 @@ func (this *weaponLogic) WeaponEnsureForHero(ctx context.Context, playerID int64
 	}
 	this.Save(playerID, row)
 	return nil
-}
-
-func (this *weaponLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
-	if _, err := this.Load(ctx, playerID); err != nil {
-		return err
-	}
-	heroes, err := Hero().Load(ctx, playerID)
-	if err != nil {
-		return err
-	}
-	if heroes.Heroes != nil {
-		var ids []int32
-		heroes.Heroes.Range(func(id int32, _ model.HeroInfo) bool {
-			ids = append(ids, id)
-			return true
-		})
-		for _, id := range ids {
-			if err := this.WeaponEnsureForHero(ctx, playerID, id); err != nil {
-				return err
-			}
-		}
-	}
-	// 武器数据由 WeaponList 下发，这里只预热缓存
-	return nil
-}
-
-func (this *weaponLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
-	if err := flushAndEvict(ctx, this.cache, playerID); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (this *weaponLogic) Load(ctx context.Context, playerID int64) (*model.PlayerWeapon, error) {
-	return this.cache.GetOrInit(ctx, playerID,
-		func(id int64) *model.PlayerWeapon {
-			return &model.PlayerWeapon{PlayerID: id, Weapons: util.NewSafeMap[int32, model.WeaponInfo]()}
-		},
-		func(row *model.PlayerWeapon) {
-			if row.Weapons == nil {
-				row.Weapons = util.NewSafeMap[int32, model.WeaponInfo]()
-			}
-		})
-}
-
-func (this *weaponLogic) Save(playerID int64, row *model.PlayerWeapon) {
-	this.cache.Set(playerID, row)
-}
-
-func (this *weaponLogic) Flush(ctx context.Context, playerID int64) error {
-	return flushAndEvict(ctx, this.cache, playerID)
 }
 
 // ============ 资产接口实现（AssetStore，唯一持有型：key 为武器配置ID） ============

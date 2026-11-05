@@ -39,6 +39,57 @@ func newSkillInfo(cfgID int32) model.SkillInfo {
 	return model.SkillInfo{SkillID: cfgID, Level: 1, Quality: 1}
 }
 
+func (this *skillLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
+	if _, err := this.Load(ctx, playerID); err != nil {
+		return err
+	}
+	heroes, err := Hero().Load(ctx, playerID)
+	if err != nil {
+		return err
+	}
+	if heroes.Heroes != nil {
+		var ids []int32
+		heroes.Heroes.Range(func(id int32, _ model.HeroInfo) bool {
+			ids = append(ids, id)
+			return true
+		})
+		for _, id := range ids {
+			if err := this.SkillEnsureForHero(ctx, playerID, id); err != nil {
+				return err
+			}
+		}
+	}
+	// 技能数据由 SkillList 下发，这里只预热缓存
+	return nil
+}
+
+func (this *skillLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
+	if err := flushAndEvict(ctx, this.cache, playerID); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (this *skillLogic) Load(ctx context.Context, playerID int64) (*model.PlayerSkill, error) {
+	return this.cache.GetOrInit(ctx, playerID,
+		func(id int64) *model.PlayerSkill {
+			return &model.PlayerSkill{PlayerID: id, Skills: util.NewSafeMap[int32, model.SkillInfo]()}
+		},
+		func(row *model.PlayerSkill) {
+			if row.Skills == nil {
+				row.Skills = util.NewSafeMap[int32, model.SkillInfo]()
+			}
+		})
+}
+
+func (this *skillLogic) Save(playerID int64, row *model.PlayerSkill) {
+	this.cache.Set(playerID, row)
+}
+
+func (this *skillLogic) Flush(ctx context.Context, playerID int64) error {
+	return flushAndEvict(ctx, this.cache, playerID)
+}
+
 func (this *skillLogic) SkillList(ctx context.Context, playerID int64) ([]*pb.SkillEntry, error) {
 	row, err := this.Load(ctx, playerID)
 	if err != nil {
@@ -234,57 +285,6 @@ func (this *skillLogic) SkillEnsureForHero(ctx context.Context, playerID int64, 
 		this.Save(playerID, row)
 	}
 	return nil
-}
-
-func (this *skillLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
-	if _, err := this.Load(ctx, playerID); err != nil {
-		return err
-	}
-	heroes, err := Hero().Load(ctx, playerID)
-	if err != nil {
-		return err
-	}
-	if heroes.Heroes != nil {
-		var ids []int32
-		heroes.Heroes.Range(func(id int32, _ model.HeroInfo) bool {
-			ids = append(ids, id)
-			return true
-		})
-		for _, id := range ids {
-			if err := this.SkillEnsureForHero(ctx, playerID, id); err != nil {
-				return err
-			}
-		}
-	}
-	// 技能数据由 SkillList 下发，这里只预热缓存
-	return nil
-}
-
-func (this *skillLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
-	if err := flushAndEvict(ctx, this.cache, playerID); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (this *skillLogic) Load(ctx context.Context, playerID int64) (*model.PlayerSkill, error) {
-	return this.cache.GetOrInit(ctx, playerID,
-		func(id int64) *model.PlayerSkill {
-			return &model.PlayerSkill{PlayerID: id, Skills: util.NewSafeMap[int32, model.SkillInfo]()}
-		},
-		func(row *model.PlayerSkill) {
-			if row.Skills == nil {
-				row.Skills = util.NewSafeMap[int32, model.SkillInfo]()
-			}
-		})
-}
-
-func (this *skillLogic) Save(playerID int64, row *model.PlayerSkill) {
-	this.cache.Set(playerID, row)
-}
-
-func (this *skillLogic) Flush(ctx context.Context, playerID int64) error {
-	return flushAndEvict(ctx, this.cache, playerID)
 }
 
 // ============ 资产接口实现（AssetStore，唯一持有型：key 为技能配置ID） ============

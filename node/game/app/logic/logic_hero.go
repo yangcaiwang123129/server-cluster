@@ -35,6 +35,46 @@ func init() {
 // Hero 获取英雄业务单例。
 func Hero() global.HeroLogic { return heroLogicInst.MustGet() }
 
+func (this *heroLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, resp *pb.EnterGameResp) error {
+	entries, err := buildHeroEntries(ctx, playerID)
+	if err != nil {
+		return err
+	}
+	for _, entry := range entries {
+		if entry.Equipped {
+			resp.HeroEntry = entry
+			return nil
+		}
+	}
+	return nil
+}
+
+func (this *heroLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
+	if err := flushAndEvict(ctx, this.cache, playerID); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (this *heroLogic) Load(ctx context.Context, playerID int64) (*model.PlayerHero, error) {
+	return this.cache.GetOrInit(ctx, playerID,
+		func(id int64) *model.PlayerHero {
+			return &model.PlayerHero{PlayerID: id, Heroes: util.NewSafeMap[int32, model.HeroInfo]()}
+		},
+		func(row *model.PlayerHero) {
+			if row.Heroes == nil {
+				row.Heroes = util.NewSafeMap[int32, model.HeroInfo]()
+			}
+		})
+}
+
+func (this *heroLogic) Save(playerID int64, row *model.PlayerHero) {
+	this.cache.Set(playerID, row)
+}
+
+func (this *heroLogic) Flush(ctx context.Context, playerID int64) error {
+	return flushAndEvict(ctx, this.cache, playerID)
+}
 func (this *heroLogic) HeroList(ctx context.Context, playerID int64) (*pb.HeroListResp, error) {
 	entries, err := buildHeroEntries(ctx, playerID)
 	if err != nil {
@@ -336,47 +376,6 @@ func (this *heroLogic) HeroUpgrade(ctx context.Context, playerID int64, req *pb.
 	}
 	global.NotifyHero(ctx, playerID, entry)
 	return &pb.HeroUpgradeResp{HeroEntry: entry, Attribute: attr}, nil
-}
-
-func (this *heroLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, resp *pb.EnterGameResp) error {
-	entries, err := buildHeroEntries(ctx, playerID)
-	if err != nil {
-		return err
-	}
-	for _, entry := range entries {
-		if entry.Equipped {
-			resp.HeroEntry = entry
-			return nil
-		}
-	}
-	return nil
-}
-
-func (this *heroLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
-	if err := flushAndEvict(ctx, this.cache, playerID); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (this *heroLogic) Load(ctx context.Context, playerID int64) (*model.PlayerHero, error) {
-	return this.cache.GetOrInit(ctx, playerID,
-		func(id int64) *model.PlayerHero {
-			return &model.PlayerHero{PlayerID: id, Heroes: util.NewSafeMap[int32, model.HeroInfo]()}
-		},
-		func(row *model.PlayerHero) {
-			if row.Heroes == nil {
-				row.Heroes = util.NewSafeMap[int32, model.HeroInfo]()
-			}
-		})
-}
-
-func (this *heroLogic) Save(playerID int64, row *model.PlayerHero) {
-	this.cache.Set(playerID, row)
-}
-
-func (this *heroLogic) Flush(ctx context.Context, playerID int64) error {
-	return flushAndEvict(ctx, this.cache, playerID)
 }
 
 // ============ 资产接口实现（AssetStore，唯一持有型） ============

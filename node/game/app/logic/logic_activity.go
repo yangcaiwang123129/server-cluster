@@ -50,6 +50,15 @@ func init() {
 // Activity 获取活动业务单例。
 func Activity() global.ActivityLogic { return activityLogicInst.MustGet() }
 
+func (this *activityLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
+	_, err := this.Load(ctx, playerID)
+	return err
+}
+
+func (this *activityLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
+	return flushAndEvict(ctx, this.cache, playerID)
+}
+
 func (this *activityLogic) Load(ctx context.Context, playerID int64) (*model.PlayerActivity, error) {
 	return this.cache.GetOrInit(ctx, playerID,
 		func(id int64) *model.PlayerActivity {
@@ -67,15 +76,6 @@ func (this *activityLogic) Save(playerID int64, row *model.PlayerActivity) {
 }
 
 func (this *activityLogic) Flush(ctx context.Context, playerID int64) error {
-	return flushAndEvict(ctx, this.cache, playerID)
-}
-
-func (this *activityLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
-	_, err := this.Load(ctx, playerID)
-	return err
-}
-
-func (this *activityLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
 	return flushAndEvict(ctx, this.cache, playerID)
 }
 
