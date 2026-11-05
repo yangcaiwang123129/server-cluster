@@ -14,7 +14,7 @@ pipeline {
             type: 'PT_MULTI_SELECT',
             value: 'gate-1,game-1,battle-1,social-1,login-1,admin-1',
             multiSelectDelimiter: ' ',
-            visibleItemCount: 6
+            visibleItemCount: 7
         )
     }
 
