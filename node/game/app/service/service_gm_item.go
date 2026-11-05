@@ -67,6 +67,18 @@ func (this *GmProvider) ItemAddEntry(ctx context.Context, req *pb.GmItemAddEntry
 	return resp, nil
 }
 
+func (this *GmProvider) ItemClear(ctx context.Context, req *pb.GmItemClearReq) (*pb.ItemContainerListResp, error) {
+	if err := checkPlayerID(req.GetPlayerId()); err != nil {
+		return nil, err
+	}
+	resp, err := logic.Item().ItemClear(ctx, req.GetPlayerId(), req)
+	if err != nil {
+		return nil, err
+	}
+	flushModule(ctx, req.GetPlayerId(), logic.Item().Flush)
+	return resp, nil
+}
+
 func (this *GmProvider) ItemTransfer(ctx context.Context, req *pb.GmItemTransferReq) (*pb.ItemTransferResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err

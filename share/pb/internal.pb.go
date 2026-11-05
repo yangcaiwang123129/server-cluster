@@ -529,16 +529,16 @@ func (x *GmItemTransferReq) GetReq() *ItemTransferReq {
 	return nil
 }
 
-// GmItemAddEntryReq 向物品容器放入对象请求（坐标为左上角格）。
+// GmItemAddEntryReq 向物品容器放入对象请求（新增实例自动按"从左往右、从上到下"寻找首个有效位置插入，坐标字段不再参与落位）。
 type GmItemAddEntryReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"`                // 玩家ID
 	ContainerType int32                  `protobuf:"varint,2,opt,name=container_type,json=containerType,proto3" json:"container_type,omitempty"` // 物品容器类型：1 背包 2 仓库 3 保险箱
 	CfgId         int32                  `protobuf:"varint,3,opt,name=cfg_id,json=cfgId,proto3" json:"cfg_id,omitempty"`                         // 对象配置ID
 	Count         int32                  `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`                                      // 堆叠数量
-	GridX         int32                  `protobuf:"varint,5,opt,name=grid_x,json=gridX,proto3" json:"grid_x,omitempty"`                         // 网格X
-	GridY         int32                  `protobuf:"varint,6,opt,name=grid_y,json=gridY,proto3" json:"grid_y,omitempty"`                         // 网格Y
-	Rotated       bool                   `protobuf:"varint,7,opt,name=rotated,proto3" json:"rotated,omitempty"`                                  // 是否旋转放置
+	GridX         int32                  `protobuf:"varint,5,opt,name=grid_x,json=gridX,proto3" json:"grid_x,omitempty"`                         // 网格X（废弃，落位由服务端自动扫描）
+	GridY         int32                  `protobuf:"varint,6,opt,name=grid_y,json=gridY,proto3" json:"grid_y,omitempty"`                         // 网格Y（废弃，落位由服务端自动扫描）
+	Rotated       bool                   `protobuf:"varint,7,opt,name=rotated,proto3" json:"rotated,omitempty"`                                  // 是否旋转放置（废弃，落位由服务端自动扫描）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -622,6 +622,67 @@ func (x *GmItemAddEntryReq) GetRotated() bool {
 	return false
 }
 
+// GmItemClearReq 清除物品请求。
+type GmItemClearReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"`                // 玩家ID
+	ContainerType int32                  `protobuf:"varint,2,opt,name=container_type,json=containerType,proto3" json:"container_type,omitempty"` // 物品容器类型：0 全部容器 1 背包 2 仓库 3 保险箱
+	ItemId        int64                  `protobuf:"varint,3,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"`                      // 物品实例ID（雪花，按字符串接收）；0 表示清除范围内容器全部物品
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GmItemClearReq) Reset() {
+	*x = GmItemClearReq{}
+	mi := &file_internal_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GmItemClearReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GmItemClearReq) ProtoMessage() {}
+
+func (x *GmItemClearReq) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GmItemClearReq.ProtoReflect.Descriptor instead.
+func (*GmItemClearReq) Descriptor() ([]byte, []int) {
+	return file_internal_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *GmItemClearReq) GetPlayerId() int64 {
+	if x != nil {
+		return x.PlayerId
+	}
+	return 0
+}
+
+func (x *GmItemClearReq) GetContainerType() int32 {
+	if x != nil {
+		return x.ContainerType
+	}
+	return 0
+}
+
+func (x *GmItemClearReq) GetItemId() int64 {
+	if x != nil {
+		return x.ItemId
+	}
+	return 0
+}
+
 // GmHeroListReq 英雄列表请求。
 type GmHeroListReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -632,7 +693,7 @@ type GmHeroListReq struct {
 
 func (x *GmHeroListReq) Reset() {
 	*x = GmHeroListReq{}
-	mi := &file_internal_proto_msgTypes[11]
+	mi := &file_internal_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -644,7 +705,7 @@ func (x *GmHeroListReq) String() string {
 func (*GmHeroListReq) ProtoMessage() {}
 
 func (x *GmHeroListReq) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_msgTypes[11]
+	mi := &file_internal_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -657,7 +718,7 @@ func (x *GmHeroListReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GmHeroListReq.ProtoReflect.Descriptor instead.
 func (*GmHeroListReq) Descriptor() ([]byte, []int) {
-	return file_internal_proto_rawDescGZIP(), []int{11}
+	return file_internal_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *GmHeroListReq) GetPlayerId() int64 {
@@ -678,7 +739,7 @@ type GmHeroAddReq struct {
 
 func (x *GmHeroAddReq) Reset() {
 	*x = GmHeroAddReq{}
-	mi := &file_internal_proto_msgTypes[12]
+	mi := &file_internal_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -690,7 +751,7 @@ func (x *GmHeroAddReq) String() string {
 func (*GmHeroAddReq) ProtoMessage() {}
 
 func (x *GmHeroAddReq) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_msgTypes[12]
+	mi := &file_internal_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -703,7 +764,7 @@ func (x *GmHeroAddReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GmHeroAddReq.ProtoReflect.Descriptor instead.
 func (*GmHeroAddReq) Descriptor() ([]byte, []int) {
-	return file_internal_proto_rawDescGZIP(), []int{12}
+	return file_internal_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *GmHeroAddReq) GetPlayerId() int64 {
@@ -731,7 +792,7 @@ type GmHeroUpdateReq struct {
 
 func (x *GmHeroUpdateReq) Reset() {
 	*x = GmHeroUpdateReq{}
-	mi := &file_internal_proto_msgTypes[13]
+	mi := &file_internal_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -743,7 +804,7 @@ func (x *GmHeroUpdateReq) String() string {
 func (*GmHeroUpdateReq) ProtoMessage() {}
 
 func (x *GmHeroUpdateReq) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_msgTypes[13]
+	mi := &file_internal_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -756,7 +817,7 @@ func (x *GmHeroUpdateReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GmHeroUpdateReq.ProtoReflect.Descriptor instead.
 func (*GmHeroUpdateReq) Descriptor() ([]byte, []int) {
-	return file_internal_proto_rawDescGZIP(), []int{13}
+	return file_internal_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *GmHeroUpdateReq) GetPlayerId() int64 {
@@ -784,7 +845,7 @@ type GmHeroAttributeReq struct {
 
 func (x *GmHeroAttributeReq) Reset() {
 	*x = GmHeroAttributeReq{}
-	mi := &file_internal_proto_msgTypes[14]
+	mi := &file_internal_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -796,7 +857,7 @@ func (x *GmHeroAttributeReq) String() string {
 func (*GmHeroAttributeReq) ProtoMessage() {}
 
 func (x *GmHeroAttributeReq) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_msgTypes[14]
+	mi := &file_internal_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -809,7 +870,7 @@ func (x *GmHeroAttributeReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GmHeroAttributeReq.ProtoReflect.Descriptor instead.
 func (*GmHeroAttributeReq) Descriptor() ([]byte, []int) {
-	return file_internal_proto_rawDescGZIP(), []int{14}
+	return file_internal_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *GmHeroAttributeReq) GetPlayerId() int64 {
@@ -837,7 +898,7 @@ type GmHeroUpgradeReq struct {
 
 func (x *GmHeroUpgradeReq) Reset() {
 	*x = GmHeroUpgradeReq{}
-	mi := &file_internal_proto_msgTypes[15]
+	mi := &file_internal_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -849,7 +910,7 @@ func (x *GmHeroUpgradeReq) String() string {
 func (*GmHeroUpgradeReq) ProtoMessage() {}
 
 func (x *GmHeroUpgradeReq) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_msgTypes[15]
+	mi := &file_internal_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -862,7 +923,7 @@ func (x *GmHeroUpgradeReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GmHeroUpgradeReq.ProtoReflect.Descriptor instead.
 func (*GmHeroUpgradeReq) Descriptor() ([]byte, []int) {
-	return file_internal_proto_rawDescGZIP(), []int{15}
+	return file_internal_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *GmHeroUpgradeReq) GetPlayerId() int64 {
@@ -889,7 +950,7 @@ type GmEquipListReq struct {
 
 func (x *GmEquipListReq) Reset() {
 	*x = GmEquipListReq{}
-	mi := &file_internal_proto_msgTypes[16]
+	mi := &file_internal_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -901,7 +962,7 @@ func (x *GmEquipListReq) String() string {
 func (*GmEquipListReq) ProtoMessage() {}
 
 func (x *GmEquipListReq) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_msgTypes[16]
+	mi := &file_internal_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -914,7 +975,7 @@ func (x *GmEquipListReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GmEquipListReq.ProtoReflect.Descriptor instead.
 func (*GmEquipListReq) Descriptor() ([]byte, []int) {
-	return file_internal_proto_rawDescGZIP(), []int{16}
+	return file_internal_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *GmEquipListReq) GetPlayerId() int64 {
@@ -934,7 +995,7 @@ type GmEquipListResp struct {
 
 func (x *GmEquipListResp) Reset() {
 	*x = GmEquipListResp{}
-	mi := &file_internal_proto_msgTypes[17]
+	mi := &file_internal_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -946,7 +1007,7 @@ func (x *GmEquipListResp) String() string {
 func (*GmEquipListResp) ProtoMessage() {}
 
 func (x *GmEquipListResp) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_msgTypes[17]
+	mi := &file_internal_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -959,7 +1020,7 @@ func (x *GmEquipListResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GmEquipListResp.ProtoReflect.Descriptor instead.
 func (*GmEquipListResp) Descriptor() ([]byte, []int) {
-	return file_internal_proto_rawDescGZIP(), []int{17}
+	return file_internal_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *GmEquipListResp) GetEntries() []*EquipEntry {
@@ -980,7 +1041,7 @@ type GmEquipAddReq struct {
 
 func (x *GmEquipAddReq) Reset() {
 	*x = GmEquipAddReq{}
-	mi := &file_internal_proto_msgTypes[18]
+	mi := &file_internal_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -992,7 +1053,7 @@ func (x *GmEquipAddReq) String() string {
 func (*GmEquipAddReq) ProtoMessage() {}
 
 func (x *GmEquipAddReq) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_msgTypes[18]
+	mi := &file_internal_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1005,7 +1066,7 @@ func (x *GmEquipAddReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GmEquipAddReq.ProtoReflect.Descriptor instead.
 func (*GmEquipAddReq) Descriptor() ([]byte, []int) {
-	return file_internal_proto_rawDescGZIP(), []int{18}
+	return file_internal_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *GmEquipAddReq) GetPlayerId() int64 {
@@ -1033,7 +1094,7 @@ type GmEquipUpdateReq struct {
 
 func (x *GmEquipUpdateReq) Reset() {
 	*x = GmEquipUpdateReq{}
-	mi := &file_internal_proto_msgTypes[19]
+	mi := &file_internal_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1045,7 +1106,7 @@ func (x *GmEquipUpdateReq) String() string {
 func (*GmEquipUpdateReq) ProtoMessage() {}
 
 func (x *GmEquipUpdateReq) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_msgTypes[19]
+	mi := &file_internal_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1058,7 +1119,7 @@ func (x *GmEquipUpdateReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GmEquipUpdateReq.ProtoReflect.Descriptor instead.
 func (*GmEquipUpdateReq) Descriptor() ([]byte, []int) {
-	return file_internal_proto_rawDescGZIP(), []int{19}
+	return file_internal_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *GmEquipUpdateReq) GetPlayerId() int64 {
@@ -1086,7 +1147,7 @@ type GmEquipUpgradeReq struct {
 
 func (x *GmEquipUpgradeReq) Reset() {
 	*x = GmEquipUpgradeReq{}
-	mi := &file_internal_proto_msgTypes[20]
+	mi := &file_internal_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1098,7 +1159,7 @@ func (x *GmEquipUpgradeReq) String() string {
 func (*GmEquipUpgradeReq) ProtoMessage() {}
 
 func (x *GmEquipUpgradeReq) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_msgTypes[20]
+	mi := &file_internal_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1111,7 +1172,7 @@ func (x *GmEquipUpgradeReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GmEquipUpgradeReq.ProtoReflect.Descriptor instead.
 func (*GmEquipUpgradeReq) Descriptor() ([]byte, []int) {
-	return file_internal_proto_rawDescGZIP(), []int{20}
+	return file_internal_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *GmEquipUpgradeReq) GetPlayerId() int64 {
@@ -1139,7 +1200,7 @@ type GmEquipUpQualityReq struct {
 
 func (x *GmEquipUpQualityReq) Reset() {
 	*x = GmEquipUpQualityReq{}
-	mi := &file_internal_proto_msgTypes[21]
+	mi := &file_internal_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1151,7 +1212,7 @@ func (x *GmEquipUpQualityReq) String() string {
 func (*GmEquipUpQualityReq) ProtoMessage() {}
 
 func (x *GmEquipUpQualityReq) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_msgTypes[21]
+	mi := &file_internal_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1164,7 +1225,7 @@ func (x *GmEquipUpQualityReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GmEquipUpQualityReq.ProtoReflect.Descriptor instead.
 func (*GmEquipUpQualityReq) Descriptor() ([]byte, []int) {
-	return file_internal_proto_rawDescGZIP(), []int{21}
+	return file_internal_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *GmEquipUpQualityReq) GetPlayerId() int64 {
@@ -1192,7 +1253,7 @@ type GmEquipBreakthroughReq struct {
 
 func (x *GmEquipBreakthroughReq) Reset() {
 	*x = GmEquipBreakthroughReq{}
-	mi := &file_internal_proto_msgTypes[22]
+	mi := &file_internal_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1204,7 +1265,7 @@ func (x *GmEquipBreakthroughReq) String() string {
 func (*GmEquipBreakthroughReq) ProtoMessage() {}
 
 func (x *GmEquipBreakthroughReq) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_msgTypes[22]
+	mi := &file_internal_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1217,7 +1278,7 @@ func (x *GmEquipBreakthroughReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GmEquipBreakthroughReq.ProtoReflect.Descriptor instead.
 func (*GmEquipBreakthroughReq) Descriptor() ([]byte, []int) {
-	return file_internal_proto_rawDescGZIP(), []int{22}
+	return file_internal_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *GmEquipBreakthroughReq) GetPlayerId() int64 {
@@ -1246,7 +1307,7 @@ type GmEquipWearReq struct {
 
 func (x *GmEquipWearReq) Reset() {
 	*x = GmEquipWearReq{}
-	mi := &file_internal_proto_msgTypes[23]
+	mi := &file_internal_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1258,7 +1319,7 @@ func (x *GmEquipWearReq) String() string {
 func (*GmEquipWearReq) ProtoMessage() {}
 
 func (x *GmEquipWearReq) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_msgTypes[23]
+	mi := &file_internal_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1271,7 +1332,7 @@ func (x *GmEquipWearReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GmEquipWearReq.ProtoReflect.Descriptor instead.
 func (*GmEquipWearReq) Descriptor() ([]byte, []int) {
-	return file_internal_proto_rawDescGZIP(), []int{23}
+	return file_internal_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *GmEquipWearReq) GetPlayerId() int64 {
@@ -1306,7 +1367,7 @@ type GmEquipUnwearReq struct {
 
 func (x *GmEquipUnwearReq) Reset() {
 	*x = GmEquipUnwearReq{}
-	mi := &file_internal_proto_msgTypes[24]
+	mi := &file_internal_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1318,7 +1379,7 @@ func (x *GmEquipUnwearReq) String() string {
 func (*GmEquipUnwearReq) ProtoMessage() {}
 
 func (x *GmEquipUnwearReq) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_msgTypes[24]
+	mi := &file_internal_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1331,7 +1392,7 @@ func (x *GmEquipUnwearReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GmEquipUnwearReq.ProtoReflect.Descriptor instead.
 func (*GmEquipUnwearReq) Descriptor() ([]byte, []int) {
-	return file_internal_proto_rawDescGZIP(), []int{24}
+	return file_internal_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *GmEquipUnwearReq) GetPlayerId() int64 {
@@ -1358,7 +1419,7 @@ type GmMailListReq struct {
 
 func (x *GmMailListReq) Reset() {
 	*x = GmMailListReq{}
-	mi := &file_internal_proto_msgTypes[25]
+	mi := &file_internal_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1370,7 +1431,7 @@ func (x *GmMailListReq) String() string {
 func (*GmMailListReq) ProtoMessage() {}
 
 func (x *GmMailListReq) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_msgTypes[25]
+	mi := &file_internal_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1383,7 +1444,7 @@ func (x *GmMailListReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GmMailListReq.ProtoReflect.Descriptor instead.
 func (*GmMailListReq) Descriptor() ([]byte, []int) {
-	return file_internal_proto_rawDescGZIP(), []int{25}
+	return file_internal_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *GmMailListReq) GetPlayerId() int64 {
@@ -1403,7 +1464,7 @@ type GmMailListResp struct {
 
 func (x *GmMailListResp) Reset() {
 	*x = GmMailListResp{}
-	mi := &file_internal_proto_msgTypes[26]
+	mi := &file_internal_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1415,7 +1476,7 @@ func (x *GmMailListResp) String() string {
 func (*GmMailListResp) ProtoMessage() {}
 
 func (x *GmMailListResp) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_msgTypes[26]
+	mi := &file_internal_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1428,7 +1489,7 @@ func (x *GmMailListResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GmMailListResp.ProtoReflect.Descriptor instead.
 func (*GmMailListResp) Descriptor() ([]byte, []int) {
-	return file_internal_proto_rawDescGZIP(), []int{26}
+	return file_internal_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *GmMailListResp) GetEntries() []*MailEntry {
@@ -1451,7 +1512,7 @@ type GmMailSendReq struct {
 
 func (x *GmMailSendReq) Reset() {
 	*x = GmMailSendReq{}
-	mi := &file_internal_proto_msgTypes[27]
+	mi := &file_internal_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1463,7 +1524,7 @@ func (x *GmMailSendReq) String() string {
 func (*GmMailSendReq) ProtoMessage() {}
 
 func (x *GmMailSendReq) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_msgTypes[27]
+	mi := &file_internal_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1476,7 +1537,7 @@ func (x *GmMailSendReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GmMailSendReq.ProtoReflect.Descriptor instead.
 func (*GmMailSendReq) Descriptor() ([]byte, []int) {
-	return file_internal_proto_rawDescGZIP(), []int{27}
+	return file_internal_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *GmMailSendReq) GetPlayerId() int64 {
@@ -1552,7 +1613,11 @@ const file_internal_proto_rawDesc = "" +
 	"\x05count\x18\x04 \x01(\x05R\x05count\x12\x15\n" +
 	"\x06grid_x\x18\x05 \x01(\x05R\x05gridX\x12\x15\n" +
 	"\x06grid_y\x18\x06 \x01(\x05R\x05gridY\x12\x18\n" +
-	"\arotated\x18\a \x01(\bR\arotated\",\n" +
+	"\arotated\x18\a \x01(\bR\arotated\"m\n" +
+	"\x0eGmItemClearReq\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12%\n" +
+	"\x0econtainer_type\x18\x02 \x01(\x05R\rcontainerType\x12\x17\n" +
+	"\aitem_id\x18\x03 \x01(\x03R\x06itemId\",\n" +
 	"\rGmHeroListReq\x12\x1b\n" +
 	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\"M\n" +
 	"\fGmHeroAddReq\x12\x1b\n" +
@@ -1601,7 +1666,7 @@ const file_internal_proto_rawDesc = "" +
 	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x18\n" +
 	"\acontent\x18\x03 \x01(\tR\acontent\x120\n" +
-	"\vattachments\x18\x04 \x03(\v2\x0e.pb.AssetEntryR\vattachments2\xce\v\n" +
+	"\vattachments\x18\x04 \x03(\v2\x0e.pb.AssetEntryR\vattachments2\x90\f\n" +
 	"\x10GameAdminService\x12Q\n" +
 	"\x10GetOnlinePlayers\x12\x1d.internal.GetOnlinePlayersReq\x1a\x1e.internal.GetOnlinePlayersResp\x12?\n" +
 	"\n" +
@@ -1612,7 +1677,8 @@ const file_internal_proto_rawDesc = "" +
 	"ItemRotate\x12\x19.internal.GmItemRotateReq\x1a\x12.pb.ItemRotateResp\x125\n" +
 	"\bItemSort\x12\x17.internal.GmItemSortReq\x1a\x10.pb.ItemSortResp\x12A\n" +
 	"\fItemTransfer\x12\x1b.internal.GmItemTransferReq\x1a\x14.pb.ItemTransferResp\x12F\n" +
-	"\fItemAddEntry\x12\x1b.internal.GmItemAddEntryReq\x1a\x19.pb.ItemContainerListResp\x125\n" +
+	"\fItemAddEntry\x12\x1b.internal.GmItemAddEntryReq\x1a\x19.pb.ItemContainerListResp\x12@\n" +
+	"\tItemClear\x12\x18.internal.GmItemClearReq\x1a\x19.pb.ItemContainerListResp\x125\n" +
 	"\bHeroList\x12\x17.internal.GmHeroListReq\x1a\x10.pb.HeroListResp\x122\n" +
 	"\aHeroAdd\x12\x16.internal.GmHeroAddReq\x1a\x0f.pb.HeroAddResp\x12;\n" +
 	"\n" +
@@ -1642,7 +1708,7 @@ func file_internal_proto_rawDescGZIP() []byte {
 	return file_internal_proto_rawDescData
 }
 
-var file_internal_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
+var file_internal_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
 var file_internal_proto_goTypes = []any{
 	(*OnlinePlayer)(nil),           // 0: internal.OnlinePlayer
 	(*GetOnlinePlayersReq)(nil),    // 1: internal.GetOnlinePlayersReq
@@ -1655,67 +1721,68 @@ var file_internal_proto_goTypes = []any{
 	(*GmItemSortReq)(nil),          // 8: internal.GmItemSortReq
 	(*GmItemTransferReq)(nil),      // 9: internal.GmItemTransferReq
 	(*GmItemAddEntryReq)(nil),      // 10: internal.GmItemAddEntryReq
-	(*GmHeroListReq)(nil),          // 11: internal.GmHeroListReq
-	(*GmHeroAddReq)(nil),           // 12: internal.GmHeroAddReq
-	(*GmHeroUpdateReq)(nil),        // 13: internal.GmHeroUpdateReq
-	(*GmHeroAttributeReq)(nil),     // 14: internal.GmHeroAttributeReq
-	(*GmHeroUpgradeReq)(nil),       // 15: internal.GmHeroUpgradeReq
-	(*GmEquipListReq)(nil),         // 16: internal.GmEquipListReq
-	(*GmEquipListResp)(nil),        // 17: internal.GmEquipListResp
-	(*GmEquipAddReq)(nil),          // 18: internal.GmEquipAddReq
-	(*GmEquipUpdateReq)(nil),       // 19: internal.GmEquipUpdateReq
-	(*GmEquipUpgradeReq)(nil),      // 20: internal.GmEquipUpgradeReq
-	(*GmEquipUpQualityReq)(nil),    // 21: internal.GmEquipUpQualityReq
-	(*GmEquipBreakthroughReq)(nil), // 22: internal.GmEquipBreakthroughReq
-	(*GmEquipWearReq)(nil),         // 23: internal.GmEquipWearReq
-	(*GmEquipUnwearReq)(nil),       // 24: internal.GmEquipUnwearReq
-	(*GmMailListReq)(nil),          // 25: internal.GmMailListReq
-	(*GmMailListResp)(nil),         // 26: internal.GmMailListResp
-	(*GmMailSendReq)(nil),          // 27: internal.GmMailSendReq
-	(*ItemContainerListReq)(nil),   // 28: pb.ItemContainerListReq
-	(*ItemMoveReq)(nil),            // 29: pb.ItemMoveReq
-	(*ItemRotateReq)(nil),          // 30: pb.ItemRotateReq
-	(*ItemSortReq)(nil),            // 31: pb.ItemSortReq
-	(*ItemTransferReq)(nil),        // 32: pb.ItemTransferReq
-	(*HeroAddReq)(nil),             // 33: pb.HeroAddReq
-	(*HeroUpdateReq)(nil),          // 34: pb.HeroUpdateReq
-	(*EquipEntry)(nil),             // 35: pb.EquipEntry
-	(*EquipAddReq)(nil),            // 36: pb.EquipAddReq
-	(*EquipUpdateReq)(nil),         // 37: pb.EquipUpdateReq
-	(*MailEntry)(nil),              // 38: pb.MailEntry
-	(*AssetEntry)(nil),             // 39: pb.AssetEntry
-	(*ItemContainerListResp)(nil),  // 40: pb.ItemContainerListResp
-	(*ItemMoveResp)(nil),           // 41: pb.ItemMoveResp
-	(*ItemRotateResp)(nil),         // 42: pb.ItemRotateResp
-	(*ItemSortResp)(nil),           // 43: pb.ItemSortResp
-	(*ItemTransferResp)(nil),       // 44: pb.ItemTransferResp
-	(*HeroListResp)(nil),           // 45: pb.HeroListResp
-	(*HeroAddResp)(nil),            // 46: pb.HeroAddResp
-	(*HeroUpdateResp)(nil),         // 47: pb.HeroUpdateResp
-	(*HeroAttributeResp)(nil),      // 48: pb.HeroAttributeResp
-	(*HeroUpgradeResp)(nil),        // 49: pb.HeroUpgradeResp
-	(*EquipAddResp)(nil),           // 50: pb.EquipAddResp
-	(*EquipUpdateResp)(nil),        // 51: pb.EquipUpdateResp
-	(*EquipUpgradeResp)(nil),       // 52: pb.EquipUpgradeResp
-	(*EquipUpQualityResp)(nil),     // 53: pb.EquipUpQualityResp
-	(*EquipBreakthroughResp)(nil),  // 54: pb.EquipBreakthroughResp
-	(*EquipWearResp)(nil),          // 55: pb.EquipWearResp
-	(*EquipUnwearResp)(nil),        // 56: pb.EquipUnwearResp
+	(*GmItemClearReq)(nil),         // 11: internal.GmItemClearReq
+	(*GmHeroListReq)(nil),          // 12: internal.GmHeroListReq
+	(*GmHeroAddReq)(nil),           // 13: internal.GmHeroAddReq
+	(*GmHeroUpdateReq)(nil),        // 14: internal.GmHeroUpdateReq
+	(*GmHeroAttributeReq)(nil),     // 15: internal.GmHeroAttributeReq
+	(*GmHeroUpgradeReq)(nil),       // 16: internal.GmHeroUpgradeReq
+	(*GmEquipListReq)(nil),         // 17: internal.GmEquipListReq
+	(*GmEquipListResp)(nil),        // 18: internal.GmEquipListResp
+	(*GmEquipAddReq)(nil),          // 19: internal.GmEquipAddReq
+	(*GmEquipUpdateReq)(nil),       // 20: internal.GmEquipUpdateReq
+	(*GmEquipUpgradeReq)(nil),      // 21: internal.GmEquipUpgradeReq
+	(*GmEquipUpQualityReq)(nil),    // 22: internal.GmEquipUpQualityReq
+	(*GmEquipBreakthroughReq)(nil), // 23: internal.GmEquipBreakthroughReq
+	(*GmEquipWearReq)(nil),         // 24: internal.GmEquipWearReq
+	(*GmEquipUnwearReq)(nil),       // 25: internal.GmEquipUnwearReq
+	(*GmMailListReq)(nil),          // 26: internal.GmMailListReq
+	(*GmMailListResp)(nil),         // 27: internal.GmMailListResp
+	(*GmMailSendReq)(nil),          // 28: internal.GmMailSendReq
+	(*ItemContainerListReq)(nil),   // 29: pb.ItemContainerListReq
+	(*ItemMoveReq)(nil),            // 30: pb.ItemMoveReq
+	(*ItemRotateReq)(nil),          // 31: pb.ItemRotateReq
+	(*ItemSortReq)(nil),            // 32: pb.ItemSortReq
+	(*ItemTransferReq)(nil),        // 33: pb.ItemTransferReq
+	(*HeroAddReq)(nil),             // 34: pb.HeroAddReq
+	(*HeroUpdateReq)(nil),          // 35: pb.HeroUpdateReq
+	(*EquipEntry)(nil),             // 36: pb.EquipEntry
+	(*EquipAddReq)(nil),            // 37: pb.EquipAddReq
+	(*EquipUpdateReq)(nil),         // 38: pb.EquipUpdateReq
+	(*MailEntry)(nil),              // 39: pb.MailEntry
+	(*AssetEntry)(nil),             // 40: pb.AssetEntry
+	(*ItemContainerListResp)(nil),  // 41: pb.ItemContainerListResp
+	(*ItemMoveResp)(nil),           // 42: pb.ItemMoveResp
+	(*ItemRotateResp)(nil),         // 43: pb.ItemRotateResp
+	(*ItemSortResp)(nil),           // 44: pb.ItemSortResp
+	(*ItemTransferResp)(nil),       // 45: pb.ItemTransferResp
+	(*HeroListResp)(nil),           // 46: pb.HeroListResp
+	(*HeroAddResp)(nil),            // 47: pb.HeroAddResp
+	(*HeroUpdateResp)(nil),         // 48: pb.HeroUpdateResp
+	(*HeroAttributeResp)(nil),      // 49: pb.HeroAttributeResp
+	(*HeroUpgradeResp)(nil),        // 50: pb.HeroUpgradeResp
+	(*EquipAddResp)(nil),           // 51: pb.EquipAddResp
+	(*EquipUpdateResp)(nil),        // 52: pb.EquipUpdateResp
+	(*EquipUpgradeResp)(nil),       // 53: pb.EquipUpgradeResp
+	(*EquipUpQualityResp)(nil),     // 54: pb.EquipUpQualityResp
+	(*EquipBreakthroughResp)(nil),  // 55: pb.EquipBreakthroughResp
+	(*EquipWearResp)(nil),          // 56: pb.EquipWearResp
+	(*EquipUnwearResp)(nil),        // 57: pb.EquipUnwearResp
 }
 var file_internal_proto_depIdxs = []int32{
 	0,  // 0: internal.GetOnlinePlayersResp.players:type_name -> internal.OnlinePlayer
-	28, // 1: internal.GmItemListReq.req:type_name -> pb.ItemContainerListReq
-	29, // 2: internal.GmItemMoveReq.req:type_name -> pb.ItemMoveReq
-	30, // 3: internal.GmItemRotateReq.req:type_name -> pb.ItemRotateReq
-	31, // 4: internal.GmItemSortReq.req:type_name -> pb.ItemSortReq
-	32, // 5: internal.GmItemTransferReq.req:type_name -> pb.ItemTransferReq
-	33, // 6: internal.GmHeroAddReq.req:type_name -> pb.HeroAddReq
-	34, // 7: internal.GmHeroUpdateReq.req:type_name -> pb.HeroUpdateReq
-	35, // 8: internal.GmEquipListResp.entries:type_name -> pb.EquipEntry
-	36, // 9: internal.GmEquipAddReq.req:type_name -> pb.EquipAddReq
-	37, // 10: internal.GmEquipUpdateReq.req:type_name -> pb.EquipUpdateReq
-	38, // 11: internal.GmMailListResp.entries:type_name -> pb.MailEntry
-	39, // 12: internal.GmMailSendReq.attachments:type_name -> pb.AssetEntry
+	29, // 1: internal.GmItemListReq.req:type_name -> pb.ItemContainerListReq
+	30, // 2: internal.GmItemMoveReq.req:type_name -> pb.ItemMoveReq
+	31, // 3: internal.GmItemRotateReq.req:type_name -> pb.ItemRotateReq
+	32, // 4: internal.GmItemSortReq.req:type_name -> pb.ItemSortReq
+	33, // 5: internal.GmItemTransferReq.req:type_name -> pb.ItemTransferReq
+	34, // 6: internal.GmHeroAddReq.req:type_name -> pb.HeroAddReq
+	35, // 7: internal.GmHeroUpdateReq.req:type_name -> pb.HeroUpdateReq
+	36, // 8: internal.GmEquipListResp.entries:type_name -> pb.EquipEntry
+	37, // 9: internal.GmEquipAddReq.req:type_name -> pb.EquipAddReq
+	38, // 10: internal.GmEquipUpdateReq.req:type_name -> pb.EquipUpdateReq
+	39, // 11: internal.GmMailListResp.entries:type_name -> pb.MailEntry
+	40, // 12: internal.GmMailSendReq.attachments:type_name -> pb.AssetEntry
 	1,  // 13: internal.GameAdminService.GetOnlinePlayers:input_type -> internal.GetOnlinePlayersReq
 	3,  // 14: internal.GameAdminService.KickPlayer:input_type -> internal.KickPlayerReq
 	5,  // 15: internal.GameAdminService.ItemList:input_type -> internal.GmItemListReq
@@ -1724,46 +1791,48 @@ var file_internal_proto_depIdxs = []int32{
 	8,  // 18: internal.GameAdminService.ItemSort:input_type -> internal.GmItemSortReq
 	9,  // 19: internal.GameAdminService.ItemTransfer:input_type -> internal.GmItemTransferReq
 	10, // 20: internal.GameAdminService.ItemAddEntry:input_type -> internal.GmItemAddEntryReq
-	11, // 21: internal.GameAdminService.HeroList:input_type -> internal.GmHeroListReq
-	12, // 22: internal.GameAdminService.HeroAdd:input_type -> internal.GmHeroAddReq
-	13, // 23: internal.GameAdminService.HeroUpdate:input_type -> internal.GmHeroUpdateReq
-	14, // 24: internal.GameAdminService.HeroAttribute:input_type -> internal.GmHeroAttributeReq
-	15, // 25: internal.GameAdminService.HeroUpgrade:input_type -> internal.GmHeroUpgradeReq
-	16, // 26: internal.GameAdminService.EquipList:input_type -> internal.GmEquipListReq
-	18, // 27: internal.GameAdminService.EquipAdd:input_type -> internal.GmEquipAddReq
-	19, // 28: internal.GameAdminService.EquipUpdate:input_type -> internal.GmEquipUpdateReq
-	20, // 29: internal.GameAdminService.EquipUpgrade:input_type -> internal.GmEquipUpgradeReq
-	21, // 30: internal.GameAdminService.EquipUpQuality:input_type -> internal.GmEquipUpQualityReq
-	22, // 31: internal.GameAdminService.EquipBreakthrough:input_type -> internal.GmEquipBreakthroughReq
-	23, // 32: internal.GameAdminService.EquipWear:input_type -> internal.GmEquipWearReq
-	24, // 33: internal.GameAdminService.EquipUnwear:input_type -> internal.GmEquipUnwearReq
-	25, // 34: internal.GameAdminService.MailList:input_type -> internal.GmMailListReq
-	27, // 35: internal.GameAdminService.MailSend:input_type -> internal.GmMailSendReq
-	2,  // 36: internal.GameAdminService.GetOnlinePlayers:output_type -> internal.GetOnlinePlayersResp
-	4,  // 37: internal.GameAdminService.KickPlayer:output_type -> internal.KickPlayerResp
-	40, // 38: internal.GameAdminService.ItemList:output_type -> pb.ItemContainerListResp
-	41, // 39: internal.GameAdminService.ItemMove:output_type -> pb.ItemMoveResp
-	42, // 40: internal.GameAdminService.ItemRotate:output_type -> pb.ItemRotateResp
-	43, // 41: internal.GameAdminService.ItemSort:output_type -> pb.ItemSortResp
-	44, // 42: internal.GameAdminService.ItemTransfer:output_type -> pb.ItemTransferResp
-	40, // 43: internal.GameAdminService.ItemAddEntry:output_type -> pb.ItemContainerListResp
-	45, // 44: internal.GameAdminService.HeroList:output_type -> pb.HeroListResp
-	46, // 45: internal.GameAdminService.HeroAdd:output_type -> pb.HeroAddResp
-	47, // 46: internal.GameAdminService.HeroUpdate:output_type -> pb.HeroUpdateResp
-	48, // 47: internal.GameAdminService.HeroAttribute:output_type -> pb.HeroAttributeResp
-	49, // 48: internal.GameAdminService.HeroUpgrade:output_type -> pb.HeroUpgradeResp
-	17, // 49: internal.GameAdminService.EquipList:output_type -> internal.GmEquipListResp
-	50, // 50: internal.GameAdminService.EquipAdd:output_type -> pb.EquipAddResp
-	51, // 51: internal.GameAdminService.EquipUpdate:output_type -> pb.EquipUpdateResp
-	52, // 52: internal.GameAdminService.EquipUpgrade:output_type -> pb.EquipUpgradeResp
-	53, // 53: internal.GameAdminService.EquipUpQuality:output_type -> pb.EquipUpQualityResp
-	54, // 54: internal.GameAdminService.EquipBreakthrough:output_type -> pb.EquipBreakthroughResp
-	55, // 55: internal.GameAdminService.EquipWear:output_type -> pb.EquipWearResp
-	56, // 56: internal.GameAdminService.EquipUnwear:output_type -> pb.EquipUnwearResp
-	26, // 57: internal.GameAdminService.MailList:output_type -> internal.GmMailListResp
-	38, // 58: internal.GameAdminService.MailSend:output_type -> pb.MailEntry
-	36, // [36:59] is the sub-list for method output_type
-	13, // [13:36] is the sub-list for method input_type
+	11, // 21: internal.GameAdminService.ItemClear:input_type -> internal.GmItemClearReq
+	12, // 22: internal.GameAdminService.HeroList:input_type -> internal.GmHeroListReq
+	13, // 23: internal.GameAdminService.HeroAdd:input_type -> internal.GmHeroAddReq
+	14, // 24: internal.GameAdminService.HeroUpdate:input_type -> internal.GmHeroUpdateReq
+	15, // 25: internal.GameAdminService.HeroAttribute:input_type -> internal.GmHeroAttributeReq
+	16, // 26: internal.GameAdminService.HeroUpgrade:input_type -> internal.GmHeroUpgradeReq
+	17, // 27: internal.GameAdminService.EquipList:input_type -> internal.GmEquipListReq
+	19, // 28: internal.GameAdminService.EquipAdd:input_type -> internal.GmEquipAddReq
+	20, // 29: internal.GameAdminService.EquipUpdate:input_type -> internal.GmEquipUpdateReq
+	21, // 30: internal.GameAdminService.EquipUpgrade:input_type -> internal.GmEquipUpgradeReq
+	22, // 31: internal.GameAdminService.EquipUpQuality:input_type -> internal.GmEquipUpQualityReq
+	23, // 32: internal.GameAdminService.EquipBreakthrough:input_type -> internal.GmEquipBreakthroughReq
+	24, // 33: internal.GameAdminService.EquipWear:input_type -> internal.GmEquipWearReq
+	25, // 34: internal.GameAdminService.EquipUnwear:input_type -> internal.GmEquipUnwearReq
+	26, // 35: internal.GameAdminService.MailList:input_type -> internal.GmMailListReq
+	28, // 36: internal.GameAdminService.MailSend:input_type -> internal.GmMailSendReq
+	2,  // 37: internal.GameAdminService.GetOnlinePlayers:output_type -> internal.GetOnlinePlayersResp
+	4,  // 38: internal.GameAdminService.KickPlayer:output_type -> internal.KickPlayerResp
+	41, // 39: internal.GameAdminService.ItemList:output_type -> pb.ItemContainerListResp
+	42, // 40: internal.GameAdminService.ItemMove:output_type -> pb.ItemMoveResp
+	43, // 41: internal.GameAdminService.ItemRotate:output_type -> pb.ItemRotateResp
+	44, // 42: internal.GameAdminService.ItemSort:output_type -> pb.ItemSortResp
+	45, // 43: internal.GameAdminService.ItemTransfer:output_type -> pb.ItemTransferResp
+	41, // 44: internal.GameAdminService.ItemAddEntry:output_type -> pb.ItemContainerListResp
+	41, // 45: internal.GameAdminService.ItemClear:output_type -> pb.ItemContainerListResp
+	46, // 46: internal.GameAdminService.HeroList:output_type -> pb.HeroListResp
+	47, // 47: internal.GameAdminService.HeroAdd:output_type -> pb.HeroAddResp
+	48, // 48: internal.GameAdminService.HeroUpdate:output_type -> pb.HeroUpdateResp
+	49, // 49: internal.GameAdminService.HeroAttribute:output_type -> pb.HeroAttributeResp
+	50, // 50: internal.GameAdminService.HeroUpgrade:output_type -> pb.HeroUpgradeResp
+	18, // 51: internal.GameAdminService.EquipList:output_type -> internal.GmEquipListResp
+	51, // 52: internal.GameAdminService.EquipAdd:output_type -> pb.EquipAddResp
+	52, // 53: internal.GameAdminService.EquipUpdate:output_type -> pb.EquipUpdateResp
+	53, // 54: internal.GameAdminService.EquipUpgrade:output_type -> pb.EquipUpgradeResp
+	54, // 55: internal.GameAdminService.EquipUpQuality:output_type -> pb.EquipUpQualityResp
+	55, // 56: internal.GameAdminService.EquipBreakthrough:output_type -> pb.EquipBreakthroughResp
+	56, // 57: internal.GameAdminService.EquipWear:output_type -> pb.EquipWearResp
+	57, // 58: internal.GameAdminService.EquipUnwear:output_type -> pb.EquipUnwearResp
+	27, // 59: internal.GameAdminService.MailList:output_type -> internal.GmMailListResp
+	39, // 60: internal.GameAdminService.MailSend:output_type -> pb.MailEntry
+	37, // [37:61] is the sub-list for method output_type
+	13, // [13:37] is the sub-list for method input_type
 	13, // [13:13] is the sub-list for extension type_name
 	13, // [13:13] is the sub-list for extension extendee
 	0,  // [0:13] is the sub-list for field type_name
@@ -1785,7 +1854,7 @@ func file_internal_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_proto_rawDesc), len(file_internal_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   28,
+			NumMessages:   29,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

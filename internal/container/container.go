@@ -38,6 +38,7 @@ var (
 	ErrItemExists       = errors.New("item already exists in container")
 	ErrPositionConflict = errors.New("position conflict")
 	ErrContainerLocked  = errors.New("container locked for cross-transfer")
+	ErrNoSpace          = errors.New("no space in container")
 )
 
 // ============ GridItem 泛型约束 ============
@@ -353,6 +354,52 @@ func (this *BaseContainer[T]) AddEntry(it T) error {
 	return nil
 }
 
+// AddEntryAuto 自动落位放入对象：不依赖调用方坐标，按行优先（自上而下逐行、行内自左向右）扫描容器格子，
+// 未旋转优先、放不下再试旋转，在第一个能完整容纳该对象形状的空闲位置插入；
+// 容器无可用空间返回 ErrNoSpace（容器尺寸固定，不做任何扩容）。
+func (this *BaseContainer[T]) AddEntryAuto(it T) error {
+	if this.EntryMap.Has(it.ID()) {
+		return ErrItemExists
+	}
+	x, y, rotated, ok := this.findFirstFit(it)
+	if !ok {
+		return ErrNoSpace
+	}
+	it.SetPos(x, y, rotated)
+	this.EntryMap.Set(it.ID(), it)
+	this.BumpVersion()
+	return nil
+}
+
+// findFirstFit 行优先扫描（自上而下逐行、行内自左向右）寻找第一个能完整容纳对象形状的空闲位置：
+// 未旋转优先，全图放不下再试旋转；命中返回坐标与朝向，容器无可用空间返回 ok=false。
+func (this *BaseContainer[T]) findFirstFit(it T) (x, y int32, rotated bool, ok bool) {
+	occ := this.BuildOccupied()
+	baseW, baseH := this.invokeRawSizeOf(it)
+	for _, tryRot := range []bool{false, true} {
+		w, h := baseW, baseH
+		if tryRot {
+			w, h = baseH, baseW
+		}
+		for row := int32(0); row+h <= this.GridH; row++ {
+			for col := int32(0); col+w <= this.GridW; col++ {
+				free := true
+				for dx := int32(0); dx < w && free; dx++ {
+					for dy := int32(0); dy < h && free; dy++ {
+						if occ[(row+dy)*this.GridW+(col+dx)] != 0 {
+							free = false
+						}
+					}
+				}
+				if free {
+					return col, row, tryRot, true
+				}
+			}
+		}
+	}
+	return 0, 0, false, false
+}
+
 // RemoveEntry 删除对象 id，返回被移除的对象。
 func (this *BaseContainer[T]) RemoveEntry(id int64) (T, error) {
 	it, ok := this.EntryMap.Get(id)
@@ -546,6 +593,51 @@ func (this *BaseContainer[T]) TransferFrom(from *BaseContainer[T], id int64, toX
 		srcIt.SetPos(origX, origY, origRot)
 		return ErrPositionConflict
 	}
+	from.EntryMap.Delete(id)
+	this.EntryMap.Set(id, srcIt2)
+	from.BumpVersion()
+	this.BumpVersion()
+	return nil
+}
+
+// TransferFromAuto 把源容器 from 的 id 对象移入本容器：落位同 AddEntryAuto 按行优先（自上而下逐行、行内自左向右）
+// 自动扫描首个能完整容纳该对象形状的有效位置；两容器按 GlobalID 升序加 transMu 避免互搬死锁，锁定后复核空间；
+// 目标容器无可用空间返回 ErrNoSpace，任一失败两容器均不修改。
+func (this *BaseContainer[T]) TransferFromAuto(from *BaseContainer[T], id int64) error {
+	if from == this {
+		return ErrPositionConflict
+	}
+	srcIt, ok := from.EntryMap.Get(id)
+	if !ok {
+		return ErrItemNotFound
+	}
+	if this.EntryMap.Has(id) {
+		return ErrItemExists
+	}
+	x, y, rotated, fit := this.findFirstFit(srcIt)
+	if !fit {
+		return ErrNoSpace
+	}
+	first, second := this, from
+	if second.GlobalID < first.GlobalID {
+		first, second = second, first
+	}
+	first.transMu.Lock()
+	defer first.transMu.Unlock()
+	second.transMu.Lock()
+	defer second.transMu.Unlock()
+	srcIt2, ok := from.EntryMap.Get(id)
+	if !ok {
+		return ErrItemNotFound
+	}
+	if this.EntryMap.Has(id) {
+		return ErrItemExists
+	}
+	occ := this.BuildOccupied()
+	if !this.canPlace(occ, srcIt2, x, y, rotated) {
+		return ErrNoSpace
+	}
+	srcIt2.SetPos(x, y, rotated)
 	from.EntryMap.Delete(id)
 	this.EntryMap.Set(id, srcIt2)
 	from.BumpVersion()

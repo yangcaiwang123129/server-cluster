@@ -46,6 +46,8 @@ func itemErr(err error) error {
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "物品已存在")
 	case errors.Is(err, model.ErrPositionConflict):
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "目标位置不可放置")
+	case errors.Is(err, model.ErrNoSpace):
+		return errs.ErrOf(pb.ErrCode_ERR_CODE_ITEM_SPACE_NOT_ENOUGH, "空间不足")
 	default:
 		return fmt.Errorf("logic: item op failed: %w", err)
 	}
@@ -203,8 +205,8 @@ func (this *itemLogic) ItemTransfer(ctx context.Context, playerID int64, req *pb
 		return &pb.ItemTransferResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "")}, nil
 	}
 
-	// 目标容器调 TransferFrom 把源容器的物品搬过来
-	if err := toC.TransferFrom(fromC, req.GetId(), req.GetToX(), req.GetToY(), req.GetRotated()); err != nil {
+	// 目标容器调 TransferFromAuto，按行优先自动扫描首个有效位置把源容器的物品搬过来
+	if err := toC.TransferFromAuto(fromC, req.GetId()); err != nil {
 		err = itemErr(err)
 		if r := codedResult(err); r != nil {
 			return &pb.ItemTransferResp{Result: r}, nil
@@ -242,14 +244,11 @@ func (this *itemLogic) ItemAddEntry(ctx context.Context, playerID int64, req *pb
 	if count <= 0 {
 		count = 1
 	}
-	// AddEntry 接收 *ItemEntry（指针化）
-	if err := c.AddEntry(&model.ItemEntry{
+	// 新增实例不按请求坐标落位：容器按"从左往右、从上到下"扫描首个能完整容纳的空闲位置自动插入，无空位返回空间不足
+	if err := c.AddEntryAuto(&model.ItemEntry{
 		ItemID:    svc.NextID(),
 		ItemCfgID: req.GetCfgId(),
 		Count:     count,
-		GridX:     req.GetGridX(),
-		GridY:     req.GetGridY(),
-		Rotated:   req.GetRotated(),
 	}); err != nil {
 		err = itemErr(err)
 		if r := codedResult(err); r != nil {
@@ -261,6 +260,61 @@ func (this *itemLogic) ItemAddEntry(ctx context.Context, playerID int64, req *pb
 	this.Save(playerID, pc)
 	record.Record(ctx, model.RecordModuleItem, playerID, model.RecordActionGain, req.GetCfgId(), count)
 	return &pb.ItemContainerListResp{ItemContainers: []*pb.ItemContainer{convert.ItemContainer(playerID, c)}}, nil
+}
+
+func (this *itemLogic) ItemClear(ctx context.Context, playerID int64, req *pb.GmItemClearReq) (*pb.ItemContainerListResp, error) {
+	pc, err := this.Load(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+
+	// container_type 合法时只操作该容器，否则（0/未指定）作用于全部容器
+	var containers []*model.ItemContainer
+	if typ, ok := convert.ContainerTypeToModel(pb.ContainerType(req.GetContainerType())); ok {
+		c := pc.ByType(typ)
+		if c == nil {
+			return &pb.ItemContainerListResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "")}, nil
+		}
+		containers = []*model.ItemContainer{c}
+	} else {
+		containers = pc.All()
+	}
+
+	if id := req.GetItemId(); id > 0 {
+		// 传实例ID：范围内精确清除单个物品实例
+		removed := false
+		for _, c := range containers {
+			if c.GetEntry(id) == nil {
+				continue
+			}
+			if _, err := c.RemoveEntry(id); err != nil {
+				err = itemErr(err)
+				if r := codedResult(err); r != nil {
+					return &pb.ItemContainerListResp{Result: r}, nil
+				}
+				return nil, err
+			}
+			removed = true
+			break
+		}
+		if !removed {
+			return &pb.ItemContainerListResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "物品不存在")}, nil
+		}
+	} else {
+		// 不传实例ID：清空范围内全部物品
+		for _, c := range containers {
+			for _, it := range c.Entries() {
+				_, _ = c.RemoveEntry(it.ID())
+			}
+		}
+	}
+
+	this.Save(playerID, pc)
+	respContainers := make([]*pb.ItemContainer, 0, len(containers))
+	for _, c := range containers {
+		respContainers = append(respContainers, convert.ItemContainer(playerID, c))
+	}
+	return &pb.ItemContainerListResp{ItemContainers: respContainers}, nil
 }
 
 // ============ 资产接口实现（AssetStore，可叠加型，落在背包容器） ============
@@ -288,7 +342,7 @@ func (this *itemAssetStore) Add(ctx context.Context, playerID int64, cfgID, coun
 		return err
 	}
 	if err := placeItemEntry(pc.ByType(int32(pb.ContainerType_CONTAINER_TYPE_BACKPACK)), cfgID, count); err != nil {
-		return err
+		return itemErr(err)
 	}
 
 	Item().(*itemLogic).cache.Set(playerID, pc)
@@ -436,32 +490,14 @@ func CloseCaches() []cache.CacheCloseStat {
 	return cache.CloseCaches()
 }
 
-// placeItemEntry 从左上角逐格尝试放置，命中空闲位置后返回；全部占满返回“背包空间不足”。
+// placeItemEntry 新增物品实例自动落位：容器按"从左往右、从上到下"扫描首个能完整容纳该物品形状的空闲位置插入；
+// 无可用空间返回 model.ErrNoSpace（容器尺寸固定，不扩容）。
 func placeItemEntry(c *model.ItemContainer, cfgID, count int32) error {
-	meta := c.Meta()
-	w, h := model.GetWHByItemCfgId(cfgID)
-	if w <= 0 || h <= 0 {
-		w, h = 1, 1
-	}
-
-	for y := int32(0); y+h <= meta.GridH; y++ {
-		for x := int32(0); x+w <= meta.GridW; x++ {
-			err := c.AddEntry(&model.ItemEntry{
-				ItemID:    svc.NextID(),
-				ItemCfgID: cfgID,
-				Count:     count,
-				GridX:     x,
-				GridY:     y,
-			})
-			if err == nil {
-				return nil
-			}
-			if !errors.Is(err, model.ErrPositionConflict) {
-				return itemErr(err)
-			}
-		}
-	}
-	return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "背包空间不足")
+	return c.AddEntryAuto(&model.ItemEntry{
+		ItemID:    svc.NextID(),
+		ItemCfgID: cfgID,
+		Count:     count,
+	})
 }
 
 // takeItemEntries 按条目扣除数量：整条扣完直接移除，否则只改剩余数量。

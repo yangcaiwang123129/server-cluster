@@ -97,15 +97,22 @@ type GmItemTransferReq struct {
 	Rotated  bool  `json:"rotated"`         // 是否旋转放置
 }
 
-// GmItemAddEntryReq 向物品容器放入物品请求（坐标为左上角格）。
+// GmItemAddEntryReq 向物品容器放入物品请求（落位由服务端按"从左往右、从上到下"自动扫描首个有效位置，坐标字段已废弃）。
 type GmItemAddEntryReq struct {
 	PlayerID      int64 `json:"playerId,string"` // 玩家ID
 	ContainerType int32 `json:"containerType"`   // 物品容器类型：1 背包 2 仓库 3 保险箱
 	ItemCfgID     int32 `json:"itemCfgId"`       // 物品配置ID
 	Count         int32 `json:"count"`           // 堆叠数量
-	GridX         int32 `json:"gridX"`           // 网格X
-	GridY         int32 `json:"gridY"`           // 网格Y
-	Rotated       bool  `json:"rotated"`         // 是否旋转放置
+	GridX         int32 `json:"gridX"`           // 网格X（废弃，服务端忽略）
+	GridY         int32 `json:"gridY"`           // 网格Y（废弃，服务端忽略）
+	Rotated       bool  `json:"rotated"`         // 是否旋转放置（废弃，服务端忽略）
+}
+
+// GmItemClearReq 清除物品请求。
+type GmItemClearReq struct {
+	PlayerID      int64 `json:"playerId,string"` // 玩家ID
+	ContainerType int32 `json:"containerType"`   // 物品容器类型：0 全部 1 背包 2 仓库 3 保险箱
+	ItemID        int64 `json:"itemId,string"`   // 物品实例ID（雪花，按字符串接收）；0 表示清除范围内容器全部物品
 }
 
 // ========== 英雄（GM） ==========

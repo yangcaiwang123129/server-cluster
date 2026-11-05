@@ -69,15 +69,22 @@ message GmItemTransferReq {
   pb.ItemTransferReq req = 2; // 业务参数
 }
 
-// GmItemAddEntryReq 向物品容器放入对象请求（坐标为左上角格）。
+// GmItemAddEntryReq 向物品容器放入对象请求（新增实例自动按"从左往右、从上到下"寻找首个有效位置插入，坐标字段不再参与落位）。
 message GmItemAddEntryReq {
   int64 player_id = 1;  // 玩家ID
   int32 container_type = 2;  // 物品容器类型：1 背包 2 仓库 3 保险箱
   int32 cfg_id = 3;     // 对象配置ID
   int32 count = 4;      // 堆叠数量
-  int32 grid_x = 5;     // 网格X
-  int32 grid_y = 6;     // 网格Y
-  bool rotated = 7;     // 是否旋转放置
+  int32 grid_x = 5;     // 网格X（废弃，落位由服务端自动扫描）
+  int32 grid_y = 6;     // 网格Y（废弃，落位由服务端自动扫描）
+  bool rotated = 7;     // 是否旋转放置（废弃，落位由服务端自动扫描）
+}
+
+// GmItemClearReq 清除物品请求。
+message GmItemClearReq {
+  int64 player_id = 1;      // 玩家ID
+  int32 container_type = 2; // 物品容器类型：0 全部容器 1 背包 2 仓库 3 保险箱
+  int64 item_id = 3;        // 物品实例ID（雪花，按字符串接收）；0 表示清除范围内容器全部物品
 }
 
 // GmHeroListReq 英雄列表请求。
@@ -197,8 +204,10 @@ service GameAdminService {
   rpc ItemSort (GmItemSortReq) returns (pb.ItemSortResp);
   // ItemTransfer 物品容器间移动对象
   rpc ItemTransfer (GmItemTransferReq) returns (pb.ItemTransferResp);
-  // ItemAddEntry 向物品容器放入对象（返回变更后的物品容器）
+  // ItemAddEntry 向物品容器放入对象（自动按行优先寻找首个有效位置插入，返回变更后的物品容器）
   rpc ItemAddEntry (GmItemAddEntryReq) returns (pb.ItemContainerListResp);
+  // ItemClear 清除物品（传实例ID精确清除单个；不传实例ID清空指定容器，容器类型也为空则全清）
+  rpc ItemClear (GmItemClearReq) returns (pb.ItemContainerListResp);
 
   // HeroList 英雄列表
   rpc HeroList (GmHeroListReq) returns (pb.HeroListResp);

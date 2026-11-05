@@ -108,6 +108,8 @@ enum ErrCode {
   ERR_CODE_TASK_NOT_ACCEPTED = 4105;        // 任务未接取
   // 活动（活动/任务快照）
   ERR_CODE_ACTIVITY_UNAVAILABLE = 4201;     // 活动快照未就绪
+  // 物品
+  ERR_CODE_ITEM_SPACE_NOT_ENOUGH = 4202;    // 物品容器空间不足
 }
 
 //  ========== 通知类型 ==========

@@ -29,6 +29,7 @@ const (
 	GameAdminService_ItemSort_FullMethodName          = "/internal.GameAdminService/ItemSort"
 	GameAdminService_ItemTransfer_FullMethodName      = "/internal.GameAdminService/ItemTransfer"
 	GameAdminService_ItemAddEntry_FullMethodName      = "/internal.GameAdminService/ItemAddEntry"
+	GameAdminService_ItemClear_FullMethodName         = "/internal.GameAdminService/ItemClear"
 	GameAdminService_HeroList_FullMethodName          = "/internal.GameAdminService/HeroList"
 	GameAdminService_HeroAdd_FullMethodName           = "/internal.GameAdminService/HeroAdd"
 	GameAdminService_HeroUpdate_FullMethodName        = "/internal.GameAdminService/HeroUpdate"
@@ -66,8 +67,10 @@ type GameAdminServiceClient interface {
 	ItemSort(ctx context.Context, in *GmItemSortReq, opts ...grpc.CallOption) (*ItemSortResp, error)
 	// ItemTransfer 物品容器间移动对象
 	ItemTransfer(ctx context.Context, in *GmItemTransferReq, opts ...grpc.CallOption) (*ItemTransferResp, error)
-	// ItemAddEntry 向物品容器放入对象（返回变更后的物品容器）
+	// ItemAddEntry 向物品容器放入对象（自动按行优先寻找首个有效位置插入，返回变更后的物品容器）
 	ItemAddEntry(ctx context.Context, in *GmItemAddEntryReq, opts ...grpc.CallOption) (*ItemContainerListResp, error)
+	// ItemClear 清除物品（传实例ID精确清除单个；不传实例ID清空指定容器，容器类型也为空则全清）
+	ItemClear(ctx context.Context, in *GmItemClearReq, opts ...grpc.CallOption) (*ItemContainerListResp, error)
 	// HeroList 英雄列表
 	HeroList(ctx context.Context, in *GmHeroListReq, opts ...grpc.CallOption) (*HeroListResp, error)
 	// HeroAdd 新增英雄
@@ -182,6 +185,16 @@ func (c *gameAdminServiceClient) ItemAddEntry(ctx context.Context, in *GmItemAdd
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ItemContainerListResp)
 	err := c.cc.Invoke(ctx, GameAdminService_ItemAddEntry_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameAdminServiceClient) ItemClear(ctx context.Context, in *GmItemClearReq, opts ...grpc.CallOption) (*ItemContainerListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ItemContainerListResp)
+	err := c.cc.Invoke(ctx, GameAdminService_ItemClear_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -358,8 +371,10 @@ type GameAdminServiceServer interface {
 	ItemSort(context.Context, *GmItemSortReq) (*ItemSortResp, error)
 	// ItemTransfer 物品容器间移动对象
 	ItemTransfer(context.Context, *GmItemTransferReq) (*ItemTransferResp, error)
-	// ItemAddEntry 向物品容器放入对象（返回变更后的物品容器）
+	// ItemAddEntry 向物品容器放入对象（自动按行优先寻找首个有效位置插入，返回变更后的物品容器）
 	ItemAddEntry(context.Context, *GmItemAddEntryReq) (*ItemContainerListResp, error)
+	// ItemClear 清除物品（传实例ID精确清除单个；不传实例ID清空指定容器，容器类型也为空则全清）
+	ItemClear(context.Context, *GmItemClearReq) (*ItemContainerListResp, error)
 	// HeroList 英雄列表
 	HeroList(context.Context, *GmHeroListReq) (*HeroListResp, error)
 	// HeroAdd 新增英雄
@@ -423,6 +438,9 @@ func (UnimplementedGameAdminServiceServer) ItemTransfer(context.Context, *GmItem
 }
 func (UnimplementedGameAdminServiceServer) ItemAddEntry(context.Context, *GmItemAddEntryReq) (*ItemContainerListResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method ItemAddEntry not implemented")
+}
+func (UnimplementedGameAdminServiceServer) ItemClear(context.Context, *GmItemClearReq) (*ItemContainerListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ItemClear not implemented")
 }
 func (UnimplementedGameAdminServiceServer) HeroList(context.Context, *GmHeroListReq) (*HeroListResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method HeroList not implemented")
@@ -630,6 +648,24 @@ func _GameAdminService_ItemAddEntry_Handler(srv interface{}, ctx context.Context
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GameAdminServiceServer).ItemAddEntry(ctx, req.(*GmItemAddEntryReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameAdminService_ItemClear_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GmItemClearReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameAdminServiceServer).ItemClear(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameAdminService_ItemClear_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameAdminServiceServer).ItemClear(ctx, req.(*GmItemClearReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -942,6 +978,10 @@ var GameAdminService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ItemAddEntry",
 			Handler:    _GameAdminService_ItemAddEntry_Handler,
+		},
+		{
+			MethodName: "ItemClear",
+			Handler:    _GameAdminService_ItemClear_Handler,
 		},
 		{
 			MethodName: "HeroList",

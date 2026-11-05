@@ -250,6 +250,8 @@ const (
 	ErrCode_ERR_CODE_TASK_NOT_ACCEPTED    ErrCode = 4105 // 任务未接取
 	// 活动（活动/任务快照）
 	ErrCode_ERR_CODE_ACTIVITY_UNAVAILABLE ErrCode = 4201 // 活动快照未就绪
+	// 物品
+	ErrCode_ERR_CODE_ITEM_SPACE_NOT_ENOUGH ErrCode = 4202 // 物品容器空间不足
 )
 
 // Enum value maps for ErrCode.
@@ -279,6 +281,7 @@ var (
 		4104: "ERR_CODE_TASK_EXPIRED",
 		4105: "ERR_CODE_TASK_NOT_ACCEPTED",
 		4201: "ERR_CODE_ACTIVITY_UNAVAILABLE",
+		4202: "ERR_CODE_ITEM_SPACE_NOT_ENOUGH",
 	}
 	ErrCode_value = map[string]int32{
 		"ERR_CODE_OK":                       0,
@@ -305,6 +308,7 @@ var (
 		"ERR_CODE_TASK_EXPIRED":             4104,
 		"ERR_CODE_TASK_NOT_ACCEPTED":        4105,
 		"ERR_CODE_ACTIVITY_UNAVAILABLE":     4201,
+		"ERR_CODE_ITEM_SPACE_NOT_ENOUGH":    4202,
 	}
 )
 
@@ -1596,7 +1600,7 @@ const file_common_proto_rawDesc = "" +
 	"\x14ROUTE_CODE_TASK_LIST\x10\xc0W\x12\x1b\n" +
 	"\x16ROUTE_CODE_TASK_NOTIFY\x10\xc1W\x12\x1a\n" +
 	"\x15ROUTE_CODE_TASK_CLAIM\x10\xc2W\x12\x1b\n" +
-	"\x16ROUTE_CODE_TASK_ACCEPT\x10\xc3W*\xe7\x05\n" +
+	"\x16ROUTE_CODE_TASK_ACCEPT\x10\xc3W*\x8c\x06\n" +
 	"\aErrCode\x12\x0f\n" +
 	"\vERR_CODE_OK\x10\x00\x12\x17\n" +
 	"\x12ERR_CODE_FORBIDDEN\x10\x93\x03\x12\x16\n" +
@@ -1621,7 +1625,8 @@ const file_common_proto_rawDesc = "" +
 	"\x1dERR_CODE_TASK_ALREADY_CLAIMED\x10\x87 \x12\x1a\n" +
 	"\x15ERR_CODE_TASK_EXPIRED\x10\x88 \x12\x1f\n" +
 	"\x1aERR_CODE_TASK_NOT_ACCEPTED\x10\x89 \x12\"\n" +
-	"\x1dERR_CODE_ACTIVITY_UNAVAILABLE\x10\xe9 *X\n" +
+	"\x1dERR_CODE_ACTIVITY_UNAVAILABLE\x10\xe9 \x12#\n" +
+	"\x1eERR_CODE_ITEM_SPACE_NOT_ENOUGH\x10\xea *X\n" +
 	"\vNOTIFY_TYPE\x12\x14\n" +
 	"\x10NOTIFY_TYPE_KICK\x10\x00\x12\x18\n" +
 	"\x14NOTIFY_TYPE_MAINTAIN\x10\x02\x12\x19\n" +

@@ -23,8 +23,10 @@ type GmItemLogic interface {
 	ItemSort(req dto.GmItemSortReq) error
 	// ItemTransfer 物品容器间移动物品（返回变更后的源/目标容器）
 	ItemTransfer(req dto.GmItemTransferReq) ([]dto.GmItemResp, error)
-	// ItemAddEntry 向物品容器放入对象（返回变更后的容器）
+	// ItemAddEntry 向物品容器放入对象（服务端按"从左往右、从上到下"自动落位，返回变更后的容器）
 	ItemAddEntry(req dto.GmItemAddEntryReq) ([]dto.GmItemResp, error)
+	// ItemClear 清除物品（传实例ID精确清除单个；不传实例ID清空指定容器，容器类型为 0 时全清）
+	ItemClear(req dto.GmItemClearReq) ([]dto.GmItemResp, error)
 }
 
 // gmItemLogicInst 物品容器 GM 业务单例容器。
@@ -123,11 +125,21 @@ func (this *gmItemLogic) ItemAddEntry(req dto.GmItemAddEntryReq) ([]dto.GmItemRe
 		ContainerType: req.ContainerType,
 		CfgId:         req.ItemCfgID,
 		Count:         req.Count,
-		GridX:         req.GridX,
-		GridY:         req.GridY,
-		Rotated:       req.Rotated,
 	}
 	resp, err := gmCall[pb.ItemContainerListResp](context.Background(), req.PlayerID, pb.GameAdminService_ItemAddEntry_FullMethodName, callReq)
+	if err != nil {
+		return nil, err
+	}
+	return toGmItemResps(req.PlayerID, resp.GetItemContainers()), nil
+}
+
+func (this *gmItemLogic) ItemClear(req dto.GmItemClearReq) ([]dto.GmItemResp, error) {
+	callReq := &pb.GmItemClearReq{
+		PlayerId:      req.PlayerID,
+		ContainerType: req.ContainerType,
+		ItemId:        req.ItemID,
+	}
+	resp, err := gmCall[pb.ItemContainerListResp](context.Background(), req.PlayerID, pb.GameAdminService_ItemClear_FullMethodName, callReq)
 	if err != nil {
 		return nil, err
 	}

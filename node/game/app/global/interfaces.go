@@ -71,8 +71,11 @@ type ItemLogic interface {
 	ItemSort(ctx context.Context, playerID int64, req *pb.ItemSortReq) (*pb.ItemSortResp, error)
 	// ItemTransfer 物品容器间移动物品
 	ItemTransfer(ctx context.Context, playerID int64, req *pb.ItemTransferReq) (*pb.ItemTransferResp, error)
-	// ItemAddEntry 向物品容器放入对象（GM，返回变更后的物品容器）
+	// ItemAddEntry 向物品容器放入对象（GM，自动按"从左往右、从上到下"寻找首个有效位置插入，返回变更后的物品容器）
 	ItemAddEntry(ctx context.Context, playerID int64, req *pb.GmItemAddEntryReq) (*pb.ItemContainerListResp, error)
+	// ItemClear 清除物品（GM，返回变更后的物品容器）：携带实例ID在目标容器范围内精确清除单个；
+	// 不传实例ID清空指定容器，container_type 为 0 时清空全部容器
+	ItemClear(ctx context.Context, playerID int64, req *pb.GmItemClearReq) (*pb.ItemContainerListResp, error)
 }
 
 // HeroLogic 英雄业务接口

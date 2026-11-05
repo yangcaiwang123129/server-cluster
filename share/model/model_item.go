@@ -25,6 +25,7 @@ var (
 	ErrItemExists       = container.ErrItemExists
 	ErrPositionConflict = container.ErrPositionConflict
 	ErrContainerLocked  = container.ErrContainerLocked
+	ErrNoSpace          = container.ErrNoSpace
 )
 
 // ItemContainer 业务层容器便捷别名（= container.BaseContainer[*ItemEntry]）。

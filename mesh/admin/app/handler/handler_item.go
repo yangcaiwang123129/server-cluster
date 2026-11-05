@@ -19,6 +19,7 @@ func RegisterItem(router http.Router) {
 	POST(g, "/item/sort", handleGmItemSort)
 	POST(g, "/item/transfer", handleGmItemTransfer)
 	POST(g, "/item/add", handleGmItemAdd)
+	POST(g, "/item/clear", handleGmItemClear)
 }
 
 // handleGmItemList 物品容器列表。
@@ -118,4 +119,19 @@ func handleGmItemAdd(ctx http.Context) ([]dto.GmItemResp, error) {
 		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
 	return logic.GmItem().ItemAddEntry(req)
+}
+
+// handleGmItemClear 清除物品（传实例ID精确清除单个；不传实例ID清空指定容器，容器类型为 0 时全清）。
+// @Summary GM 清除物品
+// @Tags gm
+// @Produce json
+// @Param body body dto.GmItemClearReq true "清除参数"
+// @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
+// @Router /api/v1/gm/item/clear [post]
+func handleGmItemClear(ctx http.Context) ([]dto.GmItemResp, error) {
+	var req dto.GmItemClearReq
+	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.ContainerType < 0 || req.ContainerType > 3 || req.ItemID < 0 {
+		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
+	}
+	return logic.GmItem().ItemClear(req)
 }
