@@ -1,30 +1,21 @@
-// CI/CD 流水线：参数选择环境/版本/服务器 → 拉代码 → 构建打包 → scp 分发重启。
 pipeline {
     agent any
 
-    // 【修复说明】
-    // 1. 不再在 parameters {} 里混写，统一用 properties 注入
-    // 2. SERVERS 使用 ET_MULTI_SELECT 类型，支持 Ctrl+鼠标点击多选
-    // 3. Active Choices 的 script 闭包使用标准 Map 格式，避免浏览器渲染空白
     parameters {
         choice(name: 'ENV', choices: ['audit', 'test', 'release', 'prod'], description: '环境')
         string(name: 'VERSION', defaultValue: '', description: '版本号，如 v1.2.3')
         string(name: 'BRANCH', defaultValue: 'main', description: '分支（TAG 为空时生效）')
         string(name: 'TAG', defaultValue: '', description: 'Tag（非空时优先，按 tag 检出）')
 
-        // 使用 Active Choices 的多选列表框
-        [
-            $class: 'DynamicReferenceParameter',
+        // 使用 Extended Choice Parameter 的多选列表框，支持 Ctrl+鼠标点击多选
+        extendedChoice(
             name: 'SERVERS',
             description: '服务器（按住 Ctrl 或 Shift 多选）',
-            choiceType: 'ET_MULTI_SELECT',
-            referencedParameters: '',
-            script: [
-                $class: 'GroovyScript',
-                fallbackScript: [classpath: [], sandbox: true, script: 'return []'],
-                script: [classpath: [], sandbox: true, script: "return ['gate-1', 'game-1', 'battle-1', 'social-1', 'login-1', 'admin-1']"]
-            ]
-        ]
+            type: 'PT_MULTI_SELECT',
+            value: 'gate-1,game-1,battle-1,social-1,login-1,admin-1',
+            multiSelectDelimiter: ' ',
+            visibleItemCount: 6
+        )
     }
 
     stages {
@@ -32,7 +23,6 @@ pipeline {
             steps {
                 script {
                     if (params.TAG?.trim()) {
-                        // 按 tag 拉取本次发布版本代码
                         checkout([$class: 'GitSCM',
                                   branches: [[name: "refs/tags/${params.TAG}"]],
                                   userRemoteConfigs: scm.userRemoteConfigs])
@@ -46,12 +36,11 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    // 确保多选的值安全转换为空格分隔的字符串
-                    def servers = (params.SERVERS instanceof List) ? params.SERVERS.join(' ') : (params.SERVERS ?: '')
-                    if (!servers?.trim()) {
+                    // Extended Choice 多选返回值是分隔符拼接的字符串（此处已设为空格）
+                    def servers = params.SERVERS?.trim() ?: ''
+                    if (!servers) {
                         error("SERVERS 不能为空，请至少选择一台服务器！")
                     }
-
                     sh 'bash deploy/scripts/build.sh --env "$ENV" --version "$VERSION" --servers "$servers"'
                 }
             }
@@ -60,8 +49,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    def servers = (params.SERVERS instanceof List) ? params.SERVERS.join(' ') : (params.SERVERS ?: '')
-
+                    def servers = params.SERVERS?.trim() ?: ''
                     sh 'bash deploy/cicd/deploy.sh --env "$ENV" --version "$VERSION" --servers "$servers"'
                 }
             }
