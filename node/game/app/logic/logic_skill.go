@@ -25,9 +25,9 @@ type skillLogic struct {
 var skillLogicInst = singleton.NewContainer[global.SkillLogic]("SkillLogic")
 
 func init() {
-	c := cache.NewPlayerTableCache[model.PlayerSkill](cache.CacherConfig{Name: enum.TablePlayerSkill.String()})
-	global.RegisterCacheCloser(c)
-	skillLogicInst.Register(&skillLogic{cache: c})
+	sLogic := &skillLogic{cache: cache.NewPlayerTableCache[model.PlayerSkill](cache.CacherConfig{Name: enum.TablePlayerSkill.String()})}
+	skillLogicInst.Register(sLogic)
+	cache.RegisterCacheCloser(sLogic.cache)
 	registerAsset(&skillAssetStore{})
 }
 

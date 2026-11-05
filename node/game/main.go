@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"server-cluster/internal/cache"
 	"server-cluster/internal/router"
 	"server-cluster/internal/singleinstance"
 	_ "server-cluster/node/game/app/handler" // 触发 handler_gm_player.go 的 init() 注册路由到 routes 切片
@@ -68,13 +69,13 @@ func main() {
 	destroy()
 }
 
-// destroy 进程退出后释放缓存刷盘、DB/Redis 等资源，并按统一停服日志输出（缓存收口在 global 包）。
+// destroy 进程退出后释放缓存刷盘、DB/Redis 等资源，并按统一停服日志输出（缓存收口在 internal/cache 包）。
 func destroy() {
 	sl := util.NewShutdownLog(consts.NodeInstanceID(), 2)
 	sl.Start()
 
 	sl.Step("玩家数据缓存落盘", func() (string, error) {
-		stats := global.CloseCaches()
+		stats := cache.CloseCaches()
 		rows := 0
 		lines := make([]string, 0, len(stats))
 		for _, s := range stats {

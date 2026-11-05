@@ -32,8 +32,8 @@ var taskLogicInst = singleton.NewContainer[global.TaskLogic]("TaskLogic")
 func init() {
 	task := cache.NewPlayerTableCache[model.PlayerTask](cache.CacherConfig{Name: enum.TablePlayerTask.String()})
 	activity := cache.NewPlayerTableCache[model.PlayerActivity](cache.CacherConfig{Name: enum.TableActivity.String()})
-	global.RegisterCacheCloser(task)
-	global.RegisterCacheCloser(activity)
+	cache.RegisterCacheCloser(task)
+	cache.RegisterCacheCloser(activity)
 	taskLogicInst.Register(&taskLogic{task: task, activity: activity})
 }
 

@@ -25,9 +25,9 @@ type weaponLogic struct {
 var weaponLogicInst = singleton.NewContainer[global.WeaponLogic]("WeaponLogic")
 
 func init() {
-	c := cache.NewPlayerTableCache[model.PlayerWeapon](cache.CacherConfig{Name: enum.TablePlayerWeapon.String()})
-	global.RegisterCacheCloser(c)
-	weaponLogicInst.Register(&weaponLogic{cache: c})
+	wLogic := &weaponLogic{cache: cache.NewPlayerTableCache[model.PlayerWeapon](cache.CacherConfig{Name: enum.TablePlayerWeapon.String()})}
+	weaponLogicInst.Register(wLogic)
+	cache.RegisterCacheCloser(wLogic.cache)
 	registerAsset(&weaponAssetStore{})
 }
 

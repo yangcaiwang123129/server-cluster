@@ -26,9 +26,9 @@ type heroLogic struct {
 var heroLogicInst = singleton.NewContainer[global.HeroLogic]("HeroLogic")
 
 func init() {
-	c := cache.NewPlayerTableCache[model.PlayerHero](cache.CacherConfig{Name: enum.TablePlayerHero.String()})
-	global.RegisterCacheCloser(c)
-	heroLogicInst.Register(&heroLogic{cache: c})
+	hLogic := &heroLogic{cache: cache.NewPlayerTableCache[model.PlayerHero](cache.CacherConfig{Name: enum.TablePlayerHero.String()})}
+	heroLogicInst.Register(hLogic)
+	cache.RegisterCacheCloser(hLogic.cache)
 	registerAsset(&heroAssetStore{})
 }
 

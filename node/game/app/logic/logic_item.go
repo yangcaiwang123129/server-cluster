@@ -28,9 +28,9 @@ type itemLogic struct {
 var itemLogicInst = singleton.NewContainer[global.ItemLogic]("ItemLogic")
 
 func init() {
-	c := cache.NewPlayerTableCache[model.PlayerItem](cache.CacherConfig{Name: enum.TablePlayerItem.String()})
-	global.RegisterCacheCloser(c)
-	itemLogicInst.Register(&itemLogic{cache: c})
+	iLogic := &itemLogic{cache: cache.NewPlayerTableCache[model.PlayerItem](cache.CacherConfig{Name: enum.TablePlayerItem.String()})}
+	itemLogicInst.Register(iLogic)
+	cache.RegisterCacheCloser(iLogic.cache)
 	registerAsset(&itemAssetStore{})
 }
 

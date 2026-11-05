@@ -10,7 +10,6 @@ import (
 	"github.com/dobyte/due/v2/etc"
 	"github.com/dobyte/due/v2/log"
 
-	"server-cluster/node/game/app/global"
 	"server-cluster/node/game/app/logic"
 	"server-cluster/share/pb"
 	"server-cluster/share/util"
@@ -82,8 +81,8 @@ func Register(proxy *node.Proxy) {
 		}
 	}
 
-	// 玩家 actor 启动时注册业务路由（actor 基础设施在 global 包，注册器由 handler 注入以避免循环依赖）
-	global.RegisterActorRouteRegistrar(bindActor)
+	// 玩家 actor 启动时注册业务路由（actor 基础设施在 logic 包，注册器由 router 注入）
+	logic.RegisterActorRouteRegistrar(bindActor)
 
 	// 断线兜底清理：客户端未走 LeaveGame 直接掉线时销毁玩家 actor（销毁幂等）。
 	proxy.AddEventHandler(cluster.Disconnect, func(ctx node.Context) {

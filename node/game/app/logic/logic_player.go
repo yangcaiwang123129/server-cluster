@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"server-cluster/internal/actor"
 	"server-cluster/node/game/app/repo"
 	"strconv"
 	"strings"
@@ -30,22 +31,29 @@ import (
 	"server-cluster/share/util"
 )
 
+// actorKindPlayer 玩家 actor 类型。
+const actorKindPlayer = "player"
+
 type playerLogic struct {
 	// cache 玩家核心数值（player_extra，一玩家一行）。
 	cache *cache.Cache[int64, *model.PlayerExtra]
 	// attrHandlers 属性类型 → 操作实现（见 newAttrHandlers）。
 	attrHandlers map[pb.Attr]attrHandler
+	// PlayerActors 在线玩家 actor 表（playerID -> 玩家 actor）。
+	PlayerActors *util.SafeMap[int64, *actor.PlayerActor]
 }
 
 var playerLogicInst = singleton.NewContainer[global.PlayerLogic]("PlayerLogic")
 
 func init() {
-	c := cache.NewPlayerTableCache[model.PlayerExtra](cache.CacherConfig{Name: enum.TablePlayerExtra.String()})
-	global.RegisterCacheCloser(c)
-	playerLogicInst.Register(&playerLogic{
-		cache:        c,
+	pLogic := &playerLogic{
+		cache:        cache.NewPlayerTableCache[model.PlayerExtra](cache.CacherConfig{Name: enum.TablePlayerExtra.String()}),
 		attrHandlers: newAttrHandlers(),
-	})
+		PlayerActors: util.NewSafeMap[int64, *actor.PlayerActor](),
+	}
+
+	playerLogicInst.Register(pLogic)
+	cache.RegisterCacheCloser(pLogic.cache)
 }
 
 // moduleLogics 延迟获取持有玩家数据的模块（init 注册顺序不确定，不能在包初始化阶段调用）。
@@ -233,16 +241,81 @@ func codedResult(err error) *pb.Result {
 	return errs.BuildErrResult(pb.ErrCode(c.Code()), c.Message())
 }
 
-func (this *playerLogic) GetActor(ctx context.Context, playerID int64) (*global.PlayerActor, error) {
-	if pa, ok := global.PlayerActors.Get(playerID); ok {
+// ── 玩家 actor 基础设施：唯一标识、在线登记表、处理器与路由注册器注入 ──
+// actor 生命周期与在线登记一一对应：processor.Start 时写入 PlayerActors 并绑定 uid、
+// 注册业务路由，processor.Destroy 时从 PlayerActors 移除登记。
+
+// playerActorID 玩家 actor 唯一标识。
+func playerActorID(playerID int64) string {
+	return strconv.FormatInt(playerID, 10)
+}
+
+// playerActorMap 获取在线玩家 actor 表。
+func playerActorMap() *util.SafeMap[int64, *actor.PlayerActor] {
+	return playerLogicInst.MustGet().(*playerLogic).PlayerActors
+}
+
+// actorRouteRegistrar 玩家 actor 路由注册器，由 handler 包装配期注入（避免 logic → handler 循环依赖）。
+var actorRouteRegistrar func(act *node.Actor)
+
+// RegisterActorRouteRegistrar 注入玩家 actor 路由注册器（handler 包在装配期调用）。
+func RegisterActorRouteRegistrar(fn func(act *node.Actor)) {
+	actorRouteRegistrar = fn
+}
+
+// playerProcessor 玩家 actor 处理器：生命周期与在线登记一一对应。
+type playerProcessor struct {
+	node.BaseProcessor
+	actor    *node.Actor
+	playerID int64
+	loginIP  string
+}
+
+// newPlayerProcessor due actor Creator。
+func newPlayerProcessor(act *node.Actor, args ...any) node.Processor {
+	var playerID int64
+	var loginIP string
+	if len(args) > 0 {
+		playerID, _ = args[0].(int64)
+	}
+	if len(args) > 1 {
+		loginIP, _ = args[1].(string)
+	}
+	return &playerProcessor{actor: act, playerID: playerID, loginIP: loginIP}
+}
+
+func (p *playerProcessor) Start() {
+	playerActorMap().Set(p.playerID, &actor.PlayerActor{
+		Actor:     p.actor,
+		PlayerID:  p.playerID,
+		EnterTime: util.Now().Unix(),
+		LoginIP:   p.loginIP,
+	})
+
+	// uid 与 actor 绑定：stateful 消息由 scheduler 定位到本 actor
+	if err := p.actor.Proxy().BindActor(p.playerID, actorKindPlayer, p.actor.ID()); err != nil {
+		log.Errorf("game: bind player actor failed, playerID=%d: %v", p.playerID, err)
+	}
+	// 注册业务路由：消息进入 actor 后串行处理
+	if actorRouteRegistrar != nil {
+		actorRouteRegistrar(p.actor)
+	}
+}
+
+func (p *playerProcessor) Destroy() {
+	playerActorMap().Delete(p.playerID)
+}
+
+func (this *playerLogic) GetActor(ctx context.Context, playerID int64) (*actor.PlayerActor, error) {
+	if pa, ok := this.PlayerActors.Get(playerID); ok {
 		return pa, nil
 	}
 	return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_PLAYER_NOT_FOUND, "player actor not found")
 }
 
-func (this *playerLogic) GetActors(ctx context.Context) ([]*global.PlayerActor, error) {
-	actors := make([]*global.PlayerActor, 0, global.PlayerActors.Len())
-	global.PlayerActors.Range(func(_ int64, pa *global.PlayerActor) bool {
+func (this *playerLogic) GetActors(ctx context.Context) ([]*actor.PlayerActor, error) {
+	actors := make([]*actor.PlayerActor, 0, this.PlayerActors.Len())
+	this.PlayerActors.Range(func(_ int64, pa *actor.PlayerActor) bool {
 		actors = append(actors, pa)
 		return true
 	})
@@ -250,18 +323,18 @@ func (this *playerLogic) GetActors(ctx context.Context) ([]*global.PlayerActor, 
 }
 
 func (this *playerLogic) CreateActor(ctx context.Context, playerID int64, loginIP string) error {
-	if global.PlayerActors.Has(playerID) {
+	if this.PlayerActors.Has(playerID) {
 		// 已在线：幂等更新登录 IP 与重连时间（断线重连可能换 IP；ReconnectAt 供断线延迟销毁豁免判断）
-		if pa, ok := global.PlayerActors.Get(playerID); ok {
+		if pa, ok := this.PlayerActors.Get(playerID); ok {
 			pa.LoginIP = loginIP
 			pa.ReconnectAt = util.Now().Unix()
 		}
 		return nil
 	}
 
-	_, err := svc.NodeProxy().Spawn(global.NewPlayerProcessor,
-		node.WithActorKind(global.ActorKindPlayer),
-		node.WithActorID(global.ActorID(playerID)),
+	_, err := svc.NodeProxy().Spawn(newPlayerProcessor,
+		node.WithActorKind(actorKindPlayer),
+		node.WithActorID(playerActorID(playerID)),
 		node.WithActorArgs(playerID, loginIP))
 	if err == nil {
 		return nil
@@ -271,11 +344,11 @@ func (this *playerLogic) CreateActor(ctx context.Context, playerID int64, loginI
 	}
 
 	// 并发重复创建：actor 已由他人创建，读回并补齐本地登记。
-	pa, ok := svc.NodeProxy().Actor(global.ActorKindPlayer, global.ActorID(playerID))
+	pa, ok := svc.NodeProxy().Actor(actorKindPlayer, playerActorID(playerID))
 	if !ok {
 		return err
 	}
-	global.PlayerActors.Set(playerID, &global.PlayerActor{
+	this.PlayerActors.Set(playerID, &actor.PlayerActor{
 		Actor:     pa,
 		PlayerID:  playerID,
 		EnterTime: util.Now().Unix(),
@@ -285,8 +358,8 @@ func (this *playerLogic) CreateActor(ctx context.Context, playerID int64, loginI
 }
 
 func (this *playerLogic) DestroyActor(ctx context.Context, playerID int64) error {
-	svc.NodeProxy().Kill(global.ActorKindPlayer, global.ActorID(playerID))
-	global.PlayerActors.Delete(playerID)
+	svc.NodeProxy().Kill(actorKindPlayer, playerActorID(playerID))
+	this.PlayerActors.Delete(playerID)
 
 	if nc, ok := ctx.(node.Context); ok {
 		_ = nc.UnbindGate(playerID)
@@ -296,7 +369,7 @@ func (this *playerLogic) DestroyActor(ctx context.Context, playerID int64) error
 }
 
 func (this *playerLogic) DestroyActorIfOffline(ctx context.Context, playerID int64, since int64) error {
-	pa, ok := global.PlayerActors.Get(playerID)
+	pa, ok := this.PlayerActors.Get(playerID)
 	if !ok {
 		return nil // actor 已不存在（正常走 LeaveGame 清理），幂等
 	}
@@ -307,7 +380,7 @@ func (this *playerLogic) DestroyActorIfOffline(ctx context.Context, playerID int
 }
 
 func (this *playerLogic) Kick(ctx context.Context, playerID int64) error {
-	if !global.PlayerActors.Has(playerID) {
+	if !this.PlayerActors.Has(playerID) {
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_PLAYER_NOT_FOUND, "player is not online")
 	}
 	if err := this.DestroyActor(ctx, playerID); err != nil {

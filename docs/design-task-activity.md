@@ -724,7 +724,7 @@ node/game/app/
 7. `logic_activity.go`：开服策略计算 + 实例生成 + 状态推进 + GM 操作
 8. Redis 快照发布（version + payload）
 9. `handler_activity.go` + admin 路由注册
-10. game 侧 `logic_activity_sync.go`：订阅 `sc:activity:changed` + 10s 轮询 Redis 快照 + 本地缓存
+10. game 侧 `logic_activity.go`：订阅 `sc:activity:changed` + 10s 轮询 Redis 快照 + 本地缓存
 
 ### P2 任务系统（game 侧）✅ 已完成
 
@@ -845,7 +845,7 @@ func (this *activityLogic) tick(ctx context.Context) {
 ### 12.3 game 快照同步（Redis 轮询）
 
 ```go
-// logic_activity_sync.go
+// logic_activity.go
 func (this *activitySync) loop(ctx context.Context) {
     t := time.NewTicker(consts.ActivitySnapshotInterval) // 10s
     defer t.Stop()

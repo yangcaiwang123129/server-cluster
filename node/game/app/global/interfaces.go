@@ -4,6 +4,8 @@ package global
 
 import (
 	"context"
+	"server-cluster/internal/actor"
+
 	"server-cluster/share/model"
 
 	"server-cluster/share/pb"
@@ -33,9 +35,9 @@ type PlayerModule[T model.PlayerRow] interface {
 type PlayerLogic interface {
 	PlayerModule[*model.PlayerExtra]
 	// GetActor 获取玩家actor
-	GetActor(ctx context.Context, playerID int64) (*PlayerActor, error)
+	GetActor(ctx context.Context, playerID int64) (*actor.PlayerActor, error)
 	// GetActors 玩家获取所有actor
-	GetActors(ctx context.Context) ([]*PlayerActor, error)
+	GetActors(ctx context.Context) ([]*actor.PlayerActor, error)
 	// CreateActor 玩家创建actor（verify 首包绑定后调用）；loginIP 由 handler 从 node.Context.GetIP() 取后传入，内存维护
 	CreateActor(ctx context.Context, playerID int64, loginIP string) error
 	// DestroyActor 玩家销毁actor

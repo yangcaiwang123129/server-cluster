@@ -27,9 +27,9 @@ type mailLogic struct {
 var mailLogicInst = singleton.NewContainer[global.MailLogic]("MailLogic")
 
 func init() {
-	c := cache.NewPlayerTableCache[model.PlayerMail](cache.CacherConfig{Name: enum.TablePlayerMail.String()})
-	global.RegisterCacheCloser(c)
-	mailLogicInst.Register(&mailLogic{cache: c})
+	mLogic := &mailLogic{cache: cache.NewPlayerTableCache[model.PlayerMail](cache.CacherConfig{Name: enum.TablePlayerMail.String()})}
+	mailLogicInst.Register(mLogic)
+	cache.RegisterCacheCloser(mLogic.cache)
 }
 
 // Mail 获取邮件业务单例。

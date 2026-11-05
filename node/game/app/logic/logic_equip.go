@@ -25,9 +25,9 @@ type equipLogic struct {
 var equipLogicInst = singleton.NewContainer[global.EquipLogic]("EquipLogic")
 
 func init() {
-	c := cache.NewPlayerTableCache[model.PlayerEquip](cache.CacherConfig{Name: enum.TablePlayerEquip.String()})
-	global.RegisterCacheCloser(c)
-	equipLogicInst.Register(&equipLogic{cache: c})
+	eLogic := &equipLogic{cache: cache.NewPlayerTableCache[model.PlayerEquip](cache.CacherConfig{Name: enum.TablePlayerEquip.String()})}
+	equipLogicInst.Register(eLogic)
+	cache.RegisterCacheCloser(eLogic.cache)
 	registerAsset(&equipAssetStore{})
 }
 
