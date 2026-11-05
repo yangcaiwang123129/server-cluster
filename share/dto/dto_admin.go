@@ -218,8 +218,8 @@ type GmEquipWearReq struct {
 	HeroID   int32 `json:"heroId"`          // 目标英雄ID，0 表示出战英雄
 }
 
-// GmEquipUnwearReq 装备卸载请求。
-type GmEquipUnwearReq struct {
+// GmEquipUnWearReq 装备卸载请求。
+type GmEquipUnWearReq struct {
 	PlayerID int64 `json:"playerId,string"` // 玩家ID
 	ID       int64 `json:"id,string"`       // 装备实例ID
 }

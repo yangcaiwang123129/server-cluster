@@ -1356,8 +1356,8 @@ func (x *GmEquipWearReq) GetHeroId() int32 {
 	return 0
 }
 
-// GmEquipUnwearReq 装备卸载请求。
-type GmEquipUnwearReq struct {
+// GmEquipUnWearReq 装备卸载请求。
+type GmEquipUnWearReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家ID
 	EquipId       int64                  `protobuf:"varint,2,opt,name=equip_id,json=equipId,proto3" json:"equip_id,omitempty"`    // 装备实例ID
@@ -1365,20 +1365,20 @@ type GmEquipUnwearReq struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GmEquipUnwearReq) Reset() {
-	*x = GmEquipUnwearReq{}
+func (x *GmEquipUnWearReq) Reset() {
+	*x = GmEquipUnWearReq{}
 	mi := &file_internal_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GmEquipUnwearReq) String() string {
+func (x *GmEquipUnWearReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GmEquipUnwearReq) ProtoMessage() {}
+func (*GmEquipUnWearReq) ProtoMessage() {}
 
-func (x *GmEquipUnwearReq) ProtoReflect() protoreflect.Message {
+func (x *GmEquipUnWearReq) ProtoReflect() protoreflect.Message {
 	mi := &file_internal_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1390,19 +1390,19 @@ func (x *GmEquipUnwearReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GmEquipUnwearReq.ProtoReflect.Descriptor instead.
-func (*GmEquipUnwearReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use GmEquipUnWearReq.ProtoReflect.Descriptor instead.
+func (*GmEquipUnWearReq) Descriptor() ([]byte, []int) {
 	return file_internal_proto_rawDescGZIP(), []int{25}
 }
 
-func (x *GmEquipUnwearReq) GetPlayerId() int64 {
+func (x *GmEquipUnWearReq) GetPlayerId() int64 {
 	if x != nil {
 		return x.PlayerId
 	}
 	return 0
 }
 
-func (x *GmEquipUnwearReq) GetEquipId() int64 {
+func (x *GmEquipUnWearReq) GetEquipId() int64 {
 	if x != nil {
 		return x.EquipId
 	}
@@ -1655,7 +1655,7 @@ const file_internal_proto_rawDesc = "" +
 	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12\x19\n" +
 	"\bequip_id\x18\x02 \x01(\x03R\aequipId\x12\x17\n" +
 	"\ahero_id\x18\x03 \x01(\x05R\x06heroId\"J\n" +
-	"\x10GmEquipUnwearReq\x12\x1b\n" +
+	"\x10GmEquipUnWearReq\x12\x1b\n" +
 	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12\x19\n" +
 	"\bequip_id\x18\x02 \x01(\x03R\aequipId\",\n" +
 	"\rGmMailListReq\x12\x1b\n" +
@@ -1692,7 +1692,7 @@ const file_internal_proto_rawDesc = "" +
 	"\x0eEquipUpQuality\x12\x1d.internal.GmEquipUpQualityReq\x1a\x16.pb.EquipUpQualityResp\x12P\n" +
 	"\x11EquipBreakthrough\x12 .internal.GmEquipBreakthroughReq\x1a\x19.pb.EquipBreakthroughResp\x128\n" +
 	"\tEquipWear\x12\x18.internal.GmEquipWearReq\x1a\x11.pb.EquipWearResp\x12>\n" +
-	"\vEquipUnwear\x12\x1a.internal.GmEquipUnwearReq\x1a\x13.pb.EquipUnwearResp\x12=\n" +
+	"\vEquipUnWear\x12\x1a.internal.GmEquipUnWearReq\x1a\x13.pb.EquipUnWearResp\x12=\n" +
 	"\bMailList\x12\x17.internal.GmMailListReq\x1a\x18.internal.GmMailListResp\x122\n" +
 	"\bMailSend\x12\x17.internal.GmMailSendReq\x1a\r.pb.MailEntryB\x19Z\x17server-cluster/share/pbb\x06proto3"
 
@@ -1735,7 +1735,7 @@ var file_internal_proto_goTypes = []any{
 	(*GmEquipUpQualityReq)(nil),    // 22: internal.GmEquipUpQualityReq
 	(*GmEquipBreakthroughReq)(nil), // 23: internal.GmEquipBreakthroughReq
 	(*GmEquipWearReq)(nil),         // 24: internal.GmEquipWearReq
-	(*GmEquipUnwearReq)(nil),       // 25: internal.GmEquipUnwearReq
+	(*GmEquipUnWearReq)(nil),       // 25: internal.GmEquipUnWearReq
 	(*GmMailListReq)(nil),          // 26: internal.GmMailListReq
 	(*GmMailListResp)(nil),         // 27: internal.GmMailListResp
 	(*GmMailSendReq)(nil),          // 28: internal.GmMailSendReq
@@ -1767,7 +1767,7 @@ var file_internal_proto_goTypes = []any{
 	(*EquipUpQualityResp)(nil),     // 54: pb.EquipUpQualityResp
 	(*EquipBreakthroughResp)(nil),  // 55: pb.EquipBreakthroughResp
 	(*EquipWearResp)(nil),          // 56: pb.EquipWearResp
-	(*EquipUnwearResp)(nil),        // 57: pb.EquipUnwearResp
+	(*EquipUnWearResp)(nil),        // 57: pb.EquipUnWearResp
 }
 var file_internal_proto_depIdxs = []int32{
 	0,  // 0: internal.GetOnlinePlayersResp.players:type_name -> internal.OnlinePlayer
@@ -1804,7 +1804,7 @@ var file_internal_proto_depIdxs = []int32{
 	22, // 31: internal.GameAdminService.EquipUpQuality:input_type -> internal.GmEquipUpQualityReq
 	23, // 32: internal.GameAdminService.EquipBreakthrough:input_type -> internal.GmEquipBreakthroughReq
 	24, // 33: internal.GameAdminService.EquipWear:input_type -> internal.GmEquipWearReq
-	25, // 34: internal.GameAdminService.EquipUnwear:input_type -> internal.GmEquipUnwearReq
+	25, // 34: internal.GameAdminService.EquipUnWear:input_type -> internal.GmEquipUnWearReq
 	26, // 35: internal.GameAdminService.MailList:input_type -> internal.GmMailListReq
 	28, // 36: internal.GameAdminService.MailSend:input_type -> internal.GmMailSendReq
 	2,  // 37: internal.GameAdminService.GetOnlinePlayers:output_type -> internal.GetOnlinePlayersResp
@@ -1828,7 +1828,7 @@ var file_internal_proto_depIdxs = []int32{
 	54, // 55: internal.GameAdminService.EquipUpQuality:output_type -> pb.EquipUpQualityResp
 	55, // 56: internal.GameAdminService.EquipBreakthrough:output_type -> pb.EquipBreakthroughResp
 	56, // 57: internal.GameAdminService.EquipWear:output_type -> pb.EquipWearResp
-	57, // 58: internal.GameAdminService.EquipUnwear:output_type -> pb.EquipUnwearResp
+	57, // 58: internal.GameAdminService.EquipUnWear:output_type -> pb.EquipUnWearResp
 	27, // 59: internal.GameAdminService.MailList:output_type -> internal.GmMailListResp
 	39, // 60: internal.GameAdminService.MailSend:output_type -> pb.MailEntry
 	37, // [37:61] is the sub-list for method output_type

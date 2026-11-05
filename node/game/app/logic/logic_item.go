@@ -262,43 +262,62 @@ func (this *itemLogic) ItemAddEntry(ctx context.Context, playerID int64, req *pb
 	return &pb.ItemContainerListResp{ItemContainers: []*pb.ItemContainer{convert.ItemContainer(playerID, c)}}, nil
 }
 
-func (this *itemLogic) ItemClear(ctx context.Context, playerID int64, req *pb.GmItemClearReq) (*pb.ItemContainerListResp, error) {
+func (this *itemLogic) GmItemClear(ctx context.Context, playerID int64, req *pb.GmItemClearReq) (*pb.ItemContainerListResp, error) {
+	containers, err := this.clearItems(ctx, playerID, pb.ContainerType(req.GetContainerType()), req.GetItemId())
+	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.ItemContainerListResp{Result: r}, nil
+		}
+		return nil, err
+	}
+	return &pb.ItemContainerListResp{ItemContainers: containers}, nil
+}
+
+func (this *itemLogic) ItemClear(ctx context.Context, playerID int64, req *pb.ItemClearReq) (*pb.ItemClearResp, error) {
+	containers, err := this.clearItems(ctx, playerID, req.GetContainerType(), req.GetId())
+	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.ItemClearResp{Result: r}, nil
+		}
+		return nil, err
+	}
+	return &pb.ItemClearResp{ItemContainers: containers}, nil
+}
+
+// clearItems 清除物品核心：container_type 合法时只操作该容器（0/未指定作用于全部容器）；
+// itemID>0 范围内精确清除单个物品实例（找不到报参数错误），itemID=0 清空范围内全部物品，返回变更后的容器。
+func (this *itemLogic) clearItems(ctx context.Context, playerID int64, containerType pb.ContainerType, itemID int64) ([]*pb.ItemContainer, error) {
 	pc, err := this.Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
 
-	// container_type 合法时只操作该容器，否则（0/未指定）作用于全部容器
 	var containers []*model.ItemContainer
-	if typ, ok := convert.ContainerTypeToModel(pb.ContainerType(req.GetContainerType())); ok {
+	if typ, ok := convert.ContainerTypeToModel(pb.ContainerType(containerType)); ok {
 		c := pc.ByType(typ)
 		if c == nil {
-			return &pb.ItemContainerListResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "")}, nil
+			return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "")
 		}
 		containers = []*model.ItemContainer{c}
 	} else {
 		containers = pc.All()
 	}
 
-	if id := req.GetItemId(); id > 0 {
+	if itemID > 0 {
 		// 传实例ID：范围内精确清除单个物品实例
 		removed := false
 		for _, c := range containers {
-			if c.GetEntry(id) == nil {
+			if c.GetEntry(itemID) == nil {
 				continue
 			}
-			if _, err := c.RemoveEntry(id); err != nil {
-				err = itemErr(err)
-				if r := codedResult(err); r != nil {
-					return &pb.ItemContainerListResp{Result: r}, nil
-				}
-				return nil, err
+			if _, err := c.RemoveEntry(itemID); err != nil {
+				return nil, itemErr(err)
 			}
 			removed = true
 			break
 		}
 		if !removed {
-			return &pb.ItemContainerListResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "物品不存在")}, nil
+			return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "物品不存在")
 		}
 	} else {
 		// 不传实例ID：清空范围内全部物品
@@ -314,7 +333,7 @@ func (this *itemLogic) ItemClear(ctx context.Context, playerID int64, req *pb.Gm
 	for _, c := range containers {
 		respContainers = append(respContainers, convert.ItemContainer(playerID, c))
 	}
-	return &pb.ItemContainerListResp{ItemContainers: respContainers}, nil
+	return respContainers, nil
 }
 
 // ============ 资产接口实现（AssetStore，可叠加型，落在背包容器） ============

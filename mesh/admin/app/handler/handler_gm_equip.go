@@ -18,7 +18,7 @@ func RegisterEquip(router http.Router) {
 	POST(g, "/equip/up-quality", handleGmEquipUpQuality)
 	POST(g, "/equip/breakthrough", handleGmEquipBreakthrough)
 	POST(g, "/equip/wear", handleGmEquipWear)
-	POST(g, "/equip/unwear", handleGmEquipUnwear)
+	POST(g, "/equip/unwear", handleGmEquipUnWear)
 }
 
 // handleGmEquipWear 穿戴装备（同英雄同配置自动顶替）。
@@ -36,19 +36,19 @@ func handleGmEquipWear(ctx http.Context) (*dto.GmEquipEntry, error) {
 	return logic.GmEquip().EquipWear(req)
 }
 
-// handleGmEquipUnwear 卸载装备。
+// handleGmEquipUnWear 卸载装备。
 // @Summary GM 装备卸载
 // @Tags gm
 // @Produce json
-// @Param body body dto.GmEquipUnwearReq true "卸载参数"
+// @Param body body dto.GmEquipUnWearReq true "卸载参数"
 // @Success 200 {object} dto.Resp "响应包在 {code, message, data} 中"
 // @Router /api/v1/gm/equip/unwear [post]
-func handleGmEquipUnwear(ctx http.Context) (*dto.GmEquipEntry, error) {
-	var req dto.GmEquipUnwearReq
+func handleGmEquipUnWear(ctx http.Context) (*dto.GmEquipEntry, error) {
+	var req dto.GmEquipUnWearReq
 	if err := bindBody(ctx, &req); err != nil || req.PlayerID <= 0 || req.ID <= 0 {
 		return nil, errs.NewError(errs.RespCodeInternal, "请求参数错误")
 	}
-	return logic.GmEquip().EquipUnwear(req)
+	return logic.GmEquip().EquipUnWear(req)
 }
 
 // handleGmEquipList 装备列表。

@@ -39,14 +39,14 @@ func handleEquipWear(ctx node.Context) {
 
 // handleEquipUnWear 卸载装备。
 func handleEquipUnWear(ctx node.Context) {
-	req := &pb.EquipUnwearReq{}
+	req := &pb.EquipUnWearReq{}
 	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.EquipUnwearResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
+		_ = ctx.Response(&pb.EquipUnWearResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
 		return
 	}
-	resp, err := logic.Equip().EquipUnwear(ctx.Context(), ctx.UID(), req)
+	resp, err := logic.Equip().EquipUnWear(ctx.Context(), ctx.UID(), req)
 	if err != nil {
-		_ = ctx.Response(&pb.EquipUnwearResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
+		_ = ctx.Response(&pb.EquipUnWearResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
 		return
 	}
 	_ = ctx.Response(resp)

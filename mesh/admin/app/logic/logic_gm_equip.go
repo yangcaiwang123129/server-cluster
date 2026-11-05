@@ -20,8 +20,8 @@ type GmEquipLogic interface {
 	EquipUpdate(req dto.GmEquipUpdateReq) (*dto.GmEquipEntry, error)
 	// EquipWear 装备穿戴（同英雄同配置自动顶替）
 	EquipWear(req dto.GmEquipWearReq) (*dto.GmEquipEntry, error)
-	// EquipUnwear 装备卸载
-	EquipUnwear(req dto.GmEquipUnwearReq) (*dto.GmEquipEntry, error)
+	// EquipUnWear 装备卸载
+	EquipUnWear(req dto.GmEquipUnWearReq) (*dto.GmEquipEntry, error)
 	// EquipUpgrade 装备升级（消耗物品）
 	EquipUpgrade(req dto.GmUpgradeReq) (*dto.GmUpgradeResp, error)
 	// EquipUpQuality 装备升品（消耗升品素材）
@@ -98,9 +98,9 @@ func (this *gmEquipLogic) EquipWear(req dto.GmEquipWearReq) (*dto.GmEquipEntry, 
 	return &entry, nil
 }
 
-func (this *gmEquipLogic) EquipUnwear(req dto.GmEquipUnwearReq) (*dto.GmEquipEntry, error) {
-	callReq := &pb.GmEquipUnwearReq{PlayerId: req.PlayerID, EquipId: req.ID}
-	resp, err := gmCall[pb.EquipUnwearResp](context.Background(), req.PlayerID, pb.GameAdminService_EquipUnwear_FullMethodName, callReq)
+func (this *gmEquipLogic) EquipUnWear(req dto.GmEquipUnWearReq) (*dto.GmEquipEntry, error) {
+	callReq := &pb.GmEquipUnWearReq{PlayerId: req.PlayerID, EquipId: req.ID}
+	resp, err := gmCall[pb.EquipUnWearResp](context.Background(), req.PlayerID, pb.GameAdminService_EquipUnWear_FullMethodName, callReq)
 	if err != nil {
 		return nil, err
 	}

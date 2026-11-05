@@ -42,7 +42,7 @@ const (
 	GameAdminService_EquipUpQuality_FullMethodName    = "/internal.GameAdminService/EquipUpQuality"
 	GameAdminService_EquipBreakthrough_FullMethodName = "/internal.GameAdminService/EquipBreakthrough"
 	GameAdminService_EquipWear_FullMethodName         = "/internal.GameAdminService/EquipWear"
-	GameAdminService_EquipUnwear_FullMethodName       = "/internal.GameAdminService/EquipUnwear"
+	GameAdminService_EquipUnWear_FullMethodName       = "/internal.GameAdminService/EquipUnWear"
 	GameAdminService_MailList_FullMethodName          = "/internal.GameAdminService/MailList"
 	GameAdminService_MailSend_FullMethodName          = "/internal.GameAdminService/MailSend"
 )
@@ -95,8 +95,8 @@ type GameAdminServiceClient interface {
 	EquipBreakthrough(ctx context.Context, in *GmEquipBreakthroughReq, opts ...grpc.CallOption) (*EquipBreakthroughResp, error)
 	// EquipWear 装备穿戴（同英雄同配置自动顶替）
 	EquipWear(ctx context.Context, in *GmEquipWearReq, opts ...grpc.CallOption) (*EquipWearResp, error)
-	// EquipUnwear 装备卸载
-	EquipUnwear(ctx context.Context, in *GmEquipUnwearReq, opts ...grpc.CallOption) (*EquipUnwearResp, error)
+	// EquipUnWear 装备卸载
+	EquipUnWear(ctx context.Context, in *GmEquipUnWearReq, opts ...grpc.CallOption) (*EquipUnWearResp, error)
 	// MailList 玩家邮件列表
 	MailList(ctx context.Context, in *GmMailListReq, opts ...grpc.CallOption) (*GmMailListResp, error)
 	// MailSend 后台发送邮件（可带附件）
@@ -321,10 +321,10 @@ func (c *gameAdminServiceClient) EquipWear(ctx context.Context, in *GmEquipWearR
 	return out, nil
 }
 
-func (c *gameAdminServiceClient) EquipUnwear(ctx context.Context, in *GmEquipUnwearReq, opts ...grpc.CallOption) (*EquipUnwearResp, error) {
+func (c *gameAdminServiceClient) EquipUnWear(ctx context.Context, in *GmEquipUnWearReq, opts ...grpc.CallOption) (*EquipUnWearResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(EquipUnwearResp)
-	err := c.cc.Invoke(ctx, GameAdminService_EquipUnwear_FullMethodName, in, out, cOpts...)
+	out := new(EquipUnWearResp)
+	err := c.cc.Invoke(ctx, GameAdminService_EquipUnWear_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -399,8 +399,8 @@ type GameAdminServiceServer interface {
 	EquipBreakthrough(context.Context, *GmEquipBreakthroughReq) (*EquipBreakthroughResp, error)
 	// EquipWear 装备穿戴（同英雄同配置自动顶替）
 	EquipWear(context.Context, *GmEquipWearReq) (*EquipWearResp, error)
-	// EquipUnwear 装备卸载
-	EquipUnwear(context.Context, *GmEquipUnwearReq) (*EquipUnwearResp, error)
+	// EquipUnWear 装备卸载
+	EquipUnWear(context.Context, *GmEquipUnWearReq) (*EquipUnWearResp, error)
 	// MailList 玩家邮件列表
 	MailList(context.Context, *GmMailListReq) (*GmMailListResp, error)
 	// MailSend 后台发送邮件（可带附件）
@@ -478,8 +478,8 @@ func (UnimplementedGameAdminServiceServer) EquipBreakthrough(context.Context, *G
 func (UnimplementedGameAdminServiceServer) EquipWear(context.Context, *GmEquipWearReq) (*EquipWearResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method EquipWear not implemented")
 }
-func (UnimplementedGameAdminServiceServer) EquipUnwear(context.Context, *GmEquipUnwearReq) (*EquipUnwearResp, error) {
-	return nil, status.Error(codes.Unimplemented, "method EquipUnwear not implemented")
+func (UnimplementedGameAdminServiceServer) EquipUnWear(context.Context, *GmEquipUnWearReq) (*EquipUnWearResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method EquipUnWear not implemented")
 }
 func (UnimplementedGameAdminServiceServer) MailList(context.Context, *GmMailListReq) (*GmMailListResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method MailList not implemented")
@@ -886,20 +886,20 @@ func _GameAdminService_EquipWear_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
-func _GameAdminService_EquipUnwear_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GmEquipUnwearReq)
+func _GameAdminService_EquipUnWear_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GmEquipUnWearReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GameAdminServiceServer).EquipUnwear(ctx, in)
+		return srv.(GameAdminServiceServer).EquipUnWear(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: GameAdminService_EquipUnwear_FullMethodName,
+		FullMethod: GameAdminService_EquipUnWear_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameAdminServiceServer).EquipUnwear(ctx, req.(*GmEquipUnwearReq))
+		return srv.(GameAdminServiceServer).EquipUnWear(ctx, req.(*GmEquipUnWearReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1032,8 +1032,8 @@ var GameAdminService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _GameAdminService_EquipWear_Handler,
 		},
 		{
-			MethodName: "EquipUnwear",
-			Handler:    _GameAdminService_EquipUnwear_Handler,
+			MethodName: "EquipUnWear",
+			Handler:    _GameAdminService_EquipUnWear_Handler,
 		},
 		{
 			MethodName: "MailList",

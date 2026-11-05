@@ -85,3 +85,15 @@ message ItemTransferResp {
   ItemContainer from_container = 2; // 源物品容器（变更后）
   ItemContainer to_container = 3;   // 目标物品容器（变更后）
 }
+
+// 物品容器内清除对象请求（路由 10507）
+message ItemClearReq {
+  ContainerType container_type = 1; // 物品容器类型（UNSPECIFIED 表示全部容器）
+  int64 id = 2;                     // 对象实例ID（0 表示清除范围内全部对象）
+}
+
+// 物品容器内清除对象响应
+message ItemClearResp {
+  Result result = 1;
+  repeated ItemContainer item_containers = 2; // 变更后的物品容器列表
+}

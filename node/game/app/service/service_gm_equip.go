@@ -56,11 +56,11 @@ func (this *GmProvider) EquipWear(ctx context.Context, req *pb.GmEquipWearReq) (
 	return resp, nil
 }
 
-func (this *GmProvider) EquipUnwear(ctx context.Context, req *pb.GmEquipUnwearReq) (*pb.EquipUnwearResp, error) {
+func (this *GmProvider) EquipUnWear(ctx context.Context, req *pb.GmEquipUnWearReq) (*pb.EquipUnWearResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
 	}
-	resp, err := logic.Equip().EquipUnwear(ctx, req.GetPlayerId(), &pb.EquipUnwearReq{Id: req.GetEquipId()})
+	resp, err := logic.Equip().EquipUnWear(ctx, req.GetPlayerId(), &pb.EquipUnWearReq{Id: req.GetEquipId()})
 	if err != nil {
 		return nil, err
 	}

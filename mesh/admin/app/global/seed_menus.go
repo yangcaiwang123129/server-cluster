@@ -139,6 +139,7 @@ var defaultMenus = []seedMenu{
 					{"GM旋转物品", "/api/v1/gm/item/rotate", "POST"},
 					{"GM整理物品容器", "/api/v1/gm/item/sort", "POST"},
 					{"GM转移物品", "/api/v1/gm/item/transfer", "POST"},
+					{"GM清除物品", "/api/v1/gm/item/clear", "POST"},
 				},
 			},
 			{

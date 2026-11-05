@@ -45,6 +45,7 @@ const (
 	RouteCode_ROUTE_CODE_ITEM_ROTATE   RouteCode = 10504 // 物品容器内对象旋转
 	RouteCode_ROUTE_CODE_ITEM_SORT     RouteCode = 10505 // 物品容器一键整理对象
 	RouteCode_ROUTE_CODE_ITEM_TRANSFER RouteCode = 10506 // 物品容器间对象移动
+	RouteCode_ROUTE_CODE_ITEM_CLEAR    RouteCode = 10507 // 物品容器内对象清除
 	// 英雄 10600~10699
 	RouteCode_ROUTE_CODE_HERO_LIST      RouteCode = 10600 // 英雄列表
 	RouteCode_ROUTE_CODE_HERO_NOTIFY    RouteCode = 10601 // 英雄变化通知
@@ -105,6 +106,7 @@ var (
 		10504: "ROUTE_CODE_ITEM_ROTATE",
 		10505: "ROUTE_CODE_ITEM_SORT",
 		10506: "ROUTE_CODE_ITEM_TRANSFER",
+		10507: "ROUTE_CODE_ITEM_CLEAR",
 		10600: "ROUTE_CODE_HERO_LIST",
 		10601: "ROUTE_CODE_HERO_NOTIFY",
 		10602: "ROUTE_CODE_HERO_ADD",
@@ -156,6 +158,7 @@ var (
 		"ROUTE_CODE_ITEM_ROTATE":         10504,
 		"ROUTE_CODE_ITEM_SORT":           10505,
 		"ROUTE_CODE_ITEM_TRANSFER":       10506,
+		"ROUTE_CODE_ITEM_CLEAR":          10507,
 		"ROUTE_CODE_HERO_LIST":           10600,
 		"ROUTE_CODE_HERO_NOTIFY":         10601,
 		"ROUTE_CODE_HERO_ADD":            10602,
@@ -1550,7 +1553,7 @@ const file_common_proto_rawDesc = "" +
 	"\bequipped\x18\x04 \x01(\bR\bequipped\x12\x17\n" +
 	"\ahero_id\x18\x05 \x01(\x05R\x06heroId\x12\x18\n" +
 	"\aquality\x18\x06 \x01(\x05R\aquality\x12\"\n" +
-	"\fbreakthrough\x18\a \x01(\x05R\fbreakthrough*\xb5\v\n" +
+	"\fbreakthrough\x18\a \x01(\x05R\fbreakthrough*\xd1\v\n" +
 	"\tRouteCode\x12\x1a\n" +
 	"\x16ROUTE_CODE_UNSPECIFIED\x10\x00\x12\x16\n" +
 	"\x11ROUTE_CODE_VERIFY\x10\x90N\x12\x1a\n" +
@@ -1568,7 +1571,8 @@ const file_common_proto_rawDesc = "" +
 	"\x14ROUTE_CODE_ITEM_MOVE\x10\x87R\x12\x1b\n" +
 	"\x16ROUTE_CODE_ITEM_ROTATE\x10\x88R\x12\x19\n" +
 	"\x14ROUTE_CODE_ITEM_SORT\x10\x89R\x12\x1d\n" +
-	"\x18ROUTE_CODE_ITEM_TRANSFER\x10\x8aR\x12\x19\n" +
+	"\x18ROUTE_CODE_ITEM_TRANSFER\x10\x8aR\x12\x1a\n" +
+	"\x15ROUTE_CODE_ITEM_CLEAR\x10\x8bR\x12\x19\n" +
 	"\x14ROUTE_CODE_HERO_LIST\x10\xe8R\x12\x1b\n" +
 	"\x16ROUTE_CODE_HERO_NOTIFY\x10\xe9R\x12\x18\n" +
 	"\x13ROUTE_CODE_HERO_ADD\x10\xeaR\x12\x1b\n" +

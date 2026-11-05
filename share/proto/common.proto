@@ -28,6 +28,7 @@ enum RouteCode {
   ROUTE_CODE_ITEM_ROTATE = 10504;  // 物品容器内对象旋转
   ROUTE_CODE_ITEM_SORT = 10505;  // 物品容器一键整理对象
   ROUTE_CODE_ITEM_TRANSFER = 10506;  // 物品容器间对象移动
+  ROUTE_CODE_ITEM_CLEAR = 10507;  // 物品容器内对象清除
 
   // 英雄 10600~10699
   ROUTE_CODE_HERO_LIST = 10600; // 英雄列表

@@ -71,7 +71,7 @@ func (this *GmProvider) ItemClear(ctx context.Context, req *pb.GmItemClearReq) (
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
 	}
-	resp, err := logic.Item().ItemClear(ctx, req.GetPlayerId(), req)
+	resp, err := logic.Item().GmItemClear(ctx, req.GetPlayerId(), req)
 	if err != nil {
 		return nil, err
 	}

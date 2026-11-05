@@ -163,8 +163,8 @@ message GmEquipWearReq {
   int32 hero_id = 3;   // 目标英雄ID，0 表示出战英雄
 }
 
-// GmEquipUnwearReq 装备卸载请求。
-message GmEquipUnwearReq {
+// GmEquipUnWearReq 装备卸载请求。
+message GmEquipUnWearReq {
   int64 player_id = 1; // 玩家ID
   int64 equip_id = 2;  // 装备实例ID
 }
@@ -234,8 +234,8 @@ service GameAdminService {
   rpc EquipBreakthrough (GmEquipBreakthroughReq) returns (pb.EquipBreakthroughResp);
   // EquipWear 装备穿戴（同英雄同配置自动顶替）
   rpc EquipWear (GmEquipWearReq) returns (pb.EquipWearResp);
-  // EquipUnwear 装备卸载
-  rpc EquipUnwear (GmEquipUnwearReq) returns (pb.EquipUnwearResp);
+  // EquipUnWear 装备卸载
+  rpc EquipUnWear (GmEquipUnWearReq) returns (pb.EquipUnWearResp);
 
   // MailList 玩家邮件列表
   rpc MailList (GmMailListReq) returns (GmMailListResp);

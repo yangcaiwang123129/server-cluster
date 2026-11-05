@@ -85,12 +85,12 @@ message EquipWearResp {
 }
 
 // 卸载装备请求（路由 10908）
-message EquipUnwearReq {
+message EquipUnWearReq {
   int64 id = 1; // 装备实例ID
 }
 
 // 卸载装备响应
-message EquipUnwearResp {
+message EquipUnWearResp {
   Result result = 1;
   EquipEntry equip_entry = 2;   // 卸载后的持有状态
   HeroAttribute attribute = 3;  // 操作后的英雄累计属性

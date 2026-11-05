@@ -215,7 +215,7 @@ func (this *equipLogic) EquipWear(ctx context.Context, playerID int64, req *pb.E
 	return &pb.EquipWearResp{EquipEntry: convert.EquipEntry(g), Attribute: attr}, nil
 }
 
-func (this *equipLogic) EquipUnwear(ctx context.Context, playerID int64, req *pb.EquipUnwearReq) (*pb.EquipUnwearResp, error) {
+func (this *equipLogic) EquipUnWear(ctx context.Context, playerID int64, req *pb.EquipUnWearReq) (*pb.EquipUnWearResp, error) {
 	row, err := this.Load(ctx, playerID)
 	if err != nil {
 		return nil, err
@@ -223,16 +223,16 @@ func (this *equipLogic) EquipUnwear(ctx context.Context, playerID int64, req *pb
 
 	g, ok := row.Equips.Get(req.GetId())
 	if !ok {
-		return &pb.EquipUnwearResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备未拥有")}, nil
+		return &pb.EquipUnWearResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备未拥有")}, nil
 	}
 	if !g.Equipped {
-		return &pb.EquipUnwearResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备未穿戴")}, nil
+		return &pb.EquipUnWearResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备未穿戴")}, nil
 	}
 
 	heroID := g.HeroID
 	g.Equipped = false
 	if !row.UpdateEquip(g) {
-		return &pb.EquipUnwearResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备未拥有")}, nil
+		return &pb.EquipUnWearResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备未拥有")}, nil
 	}
 
 	this.Save(playerID, row)
@@ -242,13 +242,13 @@ func (this *equipLogic) EquipUnwear(ctx context.Context, playerID int64, req *pb
 		_, computed, cErr := computeHeroAttribute(ctx, playerID, heroID)
 		if cErr != nil {
 			if r := codedResult(cErr); r != nil {
-				return &pb.EquipUnwearResp{Result: r}, nil
+				return &pb.EquipUnWearResp{Result: r}, nil
 			}
 			return nil, cErr
 		}
 		attr = computed
 	}
-	return &pb.EquipUnwearResp{EquipEntry: convert.EquipEntry(g), Attribute: attr}, nil
+	return &pb.EquipUnWearResp{EquipEntry: convert.EquipEntry(g), Attribute: attr}, nil
 }
 
 // equipDimGrow 维度提升通用流程：校验持有与穿戴 → 取当前维度行得消耗 → 校验下一维度行存在 → 扣素材 → 维度+1。

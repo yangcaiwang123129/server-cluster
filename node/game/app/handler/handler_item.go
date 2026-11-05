@@ -18,6 +18,7 @@ func init() {
 	router.OnActor(pb.RouteCode_ROUTE_CODE_ITEM_ROTATE, handleItemRotate)
 	router.OnActor(pb.RouteCode_ROUTE_CODE_ITEM_SORT, handleItemSort)
 	router.OnActor(pb.RouteCode_ROUTE_CODE_ITEM_TRANSFER, handleItemTransfer)
+	router.OnActor(pb.RouteCode_ROUTE_CODE_ITEM_CLEAR, handleItemClear)
 }
 
 // handleItemList 物品容器列表。
@@ -92,6 +93,21 @@ func handleItemTransfer(ctx node.Context) {
 	resp, err := logic.Item().ItemTransfer(ctx.Context(), ctx.UID(), req)
 	if err != nil {
 		_ = ctx.Response(&pb.ItemTransferResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
+		return
+	}
+	_ = ctx.Response(resp)
+}
+
+// handleItemClear 物品容器内清除物品（携带实例ID精确清除单个，实例ID为 0 清空指定容器，容器类型为 0 时全清）。
+func handleItemClear(ctx node.Context) {
+	req := &pb.ItemClearReq{}
+	if err := ctx.Parse(req); err != nil {
+		_ = ctx.Response(&pb.ItemClearResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
+		return
+	}
+	resp, err := logic.Item().ItemClear(ctx.Context(), ctx.UID(), req)
+	if err != nil {
+		_ = ctx.Response(&pb.ItemClearResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
 		return
 	}
 	_ = ctx.Response(resp)

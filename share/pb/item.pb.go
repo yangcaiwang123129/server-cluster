@@ -726,6 +726,112 @@ func (x *ItemTransferResp) GetToContainer() *ItemContainer {
 	return nil
 }
 
+// 物品容器内清除对象请求（路由 10507）
+type ItemClearReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ContainerType ContainerType          `protobuf:"varint,1,opt,name=container_type,json=containerType,proto3,enum=pb.ContainerType" json:"container_type,omitempty"` // 物品容器类型（UNSPECIFIED 表示全部容器）
+	Id            int64                  `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`                                                                  // 对象实例ID（0 表示清除范围内全部对象）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ItemClearReq) Reset() {
+	*x = ItemClearReq{}
+	mi := &file_item_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ItemClearReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ItemClearReq) ProtoMessage() {}
+
+func (x *ItemClearReq) ProtoReflect() protoreflect.Message {
+	mi := &file_item_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ItemClearReq.ProtoReflect.Descriptor instead.
+func (*ItemClearReq) Descriptor() ([]byte, []int) {
+	return file_item_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *ItemClearReq) GetContainerType() ContainerType {
+	if x != nil {
+		return x.ContainerType
+	}
+	return ContainerType_CONTAINER_TYPE_UNSPECIFIED
+}
+
+func (x *ItemClearReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+// 物品容器内清除对象响应
+type ItemClearResp struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Result         *Result                `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	ItemContainers []*ItemContainer       `protobuf:"bytes,2,rep,name=item_containers,json=itemContainers,proto3" json:"item_containers,omitempty"` // 变更后的物品容器列表
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *ItemClearResp) Reset() {
+	*x = ItemClearResp{}
+	mi := &file_item_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ItemClearResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ItemClearResp) ProtoMessage() {}
+
+func (x *ItemClearResp) ProtoReflect() protoreflect.Message {
+	mi := &file_item_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ItemClearResp.ProtoReflect.Descriptor instead.
+func (*ItemClearResp) Descriptor() ([]byte, []int) {
+	return file_item_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *ItemClearResp) GetResult() *Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
+func (x *ItemClearResp) GetItemContainers() []*ItemContainer {
+	if x != nil {
+		return x.ItemContainers
+	}
+	return nil
+}
+
 var File_item_proto protoreflect.FileDescriptor
 
 const file_item_proto_rawDesc = "" +
@@ -781,7 +887,14 @@ const file_item_proto_rawDesc = "" +
 	"\x06result\x18\x01 \x01(\v2\n" +
 	".pb.ResultR\x06result\x128\n" +
 	"\x0efrom_container\x18\x02 \x01(\v2\x11.pb.ItemContainerR\rfromContainer\x124\n" +
-	"\fto_container\x18\x03 \x01(\v2\x11.pb.ItemContainerR\vtoContainerB\x19Z\x17server-cluster/share/pbb\x06proto3"
+	"\fto_container\x18\x03 \x01(\v2\x11.pb.ItemContainerR\vtoContainer\"X\n" +
+	"\fItemClearReq\x128\n" +
+	"\x0econtainer_type\x18\x01 \x01(\x0e2\x11.pb.ContainerTypeR\rcontainerType\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\x03R\x02id\"o\n" +
+	"\rItemClearResp\x12\"\n" +
+	"\x06result\x18\x01 \x01(\v2\n" +
+	".pb.ResultR\x06result\x12:\n" +
+	"\x0fitem_containers\x18\x02 \x03(\v2\x11.pb.ItemContainerR\x0eitemContainersB\x19Z\x17server-cluster/share/pbb\x06proto3"
 
 var (
 	file_item_proto_rawDescOnce sync.Once
@@ -795,7 +908,7 @@ func file_item_proto_rawDescGZIP() []byte {
 	return file_item_proto_rawDescData
 }
 
-var file_item_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_item_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_item_proto_goTypes = []any{
 	(*ItemContainerListReq)(nil),  // 0: pb.ItemContainerListReq
 	(*ItemContainerListResp)(nil), // 1: pb.ItemContainerListResp
@@ -810,36 +923,41 @@ var file_item_proto_goTypes = []any{
 	(*ItemSortResp)(nil),          // 10: pb.ItemSortResp
 	(*ItemTransferReq)(nil),       // 11: pb.ItemTransferReq
 	(*ItemTransferResp)(nil),      // 12: pb.ItemTransferResp
-	(ContainerType)(0),            // 13: pb.ContainerType
-	(*Result)(nil),                // 14: pb.Result
-	(*ItemContainer)(nil),         // 15: pb.ItemContainer
-	(*ItemEntry)(nil),             // 16: pb.ItemEntry
+	(*ItemClearReq)(nil),          // 13: pb.ItemClearReq
+	(*ItemClearResp)(nil),         // 14: pb.ItemClearResp
+	(ContainerType)(0),            // 15: pb.ContainerType
+	(*Result)(nil),                // 16: pb.Result
+	(*ItemContainer)(nil),         // 17: pb.ItemContainer
+	(*ItemEntry)(nil),             // 18: pb.ItemEntry
 }
 var file_item_proto_depIdxs = []int32{
-	13, // 0: pb.ItemContainerListReq.container_type:type_name -> pb.ContainerType
-	14, // 1: pb.ItemContainerListResp.result:type_name -> pb.Result
-	15, // 2: pb.ItemContainerListResp.item_containers:type_name -> pb.ItemContainer
-	13, // 3: pb.ItemContainerNotify.container_type:type_name -> pb.ContainerType
-	16, // 4: pb.ItemContainerNotify.item_entry:type_name -> pb.ItemEntry
-	13, // 5: pb.ItemAddReq.container_type:type_name -> pb.ContainerType
-	16, // 6: pb.ItemAddReq.item_entry:type_name -> pb.ItemEntry
-	14, // 7: pb.ItemAddResp.result:type_name -> pb.Result
-	13, // 8: pb.ItemMoveReq.container_type:type_name -> pb.ContainerType
-	14, // 9: pb.ItemMoveResp.result:type_name -> pb.Result
-	13, // 10: pb.ItemRotateReq.container_type:type_name -> pb.ContainerType
-	14, // 11: pb.ItemRotateResp.result:type_name -> pb.Result
-	13, // 12: pb.ItemSortReq.container_type:type_name -> pb.ContainerType
-	14, // 13: pb.ItemSortResp.result:type_name -> pb.Result
-	13, // 14: pb.ItemTransferReq.from_type:type_name -> pb.ContainerType
-	13, // 15: pb.ItemTransferReq.to_type:type_name -> pb.ContainerType
-	14, // 16: pb.ItemTransferResp.result:type_name -> pb.Result
-	15, // 17: pb.ItemTransferResp.from_container:type_name -> pb.ItemContainer
-	15, // 18: pb.ItemTransferResp.to_container:type_name -> pb.ItemContainer
-	19, // [19:19] is the sub-list for method output_type
-	19, // [19:19] is the sub-list for method input_type
-	19, // [19:19] is the sub-list for extension type_name
-	19, // [19:19] is the sub-list for extension extendee
-	0,  // [0:19] is the sub-list for field type_name
+	15, // 0: pb.ItemContainerListReq.container_type:type_name -> pb.ContainerType
+	16, // 1: pb.ItemContainerListResp.result:type_name -> pb.Result
+	17, // 2: pb.ItemContainerListResp.item_containers:type_name -> pb.ItemContainer
+	15, // 3: pb.ItemContainerNotify.container_type:type_name -> pb.ContainerType
+	18, // 4: pb.ItemContainerNotify.item_entry:type_name -> pb.ItemEntry
+	15, // 5: pb.ItemAddReq.container_type:type_name -> pb.ContainerType
+	18, // 6: pb.ItemAddReq.item_entry:type_name -> pb.ItemEntry
+	16, // 7: pb.ItemAddResp.result:type_name -> pb.Result
+	15, // 8: pb.ItemMoveReq.container_type:type_name -> pb.ContainerType
+	16, // 9: pb.ItemMoveResp.result:type_name -> pb.Result
+	15, // 10: pb.ItemRotateReq.container_type:type_name -> pb.ContainerType
+	16, // 11: pb.ItemRotateResp.result:type_name -> pb.Result
+	15, // 12: pb.ItemSortReq.container_type:type_name -> pb.ContainerType
+	16, // 13: pb.ItemSortResp.result:type_name -> pb.Result
+	15, // 14: pb.ItemTransferReq.from_type:type_name -> pb.ContainerType
+	15, // 15: pb.ItemTransferReq.to_type:type_name -> pb.ContainerType
+	16, // 16: pb.ItemTransferResp.result:type_name -> pb.Result
+	17, // 17: pb.ItemTransferResp.from_container:type_name -> pb.ItemContainer
+	17, // 18: pb.ItemTransferResp.to_container:type_name -> pb.ItemContainer
+	15, // 19: pb.ItemClearReq.container_type:type_name -> pb.ContainerType
+	16, // 20: pb.ItemClearResp.result:type_name -> pb.Result
+	17, // 21: pb.ItemClearResp.item_containers:type_name -> pb.ItemContainer
+	22, // [22:22] is the sub-list for method output_type
+	22, // [22:22] is the sub-list for method input_type
+	22, // [22:22] is the sub-list for extension type_name
+	22, // [22:22] is the sub-list for extension extendee
+	0,  // [0:22] is the sub-list for field type_name
 }
 
 func init() { file_item_proto_init() }
@@ -854,7 +972,7 @@ func file_item_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_item_proto_rawDesc), len(file_item_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   13,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
