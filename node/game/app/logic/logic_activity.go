@@ -1,3 +1,4 @@
+// Package logic 活动域：activitySync 只读同步 admin 发布的活动实例快照；activityLogic 维护玩家活动参与（player_activity 行缓存）。
 package logic
 
 import (
@@ -9,11 +10,17 @@ import (
 	"github.com/dobyte/due/v2/log"
 	redis "github.com/redis/go-redis/v9"
 
+	"server-cluster/internal/cache"
 	"server-cluster/internal/svc"
+	"server-cluster/node/game/app/global"
 	"server-cluster/share/consts"
 	"server-cluster/share/dto"
+	"server-cluster/share/enum"
+	"server-cluster/share/model"
 	"server-cluster/share/pb"
+	"server-cluster/share/singleton"
 	"server-cluster/share/tpl"
+	"server-cluster/share/util"
 )
 
 // activitySync game 节点侧活动快照同步器：每 10s 读 Redis，版本变化才拉取 payload。
@@ -215,4 +222,51 @@ func diffActivities(old, cur *dto.ActivitySnapshot) int {
 		}
 	}
 	return n
+}
+
+// ── 玩家活动参与模块（player_activity）────────────────────────────
+
+type activityLogic struct {
+	// cache 玩家活动参与（player_activity，一玩家一行，活动 map JSON，key=活动实例ID）；读走 LRU，写异步批量 upsert。
+	cache *cache.Cache[int64, *model.PlayerActivity]
+}
+
+var activityLogicInst = singleton.NewContainer[global.ActivityLogic]("ActivityLogic")
+
+func init() {
+	c := cache.NewPlayerTableCache[model.PlayerActivity](cache.CacherConfig{Name: enum.TableActivity.String()})
+	cache.RegisterCacheCloser(c)
+	activityLogicInst.Register(&activityLogic{cache: c})
+}
+
+// Activity 获取活动业务单例。
+func Activity() global.ActivityLogic { return activityLogicInst.MustGet() }
+
+func (this *activityLogic) Load(ctx context.Context, playerID int64) (*model.PlayerActivity, error) {
+	return this.cache.GetOrInit(ctx, playerID,
+		func(id int64) *model.PlayerActivity {
+			return &model.PlayerActivity{PlayerID: id, Activities: util.NewSafeMap[int64, model.PlayerActivityInfo]()}
+		},
+		func(row *model.PlayerActivity) {
+			if row.Activities == nil {
+				row.Activities = util.NewSafeMap[int64, model.PlayerActivityInfo]()
+			}
+		})
+}
+
+func (this *activityLogic) Save(playerID int64, row *model.PlayerActivity) {
+	this.cache.Set(playerID, row)
+}
+
+func (this *activityLogic) Flush(ctx context.Context, playerID int64) error {
+	return flushAndEvict(ctx, this.cache, playerID)
+}
+
+func (this *activityLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
+	_, err := this.Load(ctx, playerID)
+	return err
+}
+
+func (this *activityLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
+	return flushAndEvict(ctx, this.cache, playerID)
 }

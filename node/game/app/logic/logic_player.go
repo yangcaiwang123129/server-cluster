@@ -58,7 +58,7 @@ func init() {
 
 // moduleLogics 延迟获取持有玩家数据的模块（init 注册顺序不确定，不能在包初始化阶段调用）。
 func moduleLogics() []global.PlayerLifecycle {
-	return []global.PlayerLifecycle{Item(), Hero(), Weapon(), Skill(), Equip(), Mail(), Task()}
+	return []global.PlayerLifecycle{Item(), Hero(), Weapon(), Skill(), Equip(), Mail(), Task(), Activity()}
 }
 
 // PlayerLogic 获取玩家模块业务单例。

@@ -191,6 +191,11 @@ type TaskLogic interface {
 	EmitTaskEvent(ctx context.Context, e TaskEvent)
 }
 
+// ActivityLogic 活动模块接口
+type ActivityLogic interface {
+	PlayerModule[*model.PlayerActivity]
+}
+
 // AssetLogic 资产接口
 type AssetLogic interface {
 	// AssetAdd 发放资产；Count<=0 按 1 处理
