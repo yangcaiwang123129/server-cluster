@@ -10,6 +10,7 @@ import (
 	"server-cluster/internal/record"
 	"server-cluster/internal/svc"
 	"server-cluster/node/game/app/global"
+	"server-cluster/node/game/app/repo"
 	"server-cluster/share/convert"
 	"server-cluster/share/enum"
 	"server-cluster/share/errs"
@@ -19,15 +20,17 @@ import (
 	"server-cluster/share/tpl"
 )
 
-// itemCache 玩家物品容器（player_item，一玩家一行）；读走 LRU，写异步批量 upsert。
-var itemCache = cache.NewPlayerTableCache[model.PlayerItem](cache.CacherConfig{Name: enum.TablePlayerItem.String()})
-
-type itemLogic struct{}
+type itemLogic struct {
+	// cache 玩家物品容器（player_item，一玩家一行）；读走 LRU，写异步批量 upsert。
+	cache *cache.Cache[int64, *model.PlayerItem]
+}
 
 var itemLogicInst = singleton.NewContainer[global.ItemLogic]("ItemLogic")
 
 func init() {
-	itemLogicInst.Register(&itemLogic{})
+	c := cache.NewPlayerTableCache[model.PlayerItem](cache.CacherConfig{Name: enum.TablePlayerItem.String()})
+	global.RegisterCacheCloser(c)
+	itemLogicInst.Register(&itemLogic{cache: c})
 	registerAsset(&itemAssetStore{})
 }
 
@@ -49,7 +52,7 @@ func itemErr(err error) error {
 }
 
 func (this *itemLogic) Load(ctx context.Context, playerID int64) (*model.PlayerItem, error) {
-	return itemCache.GetOrInit(ctx, playerID,
+	return this.cache.GetOrInit(ctx, playerID,
 		func(id int64) *model.PlayerItem {
 			return model.NewPlayerItem(id)
 		},
@@ -60,11 +63,11 @@ func (this *itemLogic) Load(ctx context.Context, playerID int64) (*model.PlayerI
 }
 
 func (this *itemLogic) Save(playerID int64, row *model.PlayerItem) {
-	itemCache.Set(playerID, row)
+	this.cache.Set(playerID, row)
 }
 
 func (this *itemLogic) Flush(ctx context.Context, playerID int64) error {
-	return flushAndEvict(ctx, itemCache, playerID)
+	return flushAndEvict(ctx, this.cache, playerID)
 }
 
 // itemContainerOf 加载玩家物品容器集合并取出指定类型的容器（返回 *ItemContainer）。
@@ -93,7 +96,7 @@ func (this *itemLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.En
 }
 
 func (this *itemLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
-	if err := flushAndEvict(ctx, itemCache, playerID); err != nil {
+	if err := flushAndEvict(ctx, this.cache, playerID); err != nil {
 		return err
 	}
 	return nil
@@ -268,11 +271,16 @@ type itemAssetStore struct{}
 func (this *itemAssetStore) AssetType() tpl.AssetType { return tpl.AssetType_Item }
 
 func (this *itemAssetStore) Add(ctx context.Context, playerID int64, cfgID, count int32) error {
-	if !tpl.T().Item.Has(cfgID) {
+	cfg := tpl.T().Item.Get(cfgID)
+	if cfg == nil {
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "物品配置不存在")
 	}
 	if count <= 0 {
 		count = 1
+	}
+	// 货币类型物品不落背包容器，走 player 表货币列
+	if cfg.Type == tpl.ItemType_Currency {
+		return adjustCurrency(ctx, playerID, cfgID, int64(count))
 	}
 
 	pc, err := Item().Load(ctx, playerID)
@@ -283,7 +291,7 @@ func (this *itemAssetStore) Add(ctx context.Context, playerID int64, cfgID, coun
 		return err
 	}
 
-	itemCache.Set(playerID, pc)
+	Item().(*itemLogic).cache.Set(playerID, pc)
 	record.Record(ctx, model.RecordModuleItem, playerID, model.RecordActionGain, cfgID, count)
 	return nil
 }
@@ -291,6 +299,10 @@ func (this *itemAssetStore) Add(ctx context.Context, playerID int64, cfgID, coun
 func (this *itemAssetStore) Remove(ctx context.Context, playerID int64, cfgID, count int32) error {
 	if count <= 0 {
 		count = 1
+	}
+	// 货币类型物品走货币分支（余额守卫防超扣）；非货币沿用容器扣除（配置缺失按持有 0 处理，扣减必然数量不足）
+	if cfg := tpl.T().Item.Get(cfgID); cfg != nil && cfg.Type == tpl.ItemType_Currency {
+		return adjustCurrency(ctx, playerID, cfgID, -int64(count))
 	}
 
 	pc, err := Item().Load(ctx, playerID)
@@ -303,12 +315,16 @@ func (this *itemAssetStore) Remove(ctx context.Context, playerID int64, cfgID, c
 	}
 
 	takeItemEntries(c, cfgID, count)
-	itemCache.Set(playerID, pc)
+	Item().(*itemLogic).cache.Set(playerID, pc)
 	record.Record(ctx, model.RecordModuleItem, playerID, model.RecordActionConsume, cfgID, count)
 	return nil
 }
 
 func (this *itemAssetStore) Update(ctx context.Context, playerID int64, cfgID, count int32) error {
+	// 货币类型物品直接覆盖值（value<=0 钳为 0）；非货币沿用查询后按差量增删
+	if cfg := tpl.T().Item.Get(cfgID); cfg != nil && cfg.Type == tpl.ItemType_Currency {
+		return setCurrency(ctx, playerID, cfgID, count)
+	}
 	owned, err := this.Query(ctx, playerID, cfgID)
 	if err != nil {
 		return err
@@ -326,6 +342,14 @@ func (this *itemAssetStore) Update(ctx context.Context, playerID int64, cfgID, c
 }
 
 func (this *itemAssetStore) Query(ctx context.Context, playerID int64, cfgID int32) (int32, error) {
+	// 货币类型物品直查 player 货币列；配置缺失或非货币按容器统计
+	if cfg := tpl.T().Item.Get(cfgID); cfg != nil && cfg.Type == tpl.ItemType_Currency {
+		owned, err := repo.QueryCurrency(ctx, playerID, cfgID)
+		if err != nil {
+			return 0, err
+		}
+		return int32(owned), nil
+	}
 	pc, err := Item().Load(ctx, playerID)
 	if err != nil {
 		return 0, err
@@ -343,11 +367,56 @@ func (this *itemAssetStore) List(ctx context.Context, playerID int64) ([]*tpl.As
 	for _, it := range pc.ByType(int32(pb.ContainerType_CONTAINER_TYPE_BACKPACK)).Entries() {
 		agg[it.ItemCfgID] += it.Count
 	}
-	assets := make([]*tpl.Asset, 0, len(agg))
+	assets := make([]*tpl.Asset, 0, len(agg)+3)
 	for cfgID, count := range agg {
 		assets = append(assets, &tpl.Asset{Type: tpl.AssetType_Item, Id: cfgID, Count: count})
 	}
 	sort.Slice(assets, func(i, j int) bool { return assets[i].Id < assets[j].Id })
+	// 货币不落背包容器：每种货币单条补充当前值
+	currencies, err := currencyAssetList(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+	return append(assets, currencies...), nil
+}
+
+// ============ 货币分支：ItemType_Currency 的物品走 player 表货币列，不落背包容器 ============
+//
+// 货币是强一致敏感数据，不走 itemLogic 缓存异步批量落库：repo 层单条原子 SQL 增减
+// （负 delta 附加余额守卫防超扣）成功后，直查 DB 取最新行并推送三货币快照，
+// DB 始终是事实源，player 账号行无内存镜像（查询走 repo.QueryPlayer）。
+
+// adjustCurrency 货币增减（delta 正=发放、负=扣除）：repo 原子 SQL 成功后推送最新货币快照；cfgID 合法性由 repo 层白名单校验。
+func adjustCurrency(ctx context.Context, playerID int64, cfgID int32, delta int64) error {
+	if err := repo.AdjustCurrency(ctx, playerID, cfgID, delta); err != nil {
+		return err
+	}
+	global.NotifyCurrencySnapshot(ctx, playerID)
+	return nil
+}
+
+// setCurrency 覆盖货币为指定值（value<=0 钳为 0）：repo 覆盖成功后推送最新货币快照；cfgID 合法性由 repo 层白名单校验。
+func setCurrency(ctx context.Context, playerID int64, cfgID int32, value int32) error {
+	if value <= 0 {
+		value = 0
+	}
+	if err := repo.SetCurrency(ctx, playerID, cfgID, int64(value)); err != nil {
+		return err
+	}
+	global.NotifyCurrencySnapshot(ctx, playerID)
+	return nil
+}
+
+// currencyAssetList 货币资产列表：每种货币单条（Id=货币配置ID、Count=当前值）。
+func currencyAssetList(ctx context.Context, playerID int64) ([]*tpl.Asset, error) {
+	assets := make([]*tpl.Asset, 0, len(enum.CurrencyIDs))
+	for _, itemID := range enum.CurrencyIDs {
+		owned, err := repo.QueryCurrency(ctx, playerID, int32(itemID))
+		if err != nil {
+			return nil, err
+		}
+		assets = append(assets, &tpl.Asset{Type: tpl.AssetType_Item, Id: int32(itemID), Count: int32(owned)})
+	}
 	return assets, nil
 }
 

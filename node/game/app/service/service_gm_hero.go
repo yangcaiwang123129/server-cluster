@@ -7,7 +7,7 @@ import (
 	"server-cluster/share/pb"
 )
 
-func (p *GmProvider) HeroList(ctx context.Context, req *pb.GmHeroListReq) (*pb.HeroListResp, error) {
+func (this *GmProvider) HeroList(ctx context.Context, req *pb.GmHeroListReq) (*pb.HeroListResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
 	}
@@ -19,7 +19,7 @@ func (p *GmProvider) HeroList(ctx context.Context, req *pb.GmHeroListReq) (*pb.H
 	return resp, nil
 }
 
-func (p *GmProvider) HeroAdd(ctx context.Context, req *pb.GmHeroAddReq) (*pb.HeroAddResp, error) {
+func (this *GmProvider) HeroAdd(ctx context.Context, req *pb.GmHeroAddReq) (*pb.HeroAddResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func (p *GmProvider) HeroAdd(ctx context.Context, req *pb.GmHeroAddReq) (*pb.Her
 	return resp, nil
 }
 
-func (p *GmProvider) HeroUpdate(ctx context.Context, req *pb.GmHeroUpdateReq) (*pb.HeroUpdateResp, error) {
+func (this *GmProvider) HeroUpdate(ctx context.Context, req *pb.GmHeroUpdateReq) (*pb.HeroUpdateResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (p *GmProvider) HeroUpdate(ctx context.Context, req *pb.GmHeroUpdateReq) (*
 	return resp, nil
 }
 
-func (p *GmProvider) HeroAttribute(ctx context.Context, req *pb.GmHeroAttributeReq) (*pb.HeroAttributeResp, error) {
+func (this *GmProvider) HeroAttribute(ctx context.Context, req *pb.GmHeroAttributeReq) (*pb.HeroAttributeResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func (p *GmProvider) HeroAttribute(ctx context.Context, req *pb.GmHeroAttributeR
 	return resp, nil
 }
 
-func (p *GmProvider) HeroUpgrade(ctx context.Context, req *pb.GmHeroUpgradeReq) (*pb.HeroUpgradeResp, error) {
+func (this *GmProvider) HeroUpgrade(ctx context.Context, req *pb.GmHeroUpgradeReq) (*pb.HeroUpgradeResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
 	}

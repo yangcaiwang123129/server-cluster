@@ -7,7 +7,7 @@ import (
 	"server-cluster/share/pb"
 )
 
-func (p *GmProvider) ItemList(ctx context.Context, req *pb.GmItemListReq) (*pb.ItemContainerListResp, error) {
+func (this *GmProvider) ItemList(ctx context.Context, req *pb.GmItemListReq) (*pb.ItemContainerListResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
 	}
@@ -19,7 +19,7 @@ func (p *GmProvider) ItemList(ctx context.Context, req *pb.GmItemListReq) (*pb.I
 	return resp, nil
 }
 
-func (p *GmProvider) ItemMove(ctx context.Context, req *pb.GmItemMoveReq) (*pb.ItemMoveResp, error) {
+func (this *GmProvider) ItemMove(ctx context.Context, req *pb.GmItemMoveReq) (*pb.ItemMoveResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func (p *GmProvider) ItemMove(ctx context.Context, req *pb.GmItemMoveReq) (*pb.I
 	return resp, nil
 }
 
-func (p *GmProvider) ItemRotate(ctx context.Context, req *pb.GmItemRotateReq) (*pb.ItemRotateResp, error) {
+func (this *GmProvider) ItemRotate(ctx context.Context, req *pb.GmItemRotateReq) (*pb.ItemRotateResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (p *GmProvider) ItemRotate(ctx context.Context, req *pb.GmItemRotateReq) (*
 	return resp, nil
 }
 
-func (p *GmProvider) ItemSort(ctx context.Context, req *pb.GmItemSortReq) (*pb.ItemSortResp, error) {
+func (this *GmProvider) ItemSort(ctx context.Context, req *pb.GmItemSortReq) (*pb.ItemSortResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func (p *GmProvider) ItemSort(ctx context.Context, req *pb.GmItemSortReq) (*pb.I
 	return resp, nil
 }
 
-func (p *GmProvider) ItemAddEntry(ctx context.Context, req *pb.GmItemAddEntryReq) (*pb.ItemContainerListResp, error) {
+func (this *GmProvider) ItemAddEntry(ctx context.Context, req *pb.GmItemAddEntryReq) (*pb.ItemContainerListResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (p *GmProvider) ItemAddEntry(ctx context.Context, req *pb.GmItemAddEntryReq
 	return resp, nil
 }
 
-func (p *GmProvider) ItemTransfer(ctx context.Context, req *pb.GmItemTransferReq) (*pb.ItemTransferResp, error) {
+func (this *GmProvider) ItemTransfer(ctx context.Context, req *pb.GmItemTransferReq) (*pb.ItemTransferResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
 	}

@@ -1,5 +1,12 @@
-// notify.go 集中收口 game 服主动下发的 pb 通知：所有 Push 只在这里实现，
-// 业务层只负责组装数据并调用对应的 NotifyXxx。
+// notify.go 是 game 服给玩家主动下发 pb 通知的统一出口：
+//   - 全服仅 pushToPlayer 一处调用 svc.NodeProxy().Push，业务层只组装 pb 数据并调用
+//     对应的 NotifyXxx，禁止在别处直调 Push；
+//   - 依赖 logic 私有数据组装的消息（如按英雄ID构建 HeroEntry），取数部分留在 logic，
+//     构造好 pb 后再调本包 NotifyXxx；本文件不 import logic，保证 handler→logic→global 单向依赖。
+//
+// Ack 语义：所有推送 Ack=true，玩家换网关/跨节点重连后由框架重新定位并重试一次，避免切换瞬间消息静默丢失。
+//
+// 离线降级：玩家不在线（定位不到 gate 或 gate 上无会话）不算故障，降级为 Debug 日志；其余推送失败记 Warn。
 package global
 
 import (
@@ -10,8 +17,33 @@ import (
 	"github.com/dobyte/due/v2/log"
 
 	"server-cluster/internal/svc"
+	"server-cluster/node/game/app/repo"
 	"server-cluster/share/pb"
 )
+
+// NotifyCurrencySnapshot 直查玩家行推送货币（Coupon/Gold/Coin）快照；行缺失（未建档）静默跳过。
+func NotifyCurrencySnapshot(ctx context.Context, playerID int64) {
+	row, err := repo.QueryPlayer(ctx, playerID)
+	if err != nil {
+		return
+	}
+	NotifyAttr(ctx, playerID, &pb.AttrMap{Values: map[int32]*pb.ObjectValue{
+		int32(pb.Attr_PLAYER_ATTR_COUPON): {Kind: &pb.ObjectValue_BigintValue{BigintValue: row.Coupon}},
+		int32(pb.Attr_PLAYER_ATTR_GOLD):   {Kind: &pb.ObjectValue_BigintValue{BigintValue: row.Gold}},
+		int32(pb.Attr_PLAYER_ATTR_COIN):   {Kind: &pb.ObjectValue_BigintValue{BigintValue: row.Coin}},
+	}})
+}
+
+// NotifyAttr 推送玩家属性变化；玩家离线只记日志。
+func NotifyAttr(ctx context.Context, playerID int64, values *pb.AttrMap) {
+	if playerID <= 0 || values == nil || len(values.Values) == 0 {
+		return
+	}
+	pushToPlayer(ctx, playerID, &cluster.Message{
+		Route: int32(pb.RouteCode_ROUTE_CODE_ATTR_NOTIFY),
+		Data:  &pb.AttrNotify{Values: values},
+	}, "attr")
+}
 
 // NotifyHero 推送英雄完整持有结构（客户端整体替换本地该英雄数据）；离线或推送失败只记日志。
 func NotifyHero(ctx context.Context, playerID int64, entry *pb.HeroEntry) {
@@ -33,17 +65,6 @@ func NotifyTask(ctx context.Context, playerID int64, entries []*pb.TaskEntry) {
 		Route: int32(pb.RouteCode_ROUTE_CODE_TASK_NOTIFY),
 		Data:  &pb.TaskNotify{Entries: entries},
 	}, "task")
-}
-
-// NotifyAttr 推送玩家属性变化（当前用于货币快照，键为 Attr 枚举值）；玩家离线只记日志。
-func NotifyAttr(ctx context.Context, playerID int64, values *pb.AttrMap) {
-	if playerID <= 0 || values == nil || len(values.Values) == 0 {
-		return
-	}
-	pushToPlayer(ctx, playerID, &cluster.Message{
-		Route: int32(pb.RouteCode_ROUTE_CODE_ATTR_NOTIFY),
-		Data:  &pb.AttrNotify{Values: values},
-	}, "attr")
 }
 
 // pushToPlayer 向指定玩家推送消息；Ack=true 在换网关/跨节点重连后重新定位并重试一次，避免静默丢失。

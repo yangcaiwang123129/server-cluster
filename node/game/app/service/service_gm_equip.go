@@ -7,7 +7,7 @@ import (
 	"server-cluster/share/pb"
 )
 
-func (p *GmProvider) EquipList(ctx context.Context, req *pb.GmEquipListReq) (*pb.GmEquipListResp, error) {
+func (this *GmProvider) EquipList(ctx context.Context, req *pb.GmEquipListReq) (*pb.GmEquipListResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
 	}
@@ -19,7 +19,7 @@ func (p *GmProvider) EquipList(ctx context.Context, req *pb.GmEquipListReq) (*pb
 	return &pb.GmEquipListResp{Entries: entries}, nil
 }
 
-func (p *GmProvider) EquipAdd(ctx context.Context, req *pb.GmEquipAddReq) (*pb.EquipAddResp, error) {
+func (this *GmProvider) EquipAdd(ctx context.Context, req *pb.GmEquipAddReq) (*pb.EquipAddResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func (p *GmProvider) EquipAdd(ctx context.Context, req *pb.GmEquipAddReq) (*pb.E
 	return resp, nil
 }
 
-func (p *GmProvider) EquipUpdate(ctx context.Context, req *pb.GmEquipUpdateReq) (*pb.EquipUpdateResp, error) {
+func (this *GmProvider) EquipUpdate(ctx context.Context, req *pb.GmEquipUpdateReq) (*pb.EquipUpdateResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (p *GmProvider) EquipUpdate(ctx context.Context, req *pb.GmEquipUpdateReq) 
 	return resp, nil
 }
 
-func (p *GmProvider) EquipWear(ctx context.Context, req *pb.GmEquipWearReq) (*pb.EquipWearResp, error) {
+func (this *GmProvider) EquipWear(ctx context.Context, req *pb.GmEquipWearReq) (*pb.EquipWearResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (p *GmProvider) EquipWear(ctx context.Context, req *pb.GmEquipWearReq) (*pb
 	return resp, nil
 }
 
-func (p *GmProvider) EquipUnwear(ctx context.Context, req *pb.GmEquipUnwearReq) (*pb.EquipUnwearResp, error) {
+func (this *GmProvider) EquipUnwear(ctx context.Context, req *pb.GmEquipUnwearReq) (*pb.EquipUnwearResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (p *GmProvider) EquipUnwear(ctx context.Context, req *pb.GmEquipUnwearReq) 
 	return resp, nil
 }
 
-func (p *GmProvider) EquipUpgrade(ctx context.Context, req *pb.GmEquipUpgradeReq) (*pb.EquipUpgradeResp, error) {
+func (this *GmProvider) EquipUpgrade(ctx context.Context, req *pb.GmEquipUpgradeReq) (*pb.EquipUpgradeResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func (p *GmProvider) EquipUpgrade(ctx context.Context, req *pb.GmEquipUpgradeReq
 	return resp, nil
 }
 
-func (p *GmProvider) EquipUpQuality(ctx context.Context, req *pb.GmEquipUpQualityReq) (*pb.EquipUpQualityResp, error) {
+func (this *GmProvider) EquipUpQuality(ctx context.Context, req *pb.GmEquipUpQualityReq) (*pb.EquipUpQualityResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func (p *GmProvider) EquipUpQuality(ctx context.Context, req *pb.GmEquipUpQualit
 	return resp, nil
 }
 
-func (p *GmProvider) EquipBreakthrough(ctx context.Context, req *pb.GmEquipBreakthroughReq) (*pb.EquipBreakthroughResp, error) {
+func (this *GmProvider) EquipBreakthrough(ctx context.Context, req *pb.GmEquipBreakthroughReq) (*pb.EquipBreakthroughResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
 	}

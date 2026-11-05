@@ -17,15 +17,17 @@ import (
 	"server-cluster/share/util"
 )
 
-// weaponCache 玩家武器持有（player_weapon，一玩家一行，武器 map JSON）；读走 LRU，写异步批量 upsert。
-var weaponCache = cache.NewPlayerTableCache[model.PlayerWeapon](cache.CacherConfig{Name: enum.TablePlayerWeapon.String()})
-
-type weaponLogic struct{}
+type weaponLogic struct {
+	// cache 玩家武器持有（player_weapon，一玩家一行，武器 map JSON）；读走 LRU，写异步批量 upsert。
+	cache *cache.Cache[int64, *model.PlayerWeapon]
+}
 
 var weaponLogicInst = singleton.NewContainer[global.WeaponLogic]("WeaponLogic")
 
 func init() {
-	weaponLogicInst.Register(&weaponLogic{})
+	c := cache.NewPlayerTableCache[model.PlayerWeapon](cache.CacherConfig{Name: enum.TablePlayerWeapon.String()})
+	global.RegisterCacheCloser(c)
+	weaponLogicInst.Register(&weaponLogic{cache: c})
 	registerAsset(&weaponAssetStore{})
 }
 
@@ -116,8 +118,8 @@ func weaponDimGrow(ctx context.Context, playerID int64, cfgID int32,
 	if !row.UpdateWeapon(w) {
 		return nil, model.WeaponInfo{}, 0, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "武器未拥有")
 	}
-	weaponCache.Set(playerID, row)
-	notifyHero(ctx, playerID, heroID)
+	Weapon().(*weaponLogic).cache.Set(playerID, row)
+	notifyHeroByID(ctx, playerID, heroID)
 	return row, w, heroID, nil
 }
 
@@ -255,14 +257,14 @@ func (this *weaponLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.
 }
 
 func (this *weaponLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
-	if err := flushAndEvict(ctx, weaponCache, playerID); err != nil {
+	if err := flushAndEvict(ctx, this.cache, playerID); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (this *weaponLogic) Load(ctx context.Context, playerID int64) (*model.PlayerWeapon, error) {
-	return weaponCache.GetOrInit(ctx, playerID,
+	return this.cache.GetOrInit(ctx, playerID,
 		func(id int64) *model.PlayerWeapon {
 			return &model.PlayerWeapon{PlayerID: id, Weapons: util.NewSafeMap[int32, model.WeaponInfo]()}
 		},
@@ -274,11 +276,11 @@ func (this *weaponLogic) Load(ctx context.Context, playerID int64) (*model.Playe
 }
 
 func (this *weaponLogic) Save(playerID int64, row *model.PlayerWeapon) {
-	weaponCache.Set(playerID, row)
+	this.cache.Set(playerID, row)
 }
 
 func (this *weaponLogic) Flush(ctx context.Context, playerID int64) error {
-	return flushAndEvict(ctx, weaponCache, playerID)
+	return flushAndEvict(ctx, this.cache, playerID)
 }
 
 // ============ 资产接口实现（AssetStore，唯一持有型：key 为武器配置ID） ============
@@ -303,7 +305,7 @@ func (this *weaponAssetStore) Add(ctx context.Context, playerID int64, cfgID, _ 
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "武器已拥有")
 	}
 
-	weaponCache.Set(playerID, row)
+	Weapon().(*weaponLogic).cache.Set(playerID, row)
 	record.Record(ctx, model.RecordModuleWeapon, playerID, model.RecordActionGain, cfgID, 1)
 	notifyHeroByWeapon(ctx, playerID, cfgID)
 	return nil
@@ -318,7 +320,7 @@ func (this *weaponAssetStore) Remove(ctx context.Context, playerID int64, cfgID,
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "武器未拥有")
 	}
 
-	weaponCache.Set(playerID, row)
+	Weapon().(*weaponLogic).cache.Set(playerID, row)
 	record.Record(ctx, model.RecordModuleWeapon, playerID, model.RecordActionConsume, cfgID, 1)
 	notifyHeroByWeapon(ctx, playerID, cfgID)
 	return nil

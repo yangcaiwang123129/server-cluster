@@ -12,8 +12,8 @@ type Player struct {
 	DeviceId   string `gorm:"column:device_id;type:varchar(128);not null;default:'';index:idx_device_id;comment:最初创建设备ID (客户端生成 UUIDv4)" json:"deviceId"`
 	Zone       int32  `gorm:"column:zone;type:int;not null;default:0;comment:区号" json:"zone"`
 	Coupon     int64  `gorm:"column:coupon;type:bigint;not null;default:0;comment:点券" json:"coupon"`
-	Gold       int64  `gorm:"column:gold;type:bigint;not null;default:0;comment:金币" json:"gold"`
-	Coin       int64  `gorm:"column:diamond;type:bigint;not null;default:0;comment:钻石" json:"diamond"`
+	Gold       int64  `gorm:"column:gold;type:bigint;not null;default:0;comment:金" json:"gold"`
+	Coin       int64  `gorm:"column:diamond;type:bigint;not null;default:0;comment:币" json:"diamond"`
 	RegisterIP string `gorm:"column:register_ip;type:varchar(64);not null;default:'';comment:注册IP" json:"registerIP"`
 	Status     int32  `gorm:"column:status;type:tinyint;not null;default:1;comment:1 正常 2 封号" json:"status"`
 	BanUntil   int64  `gorm:"column:ban_until;type:bigint;not null;default:0;comment:封号到期时间戳(秒)，0=永久" json:"banUntil"`

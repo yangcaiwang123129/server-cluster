@@ -17,15 +17,17 @@ import (
 	"server-cluster/share/util"
 )
 
-// skillCache 玩家技能持有（player_skill，一玩家一行，技能 map JSON）；读走 LRU，写异步批量 upsert。
-var skillCache = cache.NewPlayerTableCache[model.PlayerSkill](cache.CacherConfig{Name: enum.TablePlayerSkill.String()})
-
-type skillLogic struct{}
+type skillLogic struct {
+	// cache 玩家技能持有（player_skill，一玩家一行，技能 map JSON）；读走 LRU，写异步批量 upsert。
+	cache *cache.Cache[int64, *model.PlayerSkill]
+}
 
 var skillLogicInst = singleton.NewContainer[global.SkillLogic]("SkillLogic")
 
 func init() {
-	skillLogicInst.Register(&skillLogic{})
+	c := cache.NewPlayerTableCache[model.PlayerSkill](cache.CacherConfig{Name: enum.TablePlayerSkill.String()})
+	global.RegisterCacheCloser(c)
+	skillLogicInst.Register(&skillLogic{cache: c})
 	registerAsset(&skillAssetStore{})
 }
 
@@ -115,8 +117,8 @@ func skillDimGrow(ctx context.Context, playerID int64, cfgID int32,
 	if !row.UpdateSkill(s) {
 		return model.SkillInfo{}, 0, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "技能未拥有")
 	}
-	skillCache.Set(playerID, row)
-	notifyHero(ctx, playerID, heroID)
+	Skill().(*skillLogic).cache.Set(playerID, row)
+	notifyHeroByID(ctx, playerID, heroID)
 	return s, heroID, nil
 }
 
@@ -259,14 +261,14 @@ func (this *skillLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.E
 }
 
 func (this *skillLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
-	if err := flushAndEvict(ctx, skillCache, playerID); err != nil {
+	if err := flushAndEvict(ctx, this.cache, playerID); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (this *skillLogic) Load(ctx context.Context, playerID int64) (*model.PlayerSkill, error) {
-	return skillCache.GetOrInit(ctx, playerID,
+	return this.cache.GetOrInit(ctx, playerID,
 		func(id int64) *model.PlayerSkill {
 			return &model.PlayerSkill{PlayerID: id, Skills: util.NewSafeMap[int32, model.SkillInfo]()}
 		},
@@ -278,11 +280,11 @@ func (this *skillLogic) Load(ctx context.Context, playerID int64) (*model.Player
 }
 
 func (this *skillLogic) Save(playerID int64, row *model.PlayerSkill) {
-	skillCache.Set(playerID, row)
+	this.cache.Set(playerID, row)
 }
 
 func (this *skillLogic) Flush(ctx context.Context, playerID int64) error {
-	return flushAndEvict(ctx, skillCache, playerID)
+	return flushAndEvict(ctx, this.cache, playerID)
 }
 
 // ============ 资产接口实现（AssetStore，唯一持有型：key 为技能配置ID） ============
@@ -307,7 +309,7 @@ func (this *skillAssetStore) Add(ctx context.Context, playerID int64, cfgID, _ i
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "技能已拥有")
 	}
 
-	skillCache.Set(playerID, row)
+	Skill().(*skillLogic).cache.Set(playerID, row)
 	record.Record(ctx, model.RecordModuleSkill, playerID, model.RecordActionGain, cfgID, 1)
 	notifyHeroBySkill(ctx, playerID, cfgID)
 	return nil
@@ -322,7 +324,7 @@ func (this *skillAssetStore) Remove(ctx context.Context, playerID int64, cfgID, 
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "技能未拥有")
 	}
 
-	skillCache.Set(playerID, row)
+	Skill().(*skillLogic).cache.Set(playerID, row)
 	record.Record(ctx, model.RecordModuleSkill, playerID, model.RecordActionConsume, cfgID, 1)
 	notifyHeroBySkill(ctx, playerID, cfgID)
 	return nil

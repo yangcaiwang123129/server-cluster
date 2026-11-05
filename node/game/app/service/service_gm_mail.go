@@ -7,7 +7,7 @@ import (
 	"server-cluster/share/pb"
 )
 
-func (p *GmProvider) MailList(ctx context.Context, req *pb.GmMailListReq) (*pb.GmMailListResp, error) {
+func (this *GmProvider) MailList(ctx context.Context, req *pb.GmMailListReq) (*pb.GmMailListResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
 	}
@@ -18,7 +18,7 @@ func (p *GmProvider) MailList(ctx context.Context, req *pb.GmMailListReq) (*pb.G
 	return &pb.GmMailListResp{Entries: resp.GetEntries()}, nil
 }
 
-func (p *GmProvider) MailSend(ctx context.Context, req *pb.GmMailSendReq) (*pb.MailEntry, error) {
+func (this *GmProvider) MailSend(ctx context.Context, req *pb.GmMailSendReq) (*pb.MailEntry, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
 	}

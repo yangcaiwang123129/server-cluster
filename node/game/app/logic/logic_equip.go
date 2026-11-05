@@ -18,14 +18,16 @@ import (
 	"server-cluster/share/util"
 )
 
-var equipCache = cache.NewPlayerTableCache[model.PlayerEquip](cache.CacherConfig{Name: enum.TablePlayerEquip.String()})
-
-type equipLogic struct{}
+type equipLogic struct {
+	cache *cache.Cache[int64, *model.PlayerEquip]
+}
 
 var equipLogicInst = singleton.NewContainer[global.EquipLogic]("EquipLogic")
 
 func init() {
-	equipLogicInst.Register(&equipLogic{})
+	c := cache.NewPlayerTableCache[model.PlayerEquip](cache.CacherConfig{Name: enum.TablePlayerEquip.String()})
+	global.RegisterCacheCloser(c)
+	equipLogicInst.Register(&equipLogic{cache: c})
 	registerAsset(&equipAssetStore{})
 }
 
@@ -73,7 +75,7 @@ func (this *equipLogic) EquipAdd(ctx context.Context, playerID int64, req *pb.Eq
 
 	this.Save(playerID, row)
 	record.Record(ctx, model.RecordModuleEquip, playerID, model.RecordActionGain, req.GetCfgId(), 1)
-	notifyHero(ctx, playerID, g.HeroID)
+	notifyHeroByID(ctx, playerID, g.HeroID)
 	return &pb.EquipAddResp{EquipEntry: convert.EquipEntry(g)}, nil
 }
 
@@ -115,9 +117,9 @@ func (this *equipLogic) EquipUpdate(ctx context.Context, playerID int64, req *pb
 
 	this.Save(playerID, row)
 	if oldHeroID != heroID {
-		notifyHero(ctx, playerID, oldHeroID)
+		notifyHeroByID(ctx, playerID, oldHeroID)
 	}
-	notifyHero(ctx, playerID, heroID)
+	notifyHeroByID(ctx, playerID, heroID)
 	return &pb.EquipUpdateResp{EquipEntry: convert.EquipEntry(g)}, nil
 }
 
@@ -165,9 +167,9 @@ func (this *equipLogic) EquipWear(ctx context.Context, playerID int64, req *pb.E
 
 	this.Save(playerID, row)
 	if oldHeroID != hero.HeroID {
-		notifyHero(ctx, playerID, oldHeroID)
+		notifyHeroByID(ctx, playerID, oldHeroID)
 	}
-	notifyHero(ctx, playerID, hero.HeroID)
+	notifyHeroByID(ctx, playerID, hero.HeroID)
 	_, attr, err := computeHeroAttribute(ctx, playerID, hero.HeroID)
 	if err != nil {
 		if r := codedResult(err); r != nil {
@@ -199,7 +201,7 @@ func (this *equipLogic) EquipUnwear(ctx context.Context, playerID int64, req *pb
 	}
 
 	this.Save(playerID, row)
-	notifyHero(ctx, playerID, heroID)
+	notifyHeroByID(ctx, playerID, heroID)
 	attr := &pb.HeroAttribute{}
 	if heroID > 0 {
 		_, computed, cErr := computeHeroAttribute(ctx, playerID, heroID)
@@ -247,8 +249,8 @@ func equipDimGrow(ctx context.Context, playerID int64, id int64,
 	if !row.UpdateEquip(g) {
 		return model.EquipInfo{}, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备未拥有")
 	}
-	equipCache.Set(playerID, row)
-	notifyHero(ctx, playerID, g.HeroID)
+	Equip().(*equipLogic).cache.Set(playerID, row)
+	notifyHeroByID(ctx, playerID, g.HeroID)
 	return g, nil
 }
 
@@ -348,14 +350,14 @@ func (this *equipLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.E
 }
 
 func (this *equipLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
-	if err := flushAndEvict(ctx, equipCache, playerID); err != nil {
+	if err := flushAndEvict(ctx, this.cache, playerID); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (this *equipLogic) Load(ctx context.Context, playerID int64) (*model.PlayerEquip, error) {
-	return equipCache.GetOrInit(ctx, playerID,
+	return this.cache.GetOrInit(ctx, playerID,
 		func(id int64) *model.PlayerEquip {
 			return &model.PlayerEquip{PlayerID: id, Equips: util.NewSafeMap[int64, model.EquipInfo]()}
 		},
@@ -367,11 +369,11 @@ func (this *equipLogic) Load(ctx context.Context, playerID int64) (*model.Player
 }
 
 func (this *equipLogic) Save(playerID int64, row *model.PlayerEquip) {
-	equipCache.Set(playerID, row)
+	this.cache.Set(playerID, row)
 }
 
 func (this *equipLogic) Flush(ctx context.Context, playerID int64) error {
-	return flushAndEvict(ctx, equipCache, playerID)
+	return flushAndEvict(ctx, this.cache, playerID)
 }
 
 // ============ 资产接口实现（AssetStore，可叠加型：同配置可多件） ============
@@ -395,9 +397,9 @@ func (this *equipAssetStore) Add(ctx context.Context, playerID int64, cfgID, _ i
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备实例已存在")
 	}
 
-	equipCache.Set(playerID, row)
+	Equip().(*equipLogic).cache.Set(playerID, row)
 	record.Record(ctx, model.RecordModuleEquip, playerID, model.RecordActionGain, cfgID, 1)
-	notifyHero(ctx, playerID, g.HeroID)
+	notifyHeroByID(ctx, playerID, g.HeroID)
 	return nil
 }
 
@@ -414,9 +416,9 @@ func (this *equipAssetStore) Remove(ctx context.Context, playerID int64, cfgID, 
 	}
 	row.DeleteEquip(equipID)
 
-	equipCache.Set(playerID, row)
+	Equip().(*equipLogic).cache.Set(playerID, row)
 	record.Record(ctx, model.RecordModuleEquip, playerID, model.RecordActionConsume, cfgID, 1)
-	notifyHero(ctx, playerID, info.HeroID)
+	notifyHeroByID(ctx, playerID, info.HeroID)
 	return nil
 }
 

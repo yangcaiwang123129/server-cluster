@@ -2,9 +2,12 @@ package logic
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"server-cluster/node/game/app/repo"
 	"strconv"
-	"time"
+	"strings"
+	"unicode/utf8"
 
 	"github.com/dobyte/due/v2/cluster"
 	"github.com/dobyte/due/v2/cluster/node"
@@ -27,23 +30,22 @@ import (
 	"server-cluster/share/util"
 )
 
-// playerCache 玩家账号与货币（player，一玩家一行）；读走 LRU，写异步批量 upsert。
-var playerCache = cache.NewPlayerTableCache[model.Player](cache.CacherConfig{Name: enum.TablePlayer.String()})
-
-// playerExtraCache 玩家核心数值（player_extra，一玩家一行）。
-var playerExtraCache = cache.NewPlayerTableCache[model.PlayerExtra](cache.CacherConfig{Name: enum.TablePlayerExtra.String()})
-
-// actorKindPlayer 玩家 actor 类型。
-const actorKindPlayer = "player"
-
 type playerLogic struct {
-	PlayerActors *util.SafeMap[int64, *global.PlayerActor] // playerID -> 玩家actor
+	// cache 玩家核心数值（player_extra，一玩家一行）。
+	cache *cache.Cache[int64, *model.PlayerExtra]
+	// attrHandlers 属性类型 → 操作实现（见 newAttrHandlers）。
+	attrHandlers map[pb.Attr]attrHandler
 }
 
 var playerLogicInst = singleton.NewContainer[global.PlayerLogic]("PlayerLogic")
 
 func init() {
-	playerLogicInst.Register(&playerLogic{PlayerActors: util.NewSafeMap[int64, *global.PlayerActor]()})
+	c := cache.NewPlayerTableCache[model.PlayerExtra](cache.CacherConfig{Name: enum.TablePlayerExtra.String()})
+	global.RegisterCacheCloser(c)
+	playerLogicInst.Register(&playerLogic{
+		cache:        c,
+		attrHandlers: newAttrHandlers(),
+	})
 }
 
 // moduleLogics 延迟获取持有玩家数据的模块（init 注册顺序不确定，不能在包初始化阶段调用）。
@@ -55,7 +57,7 @@ func moduleLogics() []global.PlayerLifecycle {
 func PlayerLogic() global.PlayerLogic { return playerLogicInst.MustGet() }
 
 func (this *playerLogic) Load(ctx context.Context, playerID int64) (*model.PlayerExtra, error) {
-	return playerExtraCache.GetOrInit(ctx, playerID,
+	return this.cache.GetOrInit(ctx, playerID,
 		func(id int64) *model.PlayerExtra {
 			return &model.PlayerExtra{
 				PlayerID:     id,
@@ -67,11 +69,11 @@ func (this *playerLogic) Load(ctx context.Context, playerID int64) (*model.Playe
 }
 
 func (this *playerLogic) Save(playerID int64, row *model.PlayerExtra) {
-	playerExtraCache.Set(playerID, row)
+	this.cache.Set(playerID, row)
 }
 
 func (this *playerLogic) Flush(ctx context.Context, playerID int64) error {
-	return flushAndEvict(ctx, playerExtraCache, playerID)
+	return flushAndEvict(ctx, this.cache, playerID)
 }
 
 func (this *playerLogic) OnEnterGame(ctx context.Context, playerID int64, req *pb.EnterGameReq, resp *pb.EnterGameResp) error {
@@ -80,8 +82,8 @@ func (this *playerLogic) OnEnterGame(ctx context.Context, playerID int64, req *p
 		return err
 	}
 
-	// 账号行由 login 服建档；异常缺失时按全 0 货币处理，不阻断进入游戏
-	player, err := playerCache.Get(ctx, playerID)
+	// 账号行由 login 服建档，game 侧直查 DB（不缓存）；异常缺失时按全 0 货币处理，不阻断进入游戏
+	player, err := repo.QueryPlayer(ctx, playerID)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		player = &model.Player{PlayerID: playerID}
 	} else if err != nil {
@@ -118,11 +120,8 @@ func (this *playerLogic) OnLeaveGame(ctx context.Context, playerID int64, req *p
 	for _, mod := range moduleLogics() {
 		record("module", mod.OnLeaveGame(ctx, playerID, req, resp))
 	}
-	// 无独立模块的玩家表：账号（含货币）
-	record("player", flushAndEvict(ctx, playerCache, playerID))
 	// 核心数据（player_extra）走模块 Flush
-	record("player_core", this.Flush(ctx, playerID))
-
+	record("player_extra", this.Flush(ctx, playerID))
 	record("player_actor", this.DestroyActor(ctx, playerID))
 	return firstErr
 }
@@ -235,15 +234,15 @@ func codedResult(err error) *pb.Result {
 }
 
 func (this *playerLogic) GetActor(ctx context.Context, playerID int64) (*global.PlayerActor, error) {
-	if pa, ok := this.PlayerActors.Get(playerID); ok {
+	if pa, ok := global.PlayerActors.Get(playerID); ok {
 		return pa, nil
 	}
 	return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_PLAYER_NOT_FOUND, "player actor not found")
 }
 
 func (this *playerLogic) GetActors(ctx context.Context) ([]*global.PlayerActor, error) {
-	actors := make([]*global.PlayerActor, 0, this.PlayerActors.Len())
-	this.PlayerActors.Range(func(_ int64, pa *global.PlayerActor) bool {
+	actors := make([]*global.PlayerActor, 0, global.PlayerActors.Len())
+	global.PlayerActors.Range(func(_ int64, pa *global.PlayerActor) bool {
 		actors = append(actors, pa)
 		return true
 	})
@@ -251,18 +250,18 @@ func (this *playerLogic) GetActors(ctx context.Context) ([]*global.PlayerActor, 
 }
 
 func (this *playerLogic) CreateActor(ctx context.Context, playerID int64, loginIP string) error {
-	if this.PlayerActors.Has(playerID) {
+	if global.PlayerActors.Has(playerID) {
 		// 已在线：幂等更新登录 IP 与重连时间（断线重连可能换 IP；ReconnectAt 供断线延迟销毁豁免判断）
-		if pa, ok := this.PlayerActors.Get(playerID); ok {
+		if pa, ok := global.PlayerActors.Get(playerID); ok {
 			pa.LoginIP = loginIP
 			pa.ReconnectAt = util.Now().Unix()
 		}
 		return nil
 	}
 
-	_, err := svc.NodeProxy().Spawn(newPlayerProcessor,
-		node.WithActorKind(actorKindPlayer),
-		node.WithActorID(playerActorID(playerID)),
+	_, err := svc.NodeProxy().Spawn(global.NewPlayerProcessor,
+		node.WithActorKind(global.ActorKindPlayer),
+		node.WithActorID(global.ActorID(playerID)),
 		node.WithActorArgs(playerID, loginIP))
 	if err == nil {
 		return nil
@@ -272,11 +271,11 @@ func (this *playerLogic) CreateActor(ctx context.Context, playerID int64, loginI
 	}
 
 	// 并发重复创建：actor 已由他人创建，读回并补齐本地登记。
-	pa, ok := svc.NodeProxy().Actor(actorKindPlayer, playerActorID(playerID))
+	pa, ok := svc.NodeProxy().Actor(global.ActorKindPlayer, global.ActorID(playerID))
 	if !ok {
 		return err
 	}
-	this.PlayerActors.Set(playerID, &global.PlayerActor{
+	global.PlayerActors.Set(playerID, &global.PlayerActor{
 		Actor:     pa,
 		PlayerID:  playerID,
 		EnterTime: util.Now().Unix(),
@@ -286,8 +285,8 @@ func (this *playerLogic) CreateActor(ctx context.Context, playerID int64, loginI
 }
 
 func (this *playerLogic) DestroyActor(ctx context.Context, playerID int64) error {
-	svc.NodeProxy().Kill(actorKindPlayer, playerActorID(playerID))
-	this.PlayerActors.Delete(playerID)
+	svc.NodeProxy().Kill(global.ActorKindPlayer, global.ActorID(playerID))
+	global.PlayerActors.Delete(playerID)
 
 	if nc, ok := ctx.(node.Context); ok {
 		_ = nc.UnbindGate(playerID)
@@ -297,7 +296,7 @@ func (this *playerLogic) DestroyActor(ctx context.Context, playerID int64) error
 }
 
 func (this *playerLogic) DestroyActorIfOffline(ctx context.Context, playerID int64, since int64) error {
-	pa, ok := this.PlayerActors.Get(playerID)
+	pa, ok := global.PlayerActors.Get(playerID)
 	if !ok {
 		return nil // actor 已不存在（正常走 LeaveGame 清理），幂等
 	}
@@ -308,7 +307,7 @@ func (this *playerLogic) DestroyActorIfOffline(ctx context.Context, playerID int
 }
 
 func (this *playerLogic) Kick(ctx context.Context, playerID int64) error {
-	if !this.PlayerActors.Has(playerID) {
+	if !global.PlayerActors.Has(playerID) {
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_PLAYER_NOT_FOUND, "player is not online")
 	}
 	if err := this.DestroyActor(ctx, playerID); err != nil {
@@ -327,101 +326,93 @@ func (this *playerLogic) Kick(ctx context.Context, playerID int64) error {
 	})
 }
 
-// ── 玩家 actor（due actor）────────────────────────────────────────────
-
-// playerActorID 玩家 actor 唯一标识。
-func playerActorID(playerID int64) string {
-	return strconv.FormatInt(playerID, 10)
+// attrHandler 单个属性类型的操作实现。
+type attrHandler struct {
+	// 属性更新实现：校验并写入 core，返回操作后的属性值。
+	update func(core *model.PlayerExtra, value *pb.ObjectValue) (*pb.ObjectValue, error)
+	// 属性领取实现：按玩家状态发放奖励，返回操作后的属性值。
+	claim func(ctx context.Context, playerID int64, core *model.PlayerExtra) (*pb.ObjectValue, error)
 }
 
-// playerActorMap 在线玩家 actor 表（与 PlayerLogic 单例共享同一实例）。
-func playerActorMap() *util.SafeMap[int64, *global.PlayerActor] {
-	return playerLogicInst.MustGet().(*playerLogic).PlayerActors
-}
-
-// actorRouteRegistrar 玩家 actor 路由注册器，由 handler 包装配期注入（避免 logic → handler 循环依赖）。
-var actorRouteRegistrar func(act *node.Actor)
-
-// RegisterActorRouteRegistrar 注入玩家 actor 路由注册器（handler 包在装配期调用）。
-func RegisterActorRouteRegistrar(fn func(act *node.Actor)) {
-	actorRouteRegistrar = fn
-}
-
-// playerProcessor 玩家 actor 处理器：生命周期与在线登记一一对应。
-type playerProcessor struct {
-	node.BaseProcessor
-	actor    *node.Actor
-	playerID int64
-	loginIP  string
-}
-
-// newPlayerProcessor due actor Creator。
-func newPlayerProcessor(act *node.Actor, args ...any) node.Processor {
-	var playerID int64
-	var loginIP string
-	if len(args) > 0 {
-		playerID, _ = args[0].(int64)
-	}
-	if len(args) > 1 {
-		loginIP, _ = args[1].(string)
-	}
-	return &playerProcessor{actor: act, playerID: playerID, loginIP: loginIP}
-}
-
-func (p *playerProcessor) Start() {
-	playerActorMap().Set(p.playerID, &global.PlayerActor{
-		Actor:     p.actor,
-		PlayerID:  p.playerID,
-		EnterTime: util.Now().Unix(),
-		LoginIP:   p.loginIP,
-	})
-
-	// uid 与 actor 绑定：stateful 消息由 scheduler 定位到本 actor
-	if err := p.actor.Proxy().BindActor(p.playerID, actorKindPlayer, p.actor.ID()); err != nil {
-		log.Errorf("logic: bind player actor failed, playerID=%d: %v", p.playerID, err)
-	}
-	// 注册业务路由：消息进入 actor 后串行处理
-	if actorRouteRegistrar != nil {
-		actorRouteRegistrar(p.actor)
+// newAttrHandlers 属性操作注册表；未登记的类型或未实现的操作一律视为不支持。
+// 1000~4999 任务/成就进度、5000~9999 活动状态等属性接入时在此扩展。
+func newAttrHandlers() map[pb.Attr]attrHandler {
+	return map[pb.Attr]attrHandler{
+		pb.Attr_PLAYER_ATTR_NAME:          {update: updateNickname},
+		pb.Attr_PLAYER_ATTR_SIGNATURE:     {update: updateSignature},
+		pb.Attr_PLAYER_ATTR_SETTINGS_JSON: {update: updateSettingsJSON},
 	}
 }
 
-func (p *playerProcessor) Destroy() {
-	playerActorMap().Delete(p.playerID)
-}
-
-// CacheCloseStat 单个玩家数据缓存在停服刷盘时的统计，用于停服日志展示。
-type CacheCloseStat struct {
-	Name string
-	Rows int
-	Cost time.Duration
-}
-
-// cacheCloser 停服日志所需的缓存能力（泛型缓存实例的公共方法集合）。
-type cacheCloser interface {
-	Name() string
-	PendingLen() int
-	Close()
-}
-
-// CloseCaches 停止后台落库协程，把剩余待写数据刷入 MySQL，返回每个缓存的刷盘统计。
-func CloseCaches() []CacheCloseStat {
-	closeOne := func(c cacheCloser) CacheCloseStat {
-		begin := time.Now()
-		rows := c.PendingLen()
-		c.Close()
-		return CacheCloseStat{Name: c.Name(), Rows: rows, Cost: time.Since(begin)}
+func (this *playerLogic) AttrOperate(ctx context.Context, playerID int64, req *pb.AttrOperateReq) (*pb.AttrOperateResp, error) {
+	attr := pb.Attr(req.GetAttr())
+	h, ok := this.attrHandlers[attr]
+	if !ok {
+		return &pb.AttrOperateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "不支持的属性类型")}, nil
 	}
-	return []CacheCloseStat{
-		closeOne(playerCache),
-		closeOne(playerExtraCache),
-		closeOne(heroCache),
-		closeOne(weaponCache),
-		closeOne(skillCache),
-		closeOne(equipCache),
-		closeOne(itemCache),
-		closeOne(mailCache),
-		closeOne(taskCache),
-		closeOne(activityCache),
+
+	playerExtra, err := this.Load(ctx, playerID)
+	if err != nil {
+		return nil, err
 	}
+
+	var out *pb.ObjectValue
+	switch req.GetOperate() {
+	case pb.AttrOperate_UPDATE:
+		if h.update == nil {
+			return &pb.AttrOperateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "该属性不支持更新")}, nil
+		}
+		out, err = h.update(playerExtra, req.GetValue())
+	case pb.AttrOperate_CLAIM:
+		if h.claim == nil {
+			return &pb.AttrOperateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "该属性不支持领取")}, nil
+		}
+		out, err = h.claim(ctx, playerID, playerExtra)
+	default:
+		return &pb.AttrOperateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "不支持的操作类型")}, nil
+	}
+	if err != nil {
+		if r := codedResult(err); r != nil {
+			return &pb.AttrOperateResp{Result: r}, nil
+		}
+		return nil, err
+	}
+
+	this.Save(playerID, playerExtra)
+	return &pb.AttrOperateResp{Values: map[int32]*pb.ObjectValue{int32(attr): out}}, nil
+}
+
+// updateNickname 更新昵称：去首尾空白，长度 1~MaxNicknameLen 字符。
+func updateNickname(core *model.PlayerExtra, value *pb.ObjectValue) (*pb.ObjectValue, error) {
+	name := strings.TrimSpace(value.GetStringValue())
+	n := utf8.RuneCountInString(name)
+	if n == 0 || n > consts.MaxNicknameLen {
+		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "昵称长度不合法")
+	}
+	core.Nickname = name
+	return &pb.ObjectValue{Kind: &pb.ObjectValue_StringValue{StringValue: core.Nickname}}, nil
+}
+
+// updateSignature 更新个性签名：长度不超过 MaxSignatureLen 字符，允许为空。
+func updateSignature(core *model.PlayerExtra, value *pb.ObjectValue) (*pb.ObjectValue, error) {
+	signature := strings.TrimSpace(value.GetStringValue())
+	if utf8.RuneCountInString(signature) > consts.MaxSignatureLen {
+		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "个性签名过长")
+	}
+	core.Signature = signature
+	return &pb.ObjectValue{Kind: &pb.ObjectValue_StringValue{StringValue: core.Signature}}, nil
+}
+
+// updateSettingsJSON 更新个人设置：必须是 JSON 对象且不超过 MaxSettingsJSONLen 字节。
+func updateSettingsJSON(core *model.PlayerExtra, value *pb.ObjectValue) (*pb.ObjectValue, error) {
+	raw := strings.TrimSpace(value.GetStringValue())
+	if raw == "" || len(raw) > consts.MaxSettingsJSONLen {
+		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "个人设置长度不合法")
+	}
+	var obj map[string]json.RawMessage
+	if err := json.Unmarshal([]byte(raw), &obj); err != nil || obj == nil {
+		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "个人设置必须是 JSON 对象")
+	}
+	core.SettingsJSON = raw
+	return &pb.ObjectValue{Kind: &pb.ObjectValue_StringValue{StringValue: core.SettingsJSON}}, nil
 }

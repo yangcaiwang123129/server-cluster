@@ -4,6 +4,8 @@ import (
 	"context"
 	"sort"
 
+	"github.com/dobyte/due/v2/log"
+
 	"server-cluster/internal/cache"
 	"server-cluster/internal/record"
 	"server-cluster/node/game/app/global"
@@ -17,14 +19,16 @@ import (
 	"server-cluster/share/util"
 )
 
-var heroCache = cache.NewPlayerTableCache[model.PlayerHero](cache.CacherConfig{Name: enum.TablePlayerHero.String()})
-
-type heroLogic struct{}
+type heroLogic struct {
+	cache *cache.Cache[int64, *model.PlayerHero]
+}
 
 var heroLogicInst = singleton.NewContainer[global.HeroLogic]("HeroLogic")
 
 func init() {
-	heroLogicInst.Register(&heroLogic{})
+	c := cache.NewPlayerTableCache[model.PlayerHero](cache.CacherConfig{Name: enum.TablePlayerHero.String()})
+	global.RegisterCacheCloser(c)
+	heroLogicInst.Register(&heroLogic{cache: c})
 	registerAsset(&heroAssetStore{})
 }
 
@@ -112,6 +116,34 @@ func buildHeroEntry(ctx context.Context, playerID int64, heroID int32) (*pb.Hero
 	return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "英雄未拥有")
 }
 
+// notifyHeroByID 按英雄ID组装完整持有结构后推送；英雄未拥有时只记日志不推送。
+func notifyHeroByID(ctx context.Context, playerID int64, heroID int32) {
+	entry, err := buildHeroEntry(ctx, playerID, heroID)
+	if err != nil {
+		log.Warnf("game: assemble hero entry failed, player=%d hero=%d: %v", playerID, heroID, err)
+		return
+	}
+	global.NotifyHero(ctx, playerID, entry)
+}
+
+// notifyHeroByWeapon 武器变化后按固定绑定反查所属英雄并推送。
+func notifyHeroByWeapon(ctx context.Context, playerID int64, cfgID int32) {
+	heroID, ok := heroIDByWeapon(cfgID)
+	if !ok {
+		return
+	}
+	notifyHeroByID(ctx, playerID, heroID)
+}
+
+// notifyHeroBySkill 技能变化后按固定绑定反查所属英雄并推送。
+func notifyHeroBySkill(ctx context.Context, playerID int64, cfgID int32) {
+	heroID, ok := heroIDBySkill(cfgID)
+	if !ok {
+		return
+	}
+	notifyHeroByID(ctx, playerID, heroID)
+}
+
 // newHeroInfo 按英雄配置初始化持有状态。
 func newHeroInfo(cfgID int32) model.HeroInfo {
 	return model.HeroInfo{HeroID: cfgID}
@@ -143,7 +175,7 @@ func addHeroWithBound(ctx context.Context, playerID int64, cfgID int32) (model.H
 	if !row.AddHero(h) {
 		return model.HeroInfo{}, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "英雄已拥有")
 	}
-	heroCache.Set(playerID, row)
+	Hero().(*heroLogic).cache.Set(playerID, row)
 	record.Record(ctx, model.RecordModuleHero, playerID, model.RecordActionGain, cfgID, 1)
 	return h, nil
 }
@@ -221,7 +253,7 @@ func (this *heroLogic) HeroUpdate(ctx context.Context, playerID int64, req *pb.H
 		return nil, err
 	}
 	for _, id := range unsetHeroIDs {
-		notifyHero(ctx, playerID, id)
+		notifyHeroByID(ctx, playerID, id)
 	}
 	global.NotifyHero(ctx, playerID, entry)
 	return &pb.HeroUpdateResp{HeroEntry: entry}, nil
@@ -321,14 +353,14 @@ func (this *heroLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.En
 }
 
 func (this *heroLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
-	if err := flushAndEvict(ctx, heroCache, playerID); err != nil {
+	if err := flushAndEvict(ctx, this.cache, playerID); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (this *heroLogic) Load(ctx context.Context, playerID int64) (*model.PlayerHero, error) {
-	return heroCache.GetOrInit(ctx, playerID,
+	return this.cache.GetOrInit(ctx, playerID,
 		func(id int64) *model.PlayerHero {
 			return &model.PlayerHero{PlayerID: id, Heroes: util.NewSafeMap[int32, model.HeroInfo]()}
 		},
@@ -340,11 +372,11 @@ func (this *heroLogic) Load(ctx context.Context, playerID int64) (*model.PlayerH
 }
 
 func (this *heroLogic) Save(playerID int64, row *model.PlayerHero) {
-	heroCache.Set(playerID, row)
+	this.cache.Set(playerID, row)
 }
 
 func (this *heroLogic) Flush(ctx context.Context, playerID int64) error {
-	return flushAndEvict(ctx, heroCache, playerID)
+	return flushAndEvict(ctx, this.cache, playerID)
 }
 
 // ============ 资产接口实现（AssetStore，唯一持有型） ============
@@ -362,7 +394,7 @@ func (this *heroAssetStore) Add(ctx context.Context, playerID int64, cfgID, _ in
 	if err != nil {
 		return err
 	}
-	notifyHero(ctx, playerID, h.HeroID)
+	notifyHeroByID(ctx, playerID, h.HeroID)
 	return nil
 }
 
@@ -375,7 +407,7 @@ func (this *heroAssetStore) Remove(ctx context.Context, playerID int64, cfgID, _
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "英雄未拥有")
 	}
 
-	heroCache.Set(playerID, row)
+	Hero().(*heroLogic).cache.Set(playerID, row)
 	record.Record(ctx, model.RecordModuleHero, playerID, model.RecordActionConsume, cfgID, 1)
 	return nil
 }

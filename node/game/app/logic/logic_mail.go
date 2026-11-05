@@ -19,15 +19,17 @@ import (
 	"server-cluster/share/util"
 )
 
-// mailCache 玩家邮件（player_mail，一玩家一行，邮件 map JSON）；读走 LRU，写异步批量 upsert。
-var mailCache = cache.NewPlayerTableCache[model.PlayerMail](cache.CacherConfig{Name: enum.TablePlayerMail.String()})
-
-type mailLogic struct{}
+type mailLogic struct {
+	// cache 玩家邮件（player_mail，一玩家一行，邮件 map JSON）；读走 LRU，写异步批量 upsert。
+	cache *cache.Cache[int64, *model.PlayerMail]
+}
 
 var mailLogicInst = singleton.NewContainer[global.MailLogic]("MailLogic")
 
 func init() {
-	mailLogicInst.Register(&mailLogic{})
+	c := cache.NewPlayerTableCache[model.PlayerMail](cache.CacherConfig{Name: enum.TablePlayerMail.String()})
+	global.RegisterCacheCloser(c)
+	mailLogicInst.Register(&mailLogic{cache: c})
 }
 
 // Mail 获取邮件业务单例。
@@ -41,7 +43,7 @@ func (this *mailLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.En
 }
 
 func (this *mailLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
-	if err := flushAndEvict(ctx, mailCache, playerID); err != nil {
+	if err := flushAndEvict(ctx, this.cache, playerID); err != nil {
 		return err
 	}
 	return nil
@@ -297,7 +299,7 @@ func (this *mailLogic) MailSend(ctx context.Context, playerID int64, req *pb.GmM
 }
 
 func (this *mailLogic) Load(ctx context.Context, playerID int64) (*model.PlayerMail, error) {
-	return mailCache.GetOrInit(ctx, playerID,
+	return this.cache.GetOrInit(ctx, playerID,
 		func(id int64) *model.PlayerMail {
 			return &model.PlayerMail{PlayerID: id, Mails: util.NewSafeMap[int64, model.MailInfo]()}
 		},
@@ -309,9 +311,9 @@ func (this *mailLogic) Load(ctx context.Context, playerID int64) (*model.PlayerM
 }
 
 func (this *mailLogic) Save(playerID int64, row *model.PlayerMail) {
-	mailCache.Set(playerID, row)
+	this.cache.Set(playerID, row)
 }
 
 func (this *mailLogic) Flush(ctx context.Context, playerID int64) error {
-	return flushAndEvict(ctx, mailCache, playerID)
+	return flushAndEvict(ctx, this.cache, playerID)
 }

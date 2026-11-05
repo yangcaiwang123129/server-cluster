@@ -68,13 +68,13 @@ func main() {
 	destroy()
 }
 
-// destroy 进程退出后释放缓存刷盘、DB/Redis 等资源，并按统一停服日志输出（缓存收口在 logic 包，故自 global 迁至 main）。
+// destroy 进程退出后释放缓存刷盘、DB/Redis 等资源，并按统一停服日志输出（缓存收口在 global 包）。
 func destroy() {
 	sl := util.NewShutdownLog(consts.NodeInstanceID(), 2)
 	sl.Start()
 
 	sl.Step("玩家数据缓存落盘", func() (string, error) {
-		stats := logic.CloseCaches()
+		stats := global.CloseCaches()
 		rows := 0
 		lines := make([]string, 0, len(stats))
 		for _, s := range stats {

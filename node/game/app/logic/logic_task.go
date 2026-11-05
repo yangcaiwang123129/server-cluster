@@ -20,18 +20,21 @@ import (
 	"server-cluster/share/util"
 )
 
-// taskCache 玩家任务进度（player_task，一玩家一行，任务 map JSON，key=taskId:periodKey）；读走 LRU，写异步批量 upsert。
-var taskCache = cache.NewPlayerTableCache[model.PlayerTask](cache.CacherConfig{Name: enum.TablePlayerTask.String()})
-
-// activityCache 玩家活动参与（player_activity，一玩家一行，活动 map JSON，key=活动实例ID）；读走 LRU，写异步批量 upsert。
-var activityCache = cache.NewPlayerTableCache[model.PlayerActivity](cache.CacherConfig{Name: enum.TableActivity.String()})
-
-type taskLogic struct{}
+type taskLogic struct {
+	// task 玩家任务进度（player_task，一玩家一行，任务 map JSON，key=taskId:periodKey）；读走 LRU，写异步批量 upsert。
+	task *cache.Cache[int64, *model.PlayerTask]
+	// activity 玩家活动参与（player_activity，一玩家一行，活动 map JSON，key=活动实例ID）；读走 LRU，写异步批量 upsert。
+	activity *cache.Cache[int64, *model.PlayerActivity]
+}
 
 var taskLogicInst = singleton.NewContainer[global.TaskLogic]("TaskLogic")
 
 func init() {
-	taskLogicInst.Register(&taskLogic{})
+	task := cache.NewPlayerTableCache[model.PlayerTask](cache.CacherConfig{Name: enum.TablePlayerTask.String()})
+	activity := cache.NewPlayerTableCache[model.PlayerActivity](cache.CacherConfig{Name: enum.TableActivity.String()})
+	global.RegisterCacheCloser(task)
+	global.RegisterCacheCloser(activity)
+	taskLogicInst.Register(&taskLogic{task: task, activity: activity})
 }
 
 // Task 获取任务业务单例。
@@ -59,10 +62,10 @@ func (this *taskLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.En
 }
 
 func (this *taskLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
-	if err := flushAndEvict(ctx, taskCache, playerID); err != nil {
+	if err := flushAndEvict(ctx, this.task, playerID); err != nil {
 		return err
 	}
-	if err := flushAndEvict(ctx, activityCache, playerID); err != nil {
+	if err := flushAndEvict(ctx, this.activity, playerID); err != nil {
 		return err
 	}
 	return nil
@@ -152,7 +155,7 @@ func (this *taskLogic) TaskClaim(ctx context.Context, playerID int64, req *pb.Ta
 	pt.SetTask(info)
 	this.Save(playerID, pt)
 	// 领取状态先落库，避免发放成功后状态写失败导致重复领奖
-	if err := taskCache.FlushKey(ctx, playerID); err != nil {
+	if err := this.task.FlushKey(ctx, playerID); err != nil {
 		return nil, err
 	}
 	rewards, err := grantAssets(ctx, playerID, cfg.AssetRewards)
@@ -161,7 +164,7 @@ func (this *taskLogic) TaskClaim(ctx context.Context, playerID int64, req *pb.Ta
 		info.ClaimedAt = 0
 		pt.SetTask(info)
 		this.Save(playerID, pt)
-		if ferr := taskCache.FlushKey(ctx, playerID); ferr != nil {
+		if ferr := this.task.FlushKey(ctx, playerID); ferr != nil {
 			log.Warnf("game: task claim rollback failed, player=%d task=%d: %v", playerID, cfg.Id, ferr)
 		}
 		if r := codedResult(err); r != nil {
@@ -297,7 +300,7 @@ func newTaskInfo(cfg *tpl.TaskCfg, key string) model.PlayerTaskInfo {
 }
 
 func (this *taskLogic) Load(ctx context.Context, playerID int64) (*model.PlayerTask, error) {
-	return taskCache.GetOrInit(ctx, playerID,
+	return this.task.GetOrInit(ctx, playerID,
 		func(id int64) *model.PlayerTask {
 			return &model.PlayerTask{PlayerID: id, Tasks: util.NewSafeMap[string, model.PlayerTaskInfo]()}
 		},
@@ -309,11 +312,11 @@ func (this *taskLogic) Load(ctx context.Context, playerID int64) (*model.PlayerT
 }
 
 func (this *taskLogic) Save(playerID int64, row *model.PlayerTask) {
-	taskCache.Set(playerID, row)
+	this.task.Set(playerID, row)
 }
 
 func (this *taskLogic) Flush(ctx context.Context, playerID int64) error {
-	return flushAndEvict(ctx, taskCache, playerID)
+	return flushAndEvict(ctx, this.task, playerID)
 }
 
 // targetOf 目标数量兜底：未配置按 1 处理。
@@ -335,7 +338,7 @@ func (this *taskLogic) checkConditions(ctx context.Context, playerID int64, logi
 	if len(conds) == 0 {
 		return true
 	}
-	extra, err := playerExtraCache.Get(ctx, playerID)
+	extra, err := PlayerLogic().(*playerLogic).cache.Get(ctx, playerID)
 	if err != nil || extra == nil {
 		return false
 	}
