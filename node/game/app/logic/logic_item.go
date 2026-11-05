@@ -431,6 +431,11 @@ func countItem(c *model.ItemContainer, cfgID int32) int32 {
 	return total
 }
 
+// CloseCaches 停服刷盘收口：关闭所有注册的玩家数据缓存并返回统计（自 global 迁至 logic 包的包装）。
+func CloseCaches() []cache.CacheCloseStat {
+	return cache.CloseCaches()
+}
+
 // placeItemEntry 从左上角逐格尝试放置，命中空闲位置后返回；全部占满返回“背包空间不足”。
 func placeItemEntry(c *model.ItemContainer, cfgID, count int32) error {
 	meta := c.Meta()

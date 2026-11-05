@@ -1,4 +1,4 @@
-// Package logic 活动域：activitySync 只读同步 admin 发布的活动实例快照；activityLogic 维护玩家活动参与（player_activity 行缓存）。
+// Package logic 活动域：activityLogic 单例同时维护 admin 活动快照同步（只读）与玩家活动参与（player_activity 行缓存）。
 package logic
 
 import (
@@ -23,10 +23,15 @@ import (
 	"server-cluster/share/util"
 )
 
-// activitySync game 节点侧活动快照同步器：每 10s 读 Redis，版本变化才拉取 payload。
-// admin 活动模块是唯一写入者，game 只读缓存。
+// ── 活动模块（admin 快照同步 + 玩家活动参与）──────────────────────
+
+// activityLogic 活动模块：game 节点侧活动快照同步器 + 玩家活动参与。
+// 快照每 10s 读 Redis，版本变化才拉取 payload；admin 活动模块是唯一写入者，game 只读缓存；
 // 同时订阅 sc:activity:changed 通道，admin 发布后立即拉取，10s 轮询作为兜底。
-type activitySync struct {
+type activityLogic struct {
+	// cache 玩家活动参与（player_activity，一玩家一行，活动 map JSON，key=活动实例ID）；读走 LRU，写异步批量 upsert。
+	cache *cache.Cache[int64, *model.PlayerActivity]
+
 	mu      sync.RWMutex
 	snap    *dto.ActivitySnapshot
 	version int64
@@ -34,13 +39,48 @@ type activitySync struct {
 	lastErr string
 }
 
-var activitySyncInst = &activitySync{}
+var activityLogicInst = singleton.NewContainer[global.ActivityLogic]("ActivityLogic")
 
-// ActivitySync 获取活动快照同步器单例。
-func ActivitySync() *activitySync { return activitySyncInst }
+func init() {
+	c := cache.NewPlayerTableCache[model.PlayerActivity](cache.CacherConfig{Name: enum.TableActivity.String()})
+	cache.RegisterCacheCloser(c)
+	activityLogicInst.Register(&activityLogic{cache: c})
+}
+
+// Activity 获取活动业务单例。
+func Activity() global.ActivityLogic { return activityLogicInst.MustGet() }
+
+func (this *activityLogic) Load(ctx context.Context, playerID int64) (*model.PlayerActivity, error) {
+	return this.cache.GetOrInit(ctx, playerID,
+		func(id int64) *model.PlayerActivity {
+			return &model.PlayerActivity{PlayerID: id, Activities: util.NewSafeMap[int64, model.PlayerActivityInfo]()}
+		},
+		func(row *model.PlayerActivity) {
+			if row.Activities == nil {
+				row.Activities = util.NewSafeMap[int64, model.PlayerActivityInfo]()
+			}
+		})
+}
+
+func (this *activityLogic) Save(playerID int64, row *model.PlayerActivity) {
+	this.cache.Set(playerID, row)
+}
+
+func (this *activityLogic) Flush(ctx context.Context, playerID int64) error {
+	return flushAndEvict(ctx, this.cache, playerID)
+}
+
+func (this *activityLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
+	_, err := this.Load(ctx, playerID)
+	return err
+}
+
+func (this *activityLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
+	return flushAndEvict(ctx, this.cache, playerID)
+}
 
 // Start 启动轮询（game main 在容器 Serve 前调用）。
-func (this *activitySync) Start(ctx context.Context) {
+func (this *activityLogic) Start(ctx context.Context) {
 	this.mu.Lock()
 	if this.cancel != nil {
 		this.mu.Unlock()
@@ -57,7 +97,7 @@ func (this *activitySync) Start(ctx context.Context) {
 }
 
 // Stop 停止轮询。
-func (this *activitySync) Stop() {
+func (this *activityLogic) Stop() {
 	this.mu.Lock()
 	cancel := this.cancel
 	this.cancel = nil
@@ -68,7 +108,7 @@ func (this *activitySync) Stop() {
 }
 
 // Snapshot 返回最近一次快照副本；未就绪返回 nil。
-func (this *activitySync) Snapshot() *dto.ActivitySnapshot {
+func (this *activityLogic) Snapshot() *dto.ActivitySnapshot {
 	this.mu.RLock()
 	defer this.mu.RUnlock()
 	if this.snap == nil {
@@ -79,7 +119,7 @@ func (this *activitySync) Snapshot() *dto.ActivitySnapshot {
 	return &cp
 }
 
-func (this *activitySync) loop(ctx context.Context) {
+func (this *activityLogic) loop(ctx context.Context) {
 	t := time.NewTicker(consts.ActivitySnapshotInterval)
 	defer t.Stop()
 	for {
@@ -94,7 +134,7 @@ func (this *activitySync) loop(ctx context.Context) {
 
 // subscribe 订阅 sc:activity:changed；收到版本号信号立即触发同步。
 // go-redis PubSub 内部自动重连；循环仅在 ctx 取消或订阅对象不可用时退出。
-func (this *activitySync) subscribe(ctx context.Context) {
+func (this *activityLogic) subscribe(ctx context.Context) {
 	rdb, err := svc.Ctx().Redis.Default()
 	if err != nil {
 		this.warnOnce("redis unavailable: " + err.Error())
@@ -117,7 +157,7 @@ func (this *activitySync) subscribe(ctx context.Context) {
 }
 
 // sync 读取版本号；版本变化才拉取 payload 并更新本地缓存。
-func (this *activitySync) sync(ctx context.Context) {
+func (this *activityLogic) sync(ctx context.Context) {
 	rdb, err := svc.Ctx().Redis.Default()
 	if err != nil {
 		this.warnOnce(err.Error())
@@ -164,7 +204,7 @@ func (this *activitySync) sync(ctx context.Context) {
 }
 
 // Activities 从快照构建活动列表（键为实例ID，已取消的不下发）；快照未就绪返回 nil。
-func (this *activitySync) Activities() map[int64]*pb.ActivityEntry {
+func (this *activityLogic) Activities() map[int64]*pb.ActivityEntry {
 	snap := this.Snapshot()
 	if snap == nil {
 		return nil
@@ -196,7 +236,7 @@ func (this *activitySync) Activities() map[int64]*pb.ActivityEntry {
 }
 
 // warnOnce 相同错误只告警一次，避免 Redis 不可用时刷屏。
-func (this *activitySync) warnOnce(msg string) {
+func (this *activityLogic) warnOnce(msg string) {
 	this.mu.Lock()
 	dup := this.lastErr == msg
 	this.lastErr = msg
@@ -222,51 +262,4 @@ func diffActivities(old, cur *dto.ActivitySnapshot) int {
 		}
 	}
 	return n
-}
-
-// ── 玩家活动参与模块（player_activity）────────────────────────────
-
-type activityLogic struct {
-	// cache 玩家活动参与（player_activity，一玩家一行，活动 map JSON，key=活动实例ID）；读走 LRU，写异步批量 upsert。
-	cache *cache.Cache[int64, *model.PlayerActivity]
-}
-
-var activityLogicInst = singleton.NewContainer[global.ActivityLogic]("ActivityLogic")
-
-func init() {
-	c := cache.NewPlayerTableCache[model.PlayerActivity](cache.CacherConfig{Name: enum.TableActivity.String()})
-	cache.RegisterCacheCloser(c)
-	activityLogicInst.Register(&activityLogic{cache: c})
-}
-
-// Activity 获取活动业务单例。
-func Activity() global.ActivityLogic { return activityLogicInst.MustGet() }
-
-func (this *activityLogic) Load(ctx context.Context, playerID int64) (*model.PlayerActivity, error) {
-	return this.cache.GetOrInit(ctx, playerID,
-		func(id int64) *model.PlayerActivity {
-			return &model.PlayerActivity{PlayerID: id, Activities: util.NewSafeMap[int64, model.PlayerActivityInfo]()}
-		},
-		func(row *model.PlayerActivity) {
-			if row.Activities == nil {
-				row.Activities = util.NewSafeMap[int64, model.PlayerActivityInfo]()
-			}
-		})
-}
-
-func (this *activityLogic) Save(playerID int64, row *model.PlayerActivity) {
-	this.cache.Set(playerID, row)
-}
-
-func (this *activityLogic) Flush(ctx context.Context, playerID int64) error {
-	return flushAndEvict(ctx, this.cache, playerID)
-}
-
-func (this *activityLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
-	_, err := this.Load(ctx, playerID)
-	return err
-}
-
-func (this *activityLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
-	return flushAndEvict(ctx, this.cache, playerID)
 }

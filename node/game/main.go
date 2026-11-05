@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"strings"
 
-	"server-cluster/internal/cache"
 	"server-cluster/internal/router"
 	"server-cluster/internal/singleinstance"
 	_ "server-cluster/node/game/app/handler" // 触发 handler_gm_player.go 的 init() 注册路由到 routes 切片
@@ -58,24 +57,24 @@ func main() {
 	// 注册服务间 RPC provider
 	component.Proxy().AddServiceProvider(pb.GameAdminService_ServiceDesc.ServiceName, &pb.GameAdminService_ServiceDesc, &service.GmProvider{})
 	// 启动活动快照同步（读 Redis，10s 轮询）
-	logic.ActivitySync().Start(context.Background())
+	logic.Activity().Start(context.Background())
 	// 添加节点组件
 	container.Add(component)
 	// 启动容器
 	container.Serve()
 	// 停止快照同步
-	logic.ActivitySync().Stop()
+	logic.Activity().Stop()
 	// 释放资源
 	destroy()
 }
 
-// destroy 进程退出后释放缓存刷盘、DB/Redis 等资源，并按统一停服日志输出（缓存收口在 internal/cache 包）。
+// destroy 进程退出后释放缓存刷盘、DB/Redis 等资源，并按统一停服日志输出（缓存收口在 logic 包，故自 global 迁至 main）。
 func destroy() {
 	sl := util.NewShutdownLog(consts.NodeInstanceID(), 2)
 	sl.Start()
 
 	sl.Step("玩家数据缓存落盘", func() (string, error) {
-		stats := cache.CloseCaches()
+		stats := logic.CloseCaches()
 		rows := 0
 		lines := make([]string, 0, len(stats))
 		for _, s := range stats {

@@ -3,7 +3,7 @@
 // @title 管理后台 API
 // @version 1.0
 // @description 后台系统管理
-// @host 188.18.23.72:8081
+// @host 188.18.23.72:8877
 // @BasePath /
 package main
 

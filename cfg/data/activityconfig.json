@@ -5,7 +5,7 @@
     "desc": "每日签到活动",
     "strategyType": 1,
     "strategyStartValue": "2026/11/1 0:00:00",
-    "strategyEndValue": "2026/11/7 23:59:59",
+    "strategyEndValue": "2026/12/31 23:59:59",
     "roundCount": -1,
     "assetRewards": [],
     "triggerLogicType": 2,

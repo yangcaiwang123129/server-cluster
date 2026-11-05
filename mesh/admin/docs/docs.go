@@ -690,6 +690,112 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/gm/activity": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "activity"
+                ],
+                "summary": "活动实例列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "活动模板ID",
+                        "name": "cfgId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "状态(0未开启 1已开启 2已结束 3已取消，缺省全部)",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "页码",
+                        "name": "pageIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "每页条数",
+                        "name": "pageSize",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/api/v1/gm/activity/configs": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "activity"
+                ],
+                "summary": "活动模板列表",
+                "responses": {}
+            }
+        },
+        "/api/v1/gm/activity/{id}/end": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "activity"
+                ],
+                "summary": "提前结束活动",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "活动实例ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/api/v1/gm/activity/{id}/time": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "activity"
+                ],
+                "summary": "修改活动时间",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "活动实例ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "时间",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GmActivityTimeReq"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/api/v1/gm/catalog": {
             "get": {
                 "produces": [
@@ -816,7 +922,7 @@ const docTemplate = `{
                 "summary": "账号登录",
                 "parameters": [
                     {
-                        "description": "登录参数",
+                        "description": "账号登录参数",
                         "name": "body",
                         "in": "body",
                         "required": true,
@@ -3601,6 +3707,17 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.GmActivityTimeReq": {
+            "type": "object",
+            "properties": {
+                "endTime": {
+                    "type": "integer"
+                },
+                "startTime": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.GmEquipAddReq": {
             "type": "object",
             "properties": {
@@ -3614,7 +3731,8 @@ const docTemplate = `{
                 },
                 "playerId": {
                     "description": "玩家ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 }
             }
         },
@@ -3628,7 +3746,8 @@ const docTemplate = `{
                 },
                 "playerId": {
                     "description": "玩家ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 }
             }
         },
@@ -3658,7 +3777,8 @@ const docTemplate = `{
                 },
                 "playerId": {
                     "description": "玩家ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 },
                 "quality": {
                     "description": "品质",
@@ -3680,7 +3800,8 @@ const docTemplate = `{
                 },
                 "playerId": {
                     "description": "玩家ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 }
             }
         },
@@ -3693,7 +3814,8 @@ const docTemplate = `{
                 },
                 "playerId": {
                     "description": "玩家ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 }
             }
         },
@@ -3718,7 +3840,8 @@ const docTemplate = `{
                 },
                 "playerId": {
                     "description": "玩家ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 },
                 "skinId": {
                     "description": "皮肤ID",
@@ -3755,7 +3878,8 @@ const docTemplate = `{
                 },
                 "playerId": {
                     "description": "玩家ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 },
                 "rotated": {
                     "description": "是否旋转放置",
@@ -3777,7 +3901,8 @@ const docTemplate = `{
                 },
                 "playerId": {
                     "description": "玩家ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 },
                 "rotated": {
                     "description": "是否旋转放置",
@@ -3807,7 +3932,8 @@ const docTemplate = `{
                 },
                 "playerId": {
                     "description": "玩家ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 }
             }
         },
@@ -3820,7 +3946,8 @@ const docTemplate = `{
                 },
                 "playerId": {
                     "description": "玩家ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 }
             }
         },
@@ -3838,7 +3965,8 @@ const docTemplate = `{
                 },
                 "playerId": {
                     "description": "玩家ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 },
                 "rotated": {
                     "description": "是否旋转放置",
@@ -3891,7 +4019,8 @@ const docTemplate = `{
                 },
                 "playerId": {
                     "description": "玩家ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 },
                 "title": {
                     "description": "标题",
@@ -3913,7 +4042,8 @@ const docTemplate = `{
                 },
                 "playerId": {
                     "description": "玩家ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 }
             }
         },
@@ -3990,7 +4120,8 @@ const docTemplate = `{
                 },
                 "playerId": {
                     "description": "玩家ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 },
                 "reason": {
                     "description": "封号原因",
@@ -4011,7 +4142,8 @@ const docTemplate = `{
                 },
                 "playerId": {
                     "description": "玩家ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 }
             }
         },
@@ -4024,7 +4156,8 @@ const docTemplate = `{
                 },
                 "playerId": {
                     "description": "玩家ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 }
             }
         },
@@ -4033,7 +4166,8 @@ const docTemplate = `{
             "properties": {
                 "playerId": {
                     "description": "玩家ID",
-                    "type": "integer"
+                    "type": "string",
+                    "example": "0"
                 }
             }
         },
@@ -4244,7 +4378,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "127.0.0.1:8081",
+	Host:             "188.18.23.72:8877",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "管理后台 API",

@@ -75,7 +75,7 @@ func (this *taskLogic) collect(ctx context.Context, playerID int64, taskType, ac
 	if err != nil {
 		return nil, 0, err
 	}
-	snap := ActivitySync().Snapshot()
+	snap := Activity().Snapshot()
 	now := util.NowUnixMilli()
 	entries := make([]*pb.TaskEntry, 0, tpl.T().Task.Len())
 	claimable := int32(0)
@@ -111,7 +111,7 @@ func (this *taskLogic) TaskClaim(ctx context.Context, playerID int64, req *pb.Ta
 		return &pb.TaskClaimResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_TASK_NOT_FOUND, "")}, nil
 	}
 	now := util.NowUnixMilli()
-	key, ok := resolvePeriodKey(cfg, ActivitySync().Snapshot(), now)
+	key, ok := resolvePeriodKey(cfg, Activity().Snapshot(), now)
 	if !ok {
 		return &pb.TaskClaimResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_TASK_EXPIRED, "")}, nil
 	}
@@ -174,7 +174,7 @@ func (this *taskLogic) TaskAccept(ctx context.Context, playerID int64, req *pb.T
 		return &pb.TaskAcceptResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "该任务无需手动接取")}, nil
 	}
 	now := util.NowUnixMilli()
-	key, ok := resolvePeriodKey(cfg, ActivitySync().Snapshot(), now)
+	key, ok := resolvePeriodKey(cfg, Activity().Snapshot(), now)
 	if !ok {
 		return &pb.TaskAcceptResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_TASK_EXPIRED, "")}, nil
 	}
@@ -210,7 +210,7 @@ func (this *taskLogic) EmitTaskEvent(ctx context.Context, e global.TaskEvent) {
 	if len(cfgs) == 0 {
 		return
 	}
-	snap := ActivitySync().Snapshot()
+	snap := Activity().Snapshot()
 	now := util.NowUnixMilli()
 	pt, err := this.Load(ctx, e.PlayerID)
 	if err != nil {

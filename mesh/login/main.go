@@ -3,7 +3,7 @@
 // @title 登录服 API
 // @version 1.0
 // @description 账号注册，登录。
-// @host 188.18.23.72:8080
+// @host 188.18.23.72:7788
 // @BasePath /
 package main
 

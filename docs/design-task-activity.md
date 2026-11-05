@@ -666,7 +666,7 @@ node/game/app/
     └── begin.go                # AutoMigrate player_activity / player_task
 ```
 
-- 登录下发：`EnterGame` 合并各模块返回，任务 map 由 `Task.EnterGame` 填充，活动 map 由 `ActivitySync().Activities()` 填充。
+- 登录下发：`EnterGame` 合并各模块返回，任务 map 由 `Task.EnterGame` 填充，活动 map 由 `Activity().Activities()` 填充。
 - 任务事件入口：`Task().EmitTaskEvent(ctx, global.TaskEvent{...})`，当前已接登录/充值/消费/获得英雄；击杀等待 battle 结算通道接入。
 
 ### 8.3 admin 后台
@@ -846,7 +846,7 @@ func (this *activityLogic) tick(ctx context.Context) {
 
 ```go
 // logic_activity.go
-func (this *activitySync) loop(ctx context.Context) {
+func (this *activityLogic) loop(ctx context.Context) {
     t := time.NewTicker(consts.ActivitySnapshotInterval) // 10s
     defer t.Stop()
     for {
@@ -865,7 +865,7 @@ func (this *activitySync) loop(ctx context.Context) {
 }
 
 // broadcastDiff 只给本节点在线玩家推送变化，不关心其他节点（P2 接入客户端协议后启用）
-func (this *activitySync) broadcastDiff(old []consts.ActivityState, cur *consts.ActivitySnapshot) {
+func (this *activityLogic) broadcastDiff(old []consts.ActivityState, cur *consts.ActivitySnapshot) {
     changed := diffActivities(old, cur.Activities)
     if len(changed) == 0 {
         return
@@ -887,7 +887,7 @@ func (this *taskLogic) EmitTaskEvent(ctx context.Context, e global.TaskEvent) {
     if e.PlayerID <= 0 || e.Count <= 0 || !tpl.Loaded() {
         return
     }
-    snap := ActivitySync().Snapshot()
+    snap := Activity().Snapshot()
     pt, err := global.PlayerTaskCache.Get(ctx, e.PlayerID) // 一玩家一行，tasks map JSON
     if err != nil {
         return
@@ -933,7 +933,7 @@ func (this *taskLogic) EmitTaskEvent(ctx context.Context, e global.TaskEvent) {
 | 新进程 | **不新增独立活动进程**；活动模块内嵌常驻 `mesh/admin`，随 admin 启停 |
 | 服务注册 | admin 保持现有 HTTP mesh 注册方式；game 不依赖 admin 的 RPC，只读 Redis 快照 |
 | 单实例 | 由 admin 自身单实例保证（1s tick 单写者），无需额外 `singleinstance` 租约 |
-| 生命周期 | admin：`logic.Activity().Start/Stop` 挂在 `global.begin.go`；game：`ActivitySync` 在 `main.go` 启停，`TaskLogic` 走 `moduleLogics()` |
+| 生命周期 | admin：`logic.Activity().Start/Stop` 挂在 `global.begin.go`；game：`logic.Activity()` 在 `main.go` 启停，`TaskLogic` 走 `moduleLogics()` |
 | 缓存 | 复用 `internal/cache`：`PlayerTaskCache`/`PlayerActivityCache`（JSON map，一玩家一行）、`PlayerMailCache`（单行），`LeaveGame` 走 `flushAndEvict` |
 | 表名 | 追加 `share/enum/enum_table.go` |
 | 配置 | Luban 生成 + 内嵌；运营状态落 DB |

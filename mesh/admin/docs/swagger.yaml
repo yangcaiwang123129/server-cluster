@@ -134,6 +134,13 @@ definitions:
       status:
         type: integer
     type: object
+  dto.GmActivityTimeReq:
+    properties:
+      endTime:
+        type: integer
+      startTime:
+        type: integer
+    type: object
   dto.GmEquipAddReq:
     properties:
       equipId:
@@ -144,7 +151,8 @@ definitions:
         type: integer
       playerId:
         description: 玩家ID
-        type: integer
+        example: "0"
+        type: string
     type: object
   dto.GmEquipUnwearReq:
     properties:
@@ -154,7 +162,8 @@ definitions:
         type: string
       playerId:
         description: 玩家ID
-        type: integer
+        example: "0"
+        type: string
     type: object
   dto.GmEquipUpdateReq:
     properties:
@@ -176,7 +185,8 @@ definitions:
         type: integer
       playerId:
         description: 玩家ID
-        type: integer
+        example: "0"
+        type: string
       quality:
         description: 品质
         type: integer
@@ -192,7 +202,8 @@ definitions:
         type: string
       playerId:
         description: 玩家ID
-        type: integer
+        example: "0"
+        type: string
     type: object
   dto.GmHeroAddReq:
     properties:
@@ -201,7 +212,8 @@ definitions:
         type: integer
       playerId:
         description: 玩家ID
-        type: integer
+        example: "0"
+        type: string
     type: object
   dto.GmHeroUpdateReq:
     properties:
@@ -219,7 +231,8 @@ definitions:
         type: integer
       playerId:
         description: 玩家ID
-        type: integer
+        example: "0"
+        type: string
       skinId:
         description: 皮肤ID
         type: integer
@@ -246,7 +259,8 @@ definitions:
         type: integer
       playerId:
         description: 玩家ID
-        type: integer
+        example: "0"
+        type: string
       rotated:
         description: 是否旋转放置
         type: boolean
@@ -262,7 +276,8 @@ definitions:
         type: string
       playerId:
         description: 玩家ID
-        type: integer
+        example: "0"
+        type: string
       rotated:
         description: 是否旋转放置
         type: boolean
@@ -284,7 +299,8 @@ definitions:
         type: string
       playerId:
         description: 玩家ID
-        type: integer
+        example: "0"
+        type: string
     type: object
   dto.GmItemSortReq:
     properties:
@@ -293,7 +309,8 @@ definitions:
         type: integer
       playerId:
         description: 玩家ID
-        type: integer
+        example: "0"
+        type: string
     type: object
   dto.GmItemTransferReq:
     properties:
@@ -306,7 +323,8 @@ definitions:
         type: string
       playerId:
         description: 玩家ID
-        type: integer
+        example: "0"
+        type: string
       rotated:
         description: 是否旋转放置
         type: boolean
@@ -344,7 +362,8 @@ definitions:
         type: string
       playerId:
         description: 玩家ID
-        type: integer
+        example: "0"
+        type: string
       title:
         description: 标题
         type: string
@@ -360,7 +379,8 @@ definitions:
         type: string
       playerId:
         description: 玩家ID
-        type: integer
+        example: "0"
+        type: string
     type: object
   dto.IdsReq:
     properties:
@@ -411,7 +431,8 @@ definitions:
         type: integer
       playerId:
         description: 玩家ID
-        type: integer
+        example: "0"
+        type: string
       reason:
         description: 封号原因
         type: string
@@ -426,7 +447,8 @@ definitions:
         type: string
       playerId:
         description: 玩家ID
-        type: integer
+        example: "0"
+        type: string
     type: object
   dto.PlayerResetPasswordReq:
     properties:
@@ -435,13 +457,15 @@ definitions:
         type: string
       playerId:
         description: 玩家ID
-        type: integer
+        example: "0"
+        type: string
     type: object
   dto.PlayerUnbanReq:
     properties:
       playerId:
         description: 玩家ID
-        type: integer
+        example: "0"
+        type: string
     type: object
   dto.Resp:
     properties:
@@ -574,7 +598,7 @@ definitions:
       userId:
         type: integer
     type: object
-host: 127.0.0.1:8081
+host: 188.18.23.72:8877
 info:
   contact: {}
   description: 后台系统管理
@@ -1019,6 +1043,77 @@ paths:
       summary: 获取当前用户信息
       tags:
       - system
+  /api/v1/gm/activity:
+    get:
+      parameters:
+      - description: 活动模板ID
+        in: query
+        name: cfgId
+        type: integer
+      - description: 状态(0未开启 1已开启 2已结束 3已取消，缺省全部)
+        in: query
+        name: status
+        type: integer
+      - default: 1
+        description: 页码
+        in: query
+        name: pageIndex
+        type: integer
+      - default: 10
+        description: 每页条数
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      summary: 活动实例列表
+      tags:
+      - activity
+  /api/v1/gm/activity/{id}/end:
+    post:
+      parameters:
+      - description: 活动实例ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      summary: 提前结束活动
+      tags:
+      - activity
+  /api/v1/gm/activity/{id}/time:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: 活动实例ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 时间
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GmActivityTimeReq'
+      produces:
+      - application/json
+      responses: {}
+      summary: 修改活动时间
+      tags:
+      - activity
+  /api/v1/gm/activity/configs:
+    get:
+      produces:
+      - application/json
+      responses: {}
+      summary: 活动模板列表
+      tags:
+      - activity
   /api/v1/gm/catalog:
     get:
       parameters:
@@ -1096,7 +1191,7 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: 登录参数
+      - description: 账号登录参数
         in: body
         name: body
         required: true

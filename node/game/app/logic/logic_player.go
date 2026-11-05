@@ -106,7 +106,7 @@ func (this *playerLogic) OnEnterGame(ctx context.Context, playerID int64, req *p
 		}
 	}
 
-	resp.Activities = ActivitySync().Activities()
+	resp.Activities = Activity().Activities()
 	resp.Result = errs.BuildOKResult()
 	resp.ServerTime = util.Now().UnixMilli()
 	return nil
