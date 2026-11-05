@@ -2,8 +2,8 @@ package dto
 
 // 活动快照数据结构：admin 写入 Redis，game 节点读取缓存。
 
-// ActivityState 单个活动实例状态（快照内条目）。
-type ActivityState struct {
+// ActivityData 单个活动实例状态（快照内条目）。
+type ActivityData struct {
 	ID        int64 `json:"ID"`
 	CfgID     int32 `json:"cfgId"`
 	Status    int32 `json:"status"`
@@ -14,13 +14,13 @@ type ActivityState struct {
 
 // ActivitySnapshot 活动快照（version + 时间上下文 + 全量活动状态）。
 type ActivitySnapshot struct {
-	Version    int64           `json:"version"`
-	ServerTime int64           `json:"serverTime"`
-	DailyKey   string          `json:"dailyKey"`
-	WeeklyKey  string          `json:"weeklyKey"`
-	MonthlyKey string          `json:"monthlyKey"`
-	CfgVersion int64           `json:"cfgVersion"`
-	Activities []ActivityState `json:"activities"`
+	Version    int64          `json:"version"`
+	ServerTime int64          `json:"serverTime"`
+	DailyKey   string         `json:"dailyKey"`
+	WeeklyKey  string         `json:"weeklyKey"`
+	MonthlyKey string         `json:"monthlyKey"`
+	CfgVersion int64          `json:"cfgVersion"`
+	Activities []ActivityData `json:"activities"`
 }
 
 // ========== 后台活动管理 ==========

@@ -1,7 +1,6 @@
 package consts
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 
@@ -51,20 +50,22 @@ const (
 	ActivityResetHour = 0
 )
 
-// DailyKey 返回毫秒时间戳对应的日常周期 key（形如 20261102）。
+// 周期 key 语义：key 即所属周期第一秒的毫秒时间戳字符串（当日/本周一/本月 1 号 0 点）。
+// 判断是否跨周期 = key 不相等，新周期任务进度从零开始。
+
+// DailyKey 返回毫秒时间戳所属「日」的周期 key（当日第一秒毫秒时间戳）。
 func DailyKey(ms int64) string {
-	return util.UnixMilli(ms).Format(util.DateCompact)
+	return strconv.FormatInt(util.DayStart(util.UnixMilli(ms)).UnixMilli(), 10)
 }
 
-// WeeklyKey 返回毫秒时间戳对应的周常周期 key（ISO 周，形如 2026W44）。
+// WeeklyKey 返回毫秒时间戳所属「周」的周期 key（本周一第一秒毫秒时间戳）。
 func WeeklyKey(ms int64) string {
-	year, week := util.UnixMilli(ms).ISOWeek()
-	return fmt.Sprintf("%dW%02d", year, week)
+	return strconv.FormatInt(util.WeekStart(util.UnixMilli(ms)).UnixMilli(), 10)
 }
 
-// MonthlyKey 返回毫秒时间戳对应的月常周期 key（形如 202611）。
+// MonthlyKey 返回毫秒时间戳所属「月」的周期 key（本月 1 号第一秒毫秒时间戳）。
 func MonthlyKey(ms int64) string {
-	return util.UnixMilli(ms).Format(util.MonthCompact)
+	return strconv.FormatInt(util.MonthStart(util.UnixMilli(ms)).UnixMilli(), 10)
 }
 
 // MainPeriodKey 主线任务的周期 key。

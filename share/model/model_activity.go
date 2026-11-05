@@ -51,19 +51,19 @@ type PlayerActivity struct {
 func (PlayerActivity) TableName() string { return enum.TablePlayerActivity.String() }
 
 // GetActivity 按活动实例ID取参与数据，不存在返回零值与 false。
-func (p *PlayerActivity) GetActivity(instanceID int64) (PlayerActivityInfo, bool) {
-	if p.Activities == nil {
+func (this *PlayerActivity) GetActivity(instanceID int64) (PlayerActivityInfo, bool) {
+	if this.Activities == nil {
 		return PlayerActivityInfo{}, false
 	}
-	return p.Activities.Get(instanceID)
+	return this.Activities.Get(instanceID)
 }
 
 // SetActivity 写入/覆盖一条活动参与数据。
-func (p *PlayerActivity) SetActivity(info PlayerActivityInfo) {
-	if p.Activities == nil {
-		p.Activities = util.NewSafeMap[int64, PlayerActivityInfo]()
+func (this *PlayerActivity) SetActivity(info PlayerActivityInfo) {
+	if this.Activities == nil {
+		this.Activities = util.NewSafeMap[int64, PlayerActivityInfo]()
 	}
-	p.Activities.Set(info.ActivityID, info)
+	this.Activities.Set(info.ActivityID, info)
 }
 
 func (this *PlayerActivity) Marshal() ([]byte, error)    { return json.Marshal(this) }

@@ -189,6 +189,8 @@ type TaskLogic interface {
 	TaskClaim(ctx context.Context, playerID int64, req *pb.TaskClaimReq) (*pb.TaskClaimResp, error)
 	// TaskAccept 任务接取（仅手动接取任务：未接取→进行中）
 	TaskAccept(ctx context.Context, playerID int64, req *pb.TaskAcceptReq) (*pb.TaskAcceptResp, error)
+	// InitActivityTasks 为活动实例初始化玩家任务（每实例每玩家只建档一次，已建档跳过），返回需推送的任务条目
+	InitActivityTasks(ctx context.Context, playerID int64, inst *dto.ActivityData) ([]*pb.TaskEntry, error)
 	// EmitTaskEvent 上报任务进度事件（内部吞掉错误，不阻断业务主流程）
 	EmitTaskEvent(ctx context.Context, e TaskEvent)
 }

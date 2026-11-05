@@ -8,9 +8,16 @@ pipeline {
         string(name: 'VERSION', defaultValue: '', description: '版本号，如 v1.2.3')
         string(name: 'BRANCH', defaultValue: 'main', description: '分支（TAG 为空时生效）')
         string(name: 'TAG', defaultValue: '', description: 'Tag（非空时优先，按 tag 检出）')
-        extendedChoice(name: 'SERVERS', type: 'PT_CHECKBOX', multiSelectDelimiter: ' ',
-            value: 'gate-1,game-1,battle-1,social-1,login-1,admin-1',
-            description: '服务器（复选框，可多选）')
+
+        // 使用 Active Choices 的 Reactive/普通参数实现复选框多选
+        activeChoice(
+            name: 'SERVERS',
+            description: '服务器（复选框，可多选）',
+            choiceType: 'PT_CHECKBOX', // 复选框类型
+            groovyScript: '''
+                return ['gate-1', 'game-1', 'battle-1', 'social-1', 'login-1', 'admin-1']
+            '''
+        )
     }
 
     stages {

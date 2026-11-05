@@ -110,13 +110,7 @@ func (this *taskLogic) collect(ctx context.Context, playerID int64, taskType, ac
 		if !ok {
 			continue // 活动未开启/无实例，任务暂不展示
 		}
-		info, ok := pt.GetTask(cfg.Id, key)
-		if !ok {
-			info = newTaskInfo(cfg, key)
-		}
-		if info.Target <= 0 {
-			info.Target = targetOf(cfg)
-		}
+		info := currentTaskInfo(pt, cfg, key)
 		if info.Status == consts.TaskStatusClaimable {
 			claimable++
 		}
@@ -202,10 +196,7 @@ func (this *taskLogic) TaskAccept(ctx context.Context, playerID int64, req *pb.T
 	if err != nil {
 		return nil, err
 	}
-	info, ok := pt.GetTask(cfg.Id, key)
-	if !ok {
-		info = newTaskInfo(cfg, key)
-	}
+	info := currentTaskInfo(pt, cfg, key)
 	if info.Status != consts.TaskStatusNotAccepted {
 		return &pb.TaskAcceptResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "任务已接取，不可重复接取")}, nil
 	}
@@ -220,6 +211,66 @@ func (this *taskLogic) TaskAccept(ctx context.Context, playerID int64, req *pb.T
 	entry := convert.TaskEntry(cfg, info)
 	global.NotifyTask(ctx, playerID, []*pb.TaskEntry{entry})
 	return &pb.TaskAcceptResp{Entry: entry}, nil
+}
+
+func (this *taskLogic) InitActivityTasks(ctx context.Context, playerID int64, inst *dto.ActivityData) ([]*pb.TaskEntry, error) {
+	if inst == nil {
+		return nil, nil
+	}
+	cfgs := make([]*tpl.TaskCfg, 0)
+	for _, cfg := range tpl.T().Task.GetDataList() {
+		if cfg.TaskType == tpl.TaskType_Activity && cfg.TaskGroupID == inst.CfgID {
+			cfgs = append(cfgs, cfg)
+		}
+	}
+	if len(cfgs) == 0 {
+		return nil, nil
+	}
+	pt, err := this.Load(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+	snap := Activity().Snapshot()
+	now := util.NowUnixMilli()
+	entries := make([]*pb.TaskEntry, 0, len(cfgs))
+	created := false
+	for _, cfg := range cfgs {
+		key, ok := resolvePeriodKey(cfg, snap, now)
+		if !ok {
+			continue // 活动无有效实例，暂不建档
+		}
+		if info, exists := pt.GetTask(cfg.Id, key); exists {
+			// 已建档：仅可领取状态需要推送提醒
+			if info.Status == consts.TaskStatusClaimable {
+				entries = append(entries, convert.TaskEntry(cfg, info))
+			}
+			continue
+		}
+		info := newTaskInfo(cfg, key)
+		pt.SetTask(info)
+		created = true
+		entries = append(entries, convert.TaskEntry(cfg, info))
+	}
+	if created {
+		this.Save(playerID, pt)
+		if err := this.cache.FlushKey(ctx, playerID); err != nil {
+			log.Warnf("game: activity task init flush failed, player=%d inst=%d: %v", playerID, inst.ID, err)
+		}
+	}
+	return entries, nil
+}
+
+// OnPeriodChange 跨天/跨周/跨月后推送对应类型任务的最新周期列表；
+// 旧周期进度随 key 变化自动失效（无需清理），玩家下一次事件/查询即按新周期建档。
+func (this *taskLogic) OnPeriodChange(ctx context.Context, playerID int64, taskType int32) error {
+	entries, _, err := this.collect(ctx, playerID, taskType, 0)
+	if err != nil {
+		return err
+	}
+	if len(entries) > 0 {
+		global.NotifyTask(ctx, playerID, entries)
+	}
+	return nil
 }
 
 func (this *taskLogic) EmitTaskEvent(ctx context.Context, e global.TaskEvent) {
@@ -307,6 +358,18 @@ func newTaskInfo(cfg *tpl.TaskCfg, key string) model.PlayerTaskInfo {
 		Target:    targetOf(cfg),
 		Status:    status,
 	}
+}
+
+// currentTaskInfo 取当前周期任务进度；未建档按默认值兜底（自动接取=进行中，手动接取=未接取）。
+func currentTaskInfo(pt *model.PlayerTask, cfg *tpl.TaskCfg, key string) model.PlayerTaskInfo {
+	info, ok := pt.GetTask(cfg.Id, key)
+	if !ok {
+		return newTaskInfo(cfg, key)
+	}
+	if info.Target <= 0 {
+		info.Target = targetOf(cfg)
+	}
+	return info
 }
 
 // targetOf 目标数量兜底：未配置按 1 处理。
@@ -402,11 +465,11 @@ func taskProgressOpen(cfg *tpl.TaskCfg, snap *dto.ActivitySnapshot) bool {
 }
 
 // latestActivity 取指定模板的最新有效实例（忽略已取消）。
-func latestActivity(snap *dto.ActivitySnapshot, cfgID int32) *dto.ActivityState {
+func latestActivity(snap *dto.ActivitySnapshot, cfgID int32) *dto.ActivityData {
 	if snap == nil || cfgID <= 0 {
 		return nil
 	}
-	var latest *dto.ActivityState
+	var latest *dto.ActivityData
 	for i := range snap.Activities {
 		a := &snap.Activities[i]
 		if a.CfgID != cfgID || a.Status == consts.ActivityStatusCancelled {

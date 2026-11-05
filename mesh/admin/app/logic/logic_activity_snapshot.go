@@ -73,9 +73,9 @@ func (this *activityLogic) Snapshot() *dto.ActivitySnapshot {
 // buildSnapshotLocked 构造快照；调用方需持有锁。
 func (this *activityLogic) buildSnapshotLocked() *dto.ActivitySnapshot {
 	now := util.NowUnixMilli()
-	list := make([]dto.ActivityState, 0, len(this.insts))
+	list := make([]dto.ActivityData, 0, len(this.insts))
 	for _, inst := range this.insts {
-		list = append(list, dto.ActivityState{
+		list = append(list, dto.ActivityData{
 			ID:        inst.ID,
 			CfgID:     inst.CfgID,
 			Status:    inst.Status,

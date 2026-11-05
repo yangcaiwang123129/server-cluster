@@ -10,6 +10,7 @@ import (
 	"github.com/dobyte/due/v2/log"
 	redis "github.com/redis/go-redis/v9"
 
+	"server-cluster/internal/actor"
 	"server-cluster/internal/cache"
 	"server-cluster/internal/svc"
 	"server-cluster/node/game/app/global"
@@ -51,12 +52,59 @@ func init() {
 func Activity() global.ActivityLogic { return activityLogicInst.MustGet() }
 
 func (this *activityLogic) OnEnterGame(ctx context.Context, playerID int64, _ *pb.EnterGameReq, _ *pb.EnterGameResp) error {
-	_, err := this.Load(ctx, playerID)
-	return err
+	if _, err := this.Load(ctx, playerID); err != nil {
+		return err
+	}
+	if err := this.initActivityTasks(ctx, playerID); err != nil {
+		// 初始化失败不阻断进游戏，下次进游戏或活动状态变化时幂等重试
+		log.Warnf("game: init activity tasks on enter failed, player=%d: %v", playerID, err)
+	}
+	return nil
 }
 
 func (this *activityLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.LeaveGameReq, _ *pb.LeaveGameResp) error {
 	return flushAndEvict(ctx, this.cache, playerID)
+}
+
+// initActivityTasks 为玩家初始化全部有效活动实例的任务列表：每实例每玩家只初始化一次，
+// 以 PlayerActivity 参与行「存在即标记」（实例ID 写入即视为已初始化）；收集到的条目一次性推送。
+func (this *activityLogic) initActivityTasks(ctx context.Context, playerID int64) error {
+	snap := this.Snapshot()
+	if snap == nil {
+		return nil
+	}
+	playerActivity, err := this.Load(ctx, playerID)
+	if err != nil {
+		return err
+	}
+	entries := make([]*pb.TaskEntry, 0)
+	marked := false
+	for i := range snap.Activities {
+		inst := &snap.Activities[i]
+		if inst.Status == consts.ActivityStatusCancelled {
+			continue
+		}
+		if _, ok := playerActivity.GetActivity(inst.ID); ok {
+			continue // 该实例已初始化过
+		}
+		created, err := Task().InitActivityTasks(ctx, playerID, inst)
+		if err != nil {
+			return err // 不标记，下次重试
+		}
+		playerActivity.SetActivity(model.PlayerActivityInfo{ActivityID: inst.ID, UpdatedAt: util.NowUnixMilli()})
+		marked = true
+		entries = append(entries, created...)
+	}
+	if marked {
+		this.Save(playerID, playerActivity)
+		if err := this.cache.FlushKey(ctx, playerID); err != nil {
+			return err
+		}
+	}
+	if len(entries) > 0 {
+		global.NotifyTask(ctx, playerID, entries)
+	}
+	return nil
 }
 
 func (this *activityLogic) Load(ctx context.Context, playerID int64) (*model.PlayerActivity, error) {
@@ -115,7 +163,7 @@ func (this *activityLogic) Snapshot() *dto.ActivitySnapshot {
 		return nil
 	}
 	cp := *this.snap
-	cp.Activities = append([]dto.ActivityState(nil), this.snap.Activities...)
+	cp.Activities = append([]dto.ActivityData(nil), this.snap.Activities...)
 	return &cp
 }
 
@@ -201,6 +249,71 @@ func (this *activityLogic) sync(ctx context.Context) {
 	changed := diffActivities(old, &snap)
 	log.Infof("game: activity snapshot updated version=%d activities=%d changed=%d daily=%s weekly=%s monthly=%s",
 		ver, len(snap.Activities), changed, snap.DailyKey, snap.WeeklyKey, snap.MonthlyKey)
+	if changed > 0 {
+		this.fanoutInitTasks() // 开启(→Running)/结束(→Ended)等实例状态变化均触发
+	}
+	if types := changedPeriodTypes(old, &snap); len(types) > 0 {
+		this.fanoutPeriodTasks(types) // 跨天/跨周/跨月，推送对应类型任务的新周期列表
+	}
+}
+
+// fanoutInitTasks 实例状态变化后为所有在线玩家异步补初始化活动任务，不阻塞订阅/轮询循环；
+// PlayerActivity 标记 + 任务已建档判断保证同实例重复触发幂等。
+func (this *activityLogic) fanoutInitTasks() {
+	n := 0
+	playerActorMap().Range(func(playerID int64, _ *actor.PlayerActor) bool {
+		n++
+		go func(playerID int64) {
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			if err := this.initActivityTasks(ctx, playerID); err != nil {
+				log.Warnf("game: fanout init activity tasks failed, player=%d: %v", playerID, err)
+			}
+		}(playerID)
+		return true
+	})
+	if n > 0 {
+		log.Infof("game: activity instances changed, fanout init tasks online=%d", n)
+	}
+}
+
+// changedPeriodTypes 对比新旧快照，返回发生跨期的任务类型（日/周/月，tpl.TaskType_*）。
+func changedPeriodTypes(old, cur *dto.ActivitySnapshot) []int32 {
+	if old == nil {
+		return nil // 启动首次同步无需刷新
+	}
+	types := make([]int32, 0, 3)
+	if old.DailyKey != cur.DailyKey {
+		types = append(types, int32(tpl.TaskType_Day))
+	}
+	if old.WeeklyKey != cur.WeeklyKey {
+		types = append(types, int32(tpl.TaskType_Week))
+	}
+	if old.MonthlyKey != cur.MonthlyKey {
+		types = append(types, int32(tpl.TaskType_Month))
+	}
+	return types
+}
+
+// fanoutPeriodTasks 跨期后为所有在线玩家异步推送对应类型任务的新周期列表（纯推送不落库，重置由周期 key 失配自动完成）。
+func (this *activityLogic) fanoutPeriodTasks(types []int32) {
+	n := 0
+	playerActorMap().Range(func(playerID int64, _ *actor.PlayerActor) bool {
+		n++
+		for _, taskType := range types {
+			go func(playerID int64, taskType int32) {
+				ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+				defer cancel()
+				if err := Task().OnPeriodChange(ctx, playerID, taskType); err != nil {
+					log.Warnf("game: fanout period tasks failed, player=%d type=%d: %v", playerID, taskType, err)
+				}
+			}(playerID, taskType)
+		}
+		return true
+	})
+	if n > 0 {
+		log.Infof("game: period keys changed, fanout task refresh online=%d types=%v", n, types)
+	}
 }
 
 // Activities 从快照构建活动列表（键为实例ID，已取消的不下发）；快照未就绪返回 nil。

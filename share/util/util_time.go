@@ -369,6 +369,26 @@ func MonthTail(offset ...int) Time {
 	return time.Date(year, time.Month(month), day, 23, 59, 59, 999999999, now.Location())
 }
 
+// DayStart returns the first second of the day that contains t.
+func DayStart(t Time) Time {
+	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
+}
+
+// WeekStart returns the first second of Monday of the week that contains t.
+func WeekStart(t Time) Time {
+	offsetDays := int(time.Monday - t.Weekday())
+	if offsetDays == 1 {
+		offsetDays = -6
+	}
+	date := t.AddDate(0, 0, offsetDays)
+	return time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
+}
+
+// MonthStart returns the first second of the first day of the month that contains t.
+func MonthStart(t Time) Time {
+	return time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, t.Location())
+}
+
 // IsLeapYear reports whether year is a leap year.
 func IsLeapYear(year int) bool {
 	return (year%4 == 0 && year%100 != 0) || year%400 == 0
