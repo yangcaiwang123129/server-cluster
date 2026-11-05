@@ -191,6 +191,8 @@ type TaskLogic interface {
 	TaskAccept(ctx context.Context, playerID int64, req *pb.TaskAcceptReq) (*pb.TaskAcceptResp, error)
 	// InitActivityTasks 为活动实例初始化玩家任务（每实例每玩家只建档一次，已建档跳过），返回需推送的任务条目
 	InitActivityTasks(ctx context.Context, playerID int64, inst *dto.ActivityData) ([]*pb.TaskEntry, error)
+	// OnPeriodChange 跨天/跨周/跨月后推送对应类型任务的最新周期列表（进度随周期 key 自动重置）
+	OnPeriodChange(ctx context.Context, playerID int64, taskType int32) error
 	// EmitTaskEvent 上报任务进度事件（内部吞掉错误，不阻断业务主流程）
 	EmitTaskEvent(ctx context.Context, e TaskEvent)
 }

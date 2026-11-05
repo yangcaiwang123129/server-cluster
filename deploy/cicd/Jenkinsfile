@@ -1,33 +1,55 @@
 // CI/CD 流水线：参数选择环境/版本/服务器 → 拉代码 → 构建打包 → scp 分发重启。
-// 依赖插件：Git、Extended Choice Parameter（复选框服务器列表）。
+// 依赖插件：Git、Active Choices Parameter（复选框服务器列表）。
 pipeline {
     agent any
 
+    // Active Choices 在声明式 Pipeline 中必须通过 properties + $class 写法
     parameters {
+        // 说明：声明式 parameters 块本身支持 choice/string，
+        // 但 Active Choices 的复选框必须用 properties 方式注入，见下方 script 前的 properties 调用。
+        // 为保证统一，这里保留基础参数，SERVERS 通过 properties 注入。
         choice(name: 'ENV', choices: ['audit', 'test', 'release', 'prod'], description: '环境')
         string(name: 'VERSION', defaultValue: '', description: '版本号，如 v1.2.3')
         string(name: 'BRANCH', defaultValue: 'main', description: '分支（TAG 为空时生效）')
         string(name: 'TAG', defaultValue: '', description: 'Tag（非空时优先，按 tag 检出）')
-
-        // 使用 Active Choices 的 Reactive/普通参数实现复选框多选
-        activeChoice(
-            name: 'SERVERS',
-            description: '服务器（复选框，可多选）',
-            choiceType: 'PT_CHECKBOX', // 复选框类型
-            groovyScript: '''
-                return ['gate-1', 'game-1', 'battle-1', 'social-1', 'login-1', 'admin-1']
-            '''
-        )
     }
 
     stages {
+        stage('Init Params') {
+            steps {
+                script {
+                    // 用 properties 注入 Active Choices 复选框参数（SERVERS）
+                    // 注意：properties 会覆盖 parameters 块，所以这里要把所有参数都列全
+                    properties([
+                        parameters([
+                            choice(name: 'ENV', choices: ['audit', 'test', 'release', 'prod'], description: '环境'),
+                            string(name: 'VERSION', defaultValue: '', description: '版本号，如 v1.2.3'),
+                            string(name: 'BRANCH', defaultValue: 'main', description: '分支（TAG 为空时生效）'),
+                            string(name: 'TAG', defaultValue: '', description: 'Tag（非空时优先，按 tag 检出）'),
+                            [
+                                $class: 'DynamicReferenceParameter',
+                                name: 'SERVERS',
+                                description: '服务器（复选框，可多选）',
+                                choiceType: 'ET_CHECKBOXES',
+                                referencedParameters: '',
+                                script: [
+                                    $class: 'GroovyScript',
+                                    fallbackScript: [classpath: [], sandbox: false, script: 'return []'],
+                                    script: [classpath: [], sandbox: false, script: "return ['gate-1','game-1','battle-1','social-1','login-1','admin-1']"]
+                                ]
+                            ]
+                        ])
+                    ])
+                }
+            }
+        }
+
         stage('Checkout') {
             steps {
                 script {
-                    if (env.TAG?.trim()) {
-                        // 按 tag 拉取本次发布版本代码
+                    if (params.TAG?.trim()) {
                         checkout([$class: 'GitSCM',
-                                  branches: [[name: "refs/tags/${env.TAG}"]],
+                                  branches: [[name: "refs/tags/${params.TAG}"]],
                                   userRemoteConfigs: scm.userRemoteConfigs])
                     } else {
                         checkout scm
@@ -38,22 +60,31 @@ pipeline {
 
         stage('Build') {
             steps {
-                // 配置随代码版本化：deploy/env/<ENV>/<服务器id>/etc，按所选服务器 id 打进包内
-                sh 'bash deploy/scripts/build.sh --env "$ENV" --version "$VERSION" --servers "$SERVERS"'
+                script {
+                    // SERVERS 在 Active Choices 复选框里是 List，join 成空格分隔字符串
+                    def servers = (params.SERVERS instanceof List) ? params.SERVERS.join(' ') : (params.SERVERS ?: '')
+                    sh 'bash deploy/scripts/build.sh --env "$ENV" --version "$VERSION" --servers "$SERVERS"'
+                }
             }
         }
 
         stage('Deploy') {
             steps {
-                // 主机清单：deploy/cicd/<ENV>/servers.conf；scp 后远端 stop → 解包 → start
-                sh 'bash deploy/cicd/deploy.sh --env "$ENV" --version "$VERSION" --servers "$SERVERS"'
+                script {
+                    def servers = (params.SERVERS instanceof List) ? params.SERVERS.join(' ') : (params.SERVERS ?: '')
+                    sh 'bash deploy/cicd/deploy.sh --env "$ENV" --version "$VERSION" --servers "$SERVERS"'
+                }
             }
         }
     }
 
     post {
         success {
-            archiveArtifacts artifacts: "dist/${params.ENV}/${params.VERSION}/*.tar.gz", fingerprint: true
+            script {
+                if (params.VERSION?.trim()) {
+                    archiveArtifacts artifacts: "dist/${params.ENV}/${params.VERSION}/*.tar.gz", fingerprint: true
+                }
+            }
         }
     }
 }
