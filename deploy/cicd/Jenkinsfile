@@ -1,36 +1,33 @@
+// CI/CD 流水线：参数选择环境/版本/服务器 → 拉代码 → 构建打包 → scp 分发重启。
 pipeline {
     agent any
 
-    stages {
-        // 【关键改动】必须在进入任何 stage 之前，用 script 块注入参数
-        stage('Init Params') {
-            steps {
-                script {
-                    properties([
-                        parameters([
-                            choice(name: 'ENV', choices: ['audit', 'test', 'release', 'prod'], description: '环境'),
-                            string(name: 'VERSION', defaultValue: '', description: '版本号，如 v1.2.3'),
-                            string(name: 'BRANCH', defaultValue: 'main', description: '分支（TAG 为空时生效）'),
-                            string(name: 'TAG', defaultValue: '', description: 'Tag（非空时优先，按 tag 检出）'),
-                            [
-                                $class: 'DynamicReferenceParameter',
-                                name: 'SERVERS',
-                                description: '服务器（复选框，可多选）',
-                                choiceType: 'ET_CHECKBOXES', // 复选框
-                                referencedParameters: '',
-                                script: [
-                                    $class: 'GroovyScript',
-                                    fallbackScript: [classpath: [], sandbox: true, script: 'return []'],
-                                    // 注意：这里的 return 语句一定要是纯 Groovy 列表
-                                    script: [classpath: [], sandbox: true, script: "return ['gate-1', 'game-1', 'battle-1', 'social-1', 'login-1', 'admin-1']"]
-                                ]
-                            ]
-                        ])
-                    ])
-                }
-            }
-        }
+    // 【修复说明】
+    // 1. 不再在 parameters {} 里混写，统一用 properties 注入
+    // 2. SERVERS 使用 ET_MULTI_SELECT 类型，支持 Ctrl+鼠标点击多选
+    // 3. Active Choices 的 script 闭包使用标准 Map 格式，避免浏览器渲染空白
+    parameters {
+        choice(name: 'ENV', choices: ['audit', 'test', 'release', 'prod'], description: '环境')
+        string(name: 'VERSION', defaultValue: '', description: '版本号，如 v1.2.3')
+        string(name: 'BRANCH', defaultValue: 'main', description: '分支（TAG 为空时生效）')
+        string(name: 'TAG', defaultValue: '', description: 'Tag（非空时优先，按 tag 检出）')
 
+        // 使用 Active Choices 的多选列表框
+        [
+            $class: 'DynamicReferenceParameter',
+            name: 'SERVERS',
+            description: '服务器（按住 Ctrl 或 Shift 多选）',
+            choiceType: 'ET_MULTI_SELECT',
+            referencedParameters: '',
+            script: [
+                $class: 'GroovyScript',
+                fallbackScript: [classpath: [], sandbox: true, script: 'return []'],
+                script: [classpath: [], sandbox: true, script: "return ['gate-1', 'game-1', 'battle-1', 'social-1', 'login-1', 'admin-1']"]
+            ]
+        ]
+    }
+
+    stages {
         stage('Checkout') {
             steps {
                 script {
@@ -49,11 +46,12 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    // 将多选的 List 转换为空格分隔的字符串，例如："gate-1 game-1"
+                    // 确保多选的值安全转换为空格分隔的字符串
                     def servers = (params.SERVERS instanceof List) ? params.SERVERS.join(' ') : (params.SERVERS ?: '')
-                    if (!servers) {
-                        error("请至少选择一台服务器 (SERVERS 不能为空)")
+                    if (!servers?.trim()) {
+                        error("SERVERS 不能为空，请至少选择一台服务器！")
                     }
+
                     sh 'bash deploy/scripts/build.sh --env "$ENV" --version "$VERSION" --servers "$servers"'
                 }
             }
@@ -63,6 +61,7 @@ pipeline {
             steps {
                 script {
                     def servers = (params.SERVERS instanceof List) ? params.SERVERS.join(' ') : (params.SERVERS ?: '')
+
                     sh 'bash deploy/cicd/deploy.sh --env "$ENV" --version "$VERSION" --servers "$servers"'
                 }
             }
