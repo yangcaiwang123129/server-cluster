@@ -1,25 +1,11 @@
-// CI/CD 流水线：参数选择环境/版本/服务器 → 拉代码 → 构建打包 → scp 分发重启。
-// 依赖插件：Git、Active Choices Parameter（复选框服务器列表）。
 pipeline {
     agent any
 
-    // Active Choices 在声明式 Pipeline 中必须通过 properties + $class 写法
-    parameters {
-        // 说明：声明式 parameters 块本身支持 choice/string，
-        // 但 Active Choices 的复选框必须用 properties 方式注入，见下方 script 前的 properties 调用。
-        // 为保证统一，这里保留基础参数，SERVERS 通过 properties 注入。
-        choice(name: 'ENV', choices: ['audit', 'test', 'release', 'prod'], description: '环境')
-        string(name: 'VERSION', defaultValue: '', description: '版本号，如 v1.2.3')
-        string(name: 'BRANCH', defaultValue: 'main', description: '分支（TAG 为空时生效）')
-        string(name: 'TAG', defaultValue: '', description: 'Tag（非空时优先，按 tag 检出）')
-    }
-
     stages {
+        // 【关键改动】必须在进入任何 stage 之前，用 script 块注入参数
         stage('Init Params') {
             steps {
                 script {
-                    // 用 properties 注入 Active Choices 复选框参数（SERVERS）
-                    // 注意：properties 会覆盖 parameters 块，所以这里要把所有参数都列全
                     properties([
                         parameters([
                             choice(name: 'ENV', choices: ['audit', 'test', 'release', 'prod'], description: '环境'),
@@ -30,12 +16,13 @@ pipeline {
                                 $class: 'DynamicReferenceParameter',
                                 name: 'SERVERS',
                                 description: '服务器（复选框，可多选）',
-                                choiceType: 'ET_CHECKBOXES',
+                                choiceType: 'ET_CHECKBOXES', // 复选框
                                 referencedParameters: '',
                                 script: [
                                     $class: 'GroovyScript',
-                                    fallbackScript: [classpath: [], sandbox: false, script: 'return []'],
-                                    script: [classpath: [], sandbox: false, script: "return ['gate-1','game-1','battle-1','social-1','login-1','admin-1']"]
+                                    fallbackScript: [classpath: [], sandbox: true, script: 'return []'],
+                                    // 注意：这里的 return 语句一定要是纯 Groovy 列表
+                                    script: [classpath: [], sandbox: true, script: "return ['gate-1', 'game-1', 'battle-1', 'social-1', 'login-1', 'admin-1']"]
                                 ]
                             ]
                         ])
@@ -48,6 +35,7 @@ pipeline {
             steps {
                 script {
                     if (params.TAG?.trim()) {
+                        // 按 tag 拉取本次发布版本代码
                         checkout([$class: 'GitSCM',
                                   branches: [[name: "refs/tags/${params.TAG}"]],
                                   userRemoteConfigs: scm.userRemoteConfigs])
@@ -61,9 +49,12 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    // SERVERS 在 Active Choices 复选框里是 List，join 成空格分隔字符串
+                    // 将多选的 List 转换为空格分隔的字符串，例如："gate-1 game-1"
                     def servers = (params.SERVERS instanceof List) ? params.SERVERS.join(' ') : (params.SERVERS ?: '')
-                    sh 'bash deploy/scripts/build.sh --env "$ENV" --version "$VERSION" --servers "$SERVERS"'
+                    if (!servers) {
+                        error("请至少选择一台服务器 (SERVERS 不能为空)")
+                    }
+                    sh 'bash deploy/scripts/build.sh --env "$ENV" --version "$VERSION" --servers "$servers"'
                 }
             }
         }
@@ -72,7 +63,7 @@ pipeline {
             steps {
                 script {
                     def servers = (params.SERVERS instanceof List) ? params.SERVERS.join(' ') : (params.SERVERS ?: '')
-                    sh 'bash deploy/cicd/deploy.sh --env "$ENV" --version "$VERSION" --servers "$SERVERS"'
+                    sh 'bash deploy/cicd/deploy.sh --env "$ENV" --version "$VERSION" --servers "$servers"'
                 }
             }
         }
