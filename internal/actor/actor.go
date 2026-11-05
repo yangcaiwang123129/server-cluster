@@ -9,8 +9,11 @@ import (
 type Message interface{ MsgType() string }
 
 type Handler interface {
+	// HandleMessage 处理投递到 actor 的消息（actor 协程内串行执行）
 	HandleMessage(msg Message)
+	// Tick 周期帧回调
 	Tick(dt float64)
+	// OnStop actor 退出后的收尾回调
 	OnStop()
 }
 

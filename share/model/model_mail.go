@@ -80,8 +80,7 @@ func (p *PlayerMail) UpdateMail(m MailInfo) bool {
 	return ok
 }
 
-// DeleteMail 物理删除邮件；仅供应玩家上线/定期清理任务使用，业务删除请置为 MailStatusDeleted。
-// 不存在返回 false。
+// DeleteMail 物理删除邮件；仅供应玩家上线/定期清理任务使用，业务删除请置为 MailStatusDeleted，不存在返回 false。
 func (p *PlayerMail) DeleteMail(mailID int64) bool { return p.Mails.Delete(mailID) }
 
 // ScanJSON/ValueJSON 由 model 包提供，这里实现 Serializable 以兼容 cache 序列化。

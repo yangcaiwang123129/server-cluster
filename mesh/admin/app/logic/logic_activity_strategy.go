@@ -11,12 +11,6 @@ import (
 )
 
 // nextWindow 计算下一轮时间窗口（start/end 均为毫秒时间戳）。
-// base 取 now 或上一轮结束时间，确保下一轮不早于 base。
-// 策略值格式 "前缀 时:分:秒"（兼容 '_' 与空格分隔）：
-//   - Specify: "2026/11/3 0:00:00" 本地绝对时间
-//   - Day:     "0 0:00:00" 每天固定时分秒，不支持跨天
-//   - Week:    "1 0:00:00" 周几（1=周一..7=周日）+ 时分秒
-//   - Month:   "1 0:00:00" 几号 + 时分秒，0 表示月底
 func nextWindow(cfg *tpl.ActivityCfg, latest *model.Activity, now int64) (int64, int64, bool) {
 	base := now
 	if latest != nil && latest.EndTime > 0 {
@@ -149,7 +143,6 @@ func dailyWindow(base int64, openSec, closeSec int) (int64, int64, bool) {
 }
 
 // weeklyWindow 计算 base 之后（含）最近一个每周时间窗。
-// weekDay 取值 1~7 对应周一~周日；close 不晚于 open 时顺延到下一周。
 func weeklyWindow(base int64, openDay, openSec, closeDay, closeSec int) (int64, int64, bool) {
 	t := time.UnixMilli(base).In(time.Local)
 	start := weekDayAt(t, openDay, openSec)
@@ -178,7 +171,6 @@ func weekDayAt(base time.Time, weekDay, daySec int) time.Time {
 }
 
 // monthlyWindow 计算 base 之后（含）最近一个每月时间窗。
-// day 取 1~31，超出当月天数时取当月最后一天；close 不晚于 open 则顺延到下月。
 func monthlyWindow(base int64, openDay, openSec, closeDay, closeSec int) (int64, int64, bool) {
 	t := time.UnixMilli(base).In(time.Local)
 	start := dayAt(t.Year(), t.Month(), openDay, openSec, t.Location())

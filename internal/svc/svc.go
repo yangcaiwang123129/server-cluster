@@ -29,8 +29,7 @@ type Context struct {
 
 var ctx *Context
 
-// Init 初始化服务上下文，须在 global.Init 最前调用。
-// 初始化顺序：MySQL → Redis → 雪花 ID → JWT（secret 未配置则跳过）→ SSH 运维配置。
+// Init 初始化服务上下文，须在 global.Init 最前调用（顺序：MySQL → Redis → 雪花 ID → JWT → SSH 运维配置）。
 func Init() error {
 	mysqlMgr, err := NewMySQLManager()
 	if err != nil {

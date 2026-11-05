@@ -93,7 +93,6 @@ func (this *SafeMap[K, V]) Len() int {
 }
 
 // Range 持读锁遍历，fn 返回 false 时提前结束。
-// 回调内不得调用本 SafeMap 的方法，否则会因不可重入而死锁。
 func (this *SafeMap[K, V]) Range(fn func(key K, val V) bool) {
 	if this == nil {
 		return
@@ -108,7 +107,6 @@ func (this *SafeMap[K, V]) Range(fn func(key K, val V) bool) {
 }
 
 // First 返回第一个满足 pred 的键值；无匹配或 nil 指针返回零值与 false。
-// 适合在持有集合上做「是否存在/取首个」判断，替代手写 found + Range。
 func (this *SafeMap[K, V]) First(pred func(key K, val V) bool) (K, V, bool) {
 	if this == nil {
 		var zk K
@@ -128,7 +126,6 @@ func (this *SafeMap[K, V]) First(pred func(key K, val V) bool) (K, V, bool) {
 }
 
 // Collect 持读锁收集所有满足 pred 的键值到切片；无匹配或 nil 指针返回空切片。
-// 回调只读快照语义，结果可安全带出锁外。
 func (this *SafeMap[K, V]) Collect(pred func(key K, val V) bool) []V {
 	out := make([]V, 0, 8)
 	this.Range(func(key K, val V) bool {
@@ -141,8 +138,6 @@ func (this *SafeMap[K, V]) Collect(pred func(key K, val V) bool) []V {
 }
 
 // Update 在写锁内对单个 key 执行"读-改-写"，加锁、执行处理函数、解锁一次完成，保证原子性。
-// fn 收到旧值与键是否存在标志，返回新值与是否保留（keep=false 时删除该键）。
-// 回调在锁内执行，内部不得再调用本 SafeMap 的任何方法，否则死锁。
 func (this *SafeMap[K, V]) Update(key K, fn func(old V, exists bool) (val V, keep bool)) (V, bool) {
 	this.mu.Lock()
 	defer this.mu.Unlock()
@@ -157,7 +152,6 @@ func (this *SafeMap[K, V]) Update(key K, fn func(old V, exists bool) (val V, kee
 }
 
 // UpdateAll 持写锁执行批量读-改-写，适合需要整体一致的多键操作。
-// fn 收到的底层 map 不可被保存或带出锁外使用，fn 内不得再调用本 SafeMap 的方法。
 func (this *SafeMap[K, V]) UpdateAll(fn func(m map[K]V) error) error {
 	this.mu.Lock()
 	defer this.mu.Unlock()

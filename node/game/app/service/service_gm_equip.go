@@ -7,7 +7,6 @@ import (
 	"server-cluster/share/pb"
 )
 
-// EquipList 装备列表。
 func (p *GmProvider) EquipList(ctx context.Context, req *pb.GmEquipListReq) (*pb.GmEquipListResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
@@ -20,7 +19,6 @@ func (p *GmProvider) EquipList(ctx context.Context, req *pb.GmEquipListReq) (*pb
 	return &pb.GmEquipListResp{Entries: entries}, nil
 }
 
-// EquipAdd 新增装备。
 func (p *GmProvider) EquipAdd(ctx context.Context, req *pb.GmEquipAddReq) (*pb.EquipAddResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
@@ -33,7 +31,6 @@ func (p *GmProvider) EquipAdd(ctx context.Context, req *pb.GmEquipAddReq) (*pb.E
 	return resp, nil
 }
 
-// EquipUpdate 更新装备。
 func (p *GmProvider) EquipUpdate(ctx context.Context, req *pb.GmEquipUpdateReq) (*pb.EquipUpdateResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
@@ -46,7 +43,6 @@ func (p *GmProvider) EquipUpdate(ctx context.Context, req *pb.GmEquipUpdateReq) 
 	return resp, nil
 }
 
-// EquipWear 装备穿戴（同英雄同配置自动顶替）。
 func (p *GmProvider) EquipWear(ctx context.Context, req *pb.GmEquipWearReq) (*pb.EquipWearResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
@@ -60,7 +56,6 @@ func (p *GmProvider) EquipWear(ctx context.Context, req *pb.GmEquipWearReq) (*pb
 	return resp, nil
 }
 
-// EquipUnwear 装备卸载。
 func (p *GmProvider) EquipUnwear(ctx context.Context, req *pb.GmEquipUnwearReq) (*pb.EquipUnwearResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
@@ -73,7 +68,6 @@ func (p *GmProvider) EquipUnwear(ctx context.Context, req *pb.GmEquipUnwearReq) 
 	return resp, nil
 }
 
-// EquipUpgrade 装备升级（消耗物品）。
 func (p *GmProvider) EquipUpgrade(ctx context.Context, req *pb.GmEquipUpgradeReq) (*pb.EquipUpgradeResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
@@ -87,7 +81,6 @@ func (p *GmProvider) EquipUpgrade(ctx context.Context, req *pb.GmEquipUpgradeReq
 	return resp, nil
 }
 
-// EquipUpQuality 装备升品（消耗升品素材）。
 func (p *GmProvider) EquipUpQuality(ctx context.Context, req *pb.GmEquipUpQualityReq) (*pb.EquipUpQualityResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
@@ -101,7 +94,6 @@ func (p *GmProvider) EquipUpQuality(ctx context.Context, req *pb.GmEquipUpQualit
 	return resp, nil
 }
 
-// EquipBreakthrough 装备突破（消耗突破素材）。
 func (p *GmProvider) EquipBreakthrough(ctx context.Context, req *pb.GmEquipBreakthroughReq) (*pb.EquipBreakthroughResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err

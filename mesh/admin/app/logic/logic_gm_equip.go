@@ -46,7 +46,6 @@ func init() {
 	RegisterGmEquipLogic(&gmEquipLogic{})
 }
 
-// EquipList 装备列表。
 func (this *gmEquipLogic) EquipList(req dto.GmPlayerReq) ([]dto.GmEquipEntry, error) {
 	resp, err := gmCall[pb.GmEquipListResp](context.Background(), req.PlayerID, pb.GameAdminService_EquipList_FullMethodName,
 		&pb.GmEquipListReq{PlayerId: req.PlayerID})
@@ -56,7 +55,6 @@ func (this *gmEquipLogic) EquipList(req dto.GmPlayerReq) ([]dto.GmEquipEntry, er
 	return util.MapSlice(resp.GetEntries(), toGmEquipEntry), nil
 }
 
-// EquipAdd 新增装备。
 func (this *gmEquipLogic) EquipAdd(req dto.GmEquipAddReq) (*dto.GmEquipEntry, error) {
 	callReq := &pb.GmEquipAddReq{
 		PlayerId: req.PlayerID,
@@ -70,7 +68,6 @@ func (this *gmEquipLogic) EquipAdd(req dto.GmEquipAddReq) (*dto.GmEquipEntry, er
 	return &entry, nil
 }
 
-// EquipUpdate 更新装备。
 func (this *gmEquipLogic) EquipUpdate(req dto.GmEquipUpdateReq) (*dto.GmEquipEntry, error) {
 	callReq := &pb.GmEquipUpdateReq{
 		PlayerId: req.PlayerID,
@@ -91,7 +88,6 @@ func (this *gmEquipLogic) EquipUpdate(req dto.GmEquipUpdateReq) (*dto.GmEquipEnt
 	return &entry, nil
 }
 
-// EquipWear 装备穿戴（同英雄同配置自动顶替）。
 func (this *gmEquipLogic) EquipWear(req dto.GmEquipWearReq) (*dto.GmEquipEntry, error) {
 	callReq := &pb.GmEquipWearReq{PlayerId: req.PlayerID, EquipId: req.ID, HeroId: req.HeroID}
 	resp, err := gmCall[pb.EquipWearResp](context.Background(), req.PlayerID, pb.GameAdminService_EquipWear_FullMethodName, callReq)
@@ -102,7 +98,6 @@ func (this *gmEquipLogic) EquipWear(req dto.GmEquipWearReq) (*dto.GmEquipEntry, 
 	return &entry, nil
 }
 
-// EquipUnwear 装备卸载。
 func (this *gmEquipLogic) EquipUnwear(req dto.GmEquipUnwearReq) (*dto.GmEquipEntry, error) {
 	callReq := &pb.GmEquipUnwearReq{PlayerId: req.PlayerID, EquipId: req.ID}
 	resp, err := gmCall[pb.EquipUnwearResp](context.Background(), req.PlayerID, pb.GameAdminService_EquipUnwear_FullMethodName, callReq)
@@ -113,7 +108,6 @@ func (this *gmEquipLogic) EquipUnwear(req dto.GmEquipUnwearReq) (*dto.GmEquipEnt
 	return &entry, nil
 }
 
-// EquipUpgrade 装备升级（消耗物品）。
 func (this *gmEquipLogic) EquipUpgrade(req dto.GmUpgradeReq) (*dto.GmUpgradeResp, error) {
 	callReq := &pb.GmEquipUpgradeReq{PlayerId: req.PlayerID, EquipId: req.EquipID}
 	resp, err := gmCall[pb.EquipUpgradeResp](context.Background(), req.PlayerID, pb.GameAdminService_EquipUpgrade_FullMethodName, callReq)
@@ -123,7 +117,6 @@ func (this *gmEquipLogic) EquipUpgrade(req dto.GmUpgradeReq) (*dto.GmUpgradeResp
 	return gmEquipDimResp(resp.GetEquipEntry(), resp.GetAttribute()), nil
 }
 
-// EquipUpQuality 装备升品（消耗升品素材）。
 func (this *gmEquipLogic) EquipUpQuality(req dto.GmUpgradeReq) (*dto.GmUpgradeResp, error) {
 	callReq := &pb.GmEquipUpQualityReq{PlayerId: req.PlayerID, EquipId: req.EquipID}
 	resp, err := gmCall[pb.EquipUpQualityResp](context.Background(), req.PlayerID, pb.GameAdminService_EquipUpQuality_FullMethodName, callReq)
@@ -133,7 +126,6 @@ func (this *gmEquipLogic) EquipUpQuality(req dto.GmUpgradeReq) (*dto.GmUpgradeRe
 	return gmEquipDimResp(resp.GetEquipEntry(), resp.GetAttribute()), nil
 }
 
-// EquipBreakthrough 装备突破（消耗突破素材）。
 func (this *gmEquipLogic) EquipBreakthrough(req dto.GmUpgradeReq) (*dto.GmUpgradeResp, error) {
 	callReq := &pb.GmEquipBreakthroughReq{PlayerId: req.PlayerID, EquipId: req.EquipID}
 	resp, err := gmCall[pb.EquipBreakthroughResp](context.Background(), req.PlayerID, pb.GameAdminService_EquipBreakthrough_FullMethodName, callReq)

@@ -8,8 +8,7 @@ import (
 	"server-cluster/share/tpl"
 )
 
-// Init 初始化应用：svc（DB/Redis/雪花ID/JWT）→ 配置表 → 自动建表。
-// 须在注册路由前调用。
+// Init 初始化应用（svc、配置表、自动建表），须在注册路由前调用。
 func Init() error {
 	if err := svc.Init(); err != nil {
 		return err

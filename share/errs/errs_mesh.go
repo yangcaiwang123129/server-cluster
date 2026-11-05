@@ -38,20 +38,7 @@ const (
 
 // ============ 响应出口（唯一主体） ============
 
-// Respond 统一响应出口。
-//
-//	err == nil                 → Resp{code:0, msg:"ok"[或 successMsg], data}
-//	codes.Convert(err) != nil → Resp{code:业务码原样透传, msg}（0/1001/.../403/500）
-//	gorm.ErrRecordNotFound    → Resp{code:500, msg:"记录不存在"}
-//	Duplicate entry           → Resp{code:500, msg:"数据已存在"}
-//	普通 error                → Resp{code:500, msg:"internal server error"} + log.Errorf
-//
-// 用法：
-//
-//	return errs.Respond(ctx, err, data)              // 成功 msg="ok"
-//	return errs.Respond(ctx, nil, nil, "删除成功")    // 成功自定义 msg
-//	return errs.Respond(ctx, errs.NewError(500, "x"), nil) // 手动码失败
-//	return errs.Respond(ctx, err, nil)               // 透传 error 自动分类
+// Respond 统一响应出口：err==nil → Resp{0, msg[或 successMsg], data}；codes.Convert 可识别 → 业务码透传；gorm.ErrRecordNotFound/Duplicate entry/普通 error → 500 兜底（普通 error 附加 log.Errorf）。
 func Respond(c fiber.Ctx, err error, data any, successMsg ...string) error {
 	if err == nil {
 		msg := "ok"

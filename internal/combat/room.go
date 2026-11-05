@@ -42,7 +42,6 @@ type CombatMsg struct {
 	Reply chan any
 }
 
-// MsgType 实现 actor.Message。
 func (m *CombatMsg) MsgType() string { return m.Type }
 
 // CombatRoom 单场战斗状态容器，由 actor 串行驱动，内部无需加锁。
@@ -65,7 +64,6 @@ func NewCombatRoom(id int64, grid *RuntimeGrid) *CombatRoom {
 	}
 }
 
-// HandleMessage 实现 actor.Handler：按类型分发消息。
 func (r *CombatRoom) HandleMessage(msg actor.Message) {
 	m, ok := msg.(*CombatMsg)
 	if !ok {
@@ -142,7 +140,6 @@ func (r *CombatRoom) replySnapshot(m *CombatMsg) {
 	}
 }
 
-// Tick 实现 actor.Handler：按帧推进冷却、buff 与弹道。
 func (r *CombatRoom) Tick(dt float64) {
 	r.tickCooldowns(dt)
 	r.tickBuffs(dt)
@@ -177,7 +174,6 @@ func (r *CombatRoom) onPlayerDeath(p *PlayerState) {
 	r.AOI.Remove(p.ID, p.GridX, p.GridY)
 }
 
-// OnStop 实现 actor.Handler：房间停止时的收尾日志。
 func (r *CombatRoom) OnStop() {
 	log.Printf("[room %d] stopping, players=%d", r.ID, len(r.Players))
 }

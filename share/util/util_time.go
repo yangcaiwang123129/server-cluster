@@ -130,8 +130,7 @@ func Tomorrow() Time {
 	return Day(1)
 }
 
-// Transform renders t as a human-readable string relative to the current time. The optional rule
-// provides a custom set of [TransformRule] values in place of the default rules.
+// Transform renders t as a human-readable string relative to the current time.
 func Transform(t Time, rule ...[]TransformRule) string {
 	var (
 		dur           = Now().Unix() - t.Unix()
@@ -169,8 +168,7 @@ func Transform(t Time, rule ...[]TransformRule) string {
 	return ""
 }
 
-// Unix returns the local time corresponding to the given Unix time in seconds. The optional nsec
-// is the nanosecond offset.
+// Unix returns the local time corresponding to the given Unix time in seconds.
 func Unix(sec int64, nsec ...int64) Time {
 	if len(nsec) > 0 {
 		return time.Unix(sec, nsec[0]).In(GetLocation())
@@ -194,8 +192,7 @@ func UnixNano(nsec int64) Time {
 	return time.Unix(nsec/1e9, nsec%1e9).In(GetLocation())
 }
 
-// Day returns the current time shifted by the given number of days. For example, -1 is the previous
-// day, 0 is the current day and 1 is the next day.
+// Day returns the current time shifted by the given number of days.
 func Day(offset ...int) Time {
 	now := Now()
 
@@ -220,8 +217,7 @@ func DayTail(offset ...int) Time {
 	return time.Date(date.Year(), date.Month(), date.Day(), 23, 59, 59, 999999999, date.Location())
 }
 
-// Week returns the current time shifted by the given number of weeks. For example, -1 is the
-// previous week, 0 is the current week and 1 is the next week.
+// Week returns the current time shifted by the given number of weeks.
 func Week(offset ...int) Time {
 	if len(offset) > 0 {
 		return Now().AddDate(0, 0, offset[0]*7)
@@ -231,7 +227,6 @@ func Week(offset ...int) Time {
 }
 
 // WeekHead returns the first second of the first day of the week, with Monday as the first day.
-// offset shifts the result by whole weeks.
 func WeekHead(offset ...int) Time {
 	var (
 		now        = Now()
@@ -251,8 +246,7 @@ func WeekHead(offset ...int) Time {
 	return time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
 }
 
-// WeekTail returns the last second of the last day of the week, with Sunday as the last day. offset
-// shifts the result by whole weeks.
+// WeekTail returns the last second of the last day of the week, with Sunday as the last day.
 func WeekTail(offset ...int) Time {
 	var (
 		now        = Now()
@@ -268,8 +262,7 @@ func WeekTail(offset ...int) Time {
 	return time.Date(date.Year(), date.Month(), date.Day(), 23, 59, 59, 999999999, date.Location())
 }
 
-// Month returns the current time shifted by the given number of months. For example, -1 is the
-// previous month, 0 is the current month and 1 is the next month.
+// Month returns the current time shifted by the given number of months.
 func Month(offset ...int) Time {
 	now := Now()
 

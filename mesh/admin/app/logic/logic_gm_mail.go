@@ -33,7 +33,6 @@ func init() {
 	RegisterGmMailLogic(&gmMailLogic{})
 }
 
-// MailList 玩家邮件列表。
 func (this *gmMailLogic) MailList(req dto.GmPlayerReq) ([]dto.GmMailEntry, error) {
 	resp, err := gmCall[pb.GmMailListResp](context.Background(), req.PlayerID, pb.GameAdminService_MailList_FullMethodName,
 		&pb.GmMailListReq{PlayerId: req.PlayerID})
@@ -43,7 +42,6 @@ func (this *gmMailLogic) MailList(req dto.GmPlayerReq) ([]dto.GmMailEntry, error
 	return util.MapSlice(resp.GetEntries(), toGmMailEntry), nil
 }
 
-// MailSend 发送邮件。
 func (this *gmMailLogic) MailSend(req dto.GmMailSendReq) (*dto.GmMailEntry, error) {
 	atts := util.MapSlice(req.Attachments, func(a dto.GmMailAttachment) *pb.AssetEntry {
 		return &pb.AssetEntry{Type: a.Type, CfgId: a.CfgID, Count: a.Count}

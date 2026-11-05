@@ -119,9 +119,7 @@ type BaseContainer[T Grid] struct {
 	SellPriceOf func(it T) int64 `json:"-"`
 }
 
-// NewContainer 构造空泛型容器。
-// globalID 为跨容器加锁排序用的唯一标识；ownerID/ownerType 为所属信息。
-// sizeOf / rawSizeOf 为占格计算回调，必须注入——容器基类不关心对象具体怎么算占格。
+// NewContainer 构造空泛型容器：globalID 为跨容器加锁排序用唯一标识，ownerID/ownerType 为所属信息，sizeOf/rawSizeOf 为必须注入的占格计算回调。
 func NewContainer[T Grid](typ, gridW, gridH int32, globalID, ownerID int64, ownerType int32,
 	sizeOf, rawSizeOf func(it T) (w, h int32)) *BaseContainer[T] {
 	return &BaseContainer[T]{
@@ -158,8 +156,7 @@ func (this *BaseContainer[T]) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// UnmarshalJSON 实现 json.Unmarshaler。
-// 同时兼容老版本数组格式（[{"itemID":1,...}]）和新版本 object 格式（{"1":{...}}）。
+// UnmarshalJSON 实现 json.Unmarshaler，同时兼容老版本数组格式（[{"itemID":1,...}]）与新版本 object 格式（{"1":{...}}）。
 func (this *BaseContainer[T]) UnmarshalJSON(data []byte) error {
 	var obj struct {
 		Type  int32       `json:"type"`
@@ -242,8 +239,7 @@ func (this *BaseContainer[T]) Entries() []T {
 // BumpVersion 版本号 +1。
 func (this *BaseContainer[T]) BumpVersion() int32 { this.Ver++; return this.Ver }
 
-// BuildOccupied 构建临时一维占用表（rel 口径）。
-// occ[y*GridW+x] = id，0 为空。每次调用重新构建，不落库。
+// BuildOccupied 构建临时一维占用表（rel 口径）：occ[y*GridW+x] = id，0 为空，每次调用重新构建不落库。
 func (this *BaseContainer[T]) BuildOccupied() []int64 {
 	occ := make([]int64, this.GridW*this.GridH)
 	this.EntryMap.Range(func(id int64, it T) bool {
@@ -315,8 +311,7 @@ func (this *BaseContainer[T]) canPlaceExcept(occ []int64, it T, x, y int32, rota
 	return true
 }
 
-// swapTarget 判断目标区域是否整块被同一件物品占据（满足时才允许两件物品交换）。
-// 返回占据者 id；目标区域有空格、越界或被多件物品占据时返回 false。
+// swapTarget 判断目标区域是否整块被同一件物品占据（满足时才允许两件物品交换），返回占据者 id；有空格、越界或被多件物品占据时返回 false。
 func (this *BaseContainer[T]) swapTarget(occ []int64, it T, x, y int32, rotated bool) (int64, bool) {
 	w, h := this.invokeRawSizeOf(it)
 	if rotated {
@@ -370,9 +365,7 @@ func (this *BaseContainer[T]) RemoveEntry(id int64) (T, error) {
 	return it, nil
 }
 
-// MoveEntry 将对象 id 移到 (toX,toY)，可选旋转。
-// 若目标区域整块被另一件物品占据、且该物品能放回 id 的原位置，则两件物品交换位置；
-// 其余情况（越界、含空格、被多件物品占据、对方放不回原位置）返回 ErrPositionConflict。
+// MoveEntry 将对象 id 移到 (toX,toY) 可选旋转；目标区域整块被另一件物品占据且对方能放回原位置时两件交换，否则返回 ErrPositionConflict。
 func (this *BaseContainer[T]) MoveEntry(id int64, toX, toY int32, rotated bool) error {
 	it, ok := this.EntryMap.Get(id)
 	if !ok {
@@ -430,13 +423,7 @@ func (this *BaseContainer[T]) OnDeath() {
 	this.BumpVersion()
 }
 
-// AutoSort 一键整理（L2 物品排序规则，稳定排序）：
-//  1. 占格面积大者靠前；
-//  2. 品质高者靠前（红色 > 黄色 > 其余品质，红色对应最高稀有度值）；
-//  3. 同面积同品质：出售价从高到低；
-//  4. 全部条件相同：保持原有相对顺序（SliceStable，相等比较返回 false 即可）。
-//
-// 排序后从 (0,0) 起逐个摆放，双朝向扫描；任一物品放不下则整体回滚。
+// AutoSort 一键整理（L2 规则，稳定排序）：面积大者优先 → 品质高者优先（红 > 黄 > 其余）→ 出售价高者优先 → 全部相同保持原序；从 (0,0) 起逐个摆放、双朝向扫描，任一物品放不下整体回滚。
 func (this *BaseContainer[T]) AutoSort() error {
 	all := this.Entries()
 	if len(all) == 0 {
@@ -515,9 +502,7 @@ func (this *BaseContainer[T]) rollbackSnapshots(snapshots []itemSnap[T]) {
 	}
 }
 
-// TransferFrom 把源容器 from 里的 id 对象移到本容器的 (toX,toY,rotated) 位置。
-// 两个 BaseContainer[T] 按 GlobalID 升序加各自的 transMu，避免互搬死锁。
-// 目标放不下 / id 不在源容器 / id 已在本容器 时，两个容器均不做任何修改。
+// TransferFrom 把源容器 from 的 id 对象移到本容器 (toX,toY,rotated)：两容器按 GlobalID 升序加 transMu 避免互搬死锁；任一前置校验失败则两容器均不修改。
 func (this *BaseContainer[T]) TransferFrom(from *BaseContainer[T], id int64, toX, toY int32, rotated bool) error {
 	if from == this {
 		return this.MoveEntry(id, toX, toY, rotated)

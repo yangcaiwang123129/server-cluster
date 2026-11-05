@@ -46,8 +46,7 @@ func init() {
 	playerLogicInst.Register(&playerLogic{PlayerActors: util.NewSafeMap[int64, *global.PlayerActor]()})
 }
 
-// moduleLogics 持有玩家数据的模块，按进入/离开的统一顺序驱动。
-// 延迟获取单例：各模块的 init 注册顺序不确定，不能在包初始化阶段调用。
+// moduleLogics 延迟获取持有玩家数据的模块（init 注册顺序不确定，不能在包初始化阶段调用）。
 func moduleLogics() []global.PlayerLifecycle {
 	return []global.PlayerLifecycle{Item(), Hero(), Weapon(), Skill(), Equip(), Mail(), Task()}
 }
@@ -102,8 +101,6 @@ func (this *playerLogic) OnEnterGame(ctx context.Context, playerID int64, req *p
 	resp.ServerTime = util.Now().UnixMilli()
 	return nil
 }
-
-// 玩家属性表组装：见 convert.PlayerAttr。
 
 func (this *playerLogic) OnLeaveGame(ctx context.Context, playerID int64, req *pb.LeaveGameReq, resp *pb.LeaveGameResp) error {
 	var firstErr error
@@ -228,10 +225,7 @@ func flushAndEvict[V any](ctx context.Context, c *cache.Cache[int64, V], playerI
 	return nil
 }
 
-// codedResult helper 链路上的业务码错误转 Result（仅 logic 层内部使用）。
-// 内部 helper 保留 errs.CodeXxx 错误返回，logic 方法在此统一转成客户端 Result；
-// 普通基础设施错误（codes.Convert 解析为 Unknown）返回 nil，由调用方原样上抛，
-// 最终由 handler 兜底为 INTERNAL_ERROR。
+// codedResult 业务码错误转客户端 Result；基础设施错误（Unknown）返回 nil 由调用方上抛，handler 兜底 INTERNAL_ERROR。
 func codedResult(err error) *pb.Result {
 	c := codes.Convert(err)
 	if c == nil || c.Code() == codes.OK.Code() || c.Code() == codes.Unknown.Code() {
@@ -374,7 +368,6 @@ func newPlayerProcessor(act *node.Actor, args ...any) node.Processor {
 	return &playerProcessor{actor: act, playerID: playerID, loginIP: loginIP}
 }
 
-// Start 玩家 actor 启动：写在线登记、绑定 uid 与 actor，并把业务路由注册到 actor。
 func (p *playerProcessor) Start() {
 	playerActorMap().Set(p.playerID, &global.PlayerActor{
 		Actor:     p.actor,
@@ -393,7 +386,6 @@ func (p *playerProcessor) Start() {
 	}
 }
 
-// Destroy 玩家 actor 销毁：注销在线登记。
 func (p *playerProcessor) Destroy() {
 	playerActorMap().Delete(p.playerID)
 }

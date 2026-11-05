@@ -9,8 +9,7 @@ const (
 	MaxPageSize      = 10000
 )
 
-// PageQuery 分页查询：先 count 再 offset/limit 取数；order 为空时回退 fallback。
-// db 须已带 Model 与过滤条件。
+// PageQuery 分页查询：先 count 再 offset/limit 取数；order 为空时回退 fallback，db 须已带 Model 与过滤条件。
 func PageQuery[T any](db *gorm.DB, pageIndex, pageSize int, order, fallback string) ([]T, int64, error) {
 	var total int64
 	if err := db.Count(&total).Error; err != nil {

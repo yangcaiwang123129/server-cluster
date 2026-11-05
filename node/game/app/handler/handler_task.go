@@ -1,3 +1,4 @@
+// Package handler due 协议入口：注册路由、Parse、调用 logic、Response。
 package handler
 
 import (

@@ -60,8 +60,7 @@ func parseTableMeta[T any]() (*tableMeta, error) {
 	return m, nil
 }
 
-// fillTimestamps 为 int64 时间字段填毫秒时间戳：
-// created_at 仅在为 0（首次插入）时赋值，updated_at 每次落库刷新。
+// fillTimestamps 为 int64 时间字段填毫秒时间戳：created_at 仅在为 0（首次插入）时赋值，updated_at 每次落库刷新。
 func fillTimestamps[T any](meta *tableMeta, rows []T) {
 	if meta.createdAt == nil && meta.updatedAt == nil {
 		return
@@ -108,10 +107,7 @@ func upsertRows[T any](db *gorm.DB, rows []T, meta *tableMeta) error {
 	return nil
 }
 
-// NewPlayerTableCache 单行表缓存：key=playerID，value=*M（一玩家一行，如 PlayerCore / PlayerProfile）。
-// 读：SELECT * WHERE player_id=?，无行返回 gorm.ErrRecordNotFound。
-// 写：异步批量 upsert（冲突列取主键，更新列取非 PK 列）。
-// 删：DELETE WHERE player_id IN（同步）。
+// NewPlayerTableCache 单行表缓存（key=playerID，一玩家一行）：读 SELECT 无行返回 gorm.ErrRecordNotFound，写异步批量 upsert（冲突列取主键、更新列取非 PK 列），删同步 DELETE WHERE player_id IN。
 func NewPlayerTableCache[M any](cfg CacherConfig) *Cache[int64, *M] {
 	meta, err := parseTableMeta[M]()
 	if err != nil {

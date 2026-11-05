@@ -7,7 +7,6 @@ import (
 	"server-cluster/share/pb"
 )
 
-// HeroList 英雄列表。
 func (p *GmProvider) HeroList(ctx context.Context, req *pb.GmHeroListReq) (*pb.HeroListResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
@@ -20,7 +19,6 @@ func (p *GmProvider) HeroList(ctx context.Context, req *pb.GmHeroListReq) (*pb.H
 	return resp, nil
 }
 
-// HeroAdd 新增英雄。
 func (p *GmProvider) HeroAdd(ctx context.Context, req *pb.GmHeroAddReq) (*pb.HeroAddResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
@@ -33,7 +31,6 @@ func (p *GmProvider) HeroAdd(ctx context.Context, req *pb.GmHeroAddReq) (*pb.Her
 	return resp, nil
 }
 
-// HeroUpdate 更新英雄。
 func (p *GmProvider) HeroUpdate(ctx context.Context, req *pb.GmHeroUpdateReq) (*pb.HeroUpdateResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
@@ -46,7 +43,6 @@ func (p *GmProvider) HeroUpdate(ctx context.Context, req *pb.GmHeroUpdateReq) (*
 	return resp, nil
 }
 
-// HeroAttribute 查看英雄累计属性。
 func (p *GmProvider) HeroAttribute(ctx context.Context, req *pb.GmHeroAttributeReq) (*pb.HeroAttributeResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
@@ -59,7 +55,6 @@ func (p *GmProvider) HeroAttribute(ctx context.Context, req *pb.GmHeroAttributeR
 	return resp, nil
 }
 
-// HeroUpgrade 英雄升级（消耗物品）。
 func (p *GmProvider) HeroUpgrade(ctx context.Context, req *pb.GmHeroUpgradeReq) (*pb.HeroUpgradeResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err

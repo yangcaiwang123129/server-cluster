@@ -21,8 +21,7 @@ func JWT() *jwt.JWT {
 	return j
 }
 
-// ParseToken 校验 login 签发的 JWT 并提取 player_id。
-// 兼容新格式（字符串）与旧 token（JSON 数字）。
+// ParseToken 校验 login 签发的 JWT 并提取 player_id（兼容新格式字符串与旧 token JSON 数字）。
 func ParseToken(token string) (int64, error) {
 	payload, err := JWT().ExtractPayload(token)
 	if err != nil {

@@ -1,3 +1,4 @@
+// Package router 客户端路由注册：装配期由各模块 init 收集路由，Serve 前统一注册到 node proxy 与玩家 actor。
 package router
 
 import (

@@ -36,9 +36,6 @@ func init() {
 	RegisterCatalogLogic(&catalogLogic{})
 }
 
-// Catalog 读 Luban 配置生成目录（供 GM 页面选择器与展示）。
-// typ: hero|equip|item。全部类型统一走 keyword 过滤 + 分页，
-// pageSize<=0 时不分页全量返回，兼容量小类型的选择器场景。
 func (this *catalogLogic) Catalog(typ, keyword string, pageIndex, pageSize int) ([]dto.GameCatalogEntry, int64, error) {
 	var list []dto.GameCatalogEntry
 	switch typ {

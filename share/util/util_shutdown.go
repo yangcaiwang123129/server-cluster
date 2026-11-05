@@ -46,7 +46,6 @@ func (this *ShutdownLog) Start() {
 }
 
 // Step 执行一个资源释放步骤：name 为步骤名，fn 返回补充说明（可多行）与错误。
-// 步骤失败不中断后续步骤，最终在 End 汇总。
 func (this *ShutdownLog) Step(name string, fn func() (string, error)) {
 	this.index++
 	begin := time.Now()

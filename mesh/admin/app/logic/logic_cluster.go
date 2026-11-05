@@ -51,9 +51,6 @@ type clusterLogic struct{}
 // master 当前项目未使用，但预留以防未来需要。
 var clusterKinds = []string{cluster.Gate.String(), cluster.Node.String(), cluster.Mesh.String()}
 
-// Sync 从 etcd 拉取所有集群实例并 upsert 到 DB。
-//
-// 并发枚举 gate/node/mesh 三种服务，结果合并去重后一次性 Sync。
 func (this *clusterLogic) Sync(ctx context.Context) error {
 	reg := svc.Ctx().Registry
 	if reg == nil {
@@ -121,17 +118,6 @@ func (this *clusterLogic) UpdateSSH(_ context.Context, m *model.ClusterNode) err
 	return repo.R().UpdateClusterNodeSSH(m)
 }
 
-// Exec 在目标服务器上执行运维脚本。
-//
-// action 映射：
-//
-//	start   → cd $deploy_dir && bash start.sh
-//	stop    → cd $deploy_dir && bash stop.sh
-//	restart → bash stop.sh && bash start.sh
-//	deploy  → bash start.sh（包应已在服务器上；与 start 等价，保留语义差异）
-//
-// SSH 连接参数从 etc.toml 的 [[ssh.hosts]] 读：按节点 endpoint 的 IP 匹配 host 字段。
-// deployDir 从 [[ssh.hosts]].defaultDeployDir 取，拼上 "/" + node.Alias 作为最终目录。
 func (this *clusterLogic) Exec(ctx context.Context, nodeID, action string) (*dto.ClusterExecResp, error) {
 	node, err := repo.R().GetClusterNode(nodeID)
 	if err != nil {

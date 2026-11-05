@@ -28,6 +28,7 @@ func init() {
 	registerAsset(&heroAssetStore{})
 }
 
+// Hero 获取英雄业务单例。
 func Hero() global.HeroLogic { return heroLogicInst.MustGet() }
 
 func (this *heroLogic) HeroList(ctx context.Context, playerID int64) (*pb.HeroListResp, error) {

@@ -156,7 +156,6 @@ func (this *playerLogic) guestLogin(ctx context.Context, req *dto.PlayerLoginReq
 }
 
 // accountLogin 账号密码：player_auth(type=1, identifier=username) 查，比对 bcrypt。
-// 未找到时自动注册（player + player_auth）。
 func (this *playerLogic) accountLogin(ctx context.Context, req *dto.PlayerLoginReq) (string, bool, error) {
 	if req.Username == "" || req.Password == "" {
 		return "", false, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "username and password are required")
@@ -263,8 +262,7 @@ func (this *playerLogic) phoneLogin(ctx context.Context, req *dto.PlayerLoginReq
 	return token, true, err
 }
 
-// wechatLogin 微信：code2session 换 openid → 查/建 player_auth(type=3, openid)。
-// code2session 依赖微信开放平台 API，开发阶段暂以 wechatCode 直接当 openid mock。
+// wechatLogin 微信：code2session 换 openid → 查/建 player_auth(type=3, openid)，开发阶段暂 mock。
 func (this *playerLogic) wechatLogin(ctx context.Context, req *dto.PlayerLoginReq) (string, bool, error) {
 	if req.WechatCode == "" {
 		return "", false, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "wechatCode is required")
@@ -310,8 +308,7 @@ func (this *playerLogic) wechatLogin(ctx context.Context, req *dto.PlayerLoginRe
 	return token, true, err
 }
 
-// appleLogin Apple ID：identityToken 验签解 sub → 查/建 player_auth(type=4, sub)。
-// Apple 验签依赖 .well-known/jwks 公钥本地缓存，开发阶段暂 mock。
+// appleLogin Apple ID：identityToken 验签解 sub → 查/建 player_auth(type=4, sub)，开发阶段暂 mock。
 func (this *playerLogic) appleLogin(ctx context.Context, req *dto.PlayerLoginReq) (string, bool, error) {
 	if req.AppleIdentityToken == "" {
 		return "", false, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "appleIdentityToken is required")
@@ -359,15 +356,13 @@ func (this *playerLogic) appleLogin(ctx context.Context, req *dto.PlayerLoginReq
 
 // ──── 第三方登录 mock（后续替换为真实实现） ────
 
-// wechatCode2Openid 把 wx.login() 的 code 换成 openid。
-// TODO: 生产环境调 https://api.weixin.qq.com/sns/jscode2session
+// wechatCode2Openid 把 wx.login() 的 code 换成 openid；TODO: 生产环境调 https://api.weixin.qq.com/sns/jscode2session
 func (this *playerLogic) wechatCode2Openid(_ context.Context, code string) (string, error) {
 	// mock: 用 code 直接当 openid
 	return "wx_" + code, nil
 }
 
-// appleVerifyAndExtractSub 验签 identityToken 并解出 "sub"。
-// TODO: 生产环境拉 .well-known/jwks 本地缓存验签
+// appleVerifyAndExtractSub 验签 identityToken 并解出 "sub"；TODO: 生产环境拉 .well-known/jwks 本地缓存验签
 func (this *playerLogic) appleVerifyAndExtractSub(_ context.Context, identityToken, nonce string) (string, error) {
 	// mock: 直接返回 identityToken 当 sub（取前 32 字符模拟 sub 长度）
 	if len(identityToken) > 32 {

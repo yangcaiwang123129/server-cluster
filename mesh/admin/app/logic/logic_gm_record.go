@@ -31,7 +31,6 @@ func init() {
 	RegisterGmRecordLogic(&gmRecordLogic{})
 }
 
-// RecordList 分页查询记录（直读 game_record 库）。
 func (this *gmRecordLogic) RecordList(q dto.GmRecordQuery, pageIndex, pageSize int) ([]dto.GmRecordEntry, int64, error) {
 	rows, total, err := repo.R().ListRecords(q.Module, q.Action, repo.RecordQuery{
 		PlayerID: q.PlayerID,

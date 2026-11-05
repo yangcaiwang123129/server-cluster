@@ -42,7 +42,6 @@ func MeshName() string {
 }
 
 // ExtractHTTPAddr 从 etc.http.addr 提取 host:port（给 mesh 注册用 endpoint）。
-// etc.http.addr 形如 "127.0.0.1:8081" 或 ":8081"。
 func ExtractHTTPAddr() string {
 	addr := etc.Get("etc.http.addr").String()
 	if addr == "" {
@@ -58,8 +57,7 @@ func ExtractHTTPAddr() string {
 	return host + ":" + port
 }
 
-// BuildMeshInstance 构造一个 mesh kind 的 ServiceInstance。
-// name 须为集群服务名（"mesh"），alias 由 id 前缀推导（admin-1 → admin）。
+// BuildMeshInstance 构造一个 mesh kind 的 ServiceInstance（name 须为集群服务名，alias 由 id 前缀推导）。
 func BuildMeshInstance(id, name, endpoint string) *registry.ServiceInstance {
 	if id == "" {
 		return nil

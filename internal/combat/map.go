@@ -225,8 +225,7 @@ func (r *RuntimeGrid) FindPath(sx, sz, ex, ez int) []point {
 
 // ---------- 地图加载 ----------
 
-// LoadMap 按场景名加载 cfg/maps/<scene>.json 并预解析所有 Grid。
-// 找不到或解析失败返回 error。
+// LoadMap 按场景名加载 cfg/maps/<scene>.json 并预解析所有 Grid，找不到或解析失败返回 error。
 func LoadMap(scene string) (*BattleMap, []*RuntimeGrid, error) {
 	raw, err := fs.ReadFile(mapsFS, filepath.Join("maps", scene+".json"))
 	if err != nil {
@@ -247,9 +246,7 @@ func LoadMap(scene string) (*BattleMap, []*RuntimeGrid, error) {
 	return &bm, grids, nil
 }
 
-// LoadAllMaps 加载 cfg/maps/ 下所有 JSON 地图。
-// 返回 map[sceneName] -> (原始定义, 预解析网格列表)。
-// 单个文件失败会跳过并记入 errors，其余正常加载。
+// LoadAllMaps 加载 cfg/maps/ 下所有 JSON 地图，返回 map[sceneName] → (原始定义, 预解析网格列表)；单个文件失败跳过并记入 errors。
 func LoadAllMaps() (map[string]*BattleMap, map[string][]*RuntimeGrid, map[string]error) {
 	bms := map[string]*BattleMap{}
 	gridsMap := map[string][]*RuntimeGrid{}

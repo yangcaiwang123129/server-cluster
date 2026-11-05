@@ -64,7 +64,6 @@ func (this *activityLogic) restoreVersion(ctx context.Context) {
 	this.mu.Unlock()
 }
 
-// Snapshot 返回当前内存快照副本。
 func (this *activityLogic) Snapshot() *dto.ActivitySnapshot {
 	this.mu.RLock()
 	defer this.mu.RUnlock()

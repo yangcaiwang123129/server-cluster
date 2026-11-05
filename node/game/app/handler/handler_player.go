@@ -24,8 +24,7 @@ func init() {
 	router.OnActor(pb.RouteCode_ROUTE_CODE_ATTR_OPERATE, handleAttrOperate)
 }
 
-// handleVerify 首包：校验 login 服签发的 JWT，绑定网关与节点（proto 注释明确这是绑定入口），
-// 绑定成功后创建玩家 actor（已在线则幂等复用）。
+// handleVerify 首包：校验 JWT、绑定网关与节点，并创建玩家 actor（已在线则幂等复用）。
 func handleVerify(ctx node.Context) {
 	req := &pb.VerifyReq{}
 	if err := ctx.Parse(req); err != nil {

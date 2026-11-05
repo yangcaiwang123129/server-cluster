@@ -19,8 +19,7 @@ const DBSource = "record"
 // writeTimeout 单次写入超时，避免慢库拖住业务协程。
 const writeTimeout = 2 * time.Second
 
-// Record 尽力而为写入一条打点记录：失败仅告警，不影响业务主流程。
-// module 取 model.RecordModule*，action 取 model.RecordAction*。
+// Record 尽力而为写入一条打点记录：失败仅告警，不影响业务主流程（module 取 model.RecordModule*，action 取 model.RecordAction*）。
 func Record(ctx context.Context, module string, playerID int64, action int8, cfgID int32, count int32) {
 	if playerID <= 0 || cfgID <= 0 {
 		return

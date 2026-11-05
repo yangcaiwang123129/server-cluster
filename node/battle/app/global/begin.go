@@ -9,8 +9,7 @@ import (
 	"server-cluster/node/battle/app/service"
 )
 
-// Init 初始化应用：svc（DB/Redis/雪花ID/JWT）→ service（mesh 客户端）。
-// 须在注册路由前调用。
+// Init 初始化应用：svc（DB/Redis/雪花ID/JWT）→ service（mesh 客户端），须在注册路由前调用。
 func Init(proxy *node.Proxy) error {
 	if err := svc.Init(); err != nil {
 		return err

@@ -14,8 +14,7 @@ import (
 	"server-cluster/share/pb"
 )
 
-// gmCall 调用 game 服的 GM 内部 RPC（服务名固定为 GameAdminService）。
-// method 传 FullMethodName（/pkg.Service/Method），由 rpc.Call 拆出服务名与短方法名。
+// gmCall 调用 game 服的 GM 内部 RPC（method 传 FullMethodName，服务名固定为 GameAdminService）。
 func gmCall[Resp any](ctx context.Context, playerID int64, method string, req any) (*Resp, error) {
 	client, err := gmClient(ctx, playerID)
 	if err != nil {
@@ -24,8 +23,7 @@ func gmCall[Resp any](ctx context.Context, playerID int64, method string, req an
 	return rpc.Call[Resp](ctx, client, method, req)
 }
 
-// gmClient 选择处理 GM 请求的 game 实例：
-// 在线玩家定向到其所在实例（保证命中该玩家正在使用的内存态数据），离线玩家任选一个实例（按需从库加载）。
+// gmClient 在线玩家定向到其所在 game 实例，离线玩家任选一个实例（按需从库加载）。
 func gmClient(ctx context.Context, playerID int64) (transport.Client, error) {
 	instances, err := gameInstances(ctx, pb.GameAdminService_ServiceDesc.ServiceName)
 	if err != nil {
@@ -40,8 +38,7 @@ func gmClient(ctx context.Context, playerID int64) (transport.Client, error) {
 	return rpc.NewDirectClient(instances[0].ID)
 }
 
-// onlineNodeID 查询玩家所在的 game 实例；玩家离线返回空串。
-// 各实例只知道自己的在线玩家，故并发拉取全部实例的在线列表后取首个匹配。
+// onlineNodeID 查询玩家所在的 game 实例（并发拉取全部实例在线列表匹配）；玩家离线返回空串。
 func onlineNodeID(ctx context.Context, playerID int64) string {
 	if playerID <= 0 {
 		return ""

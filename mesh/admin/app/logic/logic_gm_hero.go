@@ -39,7 +39,6 @@ func init() {
 	RegisterGmHeroLogic(&gmHeroLogic{})
 }
 
-// HeroList 英雄列表（含绑定的武器/技能/装备）。
 func (this *gmHeroLogic) HeroList(req dto.GmPlayerReq) (*dto.GmHeroListResp, error) {
 	resp, err := gmCall[pb.HeroListResp](context.Background(), req.PlayerID, pb.GameAdminService_HeroList_FullMethodName,
 		&pb.GmHeroListReq{PlayerId: req.PlayerID})
@@ -54,7 +53,6 @@ func (this *gmHeroLogic) HeroList(req dto.GmPlayerReq) (*dto.GmHeroListResp, err
 	return &dto.GmHeroListResp{Heroes: heroes}, nil
 }
 
-// HeroAdd 新增英雄。
 func (this *gmHeroLogic) HeroAdd(req dto.GmHeroAddReq) (*dto.GmHeroEntry, error) {
 	callReq := &pb.GmHeroAddReq{
 		PlayerId: req.PlayerID,
@@ -68,7 +66,6 @@ func (this *gmHeroLogic) HeroAdd(req dto.GmHeroAddReq) (*dto.GmHeroEntry, error)
 	return &entry, nil
 }
 
-// HeroUpdate 更新英雄。
 func (this *gmHeroLogic) HeroUpdate(req dto.GmHeroUpdateReq) (*dto.GmHeroEntry, error) {
 	callReq := &pb.GmHeroUpdateReq{
 		PlayerId: req.PlayerID,
@@ -89,7 +86,6 @@ func (this *gmHeroLogic) HeroUpdate(req dto.GmHeroUpdateReq) (*dto.GmHeroEntry, 
 	return &entry, nil
 }
 
-// HeroAttribute 查看英雄累计属性。
 func (this *gmHeroLogic) HeroAttribute(req dto.GmHeroAttributeReq) (*dto.GmHeroAttribute, error) {
 	callReq := &pb.GmHeroAttributeReq{PlayerId: req.PlayerID, HeroId: req.HeroID}
 	resp, err := gmCall[pb.HeroAttributeResp](context.Background(), req.PlayerID, pb.GameAdminService_HeroAttribute_FullMethodName, callReq)
@@ -109,7 +105,6 @@ func (this *gmHeroLogic) HeroAttribute(req dto.GmHeroAttributeReq) (*dto.GmHeroA
 	return &attr, nil
 }
 
-// HeroUpgrade 英雄升级（消耗物品）。
 func (this *gmHeroLogic) HeroUpgrade(req dto.GmUpgradeReq) (*dto.GmUpgradeResp, error) {
 	callReq := &pb.GmHeroUpgradeReq{PlayerId: req.PlayerID, HeroId: req.CfgID}
 	resp, err := gmCall[pb.HeroUpgradeResp](context.Background(), req.PlayerID, pb.GameAdminService_HeroUpgrade_FullMethodName, callReq)

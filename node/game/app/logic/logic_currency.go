@@ -47,7 +47,6 @@ func init() {
 
 func (this *currencyAssetStore) AssetType() tpl.AssetType { return this.assetType }
 
-// Add 发放货币：货币无配置，cfgID 必须为 0；count<=0 按 1。
 func (this *currencyAssetStore) Add(ctx context.Context, playerID int64, cfgID, count int32) error {
 	if err := this.checkCfgID(cfgID); err != nil {
 		return err
@@ -58,7 +57,6 @@ func (this *currencyAssetStore) Add(ctx context.Context, playerID int64, cfgID, 
 	return adjustCurrency(ctx, playerID, this.column, int64(count))
 }
 
-// Remove 扣除货币：count<=0 按 1；余额不足返回错误。
 func (this *currencyAssetStore) Remove(ctx context.Context, playerID int64, cfgID, count int32) error {
 	if err := this.checkCfgID(cfgID); err != nil {
 		return err
@@ -69,7 +67,6 @@ func (this *currencyAssetStore) Remove(ctx context.Context, playerID int64, cfgI
 	return adjustCurrency(ctx, playerID, this.column, -int64(count))
 }
 
-// Update 覆盖货币为指定值：count<=0 置 0，>0 直接 SET。
 func (this *currencyAssetStore) Update(ctx context.Context, playerID int64, cfgID, count int32) error {
 	if err := this.checkCfgID(cfgID); err != nil {
 		return err
@@ -80,7 +77,6 @@ func (this *currencyAssetStore) Update(ctx context.Context, playerID int64, cfgI
 	return setCurrency(ctx, playerID, this.column, int64(count))
 }
 
-// Query 直查 DB 当前持有（保真，绕过内存缓存），行不存在返回 0。
 func (this *currencyAssetStore) Query(ctx context.Context, playerID int64, cfgID int32) (int32, error) {
 	db, err := svc.Ctx().DB()
 	if err != nil {
@@ -98,7 +94,6 @@ func (this *currencyAssetStore) Query(ctx context.Context, playerID int64, cfgID
 	return int32(value), nil
 }
 
-// List 货币为单值资产：返回一条当前持有。
 func (this *currencyAssetStore) List(ctx context.Context, playerID int64) ([]*tpl.Asset, error) {
 	owned, err := this.Query(ctx, playerID, 0)
 	if err != nil {
@@ -115,10 +110,7 @@ func (this *currencyAssetStore) checkCfgID(cfgID int32) error {
 	return nil
 }
 
-// adjustCurrency 原子增减货币（delta 正加负减）：
-// 事务内 `UPDATE player SET col = col + ? WHERE ...`；负 delta 附加余额守卫
-// `col + ? >= 0`，守卫不满足时 0 行更新 → 返回余额不足错误回滚；
-// 0 行更新且 delta 为正视为玩家行缺失。成功后同步内存行并推送货币快照。
+// adjustCurrency 事务内原子增减货币（负 delta 附加余额守卫防超扣，正 delta 0 行更新视为玩家不存在），成功后同步内存行并推送。
 func adjustCurrency(ctx context.Context, playerID int64, column string, delta int64) error {
 	db, err := svc.Ctx().DB()
 	if err != nil {
@@ -180,10 +172,7 @@ func setCurrency(ctx context.Context, playerID int64, column string, value int64
 	return nil
 }
 
-// syncCurrencyMemoryAndNotify 事务成功后的内存同步：
-// 仅当玩家行已在 playerCache 中（Peek 命中）时按白名单改写对应货币字段——
-// 不 Set（避免整行 upsert 覆盖其他列的窗口期）、不回写 DB（DB 已落定），并推送三货币快照；
-// 未命中（离线/未加载）则什么都不做。
+// syncCurrencyMemoryAndNotify 仅当玩家行已在缓存时按白名单改写对应货币字段（不 Set、不回写 DB），并推送三货币快照。
 func syncCurrencyMemoryAndNotify(ctx context.Context, playerID int64, column string, mutate func(int64) int64) {
 	row, ok := playerCache.Peek(playerID)
 	if !ok {

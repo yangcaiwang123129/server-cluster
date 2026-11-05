@@ -18,8 +18,7 @@ type PlayerQuery struct {
 	Order          string
 }
 
-// ListPlayers 玩家分页列表。
-// player 表只存基础属性，username/phone 从 player_auth 表批量补齐。
+// ListPlayers 玩家分页列表，username/phone 从 player_auth 表批量补齐。
 func (r *Repo) ListPlayers(q PlayerQuery, pageIndex, pageSize int) ([]dto.PlayerResp, int64, error) {
 	d, err := r.db()
 	if err != nil {

@@ -11,10 +11,7 @@ import (
 
 var mutex windows.Handle
 
-// Check 保证同名实例（如 game-1）单进程运行；已存在实例时打印提示并以退出码 1 结束。
-// 背景：due 的 file logger 初始化会 rotate 日志（rename 文件），Windows 下旧实例持有日志
-// 文件句柄时 rename 失败，syncer 为 nil，第一条日志即触发 nil panic（错误信息无指向性）。
-// 双开实例本身也不合法（端口/mesh 注册冲突），这里在最早阶段拦截并给出明确提示。
+// Check 保证同名实例（如 game-1）单进程运行，已存在实例时打印提示并以退出码 1 结束（命名互斥体实现：旧实例持有日志句柄会致 due 日志 rotate 失败触发 nil panic，故须在最早阶段拦截）。
 func Check(instance string) {
 	name, err := windows.UTF16PtrFromString("server-cluster-" + instance)
 	if err != nil {

@@ -43,7 +43,6 @@ func init() {
 	RegisterGmItemLogic(&gmItemLogic{})
 }
 
-// ItemContainerList 物品容器列表。
 func (this *gmItemLogic) ItemContainerList(req dto.GmItemListReq) ([]dto.GmItemResp, error) {
 	callReq := &pb.GmItemListReq{
 		PlayerId: req.PlayerID,
@@ -56,7 +55,6 @@ func (this *gmItemLogic) ItemContainerList(req dto.GmItemListReq) ([]dto.GmItemR
 	return toGmItemResps(req.PlayerID, resp.GetItemContainers()), nil
 }
 
-// ItemMove 物品容器内移动物品。
 func (this *gmItemLogic) ItemMove(req dto.GmItemMoveReq) error {
 	callReq := &pb.GmItemMoveReq{
 		PlayerId: req.PlayerID,
@@ -72,7 +70,6 @@ func (this *gmItemLogic) ItemMove(req dto.GmItemMoveReq) error {
 	return err
 }
 
-// ItemRotate 物品容器内旋转物品。
 func (this *gmItemLogic) ItemRotate(req dto.GmItemRotateReq) error {
 	callReq := &pb.GmItemRotateReq{
 		PlayerId: req.PlayerID,
@@ -85,7 +82,6 @@ func (this *gmItemLogic) ItemRotate(req dto.GmItemRotateReq) error {
 	return err
 }
 
-// ItemSort 物品容器一键整理。
 func (this *gmItemLogic) ItemSort(req dto.GmItemSortReq) error {
 	callReq := &pb.GmItemSortReq{
 		PlayerId: req.PlayerID,
@@ -95,7 +91,6 @@ func (this *gmItemLogic) ItemSort(req dto.GmItemSortReq) error {
 	return err
 }
 
-// ItemTransfer 物品容器间移动物品。
 func (this *gmItemLogic) ItemTransfer(req dto.GmItemTransferReq) ([]dto.GmItemResp, error) {
 	callReq := &pb.GmItemTransferReq{
 		PlayerId: req.PlayerID,
@@ -122,7 +117,6 @@ func (this *gmItemLogic) ItemTransfer(req dto.GmItemTransferReq) ([]dto.GmItemRe
 	return toGmItemResps(req.PlayerID, containers), nil
 }
 
-// ItemAddEntry 向物品容器放入对象。
 func (this *gmItemLogic) ItemAddEntry(req dto.GmItemAddEntryReq) ([]dto.GmItemResp, error) {
 	callReq := &pb.GmItemAddEntryReq{
 		PlayerId:      req.PlayerID,

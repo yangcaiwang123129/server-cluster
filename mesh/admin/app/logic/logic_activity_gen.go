@@ -49,8 +49,7 @@ func isAutoStrategy(s tpl.StrategyType) bool {
 	return s >= tpl.StrategyType_Specify && s <= tpl.StrategyType_Month
 }
 
-// nextRoundAllowed 判断模板是否该生成下一轮：
-// 上一轮未结束时不生成（避免同模板多实例并存）；指定时间只跑一轮；达到轮次上限后停止。
+// nextRoundAllowed 判断模板是否该生成下一轮；上一轮未结束、指定时间策略或已达轮次上限时不生成。
 func nextRoundAllowed(cfg *tpl.ActivityCfg, latest *model.Activity) bool {
 	if latest == nil {
 		return true

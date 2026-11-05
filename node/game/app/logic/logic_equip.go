@@ -494,7 +494,7 @@ func (this *equipLogic) AttributeBonus(ctx context.Context, playerID int64, hero
 	return &pb.HeroAttribute{Hp: hp, Armor: armor}, nil
 }
 
-// 装备维度系数查询（行缺失按 1）。
+// gearLevelCoef 装备等级维度系数查询（行缺失按 1）。
 func gearLevelCoef(cfgID, level int32) (hp, armor float32) {
 	if c := tpl.T().GearLevel.Get(dimID(cfgID, level)); c != nil {
 		return c.HpCoef, c.ArmorCoef
@@ -502,6 +502,7 @@ func gearLevelCoef(cfgID, level int32) (hp, armor float32) {
 	return 1, 1
 }
 
+// gearQualityCoef 装备品质维度系数查询（行缺失按 1）。
 func gearQualityCoef(cfgID, quality int32) (hp, armor float32) {
 	if c := tpl.T().GearQuality.Get(dimID(cfgID, quality)); c != nil {
 		return c.HpCoef, c.ArmorCoef
@@ -509,6 +510,7 @@ func gearQualityCoef(cfgID, quality int32) (hp, armor float32) {
 	return 1, 1
 }
 
+// gearBreakthroughCoef 装备突破维度系数查询（行缺失按 1）。
 func gearBreakthroughCoef(cfgID, breakthrough int32) (hp, armor float32) {
 	if c := tpl.T().GearBreakthrough.Get(dimID(cfgID, breakthrough)); c != nil {
 		return c.HpCoef, c.ArmorCoef

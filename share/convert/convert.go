@@ -149,8 +149,7 @@ func ContainerTypeToModel(t pb.ContainerType) (int32, bool) {
 	}
 }
 
-// PlayerAttr 玩家实体 → 下发客户端的属性表：昵称/等级/经验/vip 取自 player_extra，币/金取自 player。
-// 键为 Attr 枚举值，值按实际类型放入 ObjectValue。
+// PlayerAttr 玩家实体 → 下发客户端的属性表：昵称/等级/经验/vip 取自 player_extra，币/金取自 player，键为 Attr 枚举值。
 func PlayerAttr(playerExtra *model.PlayerExtra, player *model.Player) *pb.AttrMap {
 	return &pb.AttrMap{Values: map[int32]*pb.ObjectValue{
 		int32(pb.Attr_PLAYER_ATTR_NAME):          {Kind: &pb.ObjectValue_StringValue{StringValue: playerExtra.Nickname}},

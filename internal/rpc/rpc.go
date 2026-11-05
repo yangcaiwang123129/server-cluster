@@ -23,21 +23,17 @@ const directScheme = "direct://"
 // defaultRPCTimeout 调用方 ctx 未携带 deadline 时施加的默认超时。
 const defaultRPCTimeout = 3 * time.Second
 
-// NewClient 创建指向指定 provider 服务名的 mesh 客户端。
-// target 须为服务名（discovery 按实例的 services 字段分组），而非节点名。
+// NewClient 创建指向指定 provider 服务名的 mesh 客户端（target 传服务名，discovery 按实例 services 字段分组，而非节点名）。
 func NewClient(service string) (transport.Client, error) {
 	return svc.HTTPProxy().NewMeshClient(discoveryScheme + service)
 }
 
-// NewDirectClient 创建定向到指定实例的 mesh 客户端（direct://<instance_id>）。
-// 实例 ID → 地址的解析由传输器从注册发现缓存的实例集中完成。
+// NewDirectClient 创建定向到指定实例的 mesh 客户端（direct://<instance_id>，地址解析由传输器从注册发现缓存的实例集中完成）。
 func NewDirectClient(instanceID string) (transport.Client, error) {
 	return svc.HTTPProxy().NewMeshClient(directScheme + instanceID)
 }
 
-// Call 泛型远程调用：fullMethod 传 FullMethodName（/pkg.Service/Method），
-// 自动拆出 gRPC 服务名与短方法名；ctx 未携带 deadline 时施加默认超时。
-// 调用失败时返回 (nil, err)——gRPC 出错时 reply 可能被部分填充，直接弃用以避免调用方误读。
+// Call 泛型远程调用：fullMethod 传 FullMethodName（/pkg.Service/Method），自动拆出服务名与短方法名；ctx 无 deadline 时施加默认超时，失败返回 (nil, err)（gRPC 出错时 reply 可能被部分填充，直接弃用以避免调用方误读）。
 func Call[Resp any](ctx context.Context, client transport.Client, fullMethod string, req any) (*Resp, error) {
 	service, method, err := splitFullMethod(fullMethod)
 	if err != nil {

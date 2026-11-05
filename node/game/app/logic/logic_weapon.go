@@ -92,8 +92,7 @@ func weaponOwned(ctx context.Context, playerID int64, cfgID int32) (*model.Playe
 	return row, w, heroID, nil
 }
 
-// weaponDimGrow 维度提升通用流程：校验持有 → 取当前维度行得消耗 → 校验下一维度行存在 → 扣素材 → 维度+1。
-// rowOf 取指定维度值的等级/品质/突破行（素材与消耗字段由调用方读取）。
+// weaponDimGrow 维度提升通用流程：校验持有 → 取当前维度行得消耗 → 校验下一维度行存在 → 扣素材 → 维度+1（rowOf 取指定维度行）。
 func weaponDimGrow(ctx context.Context, playerID int64, cfgID int32,
 	cur func(w model.WeaponInfo) int32,
 	set func(w *model.WeaponInfo, v int32),
@@ -389,7 +388,7 @@ func (this *weaponLogic) AttributeBonus(ctx context.Context, playerID int64, her
 	return &pb.HeroAttribute{Damage: int32(float64(base.WeaponDamage) * coef)}, nil
 }
 
-// 武器维度系数查询（行缺失按 1）。
+// weaponLevelCoef 武器等级维度系数查询（行缺失按 1）。
 func weaponLevelCoef(cfgID, level int32) float32 {
 	if c := tpl.T().WeaponLevel.Get(dimID(cfgID, level)); c != nil {
 		return c.DamageCoef
@@ -397,6 +396,7 @@ func weaponLevelCoef(cfgID, level int32) float32 {
 	return 1
 }
 
+// weaponQualityCoef 武器品质维度系数查询（行缺失按 1）。
 func weaponQualityCoef(cfgID, quality int32) float32 {
 	if c := tpl.T().WeaponQuality.Get(dimID(cfgID, quality)); c != nil {
 		return c.DamageCoef
@@ -404,6 +404,7 @@ func weaponQualityCoef(cfgID, quality int32) float32 {
 	return 1
 }
 
+// weaponBreakthroughCoef 武器突破维度系数查询（行缺失按 1）。
 func weaponBreakthroughCoef(cfgID, breakthrough int32) float32 {
 	if c := tpl.T().WeaponBreakthrough.Get(dimID(cfgID, breakthrough)); c != nil {
 		return c.DamageCoef

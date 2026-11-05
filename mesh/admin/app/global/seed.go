@@ -37,9 +37,6 @@ type pendingMenu struct {
 }
 
 // seed 首次启动时写入管理员、字典与系统配置；已有账号时视为已初始化。
-//
-// 菜单/接口/关系不在本函数内写入，统一交给启动流程中紧随其后的 syncMenus 处理，
-// 避免同一份种子逻辑维护两套（逐条 vs 批量）。
 func seed(gdb *gorm.DB) error {
 	var count int64
 	if err := gdb.Model(&model.SysUser{}).Count(&count).Error; err != nil {
@@ -128,13 +125,6 @@ func syncMenus(gdb *gorm.DB) error {
 }
 
 // syncMenuNodes 批量补齐菜单树、接口与菜单-接口关系。
-//
-// 实现要点（把逐条 SELECT/INSERT 收敛为固定几条 SQL）：
-//  1. 一次性预加载现有菜单、接口、关系三份字典；
-//  2. 菜单按层级遍历：父 ID 确定后再处理子节点，同层新菜单合并为一次 CreateInBatches；
-//  3. 新接口按 (path, action) 去重后一次批量插入；
-//  4. 新关系按 (menu_id, api_id) 去重后一次批量插入；
-//  5. 既有菜单仅在归属/路由/标题/排序/图标有差异时逐条更新（稳定库上为 0 条）。
 func syncMenuNodes(tx *gorm.DB, roots []seedMenu) error {
 	menusByName := make(map[string]model.SysMenu)
 	var menus []model.SysMenu

@@ -13,8 +13,7 @@ import (
 	"server-cluster/share/pb"
 )
 
-// NotifyHero 推送英雄完整持有结构；客户端收到后整体替换本地该英雄数据。
-// 玩家离线或推送失败只记日志，不影响业务主流程。
+// NotifyHero 推送英雄完整持有结构（客户端整体替换本地该英雄数据）；离线或推送失败只记日志。
 func NotifyHero(ctx context.Context, playerID int64, entry *pb.HeroEntry) {
 	if playerID <= 0 || entry == nil {
 		return
@@ -47,9 +46,7 @@ func NotifyAttr(ctx context.Context, playerID int64, values *pb.AttrMap) {
 	}, "attr")
 }
 
-// pushToPlayer 向指定玩家推送消息。
-// Ack=true：gate 上找不到该用户会话时，due 会清除本地定位缓存并重新定位后重试一次，
-// 避免玩家换网关/跨节点重连后仍向旧网关推送导致静默丢失。
+// pushToPlayer 向指定玩家推送消息；Ack=true 在换网关/跨节点重连后重新定位并重试一次，避免静默丢失。
 func pushToPlayer(ctx context.Context, playerID int64, message *cluster.Message, tag string) {
 	if err := svc.NodeProxy().Push(ctx, &cluster.PushArgs{
 		Kind:    cluster.User,

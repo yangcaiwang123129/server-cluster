@@ -7,7 +7,6 @@ import (
 	"server-cluster/share/pb"
 )
 
-// MailList 玩家邮件列表。
 func (p *GmProvider) MailList(ctx context.Context, req *pb.GmMailListReq) (*pb.GmMailListResp, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err
@@ -19,7 +18,6 @@ func (p *GmProvider) MailList(ctx context.Context, req *pb.GmMailListReq) (*pb.G
 	return &pb.GmMailListResp{Entries: resp.GetEntries()}, nil
 }
 
-// MailSend 后台发送邮件（可带附件）。
 func (p *GmProvider) MailSend(ctx context.Context, req *pb.GmMailSendReq) (*pb.MailEntry, error) {
 	if err := checkPlayerID(req.GetPlayerId()); err != nil {
 		return nil, err

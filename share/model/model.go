@@ -38,8 +38,7 @@ type TableModel struct {
 	UpdatedAt int64  `gorm:"column:updated_at;type:bigint;not null;default:0;comment:更新时间(毫秒时间戳)" json:"updated_at"`
 }
 
-// BeforeCreate GORM Hook：新建 → Version=0, CreatedAt/UpdatedAt=now；
-// cache upsert 冲突行（Version>0）→ Version+=1, UpdatedAt=now, CreatedAt 保持。
+// BeforeCreate GORM Hook：新建 → Version=0, CreatedAt/UpdatedAt=now；upsert 冲突行（Version>0）→ Version+=1, UpdatedAt=now, CreatedAt 保持。
 func (t *TableModel) BeforeCreate(tx *gorm.DB) error {
 	now := util.NowUnixMilli()
 	if t.Version == 0 {

@@ -100,8 +100,7 @@ func clampDim(v, min int32) int32 {
 	return v
 }
 
-// dimConsume 维度提升前的公共校验与扣费：
-// hasNext 为 false 表示已达上限（返回 fullMsg）；否则扣除当前维度行的素材消耗（use<=0 不扣）。
+// dimConsume 维度提升前的公共校验与扣费（hasNext=false 已达上限返回 fullMsg；use<=0 不扣）。
 func dimConsume(ctx context.Context, playerID int64, material, use int32, hasNext bool, fullMsg string) error {
 	if !hasNext {
 		return errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, fullMsg)
@@ -167,8 +166,7 @@ func equippedHeroID(ctx context.Context, playerID int64) int32 {
 	return heroID
 }
 
-// computeHeroAttribute 计算英雄累计属性：英雄本体 + 武器 + 已穿戴装备的属性贡献。
-// 核心属性为加法关系，战力 = 伤害 + 护甲 + 生命；技能只影响技能参数，不贡献核心属性。
+// computeHeroAttribute 计算英雄累计属性（本体+武器+已穿戴装备，加法汇总；战力=伤害+护甲+生命）。
 func computeHeroAttribute(ctx context.Context, playerID int64, heroID int32) (*model.HeroInfo, *pb.HeroAttribute, error) {
 	_, hero, err := ownedHero(ctx, playerID, heroID)
 	if err != nil {

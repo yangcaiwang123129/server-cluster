@@ -64,18 +64,7 @@ func (r *Repo) UpdateClusterNodeSSH(m *model.ClusterNode) error {
 		Updates(m).Error
 }
 
-// SyncClusterNodes 从 etcd registry 同步集群节点到 DB。
-//
-// 写入表名与查询保持一致（model.ClusterNode.TableName()，即 enum.TableCluster），
-// 避免出现「写 A 表、读 B 表」导致列表永远为空的问题。
-//
-// 策略：
-//  1. 入参 instances 是当前 etcd 中仍活着的所有节点（已由上层按 kind 枚举合并）。
-//  2. 批量 Upsert：node_id 已存在则更新 node_name/node_kind/endpoint/services/online=1/updated_at；
-//     不存在则插入新行（online=1，SSH 字段留空）。
-//  3. DB 里 online=1 但这次没出现在 instances 里的 → 置 online=0（保留历史，不物理删）。
-//
-// SSHHost/SSHPort/SSHUser/SSHKeyPath/DeployDir/Remark 等运维配置字段**不会被**这个函数覆盖。
+// SyncClusterNodes 从 etcd registry 同步集群节点到 DB：批量 Upsert 在线节点，本次未出现的置 offline，不覆盖 SSH 运维配置字段。
 func (r *Repo) SyncClusterNodes(instances []*registry.ServiceInstance) error {
 	d, err := r.db()
 	if err != nil {

@@ -150,7 +150,6 @@ func defaultItemRawSizeOf(it *ItemEntry) (w, h int32) {
 }
 
 // defaultItemQualityOf QualityOf 注入的默认实现：读配置稀有度。
-// Rarity 数值越大品质越高（红色为最高档，黄色次之，其余品质排后）。
 func defaultItemQualityOf(it *ItemEntry) int32 {
 	def := GetItemCfgById(it.ItemCfgID)
 	if def == nil {
@@ -171,7 +170,6 @@ func defaultItemSellPriceOf(it *ItemEntry) int64 {
 // ============ NewItemContainer 构造包装 ============
 
 // NewItemContainer 构造 BaseContainer[*ItemEntry] 的便捷包装。
-// 内部调 container.NewContainer[*ItemEntry]，自动注入 SizeOf/RawSizeOf/QualityOf/SellPriceOf 依赖 tpl。
 func NewItemContainer(typ, gridW, gridH int32, globalID, ownerID int64, ownerType int32) *ItemContainer {
 	c := container.NewContainer[*ItemEntry](typ, gridW, gridH, globalID, ownerID, ownerType,
 		defaultItemSizeOf, defaultItemRawSizeOf)
@@ -229,9 +227,7 @@ func (p *PlayerItem) ByType(typ int32) *ItemContainer {
 	}
 }
 
-// Rebuild 补齐缺失容器并重建各容器 SafeMap；从 DB/JSON 加载后必须调用。
-// UnmarshalJSON 已经把数据灌进 SafeMap 了，但 GlobalID/OwnerID/OwnerType/SizeOf 是运行时字段（不持久化），
-// 所以需要在这里回填。
+// Rebuild 补齐缺失容器并重建各容器 SafeMap；从 DB/JSON 加载后必须调用（回填运行时字段 GlobalID/OwnerID/OwnerType/SizeOf）。
 func (p *PlayerItem) Rebuild() {
 	if p.Backpack == nil {
 		p.Backpack = newPlayerItemContainer(p.PlayerID, int32(pb.ContainerType_CONTAINER_TYPE_BACKPACK), 8, 12)
@@ -254,8 +250,7 @@ func (p *PlayerItem) Rebuild() {
 
 // ============ 未来 WorldContainer 便捷构造 ============
 
-// NewWorldItemContainer 构造一个世界容器（地图掉落箱、柜子、战利品箱等）。
-// entityID 是地图上该容器实体的唯一 ID（如敌人实例 ID、柜子实例 ID）。
+// NewWorldItemContainer 构造一个世界容器（地图掉落箱、柜子、战利品箱等），entityID 为地图实体唯一 ID。
 func NewWorldItemContainer(typ, gridW, gridH int32, entityID int64) *ItemContainer {
 	return NewItemContainer(typ, gridW, gridH,
 		entityID, entityID, OwnerWorld)

@@ -13,7 +13,6 @@ import (
 	"server-cluster/share/util"
 )
 
-// Configs GM 活动模板列表：展示策略、触发条件、奖励与关联任务数。
 func (this *activityLogic) Configs() []dto.GmActivityCfgResp {
 	if !tpl.Loaded() {
 		return []dto.GmActivityCfgResp{}
@@ -76,7 +75,6 @@ func activityCfgName(cfgID int32) string {
 	return ""
 }
 
-// List GM 分页查询。
 func (this *activityLogic) List(ctx context.Context, q dto.GmActivityQuery, pageIndex, pageSize int) ([]dto.GmActivityResp, int64, error) {
 	list, total, err := repo.R().ListActivities(repo.ActivityQuery{CfgID: q.CfgID, Status: q.Status, Order: q.Order}, pageIndex, pageSize)
 	if err != nil {
@@ -87,7 +85,6 @@ func (this *activityLogic) List(ctx context.Context, q dto.GmActivityQuery, page
 	}), total, nil
 }
 
-// UpdateTime GM 修改活动时间（仅未开启）。
 func (this *activityLogic) UpdateTime(ctx context.Context, id int64, req dto.GmActivityTimeReq) (*dto.GmActivityResp, error) {
 	if req.StartTime <= 0 || req.EndTime <= req.StartTime {
 		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "活动时间不合法")
@@ -110,7 +107,6 @@ func (this *activityLogic) UpdateTime(ctx context.Context, id int64, req dto.GmA
 	return this.getResp(id)
 }
 
-// End GM 提前结束活动。
 func (this *activityLogic) End(ctx context.Context, id int64, operator string) (*dto.GmActivityResp, error) {
 	remark := operatorRemark(operator, "提前结束")
 	ok, err := this.transit(id, consts.ActivityStatusRunning, consts.ActivityStatusEnded, util.NowUnixMilli(), remark)

@@ -135,7 +135,6 @@ func OperaLogMiddleware(c fiber.Ctx) error {
 }
 
 // Authenticate 解析令牌并加载用户与角色，供鉴权中间件使用。
-// 查询逻辑与 repo 中的 GetUser/RoleForUser 保持一致，此处内联以避免 middleware 依赖 repo。
 func Authenticate(token string) (*model.SysUser, *model.SysRole, error) {
 	payload, err := svc.JWT().ExtractPayload(token)
 	if err != nil {
@@ -170,7 +169,6 @@ func Authenticate(token string) (*model.SysUser, *model.SysRole, error) {
 }
 
 // Allow 判断角色是否可访问指定接口；角色标识为 admin 时全部放行。
-// 规则中的路径是路由模板（如 /api/v1/sys-user/:userId），需按模板匹配实际请求路径。
 func Allow(roleKey, path, method string) (bool, error) {
 	if roleKey == consts.AdminRoleKey {
 		return true, nil
@@ -193,8 +191,7 @@ func Allow(roleKey, path, method string) (bool, error) {
 	return false, nil
 }
 
-// matchRulePath 按路由模板匹配实际请求路径：:param / * 匹配任意单段，
-// 末尾的 * 段（如 /api/v1/gm/*）匹配剩余任意段数。
+// matchRulePath 按路由模板匹配实际请求路径：:param / * 匹配任意单段，末尾 * 段匹配剩余任意段数。
 func matchRulePath(pattern, path string) bool {
 	if pattern == path {
 		return true

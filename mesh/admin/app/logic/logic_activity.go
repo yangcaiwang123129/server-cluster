@@ -67,7 +67,6 @@ func currentKeys(now int64) periodKeys {
 	}
 }
 
-// Start 启动活动调度。
 func (this *activityLogic) Start(ctx context.Context) error {
 	this.mu.Lock()
 	if this.cancel != nil {
@@ -100,7 +99,6 @@ func (this *activityLogic) Start(ctx context.Context) error {
 	return nil
 }
 
-// Stop 停止活动调度。
 func (this *activityLogic) Stop() {
 	this.mu.Lock()
 	cancel := this.cancel

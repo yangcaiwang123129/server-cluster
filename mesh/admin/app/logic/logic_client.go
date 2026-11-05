@@ -223,9 +223,7 @@ func SimOptions() dto.SimOptionsResp {
 	}
 }
 
-// SimLogin 调 login 服 /api/v1/player/login (loginType=1 账号密码)。
-// login 服 accountLogin 自动处理"账号不存在→注册 + 账号存在→校验"，
-// 所以 admin 侧不需要区分 login/register。
+// SimLogin 调 login 服 /api/v1/player/login (loginType=1 账号密码)，账号不存在时由 login 服自动注册。
 func SimLogin(req dto.SimLoginReq) (*dto.SimLoginResp, error) {
 	if strings.TrimSpace(req.Username) == "" || req.Password == "" {
 		return nil, codes.NewCode(400, "账号和密码不能为空").Err()

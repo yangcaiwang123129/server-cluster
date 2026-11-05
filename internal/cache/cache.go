@@ -59,8 +59,7 @@ type Cache[K comparable, V any] struct {
 	pending map[K]V
 }
 
-// NewCache 构造存储并启动后台落库协程。
-// loader 必填；saver 为 nil 时写仅进缓存不落库；deleter 为 nil 时 Delete 仅逐出缓存。
+// NewCache 构造存储并启动后台落库协程（loader 必填；saver 为 nil 时写仅进缓存不落库；deleter 为 nil 时 Delete 仅逐出缓存）。
 func NewCache[K comparable, V any](cfg CacherConfig, loader Loader[K, V], saver Saver[K, V], deleter Deleter[K]) *Cache[K, V] {
 	if cfg.MaxSize <= 0 {
 		cfg.MaxSize = consts.CacheMaxSize
@@ -102,10 +101,7 @@ func (this *Cache[K, V]) Get(ctx context.Context, key K) (V, error) {
 	return this.cache.Get(ctx, key)
 }
 
-// Peek 只读探测当前内存中最完整的值：pending 待落库值优先（与 LRU 层同源同指针，取 pending 更新），
-// 未命中再查 LRU 层已缓存条目。不回源、不触发 loader、不参与 singleflight、不挂 pending。
-// 用于旁路写路径（如货币原子 SQL）在事务成功后把最新值同步进已缓存的内存行；
-// 条目不在内存时返回 (零值, false)，调用方需自行决定是否回源。
+// Peek 只读探测内存中最完整的值（pending 优先，未命中查 LRU 层；不回源、不触发 loader、不参与 singleflight、不挂 pending），供旁路写路径在事务成功后同步最新值；条目不在内存时返回 (零值, false)。
 func (this *Cache[K, V]) Peek(key K) (V, bool) {
 	// pending 优先：Set 同时写入 LRU 与 pending，pending 即最新值
 	this.mu.Lock()
@@ -133,8 +129,7 @@ func (this *Cache[K, V]) Peek(key K) (V, bool) {
 	return zero, false
 }
 
-// GetOrInit 读缓存；未建档（gorm.ErrRecordNotFound）时用 init 初始化新行并挂入缓存（异步落库）；
-// 命中后用 fix 修补 DB 中为 NULL 的集合字段（补空集合，避免业务写操作 panic），fix 可为 nil。
+// GetOrInit 读缓存；未建档（gorm.ErrRecordNotFound）时用 init 初始化新行并挂入缓存（异步落库），命中后用 fix 修补 DB 中为 NULL 的集合字段（可为 nil）。
 func (this *Cache[K, V]) GetOrInit(
 	ctx context.Context,
 	key K,
@@ -180,8 +175,7 @@ func (this *Cache[K, V]) Delete(ctx context.Context, key K) error {
 	return this.deleter(ctx, []K{key})
 }
 
-// Flush 立即同步落库全部待写条目；失败时整批回队并返回错误。
-// 用于下线等必须确定性落库的场景（后台协程的周期落库失败只记录日志）。
+// Flush 立即同步落库全部待写条目，失败整批回队并返回错误（用于下线等必须确定性落库的场景）。
 func (this *Cache[K, V]) Flush(ctx context.Context) error {
 	if this.saver == nil {
 		return nil

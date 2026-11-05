@@ -92,8 +92,7 @@ func (this *MySQLManager) Len() int {
 	return len(this.instMap)
 }
 
-// AutoMigrate 自动构建表：对给定实体执行 gorm AutoMigrate（只增不删，已存在的表做增量补列）。
-// entities 为表模型指针（实现 TableName，如 &model.AccountModel{}）；gdb 为空或无实体时直接返回。
+// AutoMigrate 自动构建表：对给定实体执行 gorm AutoMigrate（只增不删，增量补列）；entities 为表模型指针，gdb 为空或无实体时直接返回。
 func AutoMigrate(gdb *gorm.DB, entities ...any) error {
 	if gdb == nil || len(entities) == 0 {
 		return nil

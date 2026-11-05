@@ -47,7 +47,6 @@ func init() {
 	RegisterPlayerLogic(&playerLogic{})
 }
 
-// PlayerList 玩家分页列表（直查 player）。
 func (this *playerLogic) PlayerList(req dto.PlayerListReq) ([]dto.PlayerResp, int64, error) {
 	return repo.R().ListPlayers(repo.PlayerQuery{
 		PlayerID:       req.PlayerID,
@@ -60,7 +59,6 @@ func (this *playerLogic) PlayerList(req dto.PlayerListReq) ([]dto.PlayerResp, in
 	}, req.PageIndex, req.PageSize)
 }
 
-// PlayerOnline 在线玩家列表：枚举提供玩家服务的全部 game 实例，并发定向拉取后聚合。
 func (this *playerLogic) PlayerOnline() ([]dto.OnlinePlayerResp, error) {
 	instances, err := gameInstances(context.Background(), pb.GameAdminService_ServiceDesc.ServiceName)
 	if err != nil {
@@ -85,7 +83,6 @@ func (this *playerLogic) PlayerOnline() ([]dto.OnlinePlayerResp, error) {
 	return list, nil
 }
 
-// PlayerKick 踢玩家下线：按玩家所在实例定向调用（协议按服批量，单踢为一批）。
 func (this *playerLogic) PlayerKick(req dto.PlayerKickReq) error {
 	client, err := rpc.NewDirectClient(req.NodeID)
 	if err != nil {
@@ -102,7 +99,6 @@ func (this *playerLogic) PlayerKick(req dto.PlayerKickReq) error {
 	return nil
 }
 
-// PlayerBan 封号：写 DB + 如果该玩家在线则同时踢下线（KickType=2 封号踢）。
 func (this *playerLogic) PlayerBan(req dto.PlayerBanReq) error {
 	// 计算到期时间：0 表示永久
 	var banUntil int64
@@ -119,12 +115,10 @@ func (this *playerLogic) PlayerBan(req dto.PlayerBanReq) error {
 	return nil
 }
 
-// PlayerUnban 解封。
 func (this *playerLogic) PlayerUnban(req dto.PlayerUnbanReq) error {
 	return repo.R().UnbanPlayer(req.PlayerID)
 }
 
-// PlayerResetPassword 重置密码：明文 MD5 哈希后写库（与 login 服保持一致）。
 func (this *playerLogic) PlayerResetPassword(req dto.PlayerResetPasswordReq) error {
 	h := md5.Sum([]byte(req.NewPassword))
 	hash := hex.EncodeToString(h[:])
