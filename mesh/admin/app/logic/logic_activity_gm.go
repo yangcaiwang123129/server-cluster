@@ -104,6 +104,8 @@ func (this *activityLogic) UpdateTime(ctx context.Context, id int64, req dto.GmA
 		inst.Version++
 	}
 	this.mu.Unlock()
+	// 时间变更不经过 tick 的 changed 判定，需主动发布，否则 game 端要等到下次状态变化才刷新。
+	this.publishSafe(ctx, "update-time")
 	return this.getResp(id)
 }
 

@@ -38,14 +38,16 @@ const (
 const (
 	// ActivityTickInterval admin 活动模块的状态推进间隔。
 	ActivityTickInterval = time.Second
-	// ActivitySnapshotInterval game 节点读取 Redis 活动快照的间隔。
-	ActivitySnapshotInterval = 10 * time.Second
+	// ActivitySubscribeRetryInterval game 活动快照订阅断开后的重试间隔。
+	ActivitySubscribeRetryInterval = 5 * time.Second
 	// ActivitySnapshotVersionKey 活动快照版本号。
 	ActivitySnapshotVersionKey = "sc:activity:snapshot:version"
 	// ActivitySnapshotPayloadKey 活动快照 JSON。
 	ActivitySnapshotPayloadKey = "sc:activity:snapshot:payload"
-	// ActivityChangeChannel admin 发布快照后广播版本号；game 订阅后立即拉取，降低轮询延迟。
-	ActivityChangeChannel = "sc:activity:changed"
+	// ActivityChangeStreamKey admin 发布快照后写入版本号信号流；game 用 XREAD 按游标增量消费。
+	ActivityChangeStreamKey = "sc:activity:changed:stream"
+	// ActivityChangeStreamMaxLen 信号流保留条数（近似裁剪，避免无限增长）。
+	ActivityChangeStreamMaxLen = 1000
 	// ActivityResetHour 每日/每周重置小时（本地时区）。
 	ActivityResetHour = 0
 )

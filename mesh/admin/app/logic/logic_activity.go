@@ -44,11 +44,13 @@ func init() { RegisterActivityLogic(&activityLogic{}) }
 
 // activityLogic 活动模块：内存实例表为唯一实时态，DB 只做持久化与跨进程迁移校验。
 type activityLogic struct {
-	mu      sync.RWMutex
-	insts   map[int64]*model.Activity
-	keys    periodKeys
-	version int64
-	cancel  context.CancelFunc
+	mu sync.RWMutex
+	// publishMu 串行化快照发布，避免 tick 与 GM 操作并发发布时版本号与 payload 乱序写入。
+	publishMu sync.Mutex
+	insts     map[int64]*model.Activity
+	keys      periodKeys
+	version   int64
+	cancel    context.CancelFunc
 }
 
 // periodKeys 当前周期 key 集合，用于检测跨日/跨周/跨月变化。
@@ -85,7 +87,7 @@ func (this *activityLogic) Start(ctx context.Context) error {
 	}
 	this.keys = currentKeys(now)
 	this.version = 0
-	runCtx, cancel := context.WithCancel(context.Background())
+	runCtx, cancel := context.WithCancel(ctx)
 	this.cancel = cancel
 	this.mu.Unlock()
 
@@ -151,52 +153,44 @@ func (this *activityLogic) syncPeriodKeys(now int64) bool {
 }
 
 // advanceDue 推进所有到点实例，返回是否有状态变化。
+// 在读锁内一次性收集待迁移实例，再逐条 CAS 落库，避免每个实例重复加锁与二次读取。
 func (this *activityLogic) advanceDue(now int64) bool {
-	ids := this.filterInstances(func(inst *model.Activity) bool {
-		switch inst.Status {
-		case consts.ActivityStatusNotStarted:
-			return inst.StartTime > 0 && now >= inst.StartTime
-		case consts.ActivityStatusRunning:
-			return inst.EndTime > 0 && now >= inst.EndTime
+	type move struct {
+		id       int64
+		from, to int32
+	}
+	this.mu.RLock()
+	moves := make([]move, 0, len(this.insts))
+	for id, inst := range this.insts {
+		if to := nextStatus(inst, now); to != inst.Status {
+			moves = append(moves, move{id: id, from: inst.Status, to: to})
 		}
-		return false
-	})
+	}
+	this.mu.RUnlock()
+
 	changed := false
-	for _, id := range ids {
-		if this.advance(id, now) {
+	for _, m := range moves {
+		ok, err := this.transit(m.id, m.from, m.to, now, "")
+		if err != nil {
+			log.Errorf("admin: activity transition %d %d->%d failed: %v", m.id, m.from, m.to, err)
+			continue
+		}
+		if ok {
 			changed = true
 		}
 	}
 	return changed
 }
 
-// advance 按当前时间推进单个实例状态，返回是否发生迁移。
-func (this *activityLogic) advance(id, now int64) bool {
-	this.mu.RLock()
-	inst := this.insts[id]
-	if inst == nil {
-		this.mu.RUnlock()
-		return false
-	}
-	from, to := inst.Status, nextStatus(inst, now)
-	this.mu.RUnlock()
-	if to == from {
-		return false
-	}
-	ok, err := this.transit(id, from, to, now, "")
-	if err != nil {
-		log.Errorf("admin: activity transition %d %d->%d failed: %v", id, from, to, err)
-		return false
-	}
-	return ok
-}
-
-// nextStatus 依据时间计算目标状态；仅推进到点实例，结束优先于开启。
+// nextStatus 依据时间计算目标状态：未开始实例需配置合法开始时间才自动开启，结束优先于开启。
 func nextStatus(inst *model.Activity, now int64) int32 {
-	if inst.Status != consts.ActivityStatusNotStarted && inst.Status != consts.ActivityStatusRunning {
-		return inst.Status
-	}
-	if inst.Status == consts.ActivityStatusNotStarted && now < inst.StartTime {
+	switch inst.Status {
+	case consts.ActivityStatusNotStarted:
+		if inst.StartTime <= 0 || now < inst.StartTime {
+			return inst.Status
+		}
+	case consts.ActivityStatusRunning:
+	default:
 		return inst.Status
 	}
 	if inst.EndTime > 0 && now >= inst.EndTime {
@@ -227,26 +221,8 @@ func (this *activityLogic) transit(id int64, from, to int32, now int64, remark s
 
 // repair 启动时修复因停机跨越的状态，并补偿停机期间应生成的活动。
 func (this *activityLogic) repair(now int64) {
-	ids := this.filterInstances(func(inst *model.Activity) bool {
-		return inst.Status == consts.ActivityStatusNotStarted || inst.Status == consts.ActivityStatusRunning
-	})
-	for _, id := range ids {
-		this.advance(id, now)
-	}
+	this.advanceDue(now)
 	this.generate(now)
-}
-
-// filterInstances 在读锁下按条件筛选实例 ID。
-func (this *activityLogic) filterInstances(keep func(*model.Activity) bool) []int64 {
-	this.mu.RLock()
-	defer this.mu.RUnlock()
-	ids := make([]int64, 0, len(this.insts))
-	for id, inst := range this.insts {
-		if keep(inst) {
-			ids = append(ids, id)
-		}
-	}
-	return ids
 }
 
 // addInstance 写入内存实例表。
@@ -254,15 +230,4 @@ func (this *activityLogic) addInstance(m *model.Activity) {
 	this.mu.Lock()
 	this.insts[m.ID] = m
 	this.mu.Unlock()
-}
-
-// instanceStatus 读取实例当前状态。
-func (this *activityLogic) instanceStatus(id int64) (int32, bool) {
-	this.mu.RLock()
-	defer this.mu.RUnlock()
-	inst := this.insts[id]
-	if inst == nil {
-		return 0, false
-	}
-	return inst.Status, true
 }

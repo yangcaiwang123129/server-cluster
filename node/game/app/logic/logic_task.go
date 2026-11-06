@@ -226,7 +226,7 @@ func (this *taskLogic) InitActivityTasks(ctx context.Context, playerID int64, in
 	if len(cfgs) == 0 {
 		return nil, nil
 	}
-	pt, err := this.Load(ctx, playerID)
+	playerTask, err := this.Load(ctx, playerID)
 	if err != nil {
 		return nil, err
 	}
@@ -239,7 +239,7 @@ func (this *taskLogic) InitActivityTasks(ctx context.Context, playerID int64, in
 		if !ok {
 			continue // 活动无有效实例，暂不建档
 		}
-		if info, exists := pt.GetTask(cfg.Id, key); exists {
+		if info, exists := playerTask.GetTask(cfg.Id, key); exists {
 			// 已建档：仅可领取状态需要推送提醒
 			if info.Status == consts.TaskStatusClaimable {
 				entries = append(entries, convert.TaskEntry(cfg, info))
@@ -247,12 +247,12 @@ func (this *taskLogic) InitActivityTasks(ctx context.Context, playerID int64, in
 			continue
 		}
 		info := newTaskInfo(cfg, key)
-		pt.SetTask(info)
+		playerTask.SetTask(info)
 		created = true
 		entries = append(entries, convert.TaskEntry(cfg, info))
 	}
 	if created {
-		this.Save(playerID, pt)
+		this.Save(playerID, playerTask)
 		if err := this.cache.FlushKey(ctx, playerID); err != nil {
 			log.Warnf("game: activity task init flush failed, player=%d inst=%d: %v", playerID, inst.ID, err)
 		}
@@ -464,22 +464,22 @@ func taskProgressOpen(cfg *tpl.TaskCfg, snap *dto.ActivitySnapshot) bool {
 	return inst != nil && inst.Status == consts.ActivityStatusRunning
 }
 
-// latestActivity 取指定模板的最新有效实例（忽略已取消）。
+// latestActivity 取指定模板的最新有效实例。
 func latestActivity(snap *dto.ActivitySnapshot, cfgID int32) *dto.ActivityData {
 	if snap == nil || cfgID <= 0 {
 		return nil
 	}
-	var latest *dto.ActivityData
+	var activityData *dto.ActivityData
 	for i := range snap.Activities {
 		a := &snap.Activities[i]
 		if a.CfgID != cfgID || a.Status == consts.ActivityStatusCancelled {
 			continue
 		}
-		if latest == nil || a.ID > latest.ID {
-			latest = a
+		if activityData == nil || a.ID > activityData.ID {
+			activityData = a
 		}
 	}
-	return latest
+	return activityData
 }
 
 // matchTaskCfgs 匹配进度来源类型与参数（配置 0 匹配全部）。

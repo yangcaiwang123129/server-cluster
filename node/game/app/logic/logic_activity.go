@@ -4,6 +4,7 @@ package logic
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"sync"
 	"time"
 
@@ -27,12 +28,14 @@ import (
 // ── 活动模块（admin 快照同步 + 玩家活动参与）──────────────────────
 
 // activityLogic 活动模块：game 节点侧活动快照同步器 + 玩家活动参与。
-// 快照每 10s 读 Redis，版本变化才拉取 payload；admin 活动模块是唯一写入者，game 只读缓存；
-// 同时订阅 sc:activity:changed 通道，admin 发布后立即拉取，10s 轮询作为兜底。
+// admin 活动模块是唯一写入者，game 只读缓存：启动同步一次，之后按游标消费
+// sc:activity:changed:stream 信号流拉取快照；流持久化，断线期间的信号不会漏。
 type activityLogic struct {
 	// cache 玩家活动参与（player_activity，一玩家一行，活动 map JSON，key=活动实例ID）；读走 LRU，写异步批量 upsert。
 	cache *cache.Cache[int64, *model.PlayerActivity]
 
+	// syncMu 串行化快照同步：订阅信号与 10s 轮询可能同时触发，避免重复拉取与重复广播。
+	syncMu  sync.Mutex
 	mu      sync.RWMutex
 	snap    *dto.ActivitySnapshot
 	version int64
@@ -127,24 +130,23 @@ func (this *activityLogic) Flush(ctx context.Context, playerID int64) error {
 	return flushAndEvict(ctx, this.cache, playerID)
 }
 
-// Start 启动轮询（game main 在容器 Serve 前调用）。
+// Start 启动快照同步（game main 在容器 Serve 前调用）。
 func (this *activityLogic) Start(ctx context.Context) {
 	this.mu.Lock()
 	if this.cancel != nil {
 		this.mu.Unlock()
 		return
 	}
-	runCtx, cancel := context.WithCancel(context.Background())
+	runCtx, cancel := context.WithCancel(ctx)
 	this.cancel = cancel
 	this.mu.Unlock()
 
-	// 启动即同步一次，避免首个 10s 空窗。
+	// 启动即同步一次，避免依赖首次消息到达才有快照。
 	this.sync(runCtx)
-	go this.loop(runCtx)
 	go this.subscribe(runCtx)
 }
 
-// Stop 停止轮询。
+// Stop 停止快照同步。
 func (this *activityLogic) Stop() {
 	this.mu.Lock()
 	cancel := this.cancel
@@ -155,57 +157,75 @@ func (this *activityLogic) Stop() {
 	}
 }
 
-// Snapshot 返回最近一次快照副本；未就绪返回 nil。
+// Snapshot 返回最近一次快照（整体替换后不再修改，调用方只读，禁止修改）；未就绪返回 nil。
+// 直接返回指针而不再逐次拷贝，避免每次任务事件都复制整份活动列表。
 func (this *activityLogic) Snapshot() *dto.ActivitySnapshot {
 	this.mu.RLock()
 	defer this.mu.RUnlock()
-	if this.snap == nil {
-		return nil
-	}
-	cp := *this.snap
-	cp.Activities = append([]dto.ActivityData(nil), this.snap.Activities...)
-	return &cp
+	return this.snap
 }
 
-func (this *activityLogic) loop(ctx context.Context) {
-	t := time.NewTicker(consts.ActivitySnapshotInterval)
-	defer t.Stop()
+// subscribe 消费 sc:activity:changed:stream 信号，按游标增量读取；
+// Redis 暂不可用或读取失败时按固定间隔重试。
+func (this *activityLogic) subscribe(ctx context.Context) {
 	for {
+		if err := this.subscribeOnce(ctx); err != nil {
+			this.warnOnce(err.Error())
+		}
 		select {
 		case <-ctx.Done():
 			return
-		case <-t.C:
-			this.sync(ctx)
+		case <-time.After(consts.ActivitySubscribeRetryInterval):
 		}
 	}
 }
 
-// subscribe 订阅 sc:activity:changed；收到版本号信号立即触发同步。
-// go-redis PubSub 内部自动重连；循环仅在 ctx 取消或订阅对象不可用时退出。
-func (this *activityLogic) subscribe(ctx context.Context) {
+// subscribeOnce 从信号流游标增量消费，直到 ctx 取消或读取失败。
+func (this *activityLogic) subscribeOnce(ctx context.Context) error {
 	rdb, err := svc.Ctx().Redis.Default()
 	if err != nil {
-		this.warnOnce("redis unavailable: " + err.Error())
-		return
+		return err
 	}
-	sub := rdb.Subscribe(ctx, consts.ActivityChangeChannel)
-	defer sub.Close()
-	ch := sub.Channel()
+	// 先记录流末尾再全量同步：同步覆盖此前的变更，之后的变更由流补齐，
+	// 避免启动/重连窗口内的信号漏消费。
+	lastID := "0-0"
+	if entries, err := rdb.XRevRangeN(ctx, consts.ActivityChangeStreamKey, "+", "-", 1).Result(); err != nil {
+		return err
+	} else if len(entries) > 0 {
+		lastID = entries[0].ID
+	}
+	this.sync(ctx)
+
 	for {
-		select {
-		case <-ctx.Done():
-			return
-		case _, ok := <-ch:
-			if !ok {
-				return // 通道关闭（context 取消），退化为 10s 轮询兜底
-			}
-			this.sync(ctx)
+		if ctx.Err() != nil {
+			return nil
 		}
+		streams, err := rdb.XRead(ctx, &redis.XReadArgs{
+			Streams: []string{consts.ActivityChangeStreamKey, lastID},
+			Block:   10 * time.Second,
+			Count:   16,
+		}).Result()
+		if err != nil {
+			if errors.Is(err, redis.Nil) {
+				continue // 阻塞超时：暂无新信号
+			}
+			return err
+		}
+		for _, stream := range streams {
+			if len(stream.Messages) > 0 {
+				lastID = stream.Messages[len(stream.Messages)-1].ID
+			}
+		}
+		this.sync(ctx)
 	}
 }
 
-// sync 读取版本号；版本变化才拉取 payload 并更新本地缓存。
+// sync 读取版本号；版本变化才拉取 payload 并更新本地缓存（订阅信号与重连补同步共用）。
 func (this *activityLogic) sync(ctx context.Context) {
+	// 订阅消息与重连补同步可能并发触发，串行化后第二次会因版本相同直接返回。
+	this.syncMu.Lock()
+	defer this.syncMu.Unlock()
+
 	rdb, err := svc.Ctx().Redis.Default()
 	if err != nil {
 		this.warnOnce(err.Error())
@@ -260,21 +280,16 @@ func (this *activityLogic) sync(ctx context.Context) {
 // fanoutInitTasks 实例状态变化后为所有在线玩家异步补初始化活动任务，不阻塞订阅/轮询循环；
 // PlayerActivity 标记 + 任务已建档判断保证同实例重复触发幂等。
 func (this *activityLogic) fanoutInitTasks() {
-	n := 0
-	playerActorMap().Range(func(playerID int64, _ *actor.PlayerActor) bool {
-		n++
-		go func(playerID int64) {
-			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-			defer cancel()
-			if err := this.initActivityTasks(ctx, playerID); err != nil {
-				log.Warnf("game: fanout init activity tasks failed, player=%d: %v", playerID, err)
-			}
-		}(playerID)
-		return true
-	})
-	if n > 0 {
-		log.Infof("game: activity instances changed, fanout init tasks online=%d", n)
+	ids := onlinePlayerIDs()
+	if len(ids) == 0 {
+		return
 	}
+	go fanoutOnline(ids, func(ctx context.Context, playerID int64) {
+		if err := this.initActivityTasks(ctx, playerID); err != nil {
+			log.Warnf("game: fanout init activity tasks failed, player=%d: %v", playerID, err)
+		}
+	})
+	log.Infof("game: activity instances changed, fanout init tasks online=%d", len(ids))
 }
 
 // changedPeriodTypes 对比新旧快照，返回发生跨期的任务类型（日/周/月，tpl.TaskType_*）。
@@ -297,23 +312,55 @@ func changedPeriodTypes(old, cur *dto.ActivitySnapshot) []int32 {
 
 // fanoutPeriodTasks 跨期后为所有在线玩家异步推送对应类型任务的新周期列表（纯推送不落库，重置由周期 key 失配自动完成）。
 func (this *activityLogic) fanoutPeriodTasks(types []int32) {
-	n := 0
-	playerActorMap().Range(func(playerID int64, _ *actor.PlayerActor) bool {
-		n++
+	ids := onlinePlayerIDs()
+	if len(ids) == 0 {
+		return
+	}
+	go fanoutOnline(ids, func(ctx context.Context, playerID int64) {
 		for _, taskType := range types {
-			go func(playerID int64, taskType int32) {
-				ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-				defer cancel()
-				if err := Task().OnPeriodChange(ctx, playerID, taskType); err != nil {
-					log.Warnf("game: fanout period tasks failed, player=%d type=%d: %v", playerID, taskType, err)
-				}
-			}(playerID, taskType)
+			if err := Task().OnPeriodChange(ctx, playerID, taskType); err != nil {
+				log.Warnf("game: fanout period tasks failed, player=%d type=%d: %v", playerID, taskType, err)
+			}
 		}
+	})
+	log.Infof("game: period keys changed, fanout task refresh online=%d types=%v", len(ids), types)
+}
+
+// onlinePlayerIDs 快照当前在线玩家 ID，避免在遍历 actor 表时执行耗时逻辑。
+func onlinePlayerIDs() []int64 {
+	m := playerActorMap()
+	ids := make([]int64, 0, m.Len())
+	m.Range(func(playerID int64, _ *actor.PlayerActor) bool {
+		ids = append(ids, playerID)
 		return true
 	})
-	if n > 0 {
-		log.Infof("game: period keys changed, fanout task refresh online=%d types=%v", n, types)
+	return ids
+}
+
+// fanoutOnline 以固定并发度对在线玩家执行 worker（每人 5s 超时），
+// 避免玩家多时为每人/每类型无限制地创建协程。
+func fanoutOnline(ids []int64, worker func(ctx context.Context, playerID int64)) {
+	const concurrency = 32
+	workers := min(concurrency, len(ids))
+	ch := make(chan int64, len(ids))
+	for _, id := range ids {
+		ch <- id
 	}
+	close(ch)
+
+	var wg sync.WaitGroup
+	wg.Add(workers)
+	for i := 0; i < workers; i++ {
+		go func() {
+			defer wg.Done()
+			for playerID := range ch {
+				ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+				worker(ctx, playerID)
+				cancel()
+			}
+		}()
+	}
+	wg.Wait()
 }
 
 // Activities 从快照构建活动列表（键为实例ID，已取消的不下发）；快照未就绪返回 nil。

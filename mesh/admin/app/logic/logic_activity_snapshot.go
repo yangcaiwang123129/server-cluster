@@ -16,6 +16,10 @@ import (
 
 // publish 递增版本并原子写入 Redis 快照。
 func (this *activityLogic) publish(ctx context.Context) error {
+	// 发布过程串行化（版本递增 + 快照构建 + 写入），避免并发发布把版本号与 payload 写乱序。
+	this.publishMu.Lock()
+	defer this.publishMu.Unlock()
+
 	this.mu.Lock()
 	this.version++
 	snap := this.buildSnapshotLocked()
@@ -29,16 +33,20 @@ func (this *activityLogic) publish(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	_, err = rdb.TxPipelined(ctx, func(p redis.Pipeliner) error {
-		p.Set(ctx, consts.ActivitySnapshotPayloadKey, payload, 0)
-		p.Set(ctx, consts.ActivitySnapshotVersionKey, snap.Version, 0)
-		return nil
-	})
-	if err != nil {
+	// MSet 单命令写入 payload 与版本号，保证两者原子一致，且只需一次往返。
+	if err = rdb.MSet(ctx,
+		consts.ActivitySnapshotPayloadKey, payload,
+		consts.ActivitySnapshotVersionKey, snap.Version,
+	).Err(); err != nil {
 		return err
 	}
-	// 广播版本号信号，game 订阅后立即拉取快照（10s 轮询仍作为兜底）。
-	_ = rdb.Publish(ctx, consts.ActivityChangeChannel, snap.Version).Err()
+	// 写入版本号信号流，game 按游标消费后拉取快照；流会持久化，断线期间不会漏事件。
+	_ = rdb.XAdd(ctx, &redis.XAddArgs{
+		Stream: consts.ActivityChangeStreamKey,
+		MaxLen: consts.ActivityChangeStreamMaxLen,
+		Approx: true,
+		Values: map[string]interface{}{"version": snap.Version},
+	}).Err()
 	return nil
 }
 

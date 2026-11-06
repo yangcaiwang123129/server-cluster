@@ -9,7 +9,7 @@ import (
 	"github.com/dobyte/due/v2/log"
 )
 
-// generate 按开服策略生成到期活动实例，返回是否有新增。
+// generate 按策略生成到期活动实例，返回是否有新增。
 func (this *activityLogic) generate(now int64) bool {
 	if !tpl.Loaded() {
 		return false
@@ -17,29 +17,33 @@ func (this *activityLogic) generate(now int64) bool {
 	latest := this.latestByCfg()
 	created := false
 	for _, cfg := range tpl.T().Activity.GetDataList() {
-		if !isAutoStrategy(cfg.StrategyType) || !nextRoundAllowed(cfg, latest[cfg.Id]) {
+		if !isAutoStrategy(cfg.StrategyType) {
 			continue
 		}
-		start, end, ok := nextWindow(cfg, latest[cfg.Id], now)
+		latestInst := latest[cfg.Id]
+		if !nextRoundAllowed(cfg, latestInst) {
+			continue
+		}
+		start, end, ok := nextWindow(cfg, latestInst, now)
 		if !ok {
 			continue
 		}
-		m := &model.Activity{
+		activity := &model.Activity{
 			CfgID:     cfg.Id,
-			Round:     nextRound(latest[cfg.Id]),
+			Round:     nextRound(latestInst),
 			StartTime: start,
 			EndTime:   end,
 			Status:    consts.ActivityStatusNotStarted,
 			Source:    consts.ActivitySourceConfig,
 			Remark:    cfg.Name,
 		}
-		if err := repo.R().CreateActivity(m); err != nil {
+		if err := repo.R().CreateActivity(activity); err != nil {
 			log.Errorf("admin: generate activity cfg=%d failed: %v", cfg.Id, err)
 			continue
 		}
-		this.addInstance(m)
+		this.addInstance(activity)
 		created = true
-		log.Infof("admin: generated activity cfg=%d round=%d start=%d end=%d", cfg.Id, m.Round, start, end)
+		log.Infof("admin: generated activity cfg=%d round=%d start=%d end=%d", cfg.Id, activity.Round, start, end)
 	}
 	return created
 }

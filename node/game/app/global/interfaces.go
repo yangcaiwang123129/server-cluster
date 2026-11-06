@@ -206,11 +206,11 @@ type TaskLogic interface {
 // ActivityLogic 活动模块接口：admin 快照同步 + 玩家活动参与
 type ActivityLogic interface {
 	PlayerModule[*model.PlayerActivity]
-	// Start 启动快照轮询（game main 在容器 Serve 前调用）
+	// Start 启动快照同步：先同步一次，再订阅变更通道（game main 在容器 Serve 前调用）
 	Start(ctx context.Context)
-	// Stop 停止快照轮询
+	// Stop 停止快照同步
 	Stop()
-	// Snapshot 返回最近一次活动快照副本；未就绪返回 nil
+	// Snapshot 返回最近一次活动快照（只读，禁止修改）；未就绪返回 nil
 	Snapshot() *dto.ActivitySnapshot
 	// Activities 从快照构建活动列表（键为实例ID）；快照未就绪返回 nil
 	Activities() map[int64]*pb.ActivityEntry

@@ -12,18 +12,60 @@ import (
 
 // nextWindow 计算下一轮时间窗口（start/end 均为毫秒时间戳）。
 func nextWindow(cfg *tpl.ActivityCfg, latest *model.Activity, now int64) (int64, int64, bool) {
-	base := now
-	if latest != nil && latest.EndTime > 0 {
-		base = latest.EndTime
-	}
-	switch cfg.StrategyType {
-	case tpl.StrategyType_Specify:
+	if cfg.StrategyType == tpl.StrategyType_Specify {
 		start, ok1 := parseSpecifyValue(cfg.StrategyStartValue)
 		end, ok2 := parseSpecifyValue(cfg.StrategyEndValue)
-		if !ok1 || !ok2 || end <= start {
-			return 0, 0, false
+		if !ok1 || !ok2 || end <= start || end <= now {
+			return 0, 0, false // 已完全过期的指定活动不再补建
 		}
 		return start, end, true
+	}
+
+	base := windowBase(cfg.StrategyType, latest, now)
+	// 窗口已整体过期（停机超过一个周期）时最多顺延一次，避免按轮次逐秒补建历史实例。
+	for i := 0; i < 2; i++ {
+		start, end, ok := windowAt(cfg, base)
+		if !ok {
+			return 0, 0, false
+		}
+		if end > now {
+			return start, end, true
+		}
+		base = end
+	}
+	return 0, 0, false
+}
+
+// windowBase 计算窗口基准时刻：上一轮刚结束则紧接其后，否则退回当前周期起点（可重新进入本周期窗口）。
+func windowBase(strategy tpl.StrategyType, latest *model.Activity, now int64) int64 {
+	if latest == nil || latest.EndTime <= 0 {
+		return now
+	}
+	start := periodStart(strategy, now)
+	if latest.EndTime > start {
+		return latest.EndTime
+	}
+	return start
+}
+
+// periodStart 返回策略对应周期（日/周/月）在 now 所处周期的起始时刻。
+func periodStart(strategy tpl.StrategyType, now int64) int64 {
+	t := util.UnixMilli(now)
+	switch strategy {
+	case tpl.StrategyType_Day:
+		return util.DayStart(t).UnixMilli()
+	case tpl.StrategyType_Week:
+		return util.WeekStart(t).UnixMilli()
+	case tpl.StrategyType_Month:
+		return util.MonthStart(t).UnixMilli()
+	default:
+		return now
+	}
+}
+
+// windowAt 按策略计算 base 之后（含）的最近一个时间窗口。
+func windowAt(cfg *tpl.ActivityCfg, base int64) (int64, int64, bool) {
+	switch cfg.StrategyType {
 	case tpl.StrategyType_Day:
 		openSec, closeSec, ok := parseCommonWindow(cfg)
 		if !ok || closeSec <= openSec {
@@ -102,7 +144,7 @@ func parseSpecifyValue(s string) (int64, bool) {
 		year < 1970 || month < 1 || month > 12 || day < 1 || day > 31 {
 		return 0, false
 	}
-	t := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.Local).
+	t := time.Date(year, time.Month(month), day, 0, 0, 0, 0, util.GetLocation()).
 		Add(time.Duration(sec) * time.Second)
 	return t.UnixMilli(), true
 }
@@ -132,8 +174,8 @@ func validWeekDay(d int) bool { return d >= 1 && d <= 7 }
 
 // dailyWindow 计算 base 之后（含）最近一个每日时间窗；closeSec 必须晚于 openSec。
 func dailyWindow(base int64, openSec, closeSec int) (int64, int64, bool) {
-	t := time.UnixMilli(base).In(time.Local)
-	start := time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.Local).
+	t := util.UnixMilli(base)
+	start := time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location()).
 		Add(time.Duration(openSec) * time.Second)
 	if start.UnixMilli() < base {
 		start = start.AddDate(0, 0, 1)
@@ -144,7 +186,7 @@ func dailyWindow(base int64, openSec, closeSec int) (int64, int64, bool) {
 
 // weeklyWindow 计算 base 之后（含）最近一个每周时间窗。
 func weeklyWindow(base int64, openDay, openSec, closeDay, closeSec int) (int64, int64, bool) {
-	t := time.UnixMilli(base).In(time.Local)
+	t := util.UnixMilli(base)
 	start := weekDayAt(t, openDay, openSec)
 	if start.UnixMilli() < base {
 		start = start.AddDate(0, 0, 7)
@@ -172,7 +214,7 @@ func weekDayAt(base time.Time, weekDay, daySec int) time.Time {
 
 // monthlyWindow 计算 base 之后（含）最近一个每月时间窗。
 func monthlyWindow(base int64, openDay, openSec, closeDay, closeSec int) (int64, int64, bool) {
-	t := time.UnixMilli(base).In(time.Local)
+	t := util.UnixMilli(base)
 	start := dayAt(t.Year(), t.Month(), openDay, openSec, t.Location())
 	if start.UnixMilli() < base {
 		start = addMonths(start, 1)
