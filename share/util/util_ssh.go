@@ -71,11 +71,11 @@ func DialSSH(ctx context.Context, cfg SSHConfig) (*sshClient, error) {
 }
 
 // Close 关闭底层 SSH 连接。
-func (s *sshClient) Close() error { return s.cli.Close() }
+func (this *sshClient) Close() error { return this.cli.Close() }
 
 // Run 执行一条 shell 命令并等待结束，返回 stdout/stderr/exitCode。
-func (s *sshClient) Run(cmd string) (*SSHResult, error) {
-	sess, err := s.cli.NewSession()
+func (this *sshClient) Run(cmd string) (*SSHResult, error) {
+	sess, err := this.cli.NewSession()
 	if err != nil {
 		return nil, fmt.Errorf("ssh new session: %w", err)
 	}
@@ -84,7 +84,7 @@ func (s *sshClient) Run(cmd string) (*SSHResult, error) {
 	sess.Stdout = &stdout
 	sess.Stderr = &stderr
 	// 带超时：避免远端进程 hang 住导致 goroutine 泄漏
-	tctx := s.ctx
+	tctx := this.ctx
 	if tctx == nil {
 		var cancel context.CancelFunc
 		tctx, cancel = context.WithTimeout(context.Background(), 10*time.Minute)
@@ -112,8 +112,8 @@ func (s *sshClient) Run(cmd string) (*SSHResult, error) {
 }
 
 // Upload 用 SFTP 把本地文件上传到远端 destPath（含文件名）。
-func (s *sshClient) Upload(localPath, destPath string) error {
-	sftpC, err := sftp.NewClient(s.cli)
+func (this *sshClient) Upload(localPath, destPath string) error {
+	sftpC, err := sftp.NewClient(this.cli)
 	if err != nil {
 		return fmt.Errorf("ssh sftp: %w", err)
 	}

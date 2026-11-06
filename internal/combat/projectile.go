@@ -35,39 +35,39 @@ type Projectile struct {
 type AABB struct{ X, Y, W, H float64 }
 
 // Overlaps 判断两包围盒是否相交。
-func (a AABB) Overlaps(b AABB) bool {
-	return a.X < b.X+b.W && a.X+a.W > b.X &&
-		a.Y < b.Y+b.H && a.Y+a.H > b.Y
+func (this AABB) Overlaps(b AABB) bool {
+	return this.X < b.X+b.W && this.X+this.W > b.X &&
+		this.Y < b.Y+b.H && this.Y+this.H > b.Y
 }
 
 // updateProjectile 推进弹道：飞行、超时/撞墙销毁、命中结算。
-func (r *CombatRoom) updateProjectile(p *Projectile, dt float64) {
+func (this *CombatRoom) updateProjectile(p *Projectile, dt float64) {
 	if p.State != ProjFlying {
 		return
 	}
 	p.X += p.DX * p.Speed * dt
 	p.Y += p.DY * p.Speed * dt
 	p.Life -= dt
-	if p.Life <= 0 || !r.Grid.IsWalkable(int(p.X), int(p.Y)) {
+	if p.Life <= 0 || !this.Grid.IsWalkable(int(p.X), int(p.Y)) {
 		p.State = ProjDead
 		return
 	}
-	if targetID := r.CheckProjectileHit(p.OwnerID, p.X, p.Y); targetID != 0 {
-		if target, ok := r.Players[targetID]; ok {
-			r.applyDamage(target, p.Damage)
+	if targetID := this.CheckProjectileHit(p.OwnerID, p.X, p.Y); targetID != 0 {
+		if target, ok := this.Players[targetID]; ok {
+			this.applyDamage(target, p.Damage)
 		}
 		p.State = ProjHit
 	}
 }
 
 // CheckProjectileHit 返回 (px,py) 处命中的玩家 ID，未命中返回 0。
-func (r *CombatRoom) CheckProjectileHit(ownerID int64, px, py float64) int64 {
+func (this *CombatRoom) CheckProjectileHit(ownerID int64, px, py float64) int64 {
 	bulletBox := AABB{X: px, Y: py, W: projectileHitBox, H: projectileHitBox}
-	for _, eid := range r.AOI.GetNearby(int(px), int(py)) {
+	for _, eid := range this.AOI.GetNearby(int(px), int(py)) {
 		if eid == ownerID {
 			continue
 		}
-		target, ok := r.Players[eid]
+		target, ok := this.Players[eid]
 		if !ok || target.HP <= 0 {
 			continue
 		}

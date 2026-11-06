@@ -21,7 +21,7 @@ var inst = &Repo{}
 func R() *Repo { return inst }
 
 // db 默认 MySQL 实例的 gorm 句柄；实例未配置时返回错误。
-func (r *Repo) db() (*gorm.DB, error) { return svc.Ctx().DB() }
+func (this *Repo) db() (*gorm.DB, error) { return svc.Ctx().DB() }
 
 // ApiQuery 接口列表过滤条件。
 type ApiQuery struct {
@@ -33,8 +33,8 @@ type ApiQuery struct {
 }
 
 // ListApis 分页查询接口登记。
-func (r *Repo) ListApis(q ApiQuery, pageIndex, pageSize int) ([]model.SysApi, int64, error) {
-	d, err := r.db()
+func (this *Repo) ListApis(q ApiQuery, pageIndex, pageSize int) ([]model.SysApi, int64, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, 0, err
 	}
@@ -55,8 +55,8 @@ func (r *Repo) ListApis(q ApiQuery, pageIndex, pageSize int) ([]model.SysApi, in
 }
 
 // GetApi 按主键查询接口。
-func (r *Repo) GetApi(id int) (*model.SysApi, error) {
-	d, err := r.db()
+func (this *Repo) GetApi(id int) (*model.SysApi, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, err
 	}
@@ -68,8 +68,8 @@ func (r *Repo) GetApi(id int) (*model.SysApi, error) {
 }
 
 // CreateApi 新增接口。
-func (r *Repo) CreateApi(m *model.SysApi) error {
-	d, err := r.db()
+func (this *Repo) CreateApi(m *model.SysApi) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -80,8 +80,8 @@ func (r *Repo) CreateApi(m *model.SysApi) error {
 }
 
 // UpdateApi 修改接口，并重建受影响角色的放行规则。
-func (r *Repo) UpdateApi(m *model.SysApi) error {
-	d, err := r.db()
+func (this *Repo) UpdateApi(m *model.SysApi) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -95,8 +95,8 @@ func (r *Repo) UpdateApi(m *model.SysApi) error {
 }
 
 // DeleteApis 批量删除接口，并清理菜单关系与放行规则。
-func (r *Repo) DeleteApis(ids []int) error {
-	d, err := r.db()
+func (this *Repo) DeleteApis(ids []int) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -115,8 +115,8 @@ func (r *Repo) DeleteApis(ids []int) error {
 }
 
 // CreateLoginLog 写入登录审计。
-func (r *Repo) CreateLoginLog(m *model.SysLoginLog) error {
-	d, err := r.db()
+func (this *Repo) CreateLoginLog(m *model.SysLoginLog) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -124,12 +124,12 @@ func (r *Repo) CreateLoginLog(m *model.SysLoginLog) error {
 }
 
 // RoleForUser 查询用户所属角色；用户未绑定角色时返回 nil。
-func (r *Repo) RoleForUser(userId int) (*model.SysRole, error) {
-	d, err := r.db()
+func (this *Repo) RoleForUser(userId int) (*model.SysRole, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, err
 	}
-	user, err := r.GetUser(userId)
+	user, err := this.GetUser(userId)
 	if err != nil {
 		return nil, err
 	}
@@ -152,8 +152,8 @@ type ConfigQuery struct {
 }
 
 // ListConfigs 分页查询系统配置。
-func (r *Repo) ListConfigs(q ConfigQuery, pageIndex, pageSize int) ([]model.SysConfig, int64, error) {
-	d, err := r.db()
+func (this *Repo) ListConfigs(q ConfigQuery, pageIndex, pageSize int) ([]model.SysConfig, int64, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, 0, err
 	}
@@ -171,8 +171,8 @@ func (r *Repo) ListConfigs(q ConfigQuery, pageIndex, pageSize int) ([]model.SysC
 }
 
 // GetConfig 按主键查询配置。
-func (r *Repo) GetConfig(id int) (*model.SysConfig, error) {
-	d, err := r.db()
+func (this *Repo) GetConfig(id int) (*model.SysConfig, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, err
 	}
@@ -184,8 +184,8 @@ func (r *Repo) GetConfig(id int) (*model.SysConfig, error) {
 }
 
 // GetConfigByKey 按配置键查询配置。
-func (r *Repo) GetConfigByKey(key string) (*model.SysConfig, error) {
-	d, err := r.db()
+func (this *Repo) GetConfigByKey(key string) (*model.SysConfig, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, err
 	}
@@ -197,8 +197,8 @@ func (r *Repo) GetConfigByKey(key string) (*model.SysConfig, error) {
 }
 
 // CreateConfig 新增配置。
-func (r *Repo) CreateConfig(m *model.SysConfig) error {
-	d, err := r.db()
+func (this *Repo) CreateConfig(m *model.SysConfig) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -209,8 +209,8 @@ func (r *Repo) CreateConfig(m *model.SysConfig) error {
 }
 
 // UpdateConfig 修改配置。
-func (r *Repo) UpdateConfig(m *model.SysConfig) error {
-	d, err := r.db()
+func (this *Repo) UpdateConfig(m *model.SysConfig) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -220,8 +220,8 @@ func (r *Repo) UpdateConfig(m *model.SysConfig) error {
 }
 
 // DeleteConfigs 批量删除配置。
-func (r *Repo) DeleteConfigs(ids []int) error {
-	d, err := r.db()
+func (this *Repo) DeleteConfigs(ids []int) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -232,8 +232,8 @@ func (r *Repo) DeleteConfigs(ids []int) error {
 }
 
 // ConfigValue 按配置键取值，缺省返回 fallback。
-func (r *Repo) ConfigValue(key, fallback string) string {
-	d, err := r.db()
+func (this *Repo) ConfigValue(key, fallback string) string {
+	d, err := this.db()
 	if err != nil {
 		return fallback
 	}
@@ -248,8 +248,8 @@ func (r *Repo) ConfigValue(key, fallback string) string {
 }
 
 // FrontendConfigs 前端可读的系统配置（登录页/布局展示用）。
-func (r *Repo) FrontendConfigs() (map[string]string, error) {
-	d, err := r.db()
+func (this *Repo) FrontendConfigs() (map[string]string, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, err
 	}
@@ -265,8 +265,8 @@ func (r *Repo) FrontendConfigs() (map[string]string, error) {
 }
 
 // ConfigValues 按给定键批量取值；不存在的键返回空串。
-func (r *Repo) ConfigValues(keys []string) (map[string]string, error) {
-	d, err := r.db()
+func (this *Repo) ConfigValues(keys []string) (map[string]string, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, err
 	}
@@ -285,8 +285,8 @@ func (r *Repo) ConfigValues(keys []string) (map[string]string, error) {
 }
 
 // SetConfigs 批量写入配置：存在则更新，不存在则新增。
-func (r *Repo) SetConfigs(entries map[string]string) error {
-	d, err := r.db()
+func (this *Repo) SetConfigs(entries map[string]string) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -328,8 +328,8 @@ type DictDataQuery struct {
 }
 
 // ListDictTypes 分页查询字典类型。
-func (r *Repo) ListDictTypes(q DictTypeQuery, pageIndex, pageSize int) ([]model.SysDictType, int64, error) {
-	d, err := r.db()
+func (this *Repo) ListDictTypes(q DictTypeQuery, pageIndex, pageSize int) ([]model.SysDictType, int64, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, 0, err
 	}
@@ -347,8 +347,8 @@ func (r *Repo) ListDictTypes(q DictTypeQuery, pageIndex, pageSize int) ([]model.
 }
 
 // GetDictType 按主键查询字典类型。
-func (r *Repo) GetDictType(id int) (*model.SysDictType, error) {
-	d, err := r.db()
+func (this *Repo) GetDictType(id int) (*model.SysDictType, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, err
 	}
@@ -360,8 +360,8 @@ func (r *Repo) GetDictType(id int) (*model.SysDictType, error) {
 }
 
 // CreateDictType 新增字典类型。
-func (r *Repo) CreateDictType(m *model.SysDictType) error {
-	d, err := r.db()
+func (this *Repo) CreateDictType(m *model.SysDictType) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -372,8 +372,8 @@ func (r *Repo) CreateDictType(m *model.SysDictType) error {
 }
 
 // UpdateDictType 修改字典类型。
-func (r *Repo) UpdateDictType(m *model.SysDictType) error {
-	d, err := r.db()
+func (this *Repo) UpdateDictType(m *model.SysDictType) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -382,8 +382,8 @@ func (r *Repo) UpdateDictType(m *model.SysDictType) error {
 }
 
 // DeleteDictTypes 批量删除字典类型及其字典项。
-func (r *Repo) DeleteDictTypes(ids []int) error {
-	d, err := r.db()
+func (this *Repo) DeleteDictTypes(ids []int) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -406,8 +406,8 @@ func (r *Repo) DeleteDictTypes(ids []int) error {
 }
 
 // DictTypeOptions 字典类型下拉项。
-func (r *Repo) DictTypeOptions() ([]model.SysDictType, error) {
-	d, err := r.db()
+func (this *Repo) DictTypeOptions() ([]model.SysDictType, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, err
 	}
@@ -417,8 +417,8 @@ func (r *Repo) DictTypeOptions() ([]model.SysDictType, error) {
 }
 
 // ListDictData 分页查询字典项。
-func (r *Repo) ListDictData(q DictDataQuery, pageIndex, pageSize int) ([]model.SysDictData, int64, error) {
-	d, err := r.db()
+func (this *Repo) ListDictData(q DictDataQuery, pageIndex, pageSize int) ([]model.SysDictData, int64, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, 0, err
 	}
@@ -436,8 +436,8 @@ func (r *Repo) ListDictData(q DictDataQuery, pageIndex, pageSize int) ([]model.S
 }
 
 // GetDictData 按主键查询字典项。
-func (r *Repo) GetDictData(code int) (*model.SysDictData, error) {
-	d, err := r.db()
+func (this *Repo) GetDictData(code int) (*model.SysDictData, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, err
 	}
@@ -449,8 +449,8 @@ func (r *Repo) GetDictData(code int) (*model.SysDictData, error) {
 }
 
 // CreateDictData 新增字典项。
-func (r *Repo) CreateDictData(m *model.SysDictData) error {
-	d, err := r.db()
+func (this *Repo) CreateDictData(m *model.SysDictData) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -461,8 +461,8 @@ func (r *Repo) CreateDictData(m *model.SysDictData) error {
 }
 
 // UpdateDictData 修改字典项。
-func (r *Repo) UpdateDictData(m *model.SysDictData) error {
-	d, err := r.db()
+func (this *Repo) UpdateDictData(m *model.SysDictData) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -472,8 +472,8 @@ func (r *Repo) UpdateDictData(m *model.SysDictData) error {
 }
 
 // DeleteDictData 批量删除字典项。
-func (r *Repo) DeleteDictData(ids []int) error {
-	d, err := r.db()
+func (this *Repo) DeleteDictData(ids []int) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -484,8 +484,8 @@ func (r *Repo) DeleteDictData(ids []int) error {
 }
 
 // DictDataOptions 指定字典类型的下拉项（只含启用项）。
-func (r *Repo) DictDataOptions(dictType string) ([]model.SysDictData, error) {
-	d, err := r.db()
+func (this *Repo) DictDataOptions(dictType string) ([]model.SysDictData, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, err
 	}
@@ -515,8 +515,8 @@ type OperaLogQuery struct {
 }
 
 // ListLoginLogs 分页查询登录日志。
-func (r *Repo) ListLoginLogs(q LoginLogQuery, pageIndex, pageSize int) ([]model.SysLoginLog, int64, error) {
-	d, err := r.db()
+func (this *Repo) ListLoginLogs(q LoginLogQuery, pageIndex, pageSize int) ([]model.SysLoginLog, int64, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, 0, err
 	}
@@ -540,8 +540,8 @@ func (r *Repo) ListLoginLogs(q LoginLogQuery, pageIndex, pageSize int) ([]model.
 }
 
 // GetLoginLog 按主键查询登录日志。
-func (r *Repo) GetLoginLog(id int) (*model.SysLoginLog, error) {
-	d, err := r.db()
+func (this *Repo) GetLoginLog(id int) (*model.SysLoginLog, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, err
 	}
@@ -553,8 +553,8 @@ func (r *Repo) GetLoginLog(id int) (*model.SysLoginLog, error) {
 }
 
 // DeleteLoginLogs 批量删除登录日志。
-func (r *Repo) DeleteLoginLogs(ids []int) error {
-	d, err := r.db()
+func (this *Repo) DeleteLoginLogs(ids []int) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -565,8 +565,8 @@ func (r *Repo) DeleteLoginLogs(ids []int) error {
 }
 
 // ListOperaLogs 分页查询操作日志。
-func (r *Repo) ListOperaLogs(q OperaLogQuery, pageIndex, pageSize int) ([]model.SysOperaLog, int64, error) {
-	d, err := r.db()
+func (this *Repo) ListOperaLogs(q OperaLogQuery, pageIndex, pageSize int) ([]model.SysOperaLog, int64, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, 0, err
 	}
@@ -590,8 +590,8 @@ func (r *Repo) ListOperaLogs(q OperaLogQuery, pageIndex, pageSize int) ([]model.
 }
 
 // DeleteOperaLogs 批量删除操作日志。
-func (r *Repo) DeleteOperaLogs(ids []int) error {
-	d, err := r.db()
+func (this *Repo) DeleteOperaLogs(ids []int) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -602,8 +602,8 @@ func (r *Repo) DeleteOperaLogs(ids []int) error {
 }
 
 // CleanOperaLogs 清空操作日志。
-func (r *Repo) CleanOperaLogs() error {
-	d, err := r.db()
+func (this *Repo) CleanOperaLogs() error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -625,8 +625,8 @@ type MenuNode struct {
 }
 
 // ListMenus 查询菜单并组装为树。
-func (r *Repo) ListMenus(q MenuQuery) ([]model.SysMenu, error) {
-	d, err := r.db()
+func (this *Repo) ListMenus(q MenuQuery) ([]model.SysMenu, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, err
 	}
@@ -644,15 +644,15 @@ func (r *Repo) ListMenus(q MenuQuery) ([]model.SysMenu, error) {
 	if err := tx.Order("sort asc").Find(&list).Error; err != nil {
 		return nil, err
 	}
-	if err := r.fillMenuApis(list); err != nil {
+	if err := this.fillMenuApis(list); err != nil {
 		return nil, err
 	}
 	return buildMenuTree(list, 0), nil
 }
 
 // GetMenu 查询单个菜单，带出已勾选的接口 id。
-func (r *Repo) GetMenu(menuId int) (*model.SysMenu, error) {
-	d, err := r.db()
+func (this *Repo) GetMenu(menuId int) (*model.SysMenu, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, err
 	}
@@ -665,8 +665,8 @@ func (r *Repo) GetMenu(menuId int) (*model.SysMenu, error) {
 }
 
 // CreateMenu 新增菜单并写入菜单-接口关系。
-func (r *Repo) CreateMenu(m *model.SysMenu, apis []int) error {
-	d, err := r.db()
+func (this *Repo) CreateMenu(m *model.SysMenu, apis []int) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -682,8 +682,8 @@ func (r *Repo) CreateMenu(m *model.SysMenu, apis []int) error {
 }
 
 // UpdateMenu 修改菜单并重写菜单-接口关系。
-func (r *Repo) UpdateMenu(m *model.SysMenu, apis []int) error {
-	d, err := r.db()
+func (this *Repo) UpdateMenu(m *model.SysMenu, apis []int) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -702,8 +702,8 @@ func (r *Repo) UpdateMenu(m *model.SysMenu, apis []int) error {
 }
 
 // DeleteMenus 批量删除菜单（含子孙），并清理角色关系与放行规则。
-func (r *Repo) DeleteMenus(ids []int) error {
-	d, err := r.db()
+func (this *Repo) DeleteMenus(ids []int) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -726,8 +726,8 @@ func (r *Repo) DeleteMenus(ids []int) error {
 }
 
 // RoleMenuTreeselect 角色授权树：roleId 为 0 时只返回全量菜单树（用于新增角色）。
-func (r *Repo) RoleMenuTreeselect(roleId int) ([]MenuNode, []int, error) {
-	d, err := r.db()
+func (this *Repo) RoleMenuTreeselect(roleId int) ([]MenuNode, []int, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, nil, err
 	}
@@ -737,7 +737,7 @@ func (r *Repo) RoleMenuTreeselect(roleId int) ([]MenuNode, []int, error) {
 	}
 	checked := make([]int, 0)
 	if roleId > 0 {
-		owned, err := r.roleMenus(roleId)
+		owned, err := this.roleMenus(roleId)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -747,8 +747,8 @@ func (r *Repo) RoleMenuTreeselect(roleId int) ([]MenuNode, []int, error) {
 }
 
 // MenusForRoute 当前角色的路由菜单树；按钮型（F）不参与路由。
-func (r *Repo) MenusForRoute(role *model.SysRole) ([]model.SysMenu, error) {
-	d, err := r.db()
+func (this *Repo) MenusForRoute(role *model.SysRole) ([]model.SysMenu, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, err
 	}
@@ -756,7 +756,7 @@ func (r *Repo) MenusForRoute(role *model.SysRole) ([]model.SysMenu, error) {
 	if role.RoleKey == consts.AdminRoleKey {
 		err = d.Order("sort asc").Find(&menus).Error
 	} else {
-		menus, err = r.roleMenus(role.RoleId)
+		menus, err = this.roleMenus(role.RoleId)
 	}
 	if err != nil {
 		return nil, err
@@ -775,8 +775,8 @@ func (r *Repo) MenusForRoute(role *model.SysRole) ([]model.SysMenu, error) {
 }
 
 // PermissionCodes 角色菜单上的权限标识集合。
-func (r *Repo) PermissionCodes(role *model.SysRole) ([]string, error) {
-	d, err := r.db()
+func (this *Repo) PermissionCodes(role *model.SysRole) ([]string, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, err
 	}
@@ -793,8 +793,8 @@ func (r *Repo) PermissionCodes(role *model.SysRole) ([]string, error) {
 }
 
 // fillMenuApis 为菜单列表填充 sysApi。
-func (r *Repo) fillMenuApis(menus []model.SysMenu) error {
-	d, err := r.db()
+func (this *Repo) fillMenuApis(menus []model.SysMenu) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -924,8 +924,8 @@ type RoleQuery struct {
 }
 
 // ListRoles 分页查询角色。
-func (r *Repo) ListRoles(q RoleQuery, pageIndex, pageSize int) ([]model.SysRole, int64, error) {
-	d, err := r.db()
+func (this *Repo) ListRoles(q RoleQuery, pageIndex, pageSize int) ([]model.SysRole, int64, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, 0, err
 	}
@@ -943,8 +943,8 @@ func (r *Repo) ListRoles(q RoleQuery, pageIndex, pageSize int) ([]model.SysRole,
 }
 
 // GetRole 按主键查询角色，并带出已分配的菜单 id。
-func (r *Repo) GetRole(roleId int) (*model.SysRole, error) {
-	d, err := r.db()
+func (this *Repo) GetRole(roleId int) (*model.SysRole, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, err
 	}
@@ -952,7 +952,7 @@ func (r *Repo) GetRole(roleId int) (*model.SysRole, error) {
 	if err := d.First(&m, "role_id = ?", roleId).Error; err != nil {
 		return nil, err
 	}
-	menus, err := r.roleMenus(roleId)
+	menus, err := this.roleMenus(roleId)
 	if err != nil {
 		return nil, err
 	}
@@ -961,8 +961,8 @@ func (r *Repo) GetRole(roleId int) (*model.SysRole, error) {
 }
 
 // GetRoleByKey 按 roleKey 查询角色。
-func (r *Repo) GetRoleByKey(roleKey string) (*model.SysRole, error) {
-	d, err := r.db()
+func (this *Repo) GetRoleByKey(roleKey string) (*model.SysRole, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, err
 	}
@@ -974,8 +974,8 @@ func (r *Repo) GetRoleByKey(roleKey string) (*model.SysRole, error) {
 }
 
 // CreateRole 新增角色并同步菜单与放行规则。
-func (r *Repo) CreateRole(m *model.SysRole, menuIds []int) error {
-	d, err := r.db()
+func (this *Repo) CreateRole(m *model.SysRole, menuIds []int) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -994,8 +994,8 @@ func (r *Repo) CreateRole(m *model.SysRole, menuIds []int) error {
 }
 
 // UpdateRole 修改角色；菜单变更后重建该角色的放行规则。
-func (r *Repo) UpdateRole(m *model.SysRole, menuIds []int) error {
-	d, err := r.db()
+func (this *Repo) UpdateRole(m *model.SysRole, menuIds []int) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -1022,8 +1022,8 @@ func (r *Repo) UpdateRole(m *model.SysRole, menuIds []int) error {
 }
 
 // DeleteRoles 批量删除角色并清理其菜单关系与放行规则。
-func (r *Repo) DeleteRoles(ids []int) error {
-	d, err := r.db()
+func (this *Repo) DeleteRoles(ids []int) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -1051,8 +1051,8 @@ func (r *Repo) DeleteRoles(ids []int) error {
 }
 
 // UpdateRoleStatus 启用/停用角色。
-func (r *Repo) UpdateRoleStatus(roleId int, status string) error {
-	d, err := r.db()
+func (this *Repo) UpdateRoleStatus(roleId int, status string) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -1060,8 +1060,8 @@ func (r *Repo) UpdateRoleStatus(roleId int, status string) error {
 }
 
 // roleMenus 查询角色已分配的菜单。
-func (r *Repo) roleMenus(roleId int) ([]model.SysMenu, error) {
-	d, err := r.db()
+func (this *Repo) roleMenus(roleId int) ([]model.SysMenu, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, err
 	}
@@ -1154,8 +1154,8 @@ type UserQuery struct {
 }
 
 // ListUsers 分页查询用户。
-func (r *Repo) ListUsers(q UserQuery, pageIndex, pageSize int) ([]model.SysUser, int64, error) {
-	d, err := r.db()
+func (this *Repo) ListUsers(q UserQuery, pageIndex, pageSize int) ([]model.SysUser, int64, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, 0, err
 	}
@@ -1173,8 +1173,8 @@ func (r *Repo) ListUsers(q UserQuery, pageIndex, pageSize int) ([]model.SysUser,
 }
 
 // GetUser 按主键查询用户。
-func (r *Repo) GetUser(userId int) (*model.SysUser, error) {
-	d, err := r.db()
+func (this *Repo) GetUser(userId int) (*model.SysUser, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, err
 	}
@@ -1186,8 +1186,8 @@ func (r *Repo) GetUser(userId int) (*model.SysUser, error) {
 }
 
 // FindUserByUsername 按用户名查询用户。
-func (r *Repo) FindUserByUsername(username string) (*model.SysUser, error) {
-	d, err := r.db()
+func (this *Repo) FindUserByUsername(username string) (*model.SysUser, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, err
 	}
@@ -1199,8 +1199,8 @@ func (r *Repo) FindUserByUsername(username string) (*model.SysUser, error) {
 }
 
 // CreateUser 新增用户；密码为空时使用默认初始密码。
-func (r *Repo) CreateUser(m *model.SysUser) error {
-	d, err := r.db()
+func (this *Repo) CreateUser(m *model.SysUser) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -1208,7 +1208,7 @@ func (r *Repo) CreateUser(m *model.SysUser) error {
 		m.Status = consts.StatusEnabled
 	}
 	if m.Password == "" {
-		m.Password = r.ConfigValue(consts.ConfigKeyInitPassword, consts.DefaultInitPassword)
+		m.Password = this.ConfigValue(consts.ConfigKeyInitPassword, consts.DefaultInitPassword)
 	}
 	hash, err := bcrypt.GenerateFromPassword([]byte(m.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -1219,8 +1219,8 @@ func (r *Repo) CreateUser(m *model.SysUser) error {
 }
 
 // UpdateUser 修改用户；密码留空表示不修改。
-func (r *Repo) UpdateUser(m *model.SysUser) error {
-	d, err := r.db()
+func (this *Repo) UpdateUser(m *model.SysUser) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -1237,8 +1237,8 @@ func (r *Repo) UpdateUser(m *model.SysUser) error {
 }
 
 // DeleteUsers 批量删除用户。
-func (r *Repo) DeleteUsers(ids []int) error {
-	d, err := r.db()
+func (this *Repo) DeleteUsers(ids []int) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -1249,8 +1249,8 @@ func (r *Repo) DeleteUsers(ids []int) error {
 }
 
 // UpdateUserStatus 启用/停用用户。
-func (r *Repo) UpdateUserStatus(userId int, status string) error {
-	d, err := r.db()
+func (this *Repo) UpdateUserStatus(userId int, status string) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -1258,8 +1258,8 @@ func (r *Repo) UpdateUserStatus(userId int, status string) error {
 }
 
 // ResetUserPassword 重置指定用户密码。
-func (r *Repo) ResetUserPassword(userId int, password string) error {
-	d, err := r.db()
+func (this *Repo) ResetUserPassword(userId int, password string) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -1276,8 +1276,8 @@ func CheckUserPassword(hash, password string) bool {
 }
 
 // UpdateUserProfile 修改当前登录用户的资料（昵称/手机/邮箱/性别）。
-func (r *Repo) UpdateUserProfile(m *model.SysUser) error {
-	d, err := r.db()
+func (this *Repo) UpdateUserProfile(m *model.SysUser) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}

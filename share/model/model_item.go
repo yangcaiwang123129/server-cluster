@@ -210,39 +210,39 @@ func newPlayerItemContainer(playerID int64, typ, gridW, gridH int32) *ItemContai
 }
 
 // All 返回全部容器。
-func (p *PlayerItem) All() []*ItemContainer {
-	return []*ItemContainer{p.Backpack, p.Stash, p.Secure}
+func (this *PlayerItem) All() []*ItemContainer {
+	return []*ItemContainer{this.Backpack, this.Stash, this.Secure}
 }
 
 // ByType 按枚举取容器；非法类型返回 nil。
-func (p *PlayerItem) ByType(typ int32) *ItemContainer {
+func (this *PlayerItem) ByType(typ int32) *ItemContainer {
 	switch typ {
 	case int32(pb.ContainerType_CONTAINER_TYPE_BACKPACK):
-		return p.Backpack
+		return this.Backpack
 	case int32(pb.ContainerType_CONTAINER_TYPE_STASH):
-		return p.Stash
+		return this.Stash
 	case int32(pb.ContainerType_CONTAINER_TYPE_SECURE):
-		return p.Secure
+		return this.Secure
 	default:
 		return nil
 	}
 }
 
 // Rebuild 补齐缺失容器并重建各容器 SafeMap；从 DB/JSON 加载后必须调用（回填运行时字段 GlobalID/OwnerID/OwnerType/SizeOf）。
-func (p *PlayerItem) Rebuild() {
-	if p.Backpack == nil {
-		p.Backpack = newPlayerItemContainer(p.PlayerID, int32(pb.ContainerType_CONTAINER_TYPE_BACKPACK), 8, 12)
+func (this *PlayerItem) Rebuild() {
+	if this.Backpack == nil {
+		this.Backpack = newPlayerItemContainer(this.PlayerID, int32(pb.ContainerType_CONTAINER_TYPE_BACKPACK), 8, 12)
 	}
-	if p.Stash == nil {
-		p.Stash = newPlayerItemContainer(p.PlayerID, int32(pb.ContainerType_CONTAINER_TYPE_STASH), 20, 20)
+	if this.Stash == nil {
+		this.Stash = newPlayerItemContainer(this.PlayerID, int32(pb.ContainerType_CONTAINER_TYPE_STASH), 20, 20)
 	}
-	if p.Secure == nil {
-		p.Secure = newPlayerItemContainer(p.PlayerID, int32(pb.ContainerType_CONTAINER_TYPE_SECURE), 4, 6)
+	if this.Secure == nil {
+		this.Secure = newPlayerItemContainer(this.PlayerID, int32(pb.ContainerType_CONTAINER_TYPE_SECURE), 4, 6)
 	}
-	for _, c := range p.All() {
-		c.OwnerID = p.PlayerID
+	for _, c := range this.All() {
+		c.OwnerID = this.PlayerID
 		c.OwnerType = OwnerPlayer
-		c.GlobalID = p.PlayerID*consts.ContainerTypeStride + int64(c.Type)
+		c.GlobalID = this.PlayerID*consts.ContainerTypeStride + int64(c.Type)
 		c.SizeOf = defaultItemSizeOf
 		c.RawSizeOf = defaultItemRawSizeOf
 		c.EnsureInit()

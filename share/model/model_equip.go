@@ -30,8 +30,8 @@ type PlayerEquip struct {
 func (PlayerEquip) TableName() string { return enum.TablePlayerEquip.String() }
 
 // AddEquip 新增装备持有；实例ID已存在返回 false。
-func (p *PlayerEquip) AddEquip(g EquipInfo) bool {
-	_, ok := p.Equips.Update(g.EquipID, func(_ EquipInfo, exists bool) (EquipInfo, bool) {
+func (this *PlayerEquip) AddEquip(g EquipInfo) bool {
+	_, ok := this.Equips.Update(g.EquipID, func(_ EquipInfo, exists bool) (EquipInfo, bool) {
 		if exists {
 			return EquipInfo{}, false
 		}
@@ -41,8 +41,8 @@ func (p *PlayerEquip) AddEquip(g EquipInfo) bool {
 }
 
 // UpdateEquip 覆盖装备持有状态；实例不存在返回 false。
-func (p *PlayerEquip) UpdateEquip(g EquipInfo) bool {
-	_, ok := p.Equips.Update(g.EquipID, func(_ EquipInfo, exists bool) (EquipInfo, bool) {
+func (this *PlayerEquip) UpdateEquip(g EquipInfo) bool {
+	_, ok := this.Equips.Update(g.EquipID, func(_ EquipInfo, exists bool) (EquipInfo, bool) {
 		if !exists {
 			return EquipInfo{}, false
 		}
@@ -52,7 +52,7 @@ func (p *PlayerEquip) UpdateEquip(g EquipInfo) bool {
 }
 
 // DeleteEquip 删除装备实例；不存在返回 false。
-func (p *PlayerEquip) DeleteEquip(equipID int64) bool { return p.Equips.Delete(equipID) }
+func (this *PlayerEquip) DeleteEquip(equipID int64) bool { return this.Equips.Delete(equipID) }
 
 // LootItem 战斗拾取道具（对局内临时资产，结算时映射为 AssetChange；非表实体）。
 type LootItem struct {

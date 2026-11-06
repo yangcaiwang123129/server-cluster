@@ -84,8 +84,8 @@ func Ctx() *Context {
 }
 
 // DB 默认 MySQL 实例的 gorm 句柄；实例未配置时返回错误。
-func (c *Context) DB() (*gorm.DB, error) {
-	inst, err := c.MySQL.Default()
+func (this *Context) DB() (*gorm.DB, error) {
+	inst, err := this.MySQL.Default()
 	if err != nil {
 		return nil, err
 	}

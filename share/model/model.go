@@ -39,24 +39,24 @@ type TableModel struct {
 }
 
 // BeforeCreate GORM Hook：新建 → Version=0, CreatedAt/UpdatedAt=now；upsert 冲突行（Version>0）→ Version+=1, UpdatedAt=now, CreatedAt 保持。
-func (t *TableModel) BeforeCreate(tx *gorm.DB) error {
+func (this *TableModel) BeforeCreate(tx *gorm.DB) error {
 	now := util.NowUnixMilli()
-	if t.Version == 0 {
+	if this.Version == 0 {
 		// 全新创建行 —— CreatedAt/UpdatedAt 都设 now，Version 保持 0
-		t.CreatedAt = now
-		t.UpdatedAt = now
+		this.CreatedAt = now
+		this.UpdatedAt = now
 	} else {
 		// upsert 冲突更新行 —— Version+=1，UpdatedAt 刷新，CreatedAt 不动
-		t.Version += 1
-		t.UpdatedAt = now
+		this.Version += 1
+		this.UpdatedAt = now
 	}
 	return nil
 }
 
 // BeforeUpdate GORM Hook：常规 Update/Save → Version+=1, UpdatedAt=now, CreatedAt 不变。
-func (t *TableModel) BeforeUpdate(tx *gorm.DB) error {
-	t.Version += 1
-	t.UpdatedAt = util.NowUnixMilli()
+func (this *TableModel) BeforeUpdate(tx *gorm.DB) error {
+	this.Version += 1
+	this.UpdatedAt = util.NowUnixMilli()
 	return nil
 }
 

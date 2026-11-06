@@ -284,26 +284,26 @@ func newPlayerProcessor(act *node.Actor, args ...any) node.Processor {
 	return &playerProcessor{actor: act, playerID: playerID, loginIP: loginIP}
 }
 
-func (p *playerProcessor) Start() {
-	playerActorMap().Set(p.playerID, &actor.PlayerActor{
-		Actor:     p.actor,
-		PlayerID:  p.playerID,
+func (this *playerProcessor) Start() {
+	playerActorMap().Set(this.playerID, &actor.PlayerActor{
+		Actor:     this.actor,
+		PlayerID:  this.playerID,
 		EnterTime: util.Now().Unix(),
-		LoginIP:   p.loginIP,
+		LoginIP:   this.loginIP,
 	})
 
 	// uid 与 actor 绑定：stateful 消息由 scheduler 定位到本 actor
-	if err := p.actor.Proxy().BindActor(p.playerID, actorKindPlayer, p.actor.ID()); err != nil {
-		log.Errorf("game: bind player actor failed, playerID=%d: %v", p.playerID, err)
+	if err := this.actor.Proxy().BindActor(this.playerID, actorKindPlayer, this.actor.ID()); err != nil {
+		log.Errorf("game: bind player actor failed, playerID=%d: %v", this.playerID, err)
 	}
 	// 注册业务路由：消息进入 actor 后串行处理
 	if actorRouteRegistrar != nil {
-		actorRouteRegistrar(p.actor)
+		actorRouteRegistrar(this.actor)
 	}
 }
 
-func (p *playerProcessor) Destroy() {
-	playerActorMap().Delete(p.playerID)
+func (this *playerProcessor) Destroy() {
+	playerActorMap().Delete(this.playerID)
 }
 
 func (this *playerLogic) GetActor(ctx context.Context, playerID int64) (*actor.PlayerActor, error) {

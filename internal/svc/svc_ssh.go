@@ -61,20 +61,20 @@ func InitSSHManager() (*SSHManager, error) {
 func SSH() *SSHManager { return sshMgr }
 
 // GetByHost 按 host（IP 或 hostname）查找 SSH 配置。
-func (m *SSHManager) GetByHost(host string) *SSHHostConfig {
-	if m == nil || host == "" {
+func (this *SSHManager) GetByHost(host string) *SSHHostConfig {
+	if this == nil || host == "" {
 		return nil
 	}
-	m.mu.RLock()
-	defer m.mu.RUnlock()
-	if cfg, ok := m.hosts[strings.TrimSpace(host)]; ok {
+	this.mu.RLock()
+	defer this.mu.RUnlock()
+	if cfg, ok := this.hosts[strings.TrimSpace(host)]; ok {
 		return cfg
 	}
 	return nil
 }
 
 // ResolveFromEndpoint 从节点 endpoint 字段提取 host（去掉协议前缀与端口）后查找 SSH 配置；endpoint 形如 "127.0.0.1:8081"，也接受不带端口的纯 IP。
-func (m *SSHManager) ResolveFromEndpoint(endpoint string) *SSHHostConfig {
+func (this *SSHManager) ResolveFromEndpoint(endpoint string) *SSHHostConfig {
 	if endpoint == "" {
 		return nil
 	}
@@ -87,18 +87,18 @@ func (m *SSHManager) ResolveFromEndpoint(endpoint string) *SSHHostConfig {
 	if i := strings.LastIndex(ep, ":"); i >= 0 {
 		ep = ep[:i]
 	}
-	return m.GetByHost(ep)
+	return this.GetByHost(ep)
 }
 
 // All 返回所有已配置的 SSH host（只读副本，供前端列表预览用）。
-func (m *SSHManager) All() []*SSHHostConfig {
-	if m == nil {
+func (this *SSHManager) All() []*SSHHostConfig {
+	if this == nil {
 		return nil
 	}
-	m.mu.RLock()
-	defer m.mu.RUnlock()
-	out := make([]*SSHHostConfig, 0, len(m.hosts))
-	for _, v := range m.hosts {
+	this.mu.RLock()
+	defer this.mu.RUnlock()
+	out := make([]*SSHHostConfig, 0, len(this.hosts))
+	for _, v := range this.hosts {
 		out = append(out, v)
 	}
 	return out

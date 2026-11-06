@@ -13,7 +13,7 @@ const (
 )
 
 // CastSkill 释放技能：校验存在性、冷却与施法距离后依次执行效果。
-func (r *CombatRoom) CastSkill(caster *PlayerState, skillID int, targetID int64, tx, ty int) {
+func (this *CombatRoom) CastSkill(caster *PlayerState, skillID int, targetID int64, tx, ty int) {
 	cfg, ok := SkillTable[skillID]
 	if !ok || caster.HP <= 0 {
 		return
@@ -25,7 +25,7 @@ func (r *CombatRoom) CastSkill(caster *PlayerState, skillID int, targetID int64,
 		return
 	}
 	for _, eff := range cfg.Effects {
-		r.execEffect(caster, eff, targetID, tx, ty)
+		this.execEffect(caster, eff, targetID, tx, ty)
 	}
 	caster.Cooldowns[skillID] = cfg.Cooldown
 }
@@ -37,47 +37,47 @@ func inRange(ox, oy, x, y, rangeLimit int) bool {
 }
 
 // execEffect 按效果类型执行单个技能效果。
-func (r *CombatRoom) execEffect(caster *PlayerState, eff SkillEffectCfg, targetID int64, tx, ty int) {
+func (this *CombatRoom) execEffect(caster *PlayerState, eff SkillEffectCfg, targetID int64, tx, ty int) {
 	switch eff.Type {
 	case EffectDamage:
-		if target := r.resolveTarget(caster, eff.Target, targetID); target != nil {
+		if target := this.resolveTarget(caster, eff.Target, targetID); target != nil {
 			dmg := eff.Amount * caster.Attack / effectAmountScale
-			r.applyDamage(target, dmg*bpUnit/(bpUnit+target.Defense))
+			this.applyDamage(target, dmg*bpUnit/(bpUnit+target.Defense))
 		}
 	case EffectProjectile:
-		r.spawnProjectile(caster, eff, tx, ty)
+		this.spawnProjectile(caster, eff, tx, ty)
 	case EffectBuff:
-		if target := r.resolveTarget(caster, eff.Target, targetID); target != nil {
-			r.ApplyBuff(target, eff.BuffID, caster.ID)
+		if target := this.resolveTarget(caster, eff.Target, targetID); target != nil {
+			this.ApplyBuff(target, eff.BuffID, caster.ID)
 		}
 	case EffectAOE:
-		for _, eid := range r.AOI.GetNearby(tx, ty) {
+		for _, eid := range this.AOI.GetNearby(tx, ty) {
 			if eid == caster.ID {
 				continue
 			}
-			target, ok := r.Players[eid]
+			target, ok := this.Players[eid]
 			if !ok || target.HP <= 0 {
 				continue
 			}
 			if inRange(tx, ty, target.GridX, target.GridY, eff.Radius) {
-				r.applyDamage(target, eff.Amount)
+				this.applyDamage(target, eff.Amount)
 			}
 		}
 	case EffectDisplacement:
-		if target := r.resolveTarget(caster, eff.Target, targetID); target != nil && r.Grid.IsWalkable(tx, ty) {
-			r.AOI.Move(target.ID, target.GridX, target.GridY, tx, ty)
+		if target := this.resolveTarget(caster, eff.Target, targetID); target != nil && this.Grid.IsWalkable(tx, ty) {
+			this.AOI.Move(target.ID, target.GridX, target.GridY, tx, ty)
 			target.GridX, target.GridY = tx, ty
 		}
 	}
 }
 
 // resolveTarget 解析效果作用目标。
-func (r *CombatRoom) resolveTarget(caster *PlayerState, targetType string, targetID int64) *PlayerState {
+func (this *CombatRoom) resolveTarget(caster *PlayerState, targetType string, targetID int64) *PlayerState {
 	switch targetType {
 	case TargetSelf:
 		return caster
 	case TargetPrimary:
-		if t, ok := r.Players[targetID]; ok && t.HP > 0 {
+		if t, ok := this.Players[targetID]; ok && t.HP > 0 {
 			return t
 		}
 	}
@@ -85,15 +85,15 @@ func (r *CombatRoom) resolveTarget(caster *PlayerState, targetType string, targe
 }
 
 // spawnProjectile 朝 (tx,ty) 方向生成一枚弹道。
-func (r *CombatRoom) spawnProjectile(caster *PlayerState, eff SkillEffectCfg, tx, ty int) {
+func (this *CombatRoom) spawnProjectile(caster *PlayerState, eff SkillEffectCfg, tx, ty int) {
 	dx, dy := float64(tx-caster.GridX), float64(ty-caster.GridY)
 	dist := math.Sqrt(dx*dx + dy*dy)
 	if dist == 0 {
 		return
 	}
-	r.nextProjectileID++
-	r.Projectiles = append(r.Projectiles, &Projectile{
-		ID:      r.nextProjectileID,
+	this.nextProjectileID++
+	this.Projectiles = append(this.Projectiles, &Projectile{
+		ID:      this.nextProjectileID,
 		OwnerID: caster.ID,
 		X:       float64(caster.GridX),
 		Y:       float64(caster.GridY),
@@ -106,9 +106,9 @@ func (r *CombatRoom) spawnProjectile(caster *PlayerState, eff SkillEffectCfg, tx
 }
 
 // tickCooldowns 按帧推进冷却；到期的条目直接清除。
-func (r *CombatRoom) tickCooldowns(dt float64) {
+func (this *CombatRoom) tickCooldowns(dt float64) {
 	dtMs := int64(dt * 1000)
-	for _, p := range r.Players {
+	for _, p := range this.Players {
 		for skillID, remain := range p.Cooldowns {
 			remain -= dtMs
 			if remain > 0 {

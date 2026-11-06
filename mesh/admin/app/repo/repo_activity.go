@@ -16,8 +16,8 @@ type ActivityQuery struct {
 }
 
 // ListActivities 分页查询活动实例。
-func (r *Repo) ListActivities(q ActivityQuery, pageIndex, pageSize int) ([]model.Activity, int64, error) {
-	d, err := r.db()
+func (this *Repo) ListActivities(q ActivityQuery, pageIndex, pageSize int) ([]model.Activity, int64, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, 0, err
 	}
@@ -32,8 +32,8 @@ func (r *Repo) ListActivities(q ActivityQuery, pageIndex, pageSize int) ([]model
 }
 
 // GetActivity 按主键查询活动实例。
-func (r *Repo) GetActivity(id int64) (*model.Activity, error) {
-	d, err := r.db()
+func (this *Repo) GetActivity(id int64) (*model.Activity, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, err
 	}
@@ -45,8 +45,8 @@ func (r *Repo) GetActivity(id int64) (*model.Activity, error) {
 }
 
 // CreateActivity 新增活动实例（自动生成）。
-func (r *Repo) CreateActivity(m *model.Activity) error {
-	d, err := r.db()
+func (this *Repo) CreateActivity(m *model.Activity) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -57,8 +57,8 @@ func (r *Repo) CreateActivity(m *model.Activity) error {
 }
 
 // UpdateActivityTime 修改活动时间；仅未开启允许。
-func (r *Repo) UpdateActivityTime(id, startTime, endTime int64) (bool, error) {
-	d, err := r.db()
+func (this *Repo) UpdateActivityTime(id, startTime, endTime int64) (bool, error) {
+	d, err := this.db()
 	if err != nil {
 		return false, err
 	}
@@ -75,8 +75,8 @@ func (r *Repo) UpdateActivityTime(id, startTime, endTime int64) (bool, error) {
 }
 
 // TransitionActivityStatus 条件更新状态（CAS），返回是否命中。
-func (r *Repo) TransitionActivityStatus(id int64, from, to int32) (bool, error) {
-	d, err := r.db()
+func (this *Repo) TransitionActivityStatus(id int64, from, to int32) (bool, error) {
+	d, err := this.db()
 	if err != nil {
 		return false, err
 	}
@@ -92,8 +92,8 @@ func (r *Repo) TransitionActivityStatus(id int64, from, to int32) (bool, error) 
 }
 
 // ListActivitiesByStatus 查询指定状态的全部活动实例。
-func (r *Repo) ListActivitiesByStatus(status int32) ([]model.Activity, error) {
-	d, err := r.db()
+func (this *Repo) ListActivitiesByStatus(status int32) ([]model.Activity, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, err
 	}
@@ -103,8 +103,8 @@ func (r *Repo) ListActivitiesByStatus(status int32) ([]model.Activity, error) {
 }
 
 // ListAllActivities 查询全量活动实例（活动模块启动恢复用）。
-func (r *Repo) ListAllActivities() ([]model.Activity, error) {
-	d, err := r.db()
+func (this *Repo) ListAllActivities() ([]model.Activity, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, err
 	}

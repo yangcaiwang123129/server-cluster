@@ -34,10 +34,10 @@ type MySQL struct {
 }
 
 // Gorm 返回 gorm 句柄。
-func (m *MySQL) Gorm() *gorm.DB { return m.gdb }
+func (this *MySQL) Gorm() *gorm.DB { return this.gdb }
 
 // SQL 返回底层 database/sql 句柄。
-func (m *MySQL) SQL() *sql.DB { return m.sql }
+func (this *MySQL) SQL() *sql.DB { return this.sql }
 
 // MySQLManager MySQL 命名实例管理器，进程内单次创建、并发安全。
 type MySQLManager struct {

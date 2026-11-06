@@ -48,4 +48,4 @@ const (
 )
 
 // String 返回表名字符串。
-func (t Table) String() string { return string(t) }
+func (this Table) String() string { return string(this) }

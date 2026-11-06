@@ -36,27 +36,27 @@ func TaskKey(taskID int32, periodKey string) string {
 }
 
 // GetTask 按 (taskID, periodKey) 取进度，不存在返回零值与 false。
-func (p *PlayerTask) GetTask(taskID int32, periodKey string) (PlayerTaskInfo, bool) {
-	if p.Tasks == nil {
+func (this *PlayerTask) GetTask(taskID int32, periodKey string) (PlayerTaskInfo, bool) {
+	if this.Tasks == nil {
 		return PlayerTaskInfo{}, false
 	}
-	return p.Tasks.Get(TaskKey(taskID, periodKey))
+	return this.Tasks.Get(TaskKey(taskID, periodKey))
 }
 
 // SetTask 写入/覆盖一条任务进度。
-func (p *PlayerTask) SetTask(info PlayerTaskInfo) {
-	if p.Tasks == nil {
-		p.Tasks = util.NewSafeMap[string, PlayerTaskInfo]()
+func (this *PlayerTask) SetTask(info PlayerTaskInfo) {
+	if this.Tasks == nil {
+		this.Tasks = util.NewSafeMap[string, PlayerTaskInfo]()
 	}
-	p.Tasks.Set(TaskKey(info.TaskID, info.PeriodKey), info)
+	this.Tasks.Set(TaskKey(info.TaskID, info.PeriodKey), info)
 }
 
 // RangeTasks 遍历全部任务进度。
-func (p *PlayerTask) RangeTasks(fn func(info PlayerTaskInfo) bool) {
-	if p.Tasks == nil {
+func (this *PlayerTask) RangeTasks(fn func(info PlayerTaskInfo) bool) {
+	if this.Tasks == nil {
 		return
 	}
-	p.Tasks.Range(func(_ string, info PlayerTaskInfo) bool {
+	this.Tasks.Range(func(_ string, info PlayerTaskInfo) bool {
 		return fn(info)
 	})
 }

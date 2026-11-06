@@ -21,12 +21,12 @@ type RecordQuery struct {
 }
 
 // ListRecords 分页查询某模块的打点记录（读 game_record 库的独立实例）。
-func (r *Repo) ListRecords(module string, action int8, q RecordQuery, pageIndex, pageSize int) ([]model.RecordFields, int64, error) {
+func (this *Repo) ListRecords(module string, action int8, q RecordQuery, pageIndex, pageSize int) ([]model.RecordFields, int64, error) {
 	table, ok := recordTable(module)
 	if !ok {
 		return nil, 0, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "")
 	}
-	d, err := r.recordDB()
+	d, err := this.recordDB()
 	if err != nil {
 		return nil, 0, err
 	}
@@ -47,7 +47,7 @@ func (r *Repo) ListRecords(module string, action int8, q RecordQuery, pageIndex,
 }
 
 // recordDB game_record 库的 gorm 句柄（"record" 命名实例，与默认业务库分离）。
-func (r *Repo) recordDB() (*gorm.DB, error) {
+func (this *Repo) recordDB() (*gorm.DB, error) {
 	inst, err := svc.Ctx().MySQL.Get("record")
 	if err != nil {
 		return nil, err

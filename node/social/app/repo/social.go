@@ -26,6 +26,6 @@ type socialRepoImpl struct{}
 // NewSocialRepo 构造 gorm 实现。
 func NewSocialRepo() SocialRepo { return &socialRepoImpl{} }
 
-func (r *socialRepoImpl) SaveMessage(ctx context.Context, msg interface{}) error {
+func (this *socialRepoImpl) SaveMessage(ctx context.Context, msg interface{}) error {
 	return nil
 }

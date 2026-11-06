@@ -19,8 +19,8 @@ type PlayerQuery struct {
 }
 
 // ListPlayers 玩家分页列表，username/phone 从 player_auth 表批量补齐。
-func (r *Repo) ListPlayers(q PlayerQuery, pageIndex, pageSize int) ([]dto.PlayerResp, int64, error) {
-	d, err := r.db()
+func (this *Repo) ListPlayers(q PlayerQuery, pageIndex, pageSize int) ([]dto.PlayerResp, int64, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, 0, err
 	}
@@ -126,8 +126,8 @@ func (r *Repo) ListPlayers(q PlayerQuery, pageIndex, pageSize int) ([]dto.Player
 }
 
 // BanPlayer 封号。
-func (r *Repo) BanPlayer(playerID int64, banUntil int64, reason string) error {
-	d, err := r.db()
+func (this *Repo) BanPlayer(playerID int64, banUntil int64, reason string) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -139,8 +139,8 @@ func (r *Repo) BanPlayer(playerID int64, banUntil int64, reason string) error {
 }
 
 // UnbanPlayer 解封。
-func (r *Repo) UnbanPlayer(playerID int64) error {
-	d, err := r.db()
+func (this *Repo) UnbanPlayer(playerID int64) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -152,8 +152,8 @@ func (r *Repo) UnbanPlayer(playerID int64) error {
 }
 
 // ResetPlayerPassword 重置玩家密码：找 player_auth(type=1) 更新 auth_secret。
-func (r *Repo) ResetPlayerPassword(playerID int64, passwordHash string) error {
-	d, err := r.db()
+func (this *Repo) ResetPlayerPassword(playerID int64, passwordHash string) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}

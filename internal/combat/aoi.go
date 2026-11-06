@@ -24,40 +24,40 @@ func NewAOIManager(cols, rows int) *AOIManager {
 }
 
 // gridID 计算坐标所在网格编号；越界返回 -1。
-func (m *AOIManager) gridID(x, y int) int {
-	if x < 0 || x >= m.cols || y < 0 || y >= m.rows {
+func (this *AOIManager) gridID(x, y int) int {
+	if x < 0 || x >= this.cols || y < 0 || y >= this.rows {
 		return -1
 	}
-	return y*m.cols + x
+	return y*this.cols + x
 }
 
 // Add 将实体加入指定坐标所在网格。
-func (m *AOIManager) Add(eid int64, x, y int) {
-	if gid := m.gridID(x, y); gid >= 0 {
-		m.grids[gid].entities[eid] = struct{}{}
+func (this *AOIManager) Add(eid int64, x, y int) {
+	if gid := this.gridID(x, y); gid >= 0 {
+		this.grids[gid].entities[eid] = struct{}{}
 	}
 }
 
 // Remove 将实体移出指定坐标所在网格。
-func (m *AOIManager) Remove(eid int64, x, y int) {
-	if gid := m.gridID(x, y); gid >= 0 {
-		delete(m.grids[gid].entities, eid)
+func (this *AOIManager) Remove(eid int64, x, y int) {
+	if gid := this.gridID(x, y); gid >= 0 {
+		delete(this.grids[gid].entities, eid)
 	}
 }
 
 // Move 实体跨网格移动。
-func (m *AOIManager) Move(eid int64, oldX, oldY, newX, newY int) {
-	m.Remove(eid, oldX, oldY)
-	m.Add(eid, newX, newY)
+func (this *AOIManager) Move(eid int64, oldX, oldY, newX, newY int) {
+	this.Remove(eid, oldX, oldY)
+	this.Add(eid, newX, newY)
 }
 
 // GetNearby 返回 (x,y) 周围九宫格内的所有实体 ID。
-func (m *AOIManager) GetNearby(x, y int) []int64 {
+func (this *AOIManager) GetNearby(x, y int) []int64 {
 	var result []int64
 	for dy := -1; dy <= 1; dy++ {
 		for dx := -1; dx <= 1; dx++ {
-			if gid := m.gridID(x+dx, y+dy); gid >= 0 {
-				for eid := range m.grids[gid].entities {
+			if gid := this.gridID(x+dx, y+dy); gid >= 0 {
+				for eid := range this.grids[gid].entities {
 					result = append(result, eid)
 				}
 			}

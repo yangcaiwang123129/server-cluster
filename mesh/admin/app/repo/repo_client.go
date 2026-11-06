@@ -14,8 +14,8 @@ type ClientVersionQuery struct {
 }
 
 // ListClientVersions 分页查询客户端版本。
-func (r *Repo) ListClientVersions(q ClientVersionQuery, pageIndex, pageSize int) ([]model.ClientVersion, int64, error) {
-	d, err := r.db()
+func (this *Repo) ListClientVersions(q ClientVersionQuery, pageIndex, pageSize int) ([]model.ClientVersion, int64, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, 0, err
 	}
@@ -33,8 +33,8 @@ func (r *Repo) ListClientVersions(q ClientVersionQuery, pageIndex, pageSize int)
 }
 
 // GetClientVersion 按主键查询客户端版本。
-func (r *Repo) GetClientVersion(id int) (*model.ClientVersion, error) {
-	d, err := r.db()
+func (this *Repo) GetClientVersion(id int) (*model.ClientVersion, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, err
 	}
@@ -46,8 +46,8 @@ func (r *Repo) GetClientVersion(id int) (*model.ClientVersion, error) {
 }
 
 // CreateClientVersion 新增客户端版本。
-func (r *Repo) CreateClientVersion(m *model.ClientVersion) error {
-	d, err := r.db()
+func (this *Repo) CreateClientVersion(m *model.ClientVersion) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -55,8 +55,8 @@ func (r *Repo) CreateClientVersion(m *model.ClientVersion) error {
 }
 
 // UpdateClientVersion 修改客户端版本。
-func (r *Repo) UpdateClientVersion(m *model.ClientVersion) error {
-	d, err := r.db()
+func (this *Repo) UpdateClientVersion(m *model.ClientVersion) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -66,8 +66,8 @@ func (r *Repo) UpdateClientVersion(m *model.ClientVersion) error {
 }
 
 // DeleteClientVersions 批量删除客户端版本。
-func (r *Repo) DeleteClientVersions(ids []int) error {
-	d, err := r.db()
+func (this *Repo) DeleteClientVersions(ids []int) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -78,8 +78,8 @@ func (r *Repo) DeleteClientVersions(ids []int) error {
 }
 
 // UpdateClientVersionStatus 启停客户端版本。
-func (r *Repo) UpdateClientVersionStatus(id int, status string) error {
-	d, err := r.db()
+func (this *Repo) UpdateClientVersionStatus(id int, status string) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -88,8 +88,8 @@ func (r *Repo) UpdateClientVersionStatus(id int, status string) error {
 }
 
 // ExistsClientVersion 同一平台下是否已存在该版本号；excludeId>0 时排除自身。
-func (r *Repo) ExistsClientVersion(version, platform string, excludeId int) (bool, error) {
-	d, err := r.db()
+func (this *Repo) ExistsClientVersion(version, platform string, excludeId int) (bool, error) {
+	d, err := this.db()
 	if err != nil {
 		return false, err
 	}

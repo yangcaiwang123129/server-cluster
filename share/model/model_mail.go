@@ -36,17 +36,17 @@ type MailInfo struct {
 }
 
 // HasAttachments 是否携带附件。
-func (m MailInfo) HasAttachments() bool { return len(m.Attachments) > 0 }
+func (this MailInfo) HasAttachments() bool { return len(this.Attachments) > 0 }
 
 // CanDelete 是否可删除：已删除的邮件不可重复删除；无附件的邮件任意状态可删；带附件的邮件需先领取。
-func (m MailInfo) CanDelete() bool {
-	if m.Status == MailStatusDeleted {
+func (this MailInfo) CanDelete() bool {
+	if this.Status == MailStatusDeleted {
 		return false
 	}
-	if !m.HasAttachments() {
+	if !this.HasAttachments() {
 		return true
 	}
-	return m.Status == MailStatusClaimed
+	return this.Status == MailStatusClaimed
 }
 
 // PlayerMail 玩家邮件持有（1:1 行，多邮件以 JSON 对象存储，key=邮件实例ID），对应 player_mail 表。
@@ -59,8 +59,8 @@ type PlayerMail struct {
 func (PlayerMail) TableName() string { return enum.TablePlayerMail.String() }
 
 // AddMail 新增邮件；实例ID已存在返回 false。
-func (p *PlayerMail) AddMail(m MailInfo) bool {
-	_, ok := p.Mails.Update(m.MailID, func(_ MailInfo, exists bool) (MailInfo, bool) {
+func (this *PlayerMail) AddMail(m MailInfo) bool {
+	_, ok := this.Mails.Update(m.MailID, func(_ MailInfo, exists bool) (MailInfo, bool) {
 		if exists {
 			return MailInfo{}, false
 		}
@@ -70,8 +70,8 @@ func (p *PlayerMail) AddMail(m MailInfo) bool {
 }
 
 // UpdateMail 覆盖邮件状态；不存在返回 false。
-func (p *PlayerMail) UpdateMail(m MailInfo) bool {
-	_, ok := p.Mails.Update(m.MailID, func(_ MailInfo, exists bool) (MailInfo, bool) {
+func (this *PlayerMail) UpdateMail(m MailInfo) bool {
+	_, ok := this.Mails.Update(m.MailID, func(_ MailInfo, exists bool) (MailInfo, bool) {
 		if !exists {
 			return MailInfo{}, false
 		}
@@ -81,7 +81,7 @@ func (p *PlayerMail) UpdateMail(m MailInfo) bool {
 }
 
 // DeleteMail 物理删除邮件；仅供应玩家上线/定期清理任务使用，业务删除请置为 MailStatusDeleted，不存在返回 false。
-func (p *PlayerMail) DeleteMail(mailID int64) bool { return p.Mails.Delete(mailID) }
+func (this *PlayerMail) DeleteMail(mailID int64) bool { return this.Mails.Delete(mailID) }
 
 // ScanJSON/ValueJSON 由 model 包提供，这里实现 Serializable 以兼容 cache 序列化。
 func (this *PlayerMail) Marshal() ([]byte, error)    { return json.Marshal(this) }

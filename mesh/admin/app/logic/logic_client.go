@@ -168,39 +168,39 @@ func init() {
 	}()
 }
 
-func (st *simStore) put(s *simSession) {
-	st.mu.Lock()
-	st.sessions[s.id] = s
-	st.mu.Unlock()
+func (this *simStore) put(s *simSession) {
+	this.mu.Lock()
+	this.sessions[s.id] = s
+	this.mu.Unlock()
 }
 
-func (st *simStore) get(id string) (*simSession, error) {
-	st.mu.Lock()
-	s, ok := st.sessions[id]
-	st.mu.Unlock()
+func (this *simStore) get(id string) (*simSession, error) {
+	this.mu.Lock()
+	s, ok := this.sessions[id]
+	this.mu.Unlock()
 	if !ok {
 		return nil, codes.NewCode(400, "会话不存在或已结束，请重新登录").Err()
 	}
 	return s, nil
 }
 
-func (st *simStore) remove(id string) {
-	st.mu.Lock()
-	delete(st.sessions, id)
-	st.mu.Unlock()
+func (this *simStore) remove(id string) {
+	this.mu.Lock()
+	delete(this.sessions, id)
+	this.mu.Unlock()
 }
 
 // sweep 清理超时会话：先在锁内摘除，再逐个关闭连接，避免与步骤调用互相等锁。
-func (st *simStore) sweep(maxAge time.Duration) {
-	st.mu.Lock()
+func (this *simStore) sweep(maxAge time.Duration) {
+	this.mu.Lock()
 	stale := make([]*simSession, 0)
-	for id, s := range st.sessions {
+	for id, s := range this.sessions {
 		if time.Since(s.createdAt) > maxAge {
-			delete(st.sessions, id)
+			delete(this.sessions, id)
 			stale = append(stale, s)
 		}
 	}
-	st.mu.Unlock()
+	this.mu.Unlock()
 
 	for _, s := range stale {
 		s.mu.Lock()
@@ -524,11 +524,11 @@ func SimClose(sessionID string) error {
 }
 
 // waitFrame 等待与请求 route/seq 匹配的响应帧。
-func (s *simSession) waitFrame(route, seq int32, timeout time.Duration) (simFrame, bool) {
+func (this *simSession) waitFrame(route, seq int32, timeout time.Duration) (simFrame, bool) {
 	deadline := time.After(timeout)
 	for {
 		select {
-		case frame := <-s.inbox:
+		case frame := <-this.inbox:
 			if frame.route == route && frame.seq == seq {
 				return frame, true
 			}

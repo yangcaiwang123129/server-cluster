@@ -80,38 +80,38 @@ func NewRuntimeGrid(g *Grid) (*RuntimeGrid, error) {
 // ---------- 坐标转换 ----------
 
 // WorldToGrid 世界坐标 → 网格索引（格中心对齐，四舍五入）。
-func (r *RuntimeGrid) WorldToGrid(wx, wz float64) (x, z int) {
-	dx := wx - r.OriginX
-	dz := wz - r.OriginZ
-	fx := (dx*r.AxisX[0] + dz*r.AxisX[1]) / r.NodeSize
-	fz := (dx*r.AxisZ[0] + dz*r.AxisZ[1]) / r.NodeSize
+func (this *RuntimeGrid) WorldToGrid(wx, wz float64) (x, z int) {
+	dx := wx - this.OriginX
+	dz := wz - this.OriginZ
+	fx := (dx*this.AxisX[0] + dz*this.AxisX[1]) / this.NodeSize
+	fz := (dx*this.AxisZ[0] + dz*this.AxisZ[1]) / this.NodeSize
 	return int(math.Round(fx)), int(math.Round(fz))
 }
 
 // GridToWorld 网格索引 → 世界坐标（取格中心）。
-func (r *RuntimeGrid) GridToWorld(x, z int) (wx, wz float64) {
-	wx = r.OriginX + r.AxisX[0]*float64(x)*r.NodeSize + r.AxisZ[0]*float64(z)*r.NodeSize
-	wz = r.OriginZ + r.AxisX[1]*float64(x)*r.NodeSize + r.AxisZ[1]*float64(z)*r.NodeSize
+func (this *RuntimeGrid) GridToWorld(x, z int) (wx, wz float64) {
+	wx = this.OriginX + this.AxisX[0]*float64(x)*this.NodeSize + this.AxisZ[0]*float64(z)*this.NodeSize
+	wz = this.OriginZ + this.AxisX[1]*float64(x)*this.NodeSize + this.AxisZ[1]*float64(z)*this.NodeSize
 	return
 }
 
 // InBounds 网格索引是否越界。
-func (r *RuntimeGrid) InBounds(x, z int) bool {
-	return x >= 0 && x < r.Width && z >= 0 && z < r.Depth
+func (this *RuntimeGrid) InBounds(x, z int) bool {
+	return x >= 0 && x < this.Width && z >= 0 && z < this.Depth
 }
 
 // IsWalkable 网格节点是否可走。
-func (r *RuntimeGrid) IsWalkable(x, z int) bool {
-	if !r.InBounds(x, z) {
+func (this *RuntimeGrid) IsWalkable(x, z int) bool {
+	if !this.InBounds(x, z) {
 		return false
 	}
-	return r.Walkable[z*r.Width+x] == 0
+	return this.Walkable[z*this.Width+x] == 0
 }
 
 // IsWorldPosWalkable 世界坐标是否可走。
-func (r *RuntimeGrid) IsWorldPosWalkable(wx, wz float64) bool {
-	x, z := r.WorldToGrid(wx, wz)
-	return r.IsWalkable(x, z)
+func (this *RuntimeGrid) IsWorldPosWalkable(wx, wz float64) bool {
+	x, z := this.WorldToGrid(wx, wz)
+	return this.IsWalkable(x, z)
 }
 
 // ---------- A* ----------
@@ -151,15 +151,15 @@ func heuristic(a, b point) float64 {
 }
 
 // moveCost 邻居移动代价；返回 -1 表示不可走。
-func (r *RuntimeGrid) moveCost(from, to point) float64 {
-	if !r.IsWalkable(to.x, to.z) {
+func (this *RuntimeGrid) moveCost(from, to point) float64 {
+	if !this.IsWalkable(to.x, to.z) {
 		return -1
 	}
 	dx := to.x - from.x
 	dz := to.z - from.z
 	if dx != 0 && dz != 0 {
-		if !r.CutCorners {
-			if !r.IsWalkable(from.x+dx, from.z) || !r.IsWalkable(from.x, from.z+dz) {
+		if !this.CutCorners {
+			if !this.IsWalkable(from.x+dx, from.z) || !this.IsWalkable(from.x, from.z+dz) {
 				return -1
 			}
 		}
@@ -169,10 +169,10 @@ func (r *RuntimeGrid) moveCost(from, to point) float64 {
 }
 
 // FindPath 网格坐标 A* 寻路；不可达返回 nil。
-func (r *RuntimeGrid) FindPath(sx, sz, ex, ez int) []point {
+func (this *RuntimeGrid) FindPath(sx, sz, ex, ez int) []point {
 	start := point{sx, sz}
 	end := point{ex, ez}
-	if !r.IsWalkable(start.x, start.z) || !r.IsWalkable(end.x, end.z) {
+	if !this.IsWalkable(start.x, start.z) || !this.IsWalkable(end.x, end.z) {
 		return nil
 	}
 
@@ -204,7 +204,7 @@ func (r *RuntimeGrid) FindPath(sx, sz, ex, ez int) []point {
 			if closed[np] {
 				continue
 			}
-			cost := r.moveCost(cur.p, np)
+			cost := this.moveCost(cur.p, np)
 			if cost < 0 {
 				continue
 			}

@@ -26,44 +26,44 @@ func NewRoomManager(maxRooms int) *RoomManager {
 }
 
 // CreateRoom 创建并启动房间 actor；房间数达上限或 ID 已存在时返回 false。
-func (m *RoomManager) CreateRoom(id int64, grid *RuntimeGrid) bool {
-	m.mu.Lock()
-	if len(m.rooms) >= m.maxRooms {
-		m.mu.Unlock()
+func (this *RoomManager) CreateRoom(id int64, grid *RuntimeGrid) bool {
+	this.mu.Lock()
+	if len(this.rooms) >= this.maxRooms {
+		this.mu.Unlock()
 		return false
 	}
-	if _, exists := m.rooms[id]; exists {
-		m.mu.Unlock()
+	if _, exists := this.rooms[id]; exists {
+		this.mu.Unlock()
 		return false
 	}
 	room := NewCombatRoom(id, grid)
 	a := actor.New(room, consts.CombatTickRate, consts.CombatQueueSize)
-	m.rooms[id] = a
-	m.mu.Unlock()
+	this.rooms[id] = a
+	this.mu.Unlock()
 
 	go a.Run()
 	// 房间退出后清理登记；仅当登记项仍是本 actor 时删除，防止 ID 复用后误删新房间。
 	go func() {
 		<-a.Done()
-		m.mu.Lock()
-		if cur, ok := m.rooms[id]; ok && cur == a {
-			delete(m.rooms, id)
+		this.mu.Lock()
+		if cur, ok := this.rooms[id]; ok && cur == a {
+			delete(this.rooms, id)
 		}
-		m.mu.Unlock()
+		this.mu.Unlock()
 	}()
 	return true
 }
 
 // GetRoom 查询房间 actor；不存在返回 nil。
-func (m *RoomManager) GetRoom(id int64) *actor.Actor[*CombatRoom] {
-	m.mu.RLock()
-	defer m.mu.RUnlock()
-	return m.rooms[id]
+func (this *RoomManager) GetRoom(id int64) *actor.Actor[*CombatRoom] {
+	this.mu.RLock()
+	defer this.mu.RUnlock()
+	return this.rooms[id]
 }
 
 // SendToRoom 向房间投递消息；带超时防止网络层阻塞。
-func (m *RoomManager) SendToRoom(roomID int64, msg actor.Message, timeout time.Duration) bool {
-	a := m.GetRoom(roomID)
+func (this *RoomManager) SendToRoom(roomID int64, msg actor.Message, timeout time.Duration) bool {
+	a := this.GetRoom(roomID)
 	if a == nil {
 		return false
 	}
@@ -73,13 +73,13 @@ func (m *RoomManager) SendToRoom(roomID int64, msg actor.Message, timeout time.D
 }
 
 // StopAll 停止全部房间并等待退出；超时则放弃等待。
-func (m *RoomManager) StopAll(timeout time.Duration) {
-	m.mu.RLock()
-	actors := make([]*actor.Actor[*CombatRoom], 0, len(m.rooms))
-	for _, a := range m.rooms {
+func (this *RoomManager) StopAll(timeout time.Duration) {
+	this.mu.RLock()
+	actors := make([]*actor.Actor[*CombatRoom], 0, len(this.rooms))
+	for _, a := range this.rooms {
 		actors = append(actors, a)
 	}
-	m.mu.RUnlock()
+	this.mu.RUnlock()
 
 	for _, a := range actors {
 		a.Stop()

@@ -26,6 +26,6 @@ type battleRepoImpl struct{}
 // NewBattleRepo 构造 gorm 实现。
 func NewBattleRepo() BattleRepo { return &battleRepoImpl{} }
 
-func (r *battleRepoImpl) SaveRecord(ctx context.Context, record interface{}) error {
+func (this *battleRepoImpl) SaveRecord(ctx context.Context, record interface{}) error {
 	return nil
 }

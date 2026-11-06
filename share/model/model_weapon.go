@@ -32,9 +32,11 @@ func (this PlayerWeapon) Value() (driver.Value, error) { return ValueJSON(this) 
 func (PlayerWeapon) TableName() string                 { return enum.TablePlayerWeapon.String() }
 
 // AddWeapon 新增武器持有；已拥有返回 false。
-func (p *PlayerWeapon) AddWeapon(w WeaponInfo) bool { return util.AddOwned(p.Weapons, w.WeaponID, w) }
+func (this *PlayerWeapon) AddWeapon(w WeaponInfo) bool {
+	return util.AddOwned(this.Weapons, w.WeaponID, w)
+}
 
 // UpdateWeapon 覆盖武器持有状态；未拥有返回 false。
-func (p *PlayerWeapon) UpdateWeapon(w WeaponInfo) bool {
-	return util.UpdateOwned(p.Weapons, w.WeaponID, w)
+func (this *PlayerWeapon) UpdateWeapon(w WeaponInfo) bool {
+	return util.UpdateOwned(this.Weapons, w.WeaponID, w)
 }

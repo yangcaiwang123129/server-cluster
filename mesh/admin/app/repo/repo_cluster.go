@@ -22,8 +22,8 @@ type ClusterNodeQuery struct {
 }
 
 // ListClusterNodes 分页查询集群节点（不触发 etcd 同步）。
-func (r *Repo) ListClusterNodes(q ClusterNodeQuery, pageIndex, pageSize int) ([]model.ClusterNode, int64, error) {
-	d, err := r.db()
+func (this *Repo) ListClusterNodes(q ClusterNodeQuery, pageIndex, pageSize int) ([]model.ClusterNode, int64, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, 0, err
 	}
@@ -41,8 +41,8 @@ func (r *Repo) ListClusterNodes(q ClusterNodeQuery, pageIndex, pageSize int) ([]
 }
 
 // GetClusterNode 按主键查询集群节点。
-func (r *Repo) GetClusterNode(nodeID string) (*model.ClusterNode, error) {
-	d, err := r.db()
+func (this *Repo) GetClusterNode(nodeID string) (*model.ClusterNode, error) {
+	d, err := this.db()
 	if err != nil {
 		return nil, err
 	}
@@ -54,8 +54,8 @@ func (r *Repo) GetClusterNode(nodeID string) (*model.ClusterNode, error) {
 }
 
 // UpdateClusterNodeSSH 更新运维侧 SSH 连接配置；动态字段（online/endpoint 等）不允许手动改。
-func (r *Repo) UpdateClusterNodeSSH(m *model.ClusterNode) error {
-	d, err := r.db()
+func (this *Repo) UpdateClusterNodeSSH(m *model.ClusterNode) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -65,8 +65,8 @@ func (r *Repo) UpdateClusterNodeSSH(m *model.ClusterNode) error {
 }
 
 // SyncClusterNodes 从 etcd registry 同步集群节点到 DB：批量 Upsert 在线节点，本次未出现的置 offline，不覆盖 SSH 运维配置字段。
-func (r *Repo) SyncClusterNodes(instances []*registry.ServiceInstance) error {
-	d, err := r.db()
+func (this *Repo) SyncClusterNodes(instances []*registry.ServiceInstance) error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}
@@ -99,14 +99,14 @@ func (r *Repo) SyncClusterNodes(instances []*registry.ServiceInstance) error {
 		}
 	}
 	// 2. 把这次没出现的、但 DB 里还 online=1 的节点 → 置 offline
-	if err := r.markOffline(d, rows); err != nil {
+	if err := this.markOffline(d, rows); err != nil {
 		return err
 	}
 	return nil
 }
 
 // markOffline 把本次 etcd 里不再存在的节点置 online=0。
-func (r *Repo) markOffline(d *gorm.DB, rows []map[string]any) error {
+func (this *Repo) markOffline(d *gorm.DB, rows []map[string]any) error {
 	if len(rows) == 0 {
 		// etcd 里一个节点都没有：所有 DB 记录都应该置 offline
 		return d.Model(&model.ClusterNode{}).Where("online = ?", 1).
@@ -127,8 +127,8 @@ func (r *Repo) markOffline(d *gorm.DB, rows []map[string]any) error {
 }
 
 // EnsureClusterNodesTable 确保集群节点表存在（admin AutoMigrate 已覆盖，这里兜底）。
-func (r *Repo) EnsureClusterNodesTable() error {
-	d, err := r.db()
+func (this *Repo) EnsureClusterNodesTable() error {
+	d, err := this.db()
 	if err != nil {
 		return err
 	}

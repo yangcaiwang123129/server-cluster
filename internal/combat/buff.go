@@ -10,7 +10,7 @@ type BuffInstance struct {
 }
 
 // ApplyBuff 施加 buff：已存在则叠层并刷新时长，否则新增；随后重算属性。
-func (r *CombatRoom) ApplyBuff(target *PlayerState, buffID int, source int64) {
+func (this *CombatRoom) ApplyBuff(target *PlayerState, buffID int, source int64) {
 	cfg, ok := BuffTable[buffID]
 	if !ok {
 		return
@@ -24,20 +24,20 @@ func (r *CombatRoom) ApplyBuff(target *PlayerState, buffID int, source int64) {
 		}
 		b.RemainMs = cfg.DurationMs
 		b.NextTick = cfg.TickMs
-		r.recalcAttrs(target)
+		this.recalcAttrs(target)
 		return
 	}
 	target.Buffs = append(target.Buffs, &BuffInstance{
 		Cfg: cfg, Source: source, Stacks: 1,
 		RemainMs: cfg.DurationMs, NextTick: cfg.TickMs,
 	})
-	r.recalcAttrs(target)
+	this.recalcAttrs(target)
 }
 
 // tickBuffs 按帧推进 buff：周期伤害结算与到期移除。
-func (r *CombatRoom) tickBuffs(dt float64) {
+func (this *CombatRoom) tickBuffs(dt float64) {
 	dtMs := int64(dt * 1000)
-	for _, p := range r.Players {
+	for _, p := range this.Players {
 		if p.HP <= 0 {
 			continue
 		}
@@ -49,7 +49,7 @@ func (r *CombatRoom) tickBuffs(dt float64) {
 				b.NextTick -= dtMs
 				if b.NextTick <= 0 {
 					if b.Cfg.TickDamage > 0 {
-						r.applyDamage(p, b.Cfg.TickDamage*b.Stacks)
+						this.applyDamage(p, b.Cfg.TickDamage*b.Stacks)
 						if p.HP <= 0 {
 							break // 玩家已死亡，停止结算其剩余 buff
 						}
@@ -63,13 +63,13 @@ func (r *CombatRoom) tickBuffs(dt float64) {
 			}
 		}
 		if removed {
-			r.recalcAttrs(p)
+			this.recalcAttrs(p)
 		}
 	}
 }
 
 // recalcAttrs 依据身上 buff 重算实时属性（加成按万分比叠加）。
-func (r *CombatRoom) recalcAttrs(p *PlayerState) {
+func (this *CombatRoom) recalcAttrs(p *PlayerState) {
 	atkBp, defBp, spdBp := 0, 0, 0
 	for _, b := range p.Buffs {
 		v := b.Cfg.AttrValue * b.Stacks

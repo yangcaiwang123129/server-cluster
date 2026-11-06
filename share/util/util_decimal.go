@@ -53,15 +53,15 @@ func parseDecimal(s string) (Decimal, error) {
 }
 
 // MarshalJSON 输出带引号的字符串；nil 指针输出 null。
-func (d Decimal) MarshalJSON() ([]byte, error) {
-	return json.Marshal(d.String())
+func (this Decimal) MarshalJSON() ([]byte, error) {
+	return json.Marshal(this.String())
 }
 
 // UnmarshalJSON 兼容 JSON 字符串（"12.34"）、JSON 数字（12.34）与 null。
-func (d *Decimal) UnmarshalJSON(data []byte) error {
+func (this *Decimal) UnmarshalJSON(data []byte) error {
 	s := string(data)
 	if s == "null" {
-		*d = Decimal{}
+		*this = Decimal{}
 		return nil
 	}
 	// 字符串形式去掉包裹引号：数值不需要转义处理。
@@ -72,47 +72,47 @@ func (d *Decimal) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	*d = parsed
+	*this = parsed
 	return nil
 }
 
 // MarshalText 文本序列化（map 键、yaml、URL 参数等场景）。
-func (d Decimal) MarshalText() ([]byte, error) { return []byte(d.String()), nil }
+func (this Decimal) MarshalText() ([]byte, error) { return []byte(this.String()), nil }
 
 // UnmarshalText 文本反序列化。
-func (d *Decimal) UnmarshalText(b []byte) error {
+func (this *Decimal) UnmarshalText(b []byte) error {
 	parsed, err := parseDecimal(string(b))
 	if err != nil {
 		return err
 	}
-	*d = parsed
+	*this = parsed
 	return nil
 }
 
 // Value 实现 driver.Valuer：以字符串写入，MySQL 按列精度自动截断/舍入。
-func (d Decimal) Value() (driver.Value, error) { return d.String(), nil }
+func (this Decimal) Value() (driver.Value, error) { return this.String(), nil }
 
 // Scan 实现 sql.Scanner：兼容 MySQL 驱动的 []byte/string 以及整型、浮点型。
-func (d *Decimal) Scan(v any) error {
+func (this *Decimal) Scan(v any) error {
 	switch x := v.(type) {
 	case nil:
-		*d = Decimal{}
+		*this = Decimal{}
 	case []byte:
 		parsed, err := parseDecimal(string(x))
 		if err != nil {
 			return err
 		}
-		*d = parsed
+		*this = parsed
 	case string:
 		parsed, err := parseDecimal(x)
 		if err != nil {
 			return err
 		}
-		*d = parsed
+		*this = parsed
 	case int64:
-		*d = Decimal{decimal.NewFromInt(x)}
+		*this = Decimal{decimal.NewFromInt(x)}
 	case float64:
-		*d = Decimal{decimal.NewFromFloat(x)}
+		*this = Decimal{decimal.NewFromFloat(x)}
 	default:
 		return fmt.Errorf("util: cannot scan %T into Decimal", v)
 	}
@@ -120,4 +120,4 @@ func (d *Decimal) Scan(v any) error {
 }
 
 // GormDataType 声明 GORM 字段类型；列精度仍以 struct tag 的 `gorm:"type:decimal(20,6)"` 为准。
-func (d Decimal) GormDataType() string { return "decimal" }
+func (this Decimal) GormDataType() string { return "decimal" }

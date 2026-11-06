@@ -31,7 +31,9 @@ func (this PlayerSkill) Value() (driver.Value, error) { return ValueJSON(this) }
 func (PlayerSkill) TableName() string                 { return enum.TablePlayerSkill.String() }
 
 // AddSkill 新增技能持有；已拥有返回 false。
-func (p *PlayerSkill) AddSkill(s SkillInfo) bool { return util.AddOwned(p.Skills, s.SkillID, s) }
+func (this *PlayerSkill) AddSkill(s SkillInfo) bool { return util.AddOwned(this.Skills, s.SkillID, s) }
 
 // UpdateSkill 覆盖技能持有状态；未拥有返回 false。
-func (p *PlayerSkill) UpdateSkill(s SkillInfo) bool { return util.UpdateOwned(p.Skills, s.SkillID, s) }
+func (this *PlayerSkill) UpdateSkill(s SkillInfo) bool {
+	return util.UpdateOwned(this.Skills, s.SkillID, s)
+}
