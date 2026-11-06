@@ -12,14 +12,12 @@ type ActivityData struct {
 	Round     int32 `json:"round"`
 }
 
-// ActivitySnapshot 活动快照（version + 时间上下文 + 全量活动状态）。
+// ActivitySnapshot 活动快照（时间上下文 + 全量活动状态）。
 type ActivitySnapshot struct {
-	Version    int64          `json:"version"`
 	ServerTime int64          `json:"serverTime"`
 	DailyKey   string         `json:"dailyKey"`
 	WeeklyKey  string         `json:"weeklyKey"`
 	MonthlyKey string         `json:"monthlyKey"`
-	CfgVersion int64          `json:"cfgVersion"`
 	Activities []ActivityData `json:"activities"`
 }
 

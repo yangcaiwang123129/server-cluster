@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 
+	"server-cluster/mesh/admin/app/global"
 	"server-cluster/share/dto"
 	"server-cluster/share/model"
 	"server-cluster/share/pb"
@@ -11,32 +12,14 @@ import (
 	"server-cluster/share/util"
 )
 
-// GmItemLogic 后台 GM 物品容器模块业务接口。
-type GmItemLogic interface {
-	// ItemContainerList 物品容器列表
-	ItemContainerList(req dto.GmItemListReq) ([]dto.GmItemResp, error)
-	// ItemMove 物品容器内移动物品
-	ItemMove(req dto.GmItemMoveReq) error
-	// ItemRotate 物品容器内旋转物品
-	ItemRotate(req dto.GmItemRotateReq) error
-	// ItemSort 物品容器一键整理
-	ItemSort(req dto.GmItemSortReq) error
-	// ItemTransfer 物品容器间移动物品（返回变更后的源/目标容器）
-	ItemTransfer(req dto.GmItemTransferReq) ([]dto.GmItemResp, error)
-	// ItemAddEntry 向物品容器放入对象（服务端按"从左往右、从上到下"自动落位，返回变更后的容器）
-	ItemAddEntry(req dto.GmItemAddEntryReq) ([]dto.GmItemResp, error)
-	// ItemClear 清除物品（传实例ID精确清除单个；不传实例ID清空指定容器，容器类型为 0 时全清）
-	ItemClear(req dto.GmItemClearReq) ([]dto.GmItemResp, error)
-}
-
 // gmItemLogicInst 物品容器 GM 业务单例容器。
-var gmItemLogicInst = singleton.NewContainer[GmItemLogic]("GmItemLogic")
+var gmItemLogicInst = singleton.NewContainer[global.GmItemLogic]("GmItemLogic")
 
 // RegisterGmItemLogic 装配期注册物品容器 GM 业务实现。
-func RegisterGmItemLogic(inst GmItemLogic) { gmItemLogicInst.Register(inst) }
+func RegisterGmItemLogic(inst global.GmItemLogic) { gmItemLogicInst.Register(inst) }
 
 // GmItem 获取物品容器 GM 业务单例。
-func GmItem() GmItemLogic { return gmItemLogicInst.MustGet() }
+func GmItem() global.GmItemLogic { return gmItemLogicInst.MustGet() }
 
 // gmItemLogic 物品容器 GM 业务实现。
 type gmItemLogic struct{}

@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 
 	"server-cluster/internal/rpc"
+	"server-cluster/mesh/admin/app/global"
 	"server-cluster/mesh/admin/app/repo"
 	"server-cluster/share/dto"
 	"server-cluster/share/pb"
@@ -15,30 +16,14 @@ import (
 	"github.com/dobyte/due/v2/codes"
 )
 
-// PlayerLogic 玩家管理业务接口。
-type PlayerLogic interface {
-	// PlayerList 玩家分页列表（直查 player）
-	PlayerList(req dto.PlayerListReq) ([]dto.PlayerResp, int64, error)
-	// PlayerOnline 在线玩家列表（经 mesh 调 game 服内部 RPC）
-	PlayerOnline() ([]dto.OnlinePlayerResp, error)
-	// PlayerKick 踢玩家下线（经 mesh 调 game 服内部 RPC）
-	PlayerKick(req dto.PlayerKickReq) error
-	// PlayerBan 封号（更新 DB，同时如果在线则踢下线）
-	PlayerBan(req dto.PlayerBanReq) error
-	// PlayerUnban 解封（恢复状态）
-	PlayerUnban(req dto.PlayerUnbanReq) error
-	// PlayerResetPassword 重置密码（明文 MD5 哈希后存库）
-	PlayerResetPassword(req dto.PlayerResetPasswordReq) error
-}
-
 // playerLogicInst 玩家业务单例容器。
-var playerLogicInst = singleton.NewContainer[PlayerLogic]("PlayerLogic")
+var playerLogicInst = singleton.NewContainer[global.PlayerLogic]("PlayerLogic")
 
 // RegisterPlayerLogic 装配期注册玩家业务实现。
-func RegisterPlayerLogic(inst PlayerLogic) { playerLogicInst.Register(inst) }
+func RegisterPlayerLogic(inst global.PlayerLogic) { playerLogicInst.Register(inst) }
 
 // Player 获取玩家模块业务单例。
-func Player() PlayerLogic { return playerLogicInst.MustGet() }
+func Player() global.PlayerLogic { return playerLogicInst.MustGet() }
 
 // playerLogic 玩家管理业务实现。
 type playerLogic struct{}

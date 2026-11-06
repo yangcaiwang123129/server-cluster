@@ -2,54 +2,50 @@ package logic
 
 import (
 	"context"
+	"encoding/json"
+	"sort"
 	"sync"
 	"time"
 
+	"server-cluster/internal/svc"
+	"server-cluster/mesh/admin/app/global"
 	"server-cluster/mesh/admin/app/repo"
 	"server-cluster/share/consts"
 	"server-cluster/share/dto"
+	"server-cluster/share/errs"
 	"server-cluster/share/model"
+	"server-cluster/share/pb"
 	"server-cluster/share/singleton"
+	"server-cluster/share/tpl"
 	"server-cluster/share/util"
 
 	"github.com/dobyte/due/v2/log"
+	redis "github.com/redis/go-redis/v9"
 )
 
-// ActivityLogic admin 内嵌活动模块：活动状态机 + 开服策略 + 快照发布 + GM 操作。
-type ActivityLogic interface {
-	// Start 加载活动实例与开服时间，修复跨停机状态，发布首份快照并启动 ticker。
-	Start(ctx context.Context) error
-	// Stop 停止 ticker。
-	Stop()
-	// List GM 分页查询活动实例。
-	List(ctx context.Context, q dto.GmActivityQuery, pageIndex, pageSize int) ([]dto.GmActivityResp, int64, error)
-	// Configs GM 活动模板配置展示。
-	Configs() []dto.GmActivityCfgResp
-	// UpdateTime GM 修改活动时间（仅未开启允许）。
-	UpdateTime(ctx context.Context, id int64, req dto.GmActivityTimeReq) (*dto.GmActivityResp, error)
-	// End GM 提前结束活动。
-	End(ctx context.Context, id int64, operator string) (*dto.GmActivityResp, error)
-	// Snapshot 获取当前内存快照（只读）。
-	Snapshot() *dto.ActivitySnapshot
-}
+var activityLogicInst = singleton.NewContainer[global.ActivityLogic]("ActivityLogic")
 
-var activityLogicInst = singleton.NewContainer[ActivityLogic]("ActivityLogic")
-
-func RegisterActivityLogic(inst ActivityLogic) { activityLogicInst.Register(inst) }
+func RegisterActivityLogic(inst global.ActivityLogic) { activityLogicInst.Register(inst) }
 
 // Activity 获取活动模块单例。
-func Activity() ActivityLogic { return activityLogicInst.MustGet() }
+func Activity() global.ActivityLogic { return activityLogicInst.MustGet() }
 
-func init() { RegisterActivityLogic(&activityLogic{}) }
+func init() {
+	RegisterActivityLogic(&activityLogic{})
+	// 注入活动模块启停，避免 global 直接依赖 logic 形成导入环；生命周期仍由 global.Init/Destroy 驱动。
+	global.SetActivityLifecycle(
+		func(ctx context.Context) error { return Activity().Start(ctx) },
+		func() { Activity().Stop() },
+	)
+}
 
 // activityLogic 活动模块：内存实例表为唯一实时态，DB 只做持久化与跨进程迁移校验。
 type activityLogic struct {
 	mu sync.RWMutex
-	// publishMu 串行化快照发布，避免 tick 与 GM 操作并发发布时版本号与 payload 乱序写入。
+	// publishMu 串行化快照发布，保证 payload 与变更信号的写入顺序。
 	publishMu sync.Mutex
 	insts     map[int64]*model.Activity
 	keys      periodKeys
-	version   int64
 	cancel    context.CancelFunc
 }
 
@@ -86,13 +82,9 @@ func (this *activityLogic) Start(ctx context.Context) error {
 		this.insts[list[i].ID] = &list[i]
 	}
 	this.keys = currentKeys(now)
-	this.version = 0
 	runCtx, cancel := context.WithCancel(ctx)
 	this.cancel = cancel
 	this.mu.Unlock()
-
-	// 接续 Redis 中已有的版本号，避免重启后版本回退导致 game 不刷新。
-	this.restoreVersion(ctx)
 
 	this.repair(now)
 	this.publishSafe(runCtx, "start")
@@ -230,4 +222,219 @@ func (this *activityLogic) addInstance(m *model.Activity) {
 	this.mu.Lock()
 	this.insts[m.ID] = m
 	this.mu.Unlock()
+}
+
+// Configs GM 活动模板配置展示。
+func (this *activityLogic) Configs() []dto.GmActivityCfgResp {
+	if !tpl.Loaded() {
+		return []dto.GmActivityCfgResp{}
+	}
+	taskCount := make(map[int32]int32)
+	for _, task := range tpl.T().Task.GetDataList() {
+		taskCount[task.TaskGroupID]++
+	}
+	cfgs := tpl.T().Activity.GetDataList()
+	return util.MapSlice(cfgs, func(cfg *tpl.ActivityCfg) dto.GmActivityCfgResp {
+		return dto.GmActivityCfgResp{
+			ID:                 cfg.Id,
+			Name:               cfg.Name,
+			Desc:               cfg.Desc,
+			Icon:               cfg.Icon,
+			StrategyType:       int32(cfg.StrategyType),
+			StrategyStartValue: cfg.StrategyStartValue,
+			StrategyEndValue:   cfg.StrategyEndValue,
+			RoundCount:         cfg.RoundCount,
+			TriggerLogicType:   int32(cfg.TriggerLogicType),
+			TriggerConditions:  toActivityConditionResp(cfg.TriggerConditionTypes),
+			Rewards:            toActivityAssetResp(cfg.AssetRewards),
+			TaskCount:          taskCount[cfg.Id],
+		}
+	})
+}
+
+// toActivityConditionResp 触发条件转展示结构。
+func toActivityConditionResp(conds []*tpl.Condition) []dto.GmActivityConditionResp {
+	out := make([]dto.GmActivityConditionResp, 0, len(conds))
+	for _, c := range conds {
+		if c == nil {
+			continue
+		}
+		out = append(out, dto.GmActivityConditionResp{Type: int32(c.Type), Args: c.Args})
+	}
+	return out
+}
+
+// toActivityAssetResp 活动奖励转展示结构。
+func toActivityAssetResp(assets []*tpl.Asset) []dto.GmActivityAssetResp {
+	out := make([]dto.GmActivityAssetResp, 0, len(assets))
+	for _, a := range assets {
+		if a == nil {
+			continue
+		}
+		out = append(out, dto.GmActivityAssetResp{Type: int32(a.Type), ID: a.Id, Count: a.Count})
+	}
+	return out
+}
+
+// activityCfgName 取模板名称（模板缺失返回空串）。
+func activityCfgName(cfgID int32) string {
+	if !tpl.Loaded() {
+		return ""
+	}
+	if cfg := tpl.T().Activity.Get(cfgID); cfg != nil {
+		return cfg.Name
+	}
+	return ""
+}
+
+func (this *activityLogic) List(ctx context.Context, q dto.GmActivityQuery, pageIndex, pageSize int) ([]dto.GmActivityResp, int64, error) {
+	list, total, err := repo.R().ListActivities(repo.ActivityQuery{CfgID: q.CfgID, Status: q.Status, Order: q.Order}, pageIndex, pageSize)
+	if err != nil {
+		return nil, 0, err
+	}
+	return util.MapSlice(list, func(m model.Activity) dto.GmActivityResp {
+		return *toActivityResp(&m)
+	}), total, nil
+}
+
+func (this *activityLogic) UpdateTime(ctx context.Context, id int64, req dto.GmActivityTimeReq) (*dto.GmActivityResp, error) {
+	if req.StartTime <= 0 || req.EndTime <= req.StartTime {
+		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "活动时间不合法")
+	}
+	ok, err := repo.R().UpdateActivityTime(id, req.StartTime, req.EndTime)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "仅未开启的活动允许修改时间")
+	}
+	this.mu.Lock()
+	if inst := this.insts[id]; inst != nil {
+		inst.StartTime = req.StartTime
+		inst.EndTime = req.EndTime
+		inst.UpdatedAt = util.NowUnixMilli()
+		inst.Version++
+	}
+	this.mu.Unlock()
+	// 时间变更不经过 tick 的 changed 判定，需主动发布，否则 game 端要等到下次状态变化才刷新。
+	this.publishSafe(ctx, "update-time")
+	return this.getResp(id)
+}
+
+func (this *activityLogic) End(ctx context.Context, id int64, operator string) (*dto.GmActivityResp, error) {
+	remark := operatorRemark(operator, "提前结束")
+	ok, err := this.transit(id, consts.ActivityStatusRunning, consts.ActivityStatusEnded, util.NowUnixMilli(), remark)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_ACTIVITY_NOT_RUNNING, "活动未开启或已结束")
+	}
+	this.publishSafe(ctx, "end")
+	return this.getResp(id)
+}
+
+// operatorRemark 生成 GM 操作备注（操作人为空时不写）。
+func operatorRemark(operator, action string) string {
+	if operator == "" {
+		return ""
+	}
+	return operator + " " + action
+}
+
+// getResp 读内存并转为展示行。
+func (this *activityLogic) getResp(id int64) (*dto.GmActivityResp, error) {
+	this.mu.RLock()
+	defer this.mu.RUnlock()
+	inst := this.insts[id]
+	if inst == nil {
+		return nil, errs.ErrOf(pb.ErrCode_ERR_CODE_ACTIVITY_NOT_FOUND, "activity not found")
+	}
+	return toActivityResp(inst), nil
+}
+
+// toActivityResp 转换展示行，补配置名称。
+func toActivityResp(m *model.Activity) *dto.GmActivityResp {
+	return &dto.GmActivityResp{
+		ID:        m.ID,
+		CfgID:     m.CfgID,
+		CfgName:   activityCfgName(m.CfgID),
+		Round:     m.Round,
+		StartTime: m.StartTime,
+		EndTime:   m.EndTime,
+		Status:    m.Status,
+		Source:    m.Source,
+		CreatedBy: m.CreatedBy,
+		Remark:    m.Remark,
+		CreatedAt: m.CreatedAt,
+		UpdatedAt: m.UpdatedAt,
+	}
+}
+
+// publish 写入 Redis 快照并追加一条变更信号。
+func (this *activityLogic) publish(ctx context.Context) error {
+	// 发布过程串行化，保证「先写 payload 再追加信号」的顺序不被并发发布打乱。
+	this.publishMu.Lock()
+	defer this.publishMu.Unlock()
+
+	this.mu.Lock()
+	snap := this.buildSnapshotLocked()
+	this.mu.Unlock()
+
+	payload, err := json.Marshal(snap)
+	if err != nil {
+		return err
+	}
+	rdb, err := svc.Ctx().Redis.Default()
+	if err != nil {
+		return err
+	}
+	if err = rdb.Set(ctx, consts.ActivitySnapshotPayloadKey, payload, 0).Err(); err != nil {
+		return err
+	}
+	// payload 写完后追加变更信号，game 按游标消费后拉取快照；流会持久化，断线期间不会漏事件。
+	_ = rdb.XAdd(ctx, &redis.XAddArgs{
+		Stream: consts.ActivityChangeStreamKey,
+		MaxLen: consts.ActivityChangeStreamMaxLen,
+		Approx: true,
+		Values: map[string]interface{}{"changed": 1},
+	}).Err()
+	return nil
+}
+
+// publishSafe 发布失败仅告警，不影响调度主流程。
+func (this *activityLogic) publishSafe(ctx context.Context, phase string) {
+	if err := this.publish(ctx); err != nil {
+		log.Warnf("admin: publish activity snapshot failed (%s): %v", phase, err)
+	}
+}
+
+func (this *activityLogic) Snapshot() *dto.ActivitySnapshot {
+	this.mu.RLock()
+	defer this.mu.RUnlock()
+	return this.buildSnapshotLocked()
+}
+
+// buildSnapshotLocked 构造快照；调用方需持有锁。
+func (this *activityLogic) buildSnapshotLocked() *dto.ActivitySnapshot {
+	now := util.NowUnixMilli()
+	list := make([]dto.ActivityData, 0, len(this.insts))
+	for _, inst := range this.insts {
+		list = append(list, dto.ActivityData{
+			ID:        inst.ID,
+			CfgID:     inst.CfgID,
+			Status:    inst.Status,
+			StartTime: inst.StartTime,
+			EndTime:   inst.EndTime,
+			Round:     inst.Round,
+		})
+	}
+	sort.Slice(list, func(i, j int) bool { return list[i].ID < list[j].ID })
+	return &dto.ActivitySnapshot{
+		ServerTime: now,
+		DailyKey:   consts.DailyKey(now),
+		WeeklyKey:  consts.WeeklyKey(now),
+		MonthlyKey: consts.MonthlyKey(now),
+		Activities: list,
+	}
 }

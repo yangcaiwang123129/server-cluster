@@ -3,34 +3,21 @@ package logic
 import (
 	"context"
 
+	"server-cluster/mesh/admin/app/global"
 	"server-cluster/share/dto"
 	"server-cluster/share/pb"
 	"server-cluster/share/singleton"
 	"server-cluster/share/tpl"
 )
 
-// GmHeroLogic 后台 GM 英雄模块业务接口。
-type GmHeroLogic interface {
-	// HeroList 英雄列表（含绑定的武器/技能/装备）
-	HeroList(req dto.GmPlayerReq) (*dto.GmHeroListResp, error)
-	// HeroAdd 新增英雄
-	HeroAdd(req dto.GmHeroAddReq) (*dto.GmHeroEntry, error)
-	// HeroUpdate 更新英雄
-	HeroUpdate(req dto.GmHeroUpdateReq) (*dto.GmHeroEntry, error)
-	// HeroAttribute 查看英雄累计属性
-	HeroAttribute(req dto.GmHeroAttributeReq) (*dto.GmHeroAttribute, error)
-	// HeroUpgrade 英雄升级（消耗物品）
-	HeroUpgrade(req dto.GmUpgradeReq) (*dto.GmUpgradeResp, error)
-}
-
 // gmHeroLogicInst 英雄 GM 业务单例容器。
-var gmHeroLogicInst = singleton.NewContainer[GmHeroLogic]("GmHeroLogic")
+var gmHeroLogicInst = singleton.NewContainer[global.GmHeroLogic]("GmHeroLogic")
 
 // RegisterGmHeroLogic 装配期注册英雄 GM 业务实现。
-func RegisterGmHeroLogic(inst GmHeroLogic) { gmHeroLogicInst.Register(inst) }
+func RegisterGmHeroLogic(inst global.GmHeroLogic) { gmHeroLogicInst.Register(inst) }
 
 // GmHero 获取英雄 GM 业务单例。
-func GmHero() GmHeroLogic { return gmHeroLogicInst.MustGet() }
+func GmHero() global.GmHeroLogic { return gmHeroLogicInst.MustGet() }
 
 // gmHeroLogic 英雄 GM 业务实现。
 type gmHeroLogic struct{}

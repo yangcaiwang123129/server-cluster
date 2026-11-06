@@ -9,8 +9,19 @@ import (
 	"github.com/dobyte/due/v2/log"
 
 	"server-cluster/internal/svc"
-	"server-cluster/mesh/admin/app/logic"
 )
+
+// 活动模块启停由 logic 包在 init 中注入，避免 global 直接依赖 logic 形成导入环。
+var (
+	activityStarter func(ctx context.Context) error
+	activityStopper func()
+)
+
+// SetActivityLifecycle 注入活动模块启停（logic 包初始化时自动调用）。
+func SetActivityLifecycle(start func(ctx context.Context) error, stop func()) {
+	activityStarter = start
+	activityStopper = stop
+}
 
 // Init 初始化应用：svc（DB/Redis/雪花ID/JWT）→ 自动建表 → 种子数据，须在注册路由前调用。
 func Init() error {
@@ -56,8 +67,10 @@ func Init() error {
 			return err
 		}
 		// 启动内嵌活动模块（活动状态机 + Redis 快照发布）
-		if err := logic.Activity().Start(context.Background()); err != nil {
-			return err
+		if activityStarter != nil {
+			if err := activityStarter(context.Background()); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -65,6 +78,8 @@ func Init() error {
 
 // Destroy 进程退出后释放 DB / Redis 等资源，并按统一停服日志输出。
 func Destroy() {
-	logic.Activity().Stop()
+	if activityStopper != nil {
+		activityStopper()
+	}
 	svc.CloseWithLog(consts.MeshInstanceID())
 }

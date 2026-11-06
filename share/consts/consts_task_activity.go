@@ -40,8 +40,6 @@ const (
 	ActivityTickInterval = time.Second
 	// ActivitySubscribeRetryInterval game 活动快照订阅断开后的重试间隔。
 	ActivitySubscribeRetryInterval = 5 * time.Second
-	// ActivitySnapshotVersionKey 活动快照版本号。
-	ActivitySnapshotVersionKey = "sc:activity:snapshot:version"
 	// ActivitySnapshotPayloadKey 活动快照 JSON。
 	ActivitySnapshotPayloadKey = "sc:activity:snapshot:payload"
 	// ActivityChangeStreamKey admin 发布快照后写入版本号信号流；game 用 XREAD 按游标增量消费。

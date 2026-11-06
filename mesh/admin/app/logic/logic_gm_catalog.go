@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"server-cluster/mesh/admin/app/global"
 	"server-cluster/share/dto"
 	"server-cluster/share/errs"
 	"server-cluster/share/model"
@@ -13,21 +14,14 @@ import (
 	"server-cluster/share/util"
 )
 
-// CatalogLogic 游戏配置目录业务接口（英雄/装备/物品，选择器与列表共用数据源）。
-type CatalogLogic interface {
-	// Catalog 读 Luban 配置生成目录；typ: hero|equip|item。
-	// 全部类型均支持分页：pageSize>0 返回当页数据与 total，pageSize<=0 返回全量。
-	Catalog(typ, keyword string, pageIndex, pageSize int) ([]dto.GameCatalogEntry, int64, error)
-}
-
 // catalogLogicInst 目录业务单例容器。
-var catalogLogicInst = singleton.NewContainer[CatalogLogic]("CatalogLogic")
+var catalogLogicInst = singleton.NewContainer[global.CatalogLogic]("CatalogLogic")
 
 // RegisterCatalogLogic 装配期注册目录业务实现。
-func RegisterCatalogLogic(inst CatalogLogic) { catalogLogicInst.Register(inst) }
+func RegisterCatalogLogic(inst global.CatalogLogic) { catalogLogicInst.Register(inst) }
 
 // Catalog 获取目录业务单例。
-func Catalog() CatalogLogic { return catalogLogicInst.MustGet() }
+func Catalog() global.CatalogLogic { return catalogLogicInst.MustGet() }
 
 // catalogLogic 目录业务实现。
 type catalogLogic struct{}

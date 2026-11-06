@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"server-cluster/internal/svc"
+	"server-cluster/mesh/admin/app/global"
 	"server-cluster/mesh/admin/app/repo"
 	"server-cluster/share/dto"
 	"server-cluster/share/model"
@@ -18,30 +19,12 @@ import (
 	"github.com/dobyte/due/v2/registry"
 )
 
-// ClusterLogic 集群管理业务接口。
-//
-// 节点数据源：每次列表前从 etcd 拉取当前在线实例 → 与 gm_cluster_node 表做 upsert。
-// 远程运维：通过 SSH 执行服务器上的 start.sh / stop.sh。
-type ClusterLogic interface {
-	// Sync 从 etcd 同步全量节点到 gm_cluster_node（幂等，可重复调用）。
-	Sync(ctx context.Context) error
-	// List 分页查询集群节点（列表前自动触发 Sync）。
-	List(ctx context.Context, q dto.ClusterNodeQuery, pageIndex, pageSize int) ([]dto.ClusterNodeResp, int64, error)
-	// Get 查询单个节点详情。
-	Get(ctx context.Context, nodeID string) (*dto.ClusterNodeResp, error)
-	// UpdateSSH 更新单个节点的运维侧 SSH 连接配置。
-	UpdateSSH(ctx context.Context, m *model.ClusterNode) error
-	// Exec 在目标服务器上执行运维脚本并回显输出。
-	// action: start / stop / restart / deploy。
-	Exec(ctx context.Context, nodeID, action string) (*dto.ClusterExecResp, error)
-}
+var clusterLogicInst = singleton.NewContainer[global.ClusterLogic]("ClusterLogic")
 
-var clusterLogicInst = singleton.NewContainer[ClusterLogic]("ClusterLogic")
-
-func RegisterClusterLogic(inst ClusterLogic) { clusterLogicInst.Register(inst) }
+func RegisterClusterLogic(inst global.ClusterLogic) { clusterLogicInst.Register(inst) }
 
 // Cluster 获取集群管理业务单例。
-func Cluster() ClusterLogic { return clusterLogicInst.MustGet() }
+func Cluster() global.ClusterLogic { return clusterLogicInst.MustGet() }
 
 func init() { RegisterClusterLogic(&clusterLogic{}) }
 

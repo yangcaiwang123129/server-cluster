@@ -3,28 +3,21 @@ package logic
 import (
 	"context"
 
+	"server-cluster/mesh/admin/app/global"
 	"server-cluster/share/dto"
 	"server-cluster/share/pb"
 	"server-cluster/share/singleton"
 	"server-cluster/share/util"
 )
 
-// GmMailLogic 后台 GM 邮件模块业务接口。
-type GmMailLogic interface {
-	// MailList 玩家邮件列表
-	MailList(req dto.GmPlayerReq) ([]dto.GmMailEntry, error)
-	// MailSend 发送邮件（可带附件）
-	MailSend(req dto.GmMailSendReq) (*dto.GmMailEntry, error)
-}
-
 // gmMailLogicInst 邮件 GM 业务单例容器。
-var gmMailLogicInst = singleton.NewContainer[GmMailLogic]("GmMailLogic")
+var gmMailLogicInst = singleton.NewContainer[global.GmMailLogic]("GmMailLogic")
 
 // RegisterGmMailLogic 装配期注册邮件 GM 业务实现。
-func RegisterGmMailLogic(inst GmMailLogic) { gmMailLogicInst.Register(inst) }
+func RegisterGmMailLogic(inst global.GmMailLogic) { gmMailLogicInst.Register(inst) }
 
 // GmMail 获取邮件 GM 业务单例。
-func GmMail() GmMailLogic { return gmMailLogicInst.MustGet() }
+func GmMail() global.GmMailLogic { return gmMailLogicInst.MustGet() }
 
 // gmMailLogic 邮件 GM 业务实现。
 type gmMailLogic struct{}

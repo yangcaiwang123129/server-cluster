@@ -34,11 +34,10 @@ type activityLogic struct {
 	// cache 玩家活动参与（player_activity，一玩家一行，活动 map JSON，key=活动实例ID）；读走 LRU，写异步批量 upsert。
 	cache *cache.Cache[int64, *model.PlayerActivity]
 
-	// syncMu 串行化快照同步：订阅信号与 10s 轮询可能同时触发，避免重复拉取与重复广播。
+	// syncMu 串行化快照同步：信号消费与启动/重连补同步可能同时触发，避免重复拉取与重复广播。
 	syncMu  sync.Mutex
 	mu      sync.RWMutex
 	snap    *dto.ActivitySnapshot
-	version int64
 	cancel  context.CancelFunc
 	lastErr string
 }
@@ -220,9 +219,9 @@ func (this *activityLogic) subscribeOnce(ctx context.Context) error {
 	}
 }
 
-// sync 读取版本号；版本变化才拉取 payload 并更新本地缓存（订阅信号与重连补同步共用）。
+// sync 拉取 Redis 快照并更新本地缓存（信号消费与启动/重连补同步共用）。
 func (this *activityLogic) sync(ctx context.Context) {
-	// 订阅消息与重连补同步可能并发触发，串行化后第二次会因版本相同直接返回。
+	// 信号消费与重连补同步可能并发触发，串行化后同一份快照不会被重复应用。
 	this.syncMu.Lock()
 	defer this.syncMu.Unlock()
 
@@ -231,21 +230,10 @@ func (this *activityLogic) sync(ctx context.Context) {
 		this.warnOnce(err.Error())
 		return
 	}
-	ver, err := rdb.Get(ctx, consts.ActivitySnapshotVersionKey).Int64()
-	if err == redis.Nil {
+	raw, err := rdb.Get(ctx, consts.ActivitySnapshotPayloadKey).Bytes()
+	if errors.Is(err, redis.Nil) {
 		return // admin 尚未发布快照
 	}
-	if err != nil {
-		this.warnOnce(err.Error())
-		return
-	}
-	this.mu.RLock()
-	cur := this.version
-	this.mu.RUnlock()
-	if ver == cur {
-		return
-	}
-	raw, err := rdb.Get(ctx, consts.ActivitySnapshotPayloadKey).Bytes()
 	if err != nil {
 		this.warnOnce(err.Error())
 		return
@@ -255,20 +243,16 @@ func (this *activityLogic) sync(ctx context.Context) {
 		this.warnOnce("decode activity snapshot: " + err.Error())
 		return
 	}
-	if snap.Version != ver {
-		return // 读到过渡态，下次轮询自愈
-	}
 
 	this.mu.Lock()
 	old := this.snap
 	this.snap = &snap
-	this.version = ver
 	this.lastErr = ""
 	this.mu.Unlock()
 
 	changed := diffActivities(old, &snap)
-	log.Infof("game: activity snapshot updated version=%d activities=%d changed=%d daily=%s weekly=%s monthly=%s",
-		ver, len(snap.Activities), changed, snap.DailyKey, snap.WeeklyKey, snap.MonthlyKey)
+	log.Infof("game: activity snapshot updated activities=%d changed=%d daily=%s weekly=%s monthly=%s",
+		len(snap.Activities), changed, snap.DailyKey, snap.WeeklyKey, snap.MonthlyKey)
 	if changed > 0 {
 		this.fanoutInitTasks() // 开启(→Running)/结束(→Ended)等实例状态变化均触发
 	}

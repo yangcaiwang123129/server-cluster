@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 
+	"server-cluster/mesh/admin/app/global"
 	"server-cluster/share/dto"
 	"server-cluster/share/pb"
 	"server-cluster/share/singleton"
@@ -10,34 +11,14 @@ import (
 	"server-cluster/share/util"
 )
 
-// GmEquipLogic 后台 GM 装备模块业务接口。
-type GmEquipLogic interface {
-	// EquipList 装备列表
-	EquipList(req dto.GmPlayerReq) ([]dto.GmEquipEntry, error)
-	// EquipAdd 新增装备
-	EquipAdd(req dto.GmEquipAddReq) (*dto.GmEquipEntry, error)
-	// EquipUpdate 更新装备
-	EquipUpdate(req dto.GmEquipUpdateReq) (*dto.GmEquipEntry, error)
-	// EquipWear 装备穿戴（同英雄同配置自动顶替）
-	EquipWear(req dto.GmEquipWearReq) (*dto.GmEquipEntry, error)
-	// EquipUnWear 装备卸载
-	EquipUnWear(req dto.GmEquipUnWearReq) (*dto.GmEquipEntry, error)
-	// EquipUpgrade 装备升级（消耗物品）
-	EquipUpgrade(req dto.GmUpgradeReq) (*dto.GmUpgradeResp, error)
-	// EquipUpQuality 装备升品（消耗升品素材）
-	EquipUpQuality(req dto.GmUpgradeReq) (*dto.GmUpgradeResp, error)
-	// EquipBreakthrough 装备突破（消耗突破素材）
-	EquipBreakthrough(req dto.GmUpgradeReq) (*dto.GmUpgradeResp, error)
-}
-
 // gmEquipLogicInst 装备 GM 业务单例容器。
-var gmEquipLogicInst = singleton.NewContainer[GmEquipLogic]("GmEquipLogic")
+var gmEquipLogicInst = singleton.NewContainer[global.GmEquipLogic]("GmEquipLogic")
 
 // RegisterGmEquipLogic 装配期注册装备 GM 业务实现。
-func RegisterGmEquipLogic(inst GmEquipLogic) { gmEquipLogicInst.Register(inst) }
+func RegisterGmEquipLogic(inst global.GmEquipLogic) { gmEquipLogicInst.Register(inst) }
 
 // GmEquip 获取装备 GM 业务单例。
-func GmEquip() GmEquipLogic { return gmEquipLogicInst.MustGet() }
+func GmEquip() global.GmEquipLogic { return gmEquipLogicInst.MustGet() }
 
 // gmEquipLogic 装备 GM 业务实现。
 type gmEquipLogic struct{}

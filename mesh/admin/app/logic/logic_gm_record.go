@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"server-cluster/mesh/admin/app/global"
 	"server-cluster/mesh/admin/app/repo"
 	"server-cluster/share/dto"
 	"server-cluster/share/model"
@@ -9,20 +10,14 @@ import (
 	"server-cluster/share/util"
 )
 
-// GmRecordLogic 后台打点记录查询业务接口。
-type GmRecordLogic interface {
-	// RecordList 分页查询某模块的获得/消耗记录，并回填配置展示信息。
-	RecordList(q dto.GmRecordQuery, pageIndex, pageSize int) ([]dto.GmRecordEntry, int64, error)
-}
-
 // gmRecordLogicInst 打点记录业务单例容器。
-var gmRecordLogicInst = singleton.NewContainer[GmRecordLogic]("GmRecordLogic")
+var gmRecordLogicInst = singleton.NewContainer[global.GmRecordLogic]("GmRecordLogic")
 
 // RegisterGmRecordLogic 装配期注册打点记录业务实现。
-func RegisterGmRecordLogic(inst GmRecordLogic) { gmRecordLogicInst.Register(inst) }
+func RegisterGmRecordLogic(inst global.GmRecordLogic) { gmRecordLogicInst.Register(inst) }
 
 // GmRecord 获取打点记录业务单例。
-func GmRecord() GmRecordLogic { return gmRecordLogicInst.MustGet() }
+func GmRecord() global.GmRecordLogic { return gmRecordLogicInst.MustGet() }
 
 // gmRecordLogic 打点记录业务实现。
 type gmRecordLogic struct{}
