@@ -16,6 +16,7 @@ export default {
 
   // ── 列 ──
   nodeId: '节点ID',
+  alias: '部署别名',
   services: '内部服务',
   // pb 内部服务名 → 中文（services 列渲染时 lookup）
   svc_GameAdminService: 'GM 管理',

@@ -112,13 +112,7 @@ func (this *weaponLogic) WeaponUpdate(ctx context.Context, playerID int64, req *
 		return nil, err
 	}
 
-	w := model.WeaponInfo{
-		WeaponID:     req.GetCfgId(),
-		Level:        clampDim(req.GetLevel(), 1),
-		Durability:   clampDim(req.GetDurability(), 0),
-		Quality:      clampDim(req.GetQuality(), 1),
-		Breakthrough: clampDim(req.GetBreakthrough(), 0),
-	}
+	w := convert.WeaponInfoFromPb(req)
 	if !row.UpdateWeapon(w) {
 		return &pb.WeaponUpdateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "武器未拥有")}, nil
 	}

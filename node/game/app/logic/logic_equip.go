@@ -137,15 +137,7 @@ func (this *equipLogic) EquipUpdate(ctx context.Context, playerID int64, req *pb
 		heroID = req.GetHeroId()
 	}
 
-	g := model.EquipInfo{
-		EquipID:      old.EquipID,
-		CfgID:        old.CfgID,
-		HeroID:       heroID,
-		Level:        clampDim(req.GetLevel(), 1),
-		Equipped:     req.GetEquipped() && heroID > 0,
-		Quality:      clampDim(req.GetQuality(), 1),
-		Breakthrough: clampDim(req.GetBreakthrough(), 0),
-	}
+	g := convert.EquipInfoFromPb(old, req, heroID)
 	if !row.UpdateEquip(g) {
 		return &pb.EquipUpdateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "装备未拥有")}, nil
 	}

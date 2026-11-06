@@ -4,6 +4,7 @@ import (
 	"context"
 	"server-cluster/internal/svc"
 	"server-cluster/node/game/app/logic"
+	"server-cluster/share/convert"
 	"server-cluster/share/errs"
 	"server-cluster/share/pb"
 )
@@ -16,12 +17,7 @@ func (this *GmProvider) GetOnlinePlayers(ctx context.Context, req *pb.GetOnlineP
 	nodeID := svc.NodeProxy().GetID()
 	resp := &pb.GetOnlinePlayersResp{Players: make([]*pb.OnlinePlayer, 0, len(actors))}
 	for _, a := range actors {
-		resp.Players = append(resp.Players, &pb.OnlinePlayer{
-			PlayerId:  a.PlayerID,
-			EnterTime: a.EnterTime,
-			NodeId:    nodeID,
-			LoginIp:   a.LoginIP,
-		})
+		resp.Players = append(resp.Players, convert.OnlinePlayer(nodeID, a.PlayerID, a.EnterTime, a.LoginIP))
 	}
 	return resp, nil
 }

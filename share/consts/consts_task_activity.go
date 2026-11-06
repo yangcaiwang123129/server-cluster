@@ -37,7 +37,7 @@ const (
 // 活动调度与快照通道。
 const (
 	// ActivityTickInterval admin 活动模块的状态推进间隔。
-	ActivityTickInterval = time.Second
+	ActivityTickInterval = 5 * time.Second
 	// ActivitySubscribeRetryInterval game 活动快照订阅断开后的重试间隔。
 	ActivitySubscribeRetryInterval = 5 * time.Second
 	// ActivitySnapshotPayloadKey 活动快照 JSON。

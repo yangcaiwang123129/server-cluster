@@ -121,7 +121,7 @@ func (this *activityLogic) loop(ctx context.Context) {
 func (this *activityLogic) tick(ctx context.Context) {
 	now := util.NowUnixMilli()
 	changed := this.syncPeriodKeys(now)
-	if this.generate(now) {
+	if this.checkAndLoadActivityByStrategy(now) {
 		changed = true
 	}
 	if this.advanceDue(now) {
@@ -214,7 +214,7 @@ func (this *activityLogic) transit(id int64, from, to int32, now int64, remark s
 // repair 启动时修复因停机跨越的状态，并补偿停机期间应生成的活动。
 func (this *activityLogic) repair(now int64) {
 	this.advanceDue(now)
-	this.generate(now)
+	this.checkAndLoadActivityByStrategy(now)
 }
 
 // addInstance 写入内存实例表。

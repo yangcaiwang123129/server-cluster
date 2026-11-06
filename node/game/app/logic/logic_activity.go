@@ -16,6 +16,7 @@ import (
 	"server-cluster/internal/svc"
 	"server-cluster/node/game/app/global"
 	"server-cluster/share/consts"
+	"server-cluster/share/convert"
 	"server-cluster/share/dto"
 	"server-cluster/share/enum"
 	"server-cluster/share/model"
@@ -349,34 +350,7 @@ func fanoutOnline(ids []int64, worker func(ctx context.Context, playerID int64))
 
 // Activities 从快照构建活动列表（键为实例ID，已取消的不下发）；快照未就绪返回 nil。
 func (this *activityLogic) Activities() map[int64]*pb.ActivityEntry {
-	snap := this.Snapshot()
-	if snap == nil {
-		return nil
-	}
-	out := make(map[int64]*pb.ActivityEntry, len(snap.Activities))
-	for _, a := range snap.Activities {
-		if a.Status == consts.ActivityStatusCancelled {
-			continue
-		}
-		entry := &pb.ActivityEntry{
-			InstanceId: a.ID,
-			CfgId:      a.CfgID,
-			Status:     a.Status,
-			StartTime:  a.StartTime,
-			EndTime:    a.EndTime,
-			Round:      a.Round,
-		}
-		if cfg := tpl.T().Activity.Get(a.CfgID); cfg != nil {
-			entry.Name = cfg.Name
-			entry.Icon = cfg.Icon
-			entry.Desc = cfg.Desc
-		}
-		out[a.ID] = entry
-	}
-	if len(out) == 0 {
-		return nil
-	}
-	return out
+	return convert.Activities(this.Snapshot())
 }
 
 // warnOnce 相同错误只告警一次，避免 Redis 不可用时刷屏。

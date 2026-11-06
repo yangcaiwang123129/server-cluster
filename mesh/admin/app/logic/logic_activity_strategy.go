@@ -13,8 +13,8 @@ import (
 	"github.com/dobyte/due/v2/log"
 )
 
-// generate 按策略生成到期活动实例，返回是否有新增。
-func (this *activityLogic) generate(now int64) bool {
+// checkAndLoadActivityByStrategy 按策略生成到期活动实例，返回是否有新增。
+func (this *activityLogic) checkAndLoadActivityByStrategy(now int64) bool {
 	if !tpl.Loaded() {
 		return false
 	}

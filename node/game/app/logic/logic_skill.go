@@ -112,12 +112,7 @@ func (this *skillLogic) SkillUpdate(ctx context.Context, playerID int64, req *pb
 		return nil, err
 	}
 
-	s := model.SkillInfo{
-		SkillID:      req.GetCfgId(),
-		Level:        clampDim(req.GetLevel(), 1),
-		Quality:      clampDim(req.GetQuality(), 1),
-		Breakthrough: clampDim(req.GetBreakthrough(), 0),
-	}
+	s := convert.SkillInfoFromPb(req)
 	if !row.UpdateSkill(s) {
 		return &pb.SkillUpdateResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "技能未拥有")}, nil
 	}

@@ -4,12 +4,10 @@ import (
 	"context"
 
 	"server-cluster/mesh/admin/app/global"
+	"server-cluster/share/convert"
 	"server-cluster/share/dto"
-	"server-cluster/share/model"
 	"server-cluster/share/pb"
 	"server-cluster/share/singleton"
-	"server-cluster/share/tpl"
-	"server-cluster/share/util"
 )
 
 // gmItemLogicInst 物品容器 GM 业务单例容器。
@@ -29,66 +27,30 @@ func init() {
 }
 
 func (this *gmItemLogic) ItemContainerList(req dto.GmItemListReq) ([]dto.GmItemResp, error) {
-	callReq := &pb.GmItemListReq{
-		PlayerId: req.PlayerID,
-		Req:      &pb.ItemContainerListReq{ContainerType: pb.ContainerType(req.ContainerType)},
-	}
-	resp, err := gmCall[pb.ItemContainerListResp](context.Background(), req.PlayerID, pb.GameAdminService_ItemList_FullMethodName, callReq)
+	resp, err := gmCall[pb.ItemContainerListResp](context.Background(), req.PlayerID, pb.GameAdminService_ItemList_FullMethodName, convert.PbGmItemListReq(req))
 	if err != nil {
 		return nil, err
 	}
-	return toGmItemResps(req.PlayerID, resp.GetItemContainers()), nil
+	return convert.GmItemResps(req.PlayerID, resp.GetItemContainers()), nil
 }
 
 func (this *gmItemLogic) ItemMove(req dto.GmItemMoveReq) error {
-	callReq := &pb.GmItemMoveReq{
-		PlayerId: req.PlayerID,
-		Req: &pb.ItemMoveReq{
-			ContainerType: pb.ContainerType(req.ContainerType),
-			Id:            req.ItemID,
-			ToX:           req.ToX,
-			ToY:           req.ToY,
-			Rotated:       req.Rotated,
-		},
-	}
-	_, err := gmCall[pb.ItemMoveResp](context.Background(), req.PlayerID, pb.GameAdminService_ItemMove_FullMethodName, callReq)
+	_, err := gmCall[pb.ItemMoveResp](context.Background(), req.PlayerID, pb.GameAdminService_ItemMove_FullMethodName, convert.PbGmItemMoveReq(req))
 	return err
 }
 
 func (this *gmItemLogic) ItemRotate(req dto.GmItemRotateReq) error {
-	callReq := &pb.GmItemRotateReq{
-		PlayerId: req.PlayerID,
-		Req: &pb.ItemRotateReq{
-			ContainerType: pb.ContainerType(req.ContainerType),
-			Id:            req.ItemID,
-		},
-	}
-	_, err := gmCall[pb.ItemRotateResp](context.Background(), req.PlayerID, pb.GameAdminService_ItemRotate_FullMethodName, callReq)
+	_, err := gmCall[pb.ItemRotateResp](context.Background(), req.PlayerID, pb.GameAdminService_ItemRotate_FullMethodName, convert.PbGmItemRotateReq(req))
 	return err
 }
 
 func (this *gmItemLogic) ItemSort(req dto.GmItemSortReq) error {
-	callReq := &pb.GmItemSortReq{
-		PlayerId: req.PlayerID,
-		Req:      &pb.ItemSortReq{ContainerType: pb.ContainerType(req.ContainerType)},
-	}
-	_, err := gmCall[pb.ItemSortResp](context.Background(), req.PlayerID, pb.GameAdminService_ItemSort_FullMethodName, callReq)
+	_, err := gmCall[pb.ItemSortResp](context.Background(), req.PlayerID, pb.GameAdminService_ItemSort_FullMethodName, convert.PbGmItemSortReq(req))
 	return err
 }
 
 func (this *gmItemLogic) ItemTransfer(req dto.GmItemTransferReq) ([]dto.GmItemResp, error) {
-	callReq := &pb.GmItemTransferReq{
-		PlayerId: req.PlayerID,
-		Req: &pb.ItemTransferReq{
-			FromType: pb.ContainerType(req.FromType),
-			ToType:   pb.ContainerType(req.ToType),
-			Id:       req.ItemID,
-			ToX:      req.ToX,
-			ToY:      req.ToY,
-			Rotated:  req.Rotated,
-		},
-	}
-	resp, err := gmCall[pb.ItemTransferResp](context.Background(), req.PlayerID, pb.GameAdminService_ItemTransfer_FullMethodName, callReq)
+	resp, err := gmCall[pb.ItemTransferResp](context.Background(), req.PlayerID, pb.GameAdminService_ItemTransfer_FullMethodName, convert.PbGmItemTransferReq(req))
 	if err != nil {
 		return nil, err
 	}
@@ -99,75 +61,21 @@ func (this *gmItemLogic) ItemTransfer(req dto.GmItemTransferReq) ([]dto.GmItemRe
 	if resp.GetToContainer() != nil {
 		containers = append(containers, resp.GetToContainer())
 	}
-	return toGmItemResps(req.PlayerID, containers), nil
+	return convert.GmItemResps(req.PlayerID, containers), nil
 }
 
 func (this *gmItemLogic) ItemAddEntry(req dto.GmItemAddEntryReq) ([]dto.GmItemResp, error) {
-	callReq := &pb.GmItemAddEntryReq{
-		PlayerId:      req.PlayerID,
-		ContainerType: req.ContainerType,
-		CfgId:         req.ItemCfgID,
-		Count:         req.Count,
-	}
-	resp, err := gmCall[pb.ItemContainerListResp](context.Background(), req.PlayerID, pb.GameAdminService_ItemAddEntry_FullMethodName, callReq)
+	resp, err := gmCall[pb.ItemContainerListResp](context.Background(), req.PlayerID, pb.GameAdminService_ItemAddEntry_FullMethodName, convert.PbGmItemAddEntryReq(req))
 	if err != nil {
 		return nil, err
 	}
-	return toGmItemResps(req.PlayerID, resp.GetItemContainers()), nil
+	return convert.GmItemResps(req.PlayerID, resp.GetItemContainers()), nil
 }
 
 func (this *gmItemLogic) ItemClear(req dto.GmItemClearReq) ([]dto.GmItemResp, error) {
-	callReq := &pb.GmItemClearReq{
-		PlayerId:      req.PlayerID,
-		ContainerType: req.ContainerType,
-		ItemId:        req.ItemID,
-	}
-	resp, err := gmCall[pb.ItemContainerListResp](context.Background(), req.PlayerID, pb.GameAdminService_ItemClear_FullMethodName, callReq)
+	resp, err := gmCall[pb.ItemContainerListResp](context.Background(), req.PlayerID, pb.GameAdminService_ItemClear_FullMethodName, convert.PbGmItemClearReq(req))
 	if err != nil {
 		return nil, err
 	}
-	return toGmItemResps(req.PlayerID, resp.GetItemContainers()), nil
-}
-
-// toGmItemResps 物品容器条目转响应。
-func toGmItemResps(playerID int64, containers []*pb.ItemContainer) []dto.GmItemResp {
-	return util.MapSlice(containers, func(e *pb.ItemContainer) dto.GmItemResp {
-		return toGmItemResp(playerID, e)
-	})
-}
-
-// toGmItemResp 单个物品容器转响应（补齐物品名称/占格等展示信息）。
-func toGmItemResp(playerID int64, e *pb.ItemContainer) dto.GmItemResp {
-	items := make([]dto.GmItemEntry, 0, len(e.GetItemEntries()))
-	for _, it := range e.GetItemEntries() {
-		w, h := model.GetWHByItemCfgId(it.GetCfgId())
-		if it.GetRotated() {
-			w, h = h, w
-		}
-		row := dto.GmItemEntry{
-			ItemID:    it.GetId(),
-			ItemCfgID: it.GetCfgId(),
-			Count:     it.GetCount(),
-			GridX:     it.GetGridX(),
-			GridY:     it.GetGridY(),
-			Rotated:   it.GetRotated(),
-			Width:     w,
-			Height:    h,
-		}
-		if cfg := tpl.T().Item.Get(it.GetCfgId()); cfg != nil {
-			row.Name = cfg.Name
-			row.IconKey = cfg.IconKey
-			row.Rarity = cfg.Rarity
-			row.MaxCount = cfg.MaxCount
-		}
-		items = append(items, row)
-	}
-	return dto.GmItemResp{
-		PlayerID:      playerID,
-		ContainerType: int32(e.GetType()),
-		GridW:         e.GetGridW(),
-		GridH:         e.GetGridH(),
-		Version:       e.GetVersion(),
-		Items:         items,
-	}
+	return convert.GmItemResps(req.PlayerID, resp.GetItemContainers()), nil
 }

@@ -179,7 +179,7 @@ func (this *mailLogic) MailClaim(ctx context.Context, playerID int64, req *pb.Ma
 			}
 			return nil, err
 		}
-		granted = append(granted, &pb.AssetEntry{Type: a.Type, CfgId: a.CfgID, Count: count})
+		granted = append(granted, convert.MailAttachmentEntry(a))
 	}
 	this.Save(playerID, row)
 	return &pb.MailClaimResp{Entry: convert.MailEntry(m), Attachments: granted}, nil
@@ -299,10 +299,7 @@ func (this *mailLogic) MailSend(ctx context.Context, playerID int64, req *pb.GmM
 	if err != nil {
 		return nil, err
 	}
-	atts := make([]model.MailAttachment, 0, len(req.GetAttachments()))
-	for _, a := range req.GetAttachments() {
-		atts = append(atts, model.MailAttachment{Type: a.GetType(), CfgID: a.GetCfgId(), Count: a.GetCount()})
-	}
+	atts := convert.MailAttachmentsFromPb(req.GetAttachments())
 	m := model.MailInfo{
 		MailID:      svc.NextID(),
 		Title:       req.GetTitle(),

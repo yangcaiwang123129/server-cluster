@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"server-cluster/mesh/admin/app/global"
+	"server-cluster/share/convert"
 	"server-cluster/share/dto"
 	"server-cluster/share/pb"
 	"server-cluster/share/singleton"
-	"server-cluster/share/util"
 )
 
 // gmMailLogicInst 邮件 GM 业务单例容器。
@@ -28,46 +28,18 @@ func init() {
 
 func (this *gmMailLogic) MailList(req dto.GmPlayerReq) ([]dto.GmMailEntry, error) {
 	resp, err := gmCall[pb.GmMailListResp](context.Background(), req.PlayerID, pb.GameAdminService_MailList_FullMethodName,
-		&pb.GmMailListReq{PlayerId: req.PlayerID})
+		convert.PbGmMailListReq(req))
 	if err != nil {
 		return nil, err
 	}
-	return util.MapSlice(resp.GetEntries(), toGmMailEntry), nil
+	return convert.GmMailEntries(resp.GetEntries()), nil
 }
 
 func (this *gmMailLogic) MailSend(req dto.GmMailSendReq) (*dto.GmMailEntry, error) {
-	atts := util.MapSlice(req.Attachments, func(a dto.GmMailAttachment) *pb.AssetEntry {
-		return &pb.AssetEntry{Type: a.Type, CfgId: a.CfgID, Count: a.Count}
-	})
-	callReq := &pb.GmMailSendReq{
-		PlayerId:    req.PlayerID,
-		Title:       req.Title,
-		Content:     req.Content,
-		Attachments: atts,
-	}
-	resp, err := gmCall[pb.MailEntry](context.Background(), req.PlayerID, pb.GameAdminService_MailSend_FullMethodName, callReq)
+	resp, err := gmCall[pb.MailEntry](context.Background(), req.PlayerID, pb.GameAdminService_MailSend_FullMethodName, convert.PbGmMailSendReq(req))
 	if err != nil {
 		return nil, err
 	}
-	entry := toGmMailEntry(resp)
+	entry := convert.GmMailEntry(resp)
 	return &entry, nil
-}
-
-// toGmMailEntry 邮件条目转响应。
-func toGmMailEntry(e *pb.MailEntry) dto.GmMailEntry {
-	row := dto.GmMailEntry{
-		ID:        e.GetId(),
-		Title:     e.GetTitle(),
-		Content:   e.GetContent(),
-		Status:    int32(e.GetStatus()),
-		CreatedAt: e.GetCreatedAt(),
-	}
-	for _, a := range e.GetAttachments() {
-		row.Attachments = append(row.Attachments, dto.GmMailAttachment{
-			Type:  a.GetType(),
-			CfgID: a.GetCfgId(),
-			Count: a.GetCount(),
-		})
-	}
-	return row
 }

@@ -78,9 +78,9 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('admin.cluster.nodeName')" prop="nodeName" width="120">
+      <el-table-column :label="$t('admin.cluster.alias')" prop="alias" width="130" show-overflow-tooltip>
         <template #default="{ row }">
-          {{ kindLabel(row.nodeName) }}
+          <span :class="{ muted: !row.alias }">{{ row.alias || '-' }}</span>
         </template>
       </el-table-column>
 
@@ -89,6 +89,15 @@
           <el-tag :type="kindType(row.nodeKind)" effect="plain" round>
             {{ kindLabel(row.nodeKind) }}
           </el-tag>
+        </template>
+      </el-table-column>
+
+      <el-table-column :label="$t('admin.cluster.online')" width="90" align="center">
+        <template #default="{ row }">
+          <div :class="['online-dot', row.online ? 'online-dot--up' : 'online-dot--down']">
+            <span class="dot" />
+            <span>{{ row.online ? $t('admin.cluster.onlineYes') : $t('admin.cluster.onlineNo') }}</span>
+          </div>
         </template>
       </el-table-column>
 
@@ -107,23 +116,13 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('admin.cluster.online')" width="100" align="center">
-        <template #default="{ row }">
-          <div :class="['online-dot', row.online ? 'online-dot--up' : 'online-dot--down']">
-            <span class="dot" />
-            <span>{{ row.online ? $t('admin.cluster.onlineYes') : $t('admin.cluster.onlineNo') }}</span>
-          </div>
-        </template>
-      </el-table-column>
-
       <el-table-column :label="$t('admin.cluster.endpoint')" prop="endpoint" min-width="160" show-overflow-tooltip />
 
-      <el-table-column
-        :label="$t('admin.cluster.updatedAt')"
-        prop="updatedAt"
-        min-width="160"
-        sortable="custom"
-      />
+      <el-table-column :label="$t('admin.cluster.remark')" prop="remark" min-width="160" show-overflow-tooltip>
+        <template #default="{ row }">
+          <span :class="{ muted: !row.remark }">{{ row.remark || '-' }}</span>
+        </template>
+      </el-table-column>
 
       <el-table-column :label="$t('common.operation')" width="230" fixed="right">
         <template #default="{ row }">

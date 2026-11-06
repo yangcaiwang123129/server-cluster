@@ -14,6 +14,7 @@ export default {
   onlineNo: 'Offline',
 
   nodeId: 'Node ID',
+  alias: 'Deploy Alias',
   services: 'Services',
   endpoint: 'Endpoint',
   sshHost: 'SSH Host',

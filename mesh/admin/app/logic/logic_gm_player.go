@@ -8,6 +8,7 @@ import (
 	"server-cluster/internal/rpc"
 	"server-cluster/mesh/admin/app/global"
 	"server-cluster/mesh/admin/app/repo"
+	"server-cluster/share/convert"
 	"server-cluster/share/dto"
 	"server-cluster/share/pb"
 	"server-cluster/share/singleton"
@@ -56,14 +57,7 @@ func (this *playerLogic) PlayerOnline() ([]dto.OnlinePlayerResp, error) {
 		if r.Err != nil {
 			continue // 实例不可达：跳过，避免单实例故障拖垮整个列表
 		}
-		for _, p := range r.Resp.Players {
-			list = append(list, dto.OnlinePlayerResp{
-				PlayerID:    p.PlayerId,
-				EnterTime:   p.EnterTime,
-				LobbyNodeID: p.NodeId,
-				LoginIP:     p.LoginIp,
-			})
-		}
+		list = append(list, convert.OnlinePlayersResp(r.Resp.Players)...)
 	}
 	return list, nil
 }
@@ -74,7 +68,7 @@ func (this *playerLogic) PlayerKick(req dto.PlayerKickReq) error {
 		return err
 	}
 	resp, err := rpc.Call[pb.KickPlayerResp](context.Background(), client, pb.GameAdminService_KickPlayer_FullMethodName,
-		&pb.KickPlayerReq{PlayerIds: []int64{req.PlayerID}})
+		convert.PbKickPlayerReq(req.PlayerID))
 	if err != nil {
 		return err
 	}
@@ -96,7 +90,7 @@ func (this *playerLogic) PlayerBan(req dto.PlayerBanReq) error {
 	// 在线则按服踢下线：枚举 mesh 实例找玩家（简化版，逐实例尝试，失败忽略）
 	instances, _ := gameInstances(context.Background(), pb.GameAdminService_ServiceDesc.ServiceName)
 	rpc.CallAll[pb.KickPlayerResp](context.Background(), instanceIDs(instances),
-		pb.GameAdminService_KickPlayer_FullMethodName, &pb.KickPlayerReq{PlayerIds: []int64{req.PlayerID}})
+		pb.GameAdminService_KickPlayer_FullMethodName, convert.PbKickPlayerReq(req.PlayerID))
 	return nil
 }
 
