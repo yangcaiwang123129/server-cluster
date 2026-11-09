@@ -1,8 +1,8 @@
 def resolvedVersion = ''
 
-// 配置表工程（cnb.cool 私有仓库）：Jenkins 中需存在 ID 为 excelconfig-git 的 Username/Password 凭据
+// 配置表工程（cnb.cool 私有仓库）：复用已在 server-cluster 检出中成功使用的 cnb 凭据
 def EXCEL_REPO_HOST_PATH = 'cnb.cool/nightcatgames/excelconfig.git'
-def EXCEL_CREDENTIALS_ID = 'excelconfig-git'
+def EXCEL_CREDENTIALS_ID = 'cnb'
 
 // 归一化服务器列表：Extended Choice 返回空格分隔，这里统一兼容逗号和多余空格。
 def normalizedServers() {
