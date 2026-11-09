@@ -32,7 +32,7 @@ if (isTagMode) {
     checkoutRef     = "refs/tags/${version}"
 } else {
     if (env == 'audit' && !version) error('audit 环境 VERSION 必填')
-    resolvedVersion = version ?: "${branch}-${env.BUILD_NUMBER}"
+    resolvedVersion = version ?: "${branch}-${currentBuild.number}"
     checkoutRef     = "*/${branch}"
 }
 
