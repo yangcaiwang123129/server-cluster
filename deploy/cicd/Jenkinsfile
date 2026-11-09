@@ -1,7 +1,9 @@
 // ============================================================
 // Jenkinsfile — 全环境通用
-//   ENV=test/audit  → branch 模式（BRANCH + 手动 VERSION）
-//   ENV=release/prod → tag 模式（TAG 即 VERSION）
+//   test       → VERSION 可空（空则 branch-构建号 自动生成）
+//   audit      → VERSION 必填
+//   release/prod → VERSION 必填，作为 tag 检出（VERSION 就是 tag 名）
+//   脚本里统一用 VERSION 变量
 // ============================================================
 
 def EXCEL_CREDENTIALS_ID = 'cnb'
@@ -15,21 +17,27 @@ def DEFAULT_SERVERS = [
 ]
 
 def env = params.ENV
-def servers = (params.SERVERS?.trim() ?: '').replace(',', ' ').replaceAll(/\s+/, ' ')
-if (!servers) servers = DEFAULT_SERVERS[env]
-
-// 根据 ENV 决定构建模式和版本号
 def isTagMode = (env in ['release', 'prod'])
+
+// 版本号统一用 params.VERSION（release/prod 下就是 tag 名）
+def version = params.VERSION?.trim()
+def branch  = params.BRANCH?.trim() ?: 'master'
+
 def resolvedVersion
 def checkoutRef
 
 if (isTagMode) {
-    resolvedVersion = params.TAG.trim()
-    checkoutRef     = "refs/tags/${resolvedVersion}"
+    if (!version) error("${env} 环境 VERSION 必填（VERSION 即 tag 名）")
+    resolvedVersion = version
+    checkoutRef     = "refs/tags/${version}"
 } else {
-    resolvedVersion = params.VERSION.trim()
-    checkoutRef     = "*/${params.BRANCH.trim() ?: 'master'}"
+    if (env == 'audit' && !version) error('audit 环境 VERSION 必填')
+    resolvedVersion = version ?: "${branch}-${env.BUILD_NUMBER}"
+    checkoutRef     = "*/${branch}"
 }
+
+def servers = (params.SERVERS?.trim() ?: '').replace(',', ' ').replaceAll(/\s+/, ' ')
+if (!servers) servers = DEFAULT_SERVERS[env]
 
 pipeline {
     agent any
@@ -41,18 +49,12 @@ pipeline {
     }
 
     parameters {
-        choice(name: 'ENV',     choices: ['test', 'audit', 'release', 'prod'], description: '环境')
-
-        // branch 模式用
-        string(name: 'BRANCH',  defaultValue: 'master', description: '分支（test/audit 时生效）')
-        string(name: 'VERSION', defaultValue: '',        description: '版本号 vX.Y.Z（test/audit 必填；release/prod 自动取 TAG）')
-
-        // tag 模式用
-        string(name: 'TAG',     defaultValue: '',        description: 'Tag（release/prod 时必填；同时作为版本号）')
-
+        choice(name: 'ENV', choices: ['test', 'audit', 'release', 'prod'], description: '环境')
+        string(name: 'BRANCH',  defaultValue: 'master', description: '分支（release/prod 时忽略）')
+        string(name: 'VERSION', defaultValue: '',        description: '版本号（test 可空=自动生成；audit/release/prod 必填）')
         extendedChoice(
             name: 'SERVERS',
-            description: '服务器（按住 Ctrl/Shift 多选；空=默认全部）',
+            description: '服务器（按住 Ctrl/Shift 多选）',
             type: 'PT_MULTI_SELECT',
             value: 'gate-1,game-1,battle-1,social-1,login-1,admin-1',
             multiSelectDelimiter: ' ',
@@ -73,22 +75,15 @@ pipeline {
 
         stage('Validate') {
             steps {
-                script {
-                    if (isTagMode) {
-                        if (!resolvedVersion) error('release/prod 环境 TAG 必填')
-                    } else {
-                        if (!resolvedVersion) error('test/audit 环境 VERSION 必填')
-                    }
-                    echo """
-                    === 运行计划 ===
-                    模式     : ${isTagMode ? 'tag' : 'branch'}
-                    检出     : ${checkoutRef}
-                    版本号   : ${resolvedVersion}
-                    环境     : ${env}
-                    服务器   : ${servers}
-                    部署     : ${params.RUN_DEPLOY ? '是' : '否'}
-                    """
-                }
+                echo """
+                === 运行计划 ===
+                模式     : ${isTagMode ? 'tag' : 'branch'}
+                检出     : ${checkoutRef}
+                VERSION  : ${resolvedVersion}
+                环境     : ${env}
+                服务器   : ${servers}
+                部署     : ${params.RUN_DEPLOY ? '是' : '否'}
+                """
             }
         }
 
