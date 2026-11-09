@@ -30,12 +30,27 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         --env) ENV="${2:-}"; shift 2 ;;
         --version) VERSION="${2:-}"; shift 2 ;;
-        --servers) SERVERS="${2:-}"; shift 2 ;;
+        --servers)
+            # 取 --servers 后面的值（可能是一个空格/逗号分隔的大字符串）
+            # 如果 shell 把多服务拆成了多个位置参数，也逐个收进来
+            SERVERS="${SERVERS} ${2:-}"
+            shift 2
+            # 继续吃掉可能残留的、看起来不像 flag 的位置参数（被 shell 拆出来的服务名）
+            while [[ $# -gt 0 && ! "$1" =~ ^-- ]]; do
+                SERVERS="${SERVERS} $1"
+                shift
+            done
+            ;;
         -h | --help) usage ;;
-        *) echo "未知参数: $1" >&2; usage ;;
+        --*) echo "未知参数: $1" >&2; usage ;;
+        # 额外的非 flag 位置参数 → 也当服务名收进来（兼容无 --servers 的调用）
+        *) SERVERS="${SERVERS} $1"; shift ;;
     esac
 done
 
+# 空格/逗号/重复空白 规整为单空格
+SERVERS="$(echo "$SERVERS" | sed 's/,/ /g' | tr -s ' ')"
+SERVERS="${SERVERS# }"
 [[ -n "$ENV" && -n "$VERSION" && -n "$SERVERS" ]] || usage
 
 # 服务器 id 前缀 → 入口包

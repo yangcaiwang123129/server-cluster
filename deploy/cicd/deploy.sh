@@ -31,14 +31,26 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         --env) ENV="${2:-}"; shift 2 ;;
         --version) VERSION="${2:-}"; shift 2 ;;
-        --servers) SERVERS="${2:-}"; shift 2 ;;
+        --servers)
+            SERVERS="${SERVERS} ${2:-}"
+            shift 2
+            while [[ $# -gt 0 && ! "$1" =~ ^-- ]]; do
+                SERVERS="${SERVERS} $1"
+                shift
+            done
+            ;;
         --user) USER_DEFAULT="${2:-}"; shift 2 ;;
         --remote) REMOTE_ROOT="${2:-}"; shift 2 ;;
         --dry-run) DRY_RUN=1; shift ;;
         -h | --help) usage ;;
-        *) echo "未知参数: $1" >&2; usage ;;
+        --*) echo "未知参数: $1" >&2; usage ;;
+        *) SERVERS="${SERVERS} $1"; shift ;;
     esac
 done
+
+# 空格/逗号/重复空白 规整为单空格
+SERVERS="$(echo "$SERVERS" | sed 's/,/ /g' | tr -s ' ')"
+SERVERS="${SERVERS# }"
 
 [[ -n "$ENV" && -n "$VERSION" ]] || usage
 

@@ -108,7 +108,10 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh "bash deploy/scripts/build.sh --env '${env}' --version '${resolvedVersion}' --servers '${servers}'"
+                sh """
+                    echo "[Build] SERVERS 原始值: '${servers}'"
+                    bash deploy/scripts/build.sh --env '${env}' --version '${resolvedVersion}' ${servers}
+                """
             }
         }
 
@@ -133,7 +136,8 @@ pipeline {
                                 ssh-keyscan -H "\$host" 2>/dev/null >> \$WORKSPACE/.ssh/known_hosts || true
                             done
                             export DEPLOY_SSH_OPTS="-o UserKnownHostsFile=\$WORKSPACE/.ssh/known_hosts"
-                            bash deploy/cicd/deploy.sh --env '${env}' --version '${resolvedVersion}' --servers '${servers}' --user "\$SSH_USER"
+                            echo "[Deploy] SERVERS 原始值: '${servers}'"
+                            bash deploy/cicd/deploy.sh --env '${env}' --version '${resolvedVersion}' ${servers} --user "\$SSH_USER"
                         """
                     }
                 }
