@@ -10,6 +10,10 @@
 # clash with the Luban/ subdirectory on case-insensitive filesystems).
 set -euo pipefail
 
+# Alpine / 最小 Debian 镜像缺 libicu，dotnet runtime 会 FailFast 退出。
+# Luban 本身不需要 locale（模板输出固定英文/UTF-8），用 invariant 模式绕过去即可。
+export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+
 LUBAN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BIN="$LUBAN_DIR/Luban/Luban"
 DLL="$LUBAN_DIR/Luban/Luban.dll"
