@@ -1,36 +1,44 @@
-# 登录服（test / login-1）。
+# 登录服（mesh 集群）配置
+# due 自动加载 ./etc/etc.toml。
 
-pid = "./pid/login-1.pid"
+pid = ""
 mode = "debug"
-timezone = "Asia/Shanghai"
+timezone = "Local"
 
 [cluster.mesh]
+    # 实例ID，网格集群中唯一。不填写默认自动生成
     id = "login-1"
+    # 实例名称
     name = "login"
+    # 编解码器。可选：json | proto
     codec = "json"
     [cluster.mesh.linker]
+        # RPC调用超时时间
         callTimeout = "3s"
-
+# HTTP 监听地址（due http 组件）
 [http]
-    addr = "0.0.0.0:8080"
+    addr = "172.16.0.12:7788"
 
-[http.swagger]
+# CORS 跨域（开发环境全放行）
+[http.cors]
     enable = true
-    title = "登录服 API"
-    filePath = "docs/swagger.json"
-    basePath = "/swagger"
-
+    allowOrigins = []
+    allowMethods = ["GET", "POST", "HEAD", "PUT", "DELETE", "PATCH", "OPTIONS"]
+    allowHeaders = []
+    allowCredentials = false
+    exposeHeaders = []
+    maxAge = 86400
 [log]
     level = "info"
     timeFormat = "2006/01/02 15:04:05.000000"
     stackLevel = "error"
-    callFullPath = true
     [log.file]
-        path = "./log/login-1.log"
+        path = "../../.dev/log/login.log"
         format = "text"
         maxAge = "7d"
         maxSize = 100
         rotate = "day"
+    callFullPath = true
 
 [packet]
     byteOrder = "big"
@@ -40,14 +48,14 @@ timezone = "Asia/Shanghai"
     heartbeatTime = true
 
 [registry.etcd]
-    addrs = ["10.10.2.10:2379"]
+    addrs = ["172.16.0.2:2379"]
     namespace = "services"
 
 [locate.redis]
-    addrs = ["10.10.2.10:6379"]
-    db = 2
+    addrs = ["172.16.0.2:6379"]
+    db = 0
     username = ""
-    password = "game123"
+    password = "root123"
     maxRetries = 3
     prefix = "cluster:locate"
 
@@ -60,23 +68,33 @@ timezone = "Asia/Shanghai"
     caFile = ""
     serverName = ""
 
+# Swagger 文档（由 swag 生成，due http 组件自动挂载到 /swagger）
+[http.swagger]
+    enable = true
+    title = "登录服 API"
+    filePath = "docs/swagger.json"
+    basePath = "/swagger"
+
+# MySQL 命名实例（多数据源；dsn 为空则跳过该实例，启动后接口返回内部错误）
 [[db.mysql.instances]]
     name = "default"
-    dsn = "game:game123@tcp(10.10.2.10:3306)/game_test?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s&readTimeout=10s&writeTimeout=10s"
+    dsn = "root:root123@tcp(172.16.0.2:3306)/game?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s&readTimeout=10s&writeTimeout=10s"
     max_open_conns = 50
     max_idle_conns = 20
 
+# Redis 命名实例（不同业务可按 name 使用不同 db 号）
 [[redis.instances]]
     name = "default"
-    addrs = ["10.10.2.10:6379"]
+    addrs = ["172.16.0.2:6379"]
     username = ""
-    password = "game123"
-    db = 2
+    password = "root123"
+    db = 0
 
+# JWT 配置：game 服验签需使用相同 secret
 [jwt]
-    secret = "test-cluster-secret"
-    valid_duration = 7200
+    secret = "cluster-secret"
+    valid_duration = 7200 # 秒
 
-# 下发给客户端的网关地址，须与 gate 的 network.ws.server 对外地址一致
+# 网关地址：登录成功后下发给客户端连接（必须与 gate 的 network.ws.server.addr 一致）
 [gate]
-    addr = "10.10.2.11:9000"
+    addr = "172.16.0.12:9000"

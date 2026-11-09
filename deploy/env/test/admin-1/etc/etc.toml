@@ -1,19 +1,26 @@
-# 管理后台服（test / admin-1）。
+# 管理后台服（纯 HTTP 服务）配置
+# due 自动加载 ./etc/etc.toml。
 
-pid = "./pid/admin-1.pid"
+pid = "../../pid/admin.pid"
 mode = "debug"
-timezone = "Asia/Shanghai"
+timezone = "Local"
 
 [cluster.mesh]
+    # 实例ID，网格集群中唯一。不填写默认自动生成
     id = "admin-1"
+    # 实例名称
     name = "admin"
+    # 编解码器。可选：json | proto
     codec = "json"
     [cluster.mesh.linker]
+        # RPC调用超时时间
         callTimeout = "3s"
 
+# HTTP 监听地址（due http 组件）
 [http]
-    addr = "0.0.0.0:8081"
+    addr = "172.16.0.12:8877"
 
+# Swagger 文档（由 swag 生成，due http 组件自动挂载到 /swagger）
 [http.swagger]
     enable = true
     title = "管理后台 API"
@@ -24,13 +31,13 @@ timezone = "Asia/Shanghai"
     level = "info"
     timeFormat = "2006/01/02 15:04:05.000000"
     stackLevel = "error"
-    callFullPath = true
     [log.file]
-        path = "./log/admin-1.log"
+        path = "../../log/admin.log"
         format = "text"
         maxAge = "7d"
         maxSize = 100
         rotate = "day"
+    callFullPath = true
 
 [packet]
     byteOrder = "big"
@@ -44,37 +51,65 @@ timezone = "Asia/Shanghai"
     nonblocking = true
     disablePurge = true
 
+# 服务注册发现（admin 经 etcd 发现 game 节点）
 [registry.etcd]
-    addrs = ["10.10.2.10:2379"]
+    addrs = ["172.16.0.2:2379"]
     namespace = "services"
 
+# gRPC 传输客户端（服务间 RPC）
 [transport.grpc.client]
     caFile = ""
     serverName = ""
 
+# MySQL 命名实例（多数据源；dsn 为空则跳过该实例）
 [[db.mysql.instances]]
     name = "default"
-    dsn = "game:game123@tcp(10.10.2.10:3306)/game_test?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s&readTimeout=10s&writeTimeout=10s"
+    dsn = "root:root123@tcp(172.16.0.2:3306)/game?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s&readTimeout=10s&writeTimeout=10s"
     max_open_conns = 50
     max_idle_conns = 20
 
 # 打点记录库（game_record）：后台只读
 [[db.mysql.instances]]
     name = "record"
-    dsn = "game:game123@tcp(10.10.2.10:3306)/game_record?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s&readTimeout=10s&writeTimeout=10s"
+    dsn = "root:root123@tcp(172.16.0.2:3306)/game_record?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s&readTimeout=10s&writeTimeout=10s"
     max_open_conns = 50
     max_idle_conns = 20
 
+# Redis 命名实例（不同业务可按 name 使用不同 db 号）
 [[redis.instances]]
     name = "default"
-    addrs = ["10.10.2.10:6379"]
+    addrs = ["172.16.0.2:6379"]
     username = ""
-    password = "game123"
-    db = 2
+    password = "root123"
+    db = 0
 
+# JWT 配置：与 login 服 secret 保持一致
 [jwt]
-    secret = "test-cluster-secret"
-    valid_duration = 7200
+    secret = "cluster-secret"
+    valid_duration = 7200 # 秒
 
+# 客户端模拟器默认参数（页面可覆盖）
 [sim]
-    loginAddr = "http://10.10.2.15:8080"
+    # 登录服地址
+    loginAddr = "http://172.16.0.12:8080"
+
+# SSH 运维配置：key 是目标服务器 IP/Hostname，value 是连接参数。
+# 节点列表里 endpoint 匹配到这里的 host 时自动应用；endpoint 是内网 IP 也可按别名匹配。
+# 注意密码与私钥路径二选一；同时配置则优先私钥。
+[[ssh.hosts]]
+    host = "172.16.0.2"
+    user = "root"
+    port = 22
+    # password = ""
+    keyPath = "~/.ssh/id_rsa"
+    defaultDeployDir = "/opt/server"
+    remark = "本地开发机"
+
+[[ssh.hosts]]
+    host = "172.16.0.12"
+    user = "ops"
+    port = 22
+    # password = ""
+    keyPath = "/home/ops/.ssh/id_rsa"
+    defaultDeployDir = "/opt/server"
+    remark = "线上运维机"

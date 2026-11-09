@@ -1,28 +1,37 @@
-# 玩家逻辑服（test / game-1）。
+# 玩家逻辑服（node 集群）配置
+# due 自动加载 ./etc/etc.toml。
 
-pid = "./pid/game-1.pid"
+# 进程号
+pid = ""
+# 开发模式。支持模式：debug、test、release
 mode = "debug"
-timezone = "Asia/Shanghai"
+# 统一时区设置
+timezone = "Local"
 
 [cluster.node]
+    # 实例ID，节点集群中唯一。不填写默认自动生成
     id = "game-1"
+    # 实例名称
     name = "game"
-    addr = "127.0.0.1:"
+    # 内建RPC服务器监听地址。不填写默认随机监听
+    addr = "172.16.0.12:"
+    # 编解码器。可选：json | proto
     codec = "proto"
     [cluster.node.linker]
+        # RPC调用超时时间
         callTimeout = "3s"
 
 [log]
     level = "info"
     timeFormat = "2006/01/02 15:04:05.000000"
     stackLevel = "error"
-    callFullPath = true
     [log.file]
-        path = "./log/game-1.log"
+        path = "../../log/game.log"
         format = "text"
         maxAge = "7d"
         maxSize = 100
         rotate = "day"
+    callFullPath = true
 
 [packet]
     byteOrder = "big"
@@ -31,49 +40,82 @@ timezone = "Asia/Shanghai"
     bufferBytes = 5000
 
 [registry.etcd]
-    addrs = ["10.10.2.10:2379"]
+    addrs = ["172.16.0.2:2379"]
     namespace = "services"
 
 [locate.redis]
-    addrs = ["10.10.2.10:6379"]
-    db = 2
+    addrs = ["172.16.0.2:6379"]
+    db = 0
     username = ""
-    password = "game123"
+    password = "root123"
     maxRetries = 3
     prefix = "cluster:locate"
 
 [task]
+    # 任务池大小(goroutine)
     size = 1000
+    # 是否非阻塞
     nonblocking = true
+    # 是否禁用清除
     disablePurge = true
 
+# gRPC 传输服务端（node 对外提供内部 RPC；单机部署固定回环地址，
+# 默认 ":0" 会自动探测私网 IP，本机网卡为公网段 IP 时探测失败）
 [transport.grpc.server]
-    addr = "127.0.0.1:"
+    addr = "172.16.0.12:"
 
 [transport.grpc.client]
     caFile = ""
     serverName = ""
 
+# MySQL 命名实例（多数据源；dsn 为空则跳过该实例，模板可无 MySQL 启动）
 [[db.mysql.instances]]
     name = "default"
-    dsn = "game:game123@tcp(10.10.2.10:3306)/game_test?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s&readTimeout=10s&writeTimeout=10s"
+    dsn = "root:root123@tcp(172.16.0.2:3306)/game?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s&readTimeout=10s&writeTimeout=10s"
     max_open_conns = 50
     max_idle_conns = 20
 
 # 打点记录库（game_record）：物品/装备/武器/技能/英雄 获得与消耗记录
 [[db.mysql.instances]]
     name = "record"
-    dsn = "game:game123@tcp(10.10.2.10:3306)/game_record?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s&readTimeout=10s&writeTimeout=10s"
+    dsn = "root:root123@tcp(172.16.0.2:3306)/game_record?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s&readTimeout=10s&writeTimeout=10s"
     max_open_conns = 50
     max_idle_conns = 20
 
+# Redis 命名实例（不同业务可按 name 使用不同 db 号）
 [[redis.instances]]
     name = "default"
-    addrs = ["10.10.2.10:6379"]
+    addrs = ["172.16.0.2:6379"]
     username = ""
-    password = "game123"
-    db = 2
+    password = "root123"
+    db = 0
 
+# JWT 配置：须与 login 服 secret 一致
 [jwt]
-    secret = "test-cluster-secret"
-    valid_duration = 7200
+    secret = "cluster-secret"
+    valid_duration = 7200 # 秒
+
+# 玩家数据存储层（etc.store 段缺席则跳过初始化，模板可无存储启动）。
+# 字段说明见 internal/store/config.go；wal_id 每实例唯一且需持久化，崩溃恢复依赖它定位水位。
+# [store]
+#     wal_id = "game-1"
+#     wal_dir = "./data/wal"
+#     wal_sync_mode = "batch"
+#     wal_batch_sync_interval = "200ms"
+#     [store.local]
+#         mode = "simple"
+#         max_size = 100000
+#         ttl = "60s"
+#     [store.redis]
+#         enabled = false
+#         instance = "default"   # 引用 [[redis.instances]] 中的命名实例
+#         key_prefix = "player"
+#         ttl = "15m"
+#         ttl_jitter = "300s"
+#         invalidate_channel = "player:invalidate"
+#     [store.mysql]
+#         flush_batch_size = 200
+#         flush_interval = "200ms"
+#         shards = ["default"]   # 引用 [[db.mysql.instances]] 中的命名实例
+#     [store.version]
+#         driver = "redis_incr"

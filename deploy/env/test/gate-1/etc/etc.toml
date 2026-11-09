@@ -1,56 +1,94 @@
-# 网关服（test / gate-1）。部署包目录即工作目录，pid/log 均相对当前目录。
+# 网关服（gate 集群）配置
+# due 自动加载 ./etc/etc.toml。
 
-pid = "./pid/gate-1.pid"
+# 进程号
+pid = ""
+# 开发模式。支持模式：debug、test、release
 mode = "debug"
-timezone = "Asia/Shanghai"
+# 统一时区设置
+timezone = "Local"
 
 [cluster.gate]
+    # 实例ID，网关集群中唯一。不填写默认自动生成
     id = "gate-1"
+    # 实例名称
     name = "gate"
-    addr = "127.0.0.1:"
+    # 内建RPC服务器监听地址。不填写默认随机监听
+    addr = "172.16.0.12:"
     [cluster.gate.linker]
+        # RPC调用超时时间
         callTimeout = "3s"
 
 [log]
-    level = "info"
+    # 日志输出级别，可选：debug | info | warn | error | fatal | panic
+    # debug 用于排查连接断开原因（含心跳超时、读失败等 debug 级日志），排查完可改回 info
+    level = "debug"
+    # 时间格式，标准库时间格式
     timeFormat = "2006/01/02 15:04:05.000000"
+    # 堆栈的最低输出级别
     stackLevel = "error"
+    # 是否启用调用文件全路径
     callFullPath = true
     [log.file]
-        path = "./log/gate-1.log"
+        # 日志输出文件
+        path = "../../.dev/log/gate.log"
+        # 日志输出格式，可选：text | json
         format = "text"
+        # 文件最大留存时间
         maxAge = "7d"
+        # 文件最大尺寸限制，单位（MB）
         maxSize = 100
+        # 文件切割方式
         rotate = "day"
 
 [packet]
+    # 字节序，可选：little | big
     byteOrder = "big"
+    # 路由字节数
     routeBytes = 4
+    # 序列号字节数
     seqBytes = 4
+    # 消息字节数
     bufferBytes = 5000
+    # 是否携带服务器时间
     heartbeatTime = true
 
 [locate.redis]
-    addrs = ["10.10.2.10:6379"]
-    db = 2
+    # 客户端连接地址
+    addrs = ["172.16.0.2:6379"]
+    # 数据库号
+    db = 0
+    # 用户名
     username = ""
-    password = "game123"
+    # 密码
+    password = "root123"
+    # 最大重试次数
     maxRetries = 3
+    # key前缀
     prefix = "cluster:locate"
 
 [registry.etcd]
-    addrs = ["10.10.2.10:2379"]
+    # 服务器地址
+    addrs = ["172.16.0.2:2379"]
+    # 命名空间
     namespace = "services"
 
 [transport.grpc.client]
+    # CA证书文件
     caFile = ""
+    # 证书域名
     serverName = ""
 
-# 客户端接入地址：对外域名/IP 按实际网络映射填写
 [network.ws.server]
-    addr = "0.0.0.0:9000"
+    # 服务器监听地址（WebSocket 客户端接入地址）
+    addr = "172.16.0.12:9000"
+    # 客户端连接路径
     path = "/"
+    # 服务器最大连接数
     maxConnNum = 5000
+    # 跨域检测，空数组时不允许任何连接升级成websocket，未设置此参数时允许所有的链接升级成websocket
     origins = ["*"]
+    # 心跳检测间隔时间。设置为0则不启用心跳检测
     heartbeatInterval = "10s"
+    # 心跳机制：resp 响应式心跳 | tick 定时主推心跳
     heartbeatMechanism = "resp"
