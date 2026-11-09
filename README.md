@@ -63,11 +63,11 @@ Windows 原生可用 `gen-proto.bat` 与 `gen-config.bat`；`gen-swagger` 依赖
 ### 流程
 
 1. **拉代码**：Jenkins 按所选分支 checkout；发布按 `tag`（`VERSION` 即 tag 或代码中的版本号）。
-2. **拉配置**：配置随代码版本化，同一版本即包含该环境的 `deploy/env/<ENV>/<服务器id>/etc`，无需单独拉取。
+2. **拉配置表**：从 `https://cnb.cool/nightcatgames/excelconfig` 拉取配置表工程覆盖到 `cfg/excel`（Jenkins 凭据 ID：`excelconfig-git`），再执行 `deploy/scripts/gen-config.sh` 生成 `share/tpl` 代码与 `cfg/data`。
 3. **构建打包**：调用 `deploy/scripts/build.sh`，按服务器 id 取其 etc，交叉编译 Linux 可执行文件，产物以服务器 id 命名。
 4. **分发**：`<服务器id>.tar.gz` 经 `scp` 推到目标机（Jenkins 已配 SSH 凭据），远端解包后 `start.sh` 拉起。
 
-流水线见 [deploy/cicd/Jenkinsfile](deploy/cicd/Jenkinsfile)：`Checkout`（`TAG` 优先，其次分支）→ `Build`（`build.sh`）→ `Deploy`（`deploy.sh`）。
+流水线见 [deploy/cicd/Jenkinsfile](deploy/cicd/Jenkinsfile)：`Checkout`（`TAG` 优先，其次分支）→ `Validate` → `Config`（拉取 excelconfig + `gen-config.sh`）→ `Build`（`build.sh`）→ `Deploy`（`deploy.sh`）。
 
 主机清单 `deploy/cicd/<env>/servers.conf`：每行 `<服务器id> <主机> [ssh用户，默认 game] [远端目录，默认 /data/game]`。
 
@@ -97,7 +97,7 @@ bash deploy/scripts/build.sh --env prod --version v1.2.3 --servers "gate-1 game-
 ```
 
 - 服务器 id 前缀决定入口包：`gate-*`/`game-*`/`battle-*`/`social-*`/`login-*`/`admin-*`。
-- 配置查找顺序：`deploy/env/<env>/<服务器id>/etc` → `deploy/env/<env>/<服务名>/etc` → 服务自身 `etc`（回退时打印来源）。
+- 配置查找顺序：`deploy/env/<env>/<服务器id>/etc` → `deploy/env/<env>/<服务名>/etc` → 服务自身 `etc`（仅 test/audit 允许回退；release/prod 缺配置直接报错）。
 - 交叉编译：`CGO_ENABLED=0 GOOS=linux GOARCH=amd64`，可用同名环境变量覆盖。
 - login/admin 额外打包 `docs/`（swagger 文档）。
 

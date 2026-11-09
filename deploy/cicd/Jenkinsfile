@@ -1,9 +1,26 @@
+def resolvedVersion = ''
+
+// 配置表工程（cnb.cool 私有仓库）：Jenkins 中需存在 ID 为 excelconfig-git 的 Username/Password 凭据
+def EXCEL_REPO_HOST_PATH = 'cnb.cool/nightcatgames/excelconfig.git'
+def EXCEL_CREDENTIALS_ID = 'excelconfig-git'
+
+// 归一化服务器列表：Extended Choice 返回空格分隔，这里统一兼容逗号和多余空格。
+def normalizedServers() {
+    return (params.SERVERS ?: '').trim().replace(',', ' ').replaceAll(/\s+/, ' ')
+}
+
 pipeline {
     agent any
 
+    options {
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '30'))
+        timeout(time: 2, unit: 'HOURS')
+    }
+
     parameters {
         choice(name: 'ENV', choices: ['test', 'audit', 'release', 'prod'], description: '环境')
-        string(name: 'VERSION', defaultValue: '', description: '版本号，如 v1.0.0')
+        string(name: 'VERSION', defaultValue: '', description: '版本号，如 v1.0.0（TAG 为空时必填）')
         string(name: 'BRANCH', defaultValue: 'test', description: '分支（TAG 为空时生效）')
         string(name: 'TAG', defaultValue: '', description: 'Tag（非空时优先，按 tag 检出）')
 
@@ -21,14 +38,54 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                // 清空工作区，避免上一次构建的 dist 产物混入本次打包
+                deleteDir()
                 script {
                     if (params.TAG?.trim()) {
                         checkout([$class: 'GitSCM',
-                                  branches: [[name: "refs/tags/${params.TAG}"]],
+                                  branches: [[name: "refs/tags/${params.TAG.trim()}"]],
                                   userRemoteConfigs: scm.userRemoteConfigs])
                     } else {
-                        checkout scm
+                        checkout([$class: 'GitSCM',
+                                  branches: [[name: "*/${params.BRANCH?.trim() ?: 'test'}"]],
+                                  userRemoteConfigs: scm.userRemoteConfigs])
                     }
+                }
+            }
+        }
+
+        stage('Validate') {
+            steps {
+                script {
+                    def tag = params.TAG?.trim() ?: ''
+                    def version = params.VERSION?.trim() ?: ''
+                    if (version) {
+                        resolvedVersion = version
+                    } else if (tag) {
+                        resolvedVersion = tag
+                    } else {
+                        error('VERSION 不能为空（未指定 TAG 时必须填写 VERSION）')
+                    }
+                }
+            }
+        }
+
+        stage('Config') {
+            steps {
+                script {
+                    // 拉取配置表工程覆盖 cfg/excel，再生成 share/tpl 代码与 cfg/data JSON
+                    withCredentials([usernamePassword(
+                        credentialsId: EXCEL_CREDENTIALS_ID,
+                        usernameVariable: 'EXCEL_GIT_USER',
+                        passwordVariable: 'EXCEL_GIT_PASS'
+                    )]) {
+                        sh """
+                            set -e
+                            rm -rf cfg/excel
+                            git clone --depth 1 "https://\${EXCEL_GIT_USER}:\${EXCEL_GIT_PASS}@${EXCEL_REPO_HOST_PATH}" cfg/excel
+                        """
+                    }
+                    sh 'bash deploy/scripts/gen-config.sh'
                 }
             }
         }
@@ -37,11 +94,11 @@ pipeline {
             steps {
                 script {
                     // Extended Choice 多选返回值是分隔符拼接的字符串（此处已设为空格）
-                    def servers = params.SERVERS?.trim() ?: ''
+                    def servers = normalizedServers()
                     if (!servers) {
-                        error("SERVERS 不能为空，请至少选择一台服务器！")
+                        error('SERVERS 不能为空，请至少选择一台服务器！')
                     }
-                    sh 'bash deploy/scripts/build.sh --env "$ENV" --version "$VERSION" --servers "$servers"'
+                    sh "bash deploy/scripts/build.sh --env '${params.ENV}' --version '${resolvedVersion}' --servers '${servers}'"
                 }
             }
         }
@@ -49,43 +106,20 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    def servers = params.SERVERS?.trim() ?: ''
-                    sh 'bash deploy/cicd/deploy.sh --env "$ENV" --version "$VERSION" --servers "$servers"'
-                }
-            }
-        }
-
-        stage('Transfer') {
-            steps {
-                script {
-                    def version = params.VERSION?.trim()
-                    if (!version) {
-                        error("VERSION 不能为空，无法定位产物进行传输！")
-                    }
-
-                    // ====== 目标服务器配置（按需修改） ======
-                    def remoteHost = '172.16.0.12'          // 目标服务器 IP
-                    def remoteDir  = "/data/deploy/${params.ENV}"
-                    def localGlob  = "dist/${params.ENV}/${version}/*.tar.gz"
-                    // =======================================
-
-                    // 使用 Jenkins 凭据（SSH Username with private key）
-                    // 凭据 ID 设为 deploy-ssh-key，请先在 Jenkins 中创建
+                    def servers = normalizedServers()
+                    // 用 Jenkins 凭据注入私钥，通过 ssh-agent 让 deploy.sh 的 ssh/scp 直接复用，
+                    // 不再依赖构建机预先配置的免密登录。
                     withCredentials([sshUserPrivateKey(
                         credentialsId: 'deploy-ssh-key',
                         keyFileVariable: 'SSH_KEY',
                         usernameVariable: 'SSH_USER'
                     )]) {
-                        // 先确保远端目录存在
                         sh """
-                            ssh -i "\$SSH_KEY" -o StrictHostKeyChecking=no \\
-                                \${SSH_USER}@${remoteHost} "mkdir -p ${remoteDir}"
-                        """
-                        // 传输产物
-                        sh """
-                            scp -i "\$SSH_KEY" -o StrictHostKeyChecking=no \\
-                                ${localGlob} \\
-                                \${SSH_USER}@${remoteHost}:${remoteDir}/
+                            set -e
+                            eval "\$(ssh-agent -s)"
+                            trap 'ssh-agent -k >/dev/null 2>&1 || true' EXIT
+                            ssh-add "\$SSH_KEY"
+                            bash deploy/cicd/deploy.sh --env '${params.ENV}' --version '${resolvedVersion}' --servers '${servers}' --user "\$SSH_USER"
                         """
                     }
                 }
@@ -96,9 +130,7 @@ pipeline {
     post {
         success {
             script {
-                if (params.VERSION?.trim()) {
-                    archiveArtifacts artifacts: "dist/${params.ENV}/${params.VERSION}/*.tar.gz", fingerprint: true
-                }
+                archiveArtifacts artifacts: "dist/${params.ENV}/${resolvedVersion}/*.tar.gz", fingerprint: true
             }
         }
     }
