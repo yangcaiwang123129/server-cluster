@@ -1,8 +1,13 @@
 def resolvedVersion = ''
 
-// 配置表工程（cnb.cool 私有仓库）：复用已在 server-cluster 检出中成功使用的 cnb 凭据
-def EXCEL_REPO_HOST_PATH = 'cnb.cool/nightcatgames/excelconfig.git'
+// ========== Jenkins 凭据（需在 Credentials 页面预先创建好） ==========
+// EXCEL_CREDENTIALS_ID：Username/Password 类型，用于 https://cnb.cool/nightcatgames/excelconfig 拉取配置表
+//   复用检出 server-cluster 已成功使用的 cnb 凭据
+// DEPLOY_CREDENTIALS_ID：SSH Private Key 类型，用于 scp/ssh 到 servers.conf 里列的目标机
+//   目标机公钥需已加入 known_hosts（或用 StrictHostKeyChecking=no 降低安全）
+def EXCEL_GIT_URL = 'https://cnb.cool/nightcatgames/excelconfig.git'
 def EXCEL_CREDENTIALS_ID = 'cnb'
+def DEPLOY_CREDENTIALS_ID = 'deploy-ssh-key'
 
 // 归一化服务器列表：Extended Choice 返回空格分隔，这里统一兼容逗号和多余空格。
 def normalizedServers() {
@@ -73,7 +78,25 @@ pipeline {
         stage('Config') {
             steps {
                 script {
+                    // 前置检查：dotnet（Luban 跑在 dotnet 上）、go、bash、git 必须齐备
+                    sh '''
+                        set +e
+                        echo "=== tool check ==="
+                        for tool in dotnet go bash git chmod; do
+                            if command -v "$tool" >/dev/null 2>&1; then
+                                printf '  %-8s -> %s\\n' "$tool" "$(command -v "$tool")"
+                            else
+                                printf '  %-8s -> MISSING\\n' "$tool"
+                            fi
+                        done
+                        echo
+                        if command -v dotnet >/dev/null 2>&1; then
+                            dotnet --list-runtimes 2>/dev/null | head -5
+                        fi
+                        set -e
+                    '''
                     // 拉取配置表工程覆盖 cfg/excel，再生成 share/tpl 代码与 cfg/data JSON
+                    // 用 GIT_ASKPASS helper 安全传凭据，避免 URL 内嵌密码特殊字符导致 clone 失败
                     withCredentials([usernamePassword(
                         credentialsId: EXCEL_CREDENTIALS_ID,
                         usernameVariable: 'EXCEL_GIT_USER',
@@ -82,7 +105,18 @@ pipeline {
                         sh """
                             set -e
                             rm -rf cfg/excel
-                            git clone --depth 1 "https://\${EXCEL_GIT_USER}:\${EXCEL_GIT_PASS}@${EXCEL_REPO_HOST_PATH}" cfg/excel
+                            chmod +x deploy/scripts/*.sh deploy/tools/Luban/luban.sh 2>/dev/null || true
+                            cat > .jenkins-git-askpass.sh <<'ASKPASS_EOF'
+#!/bin/sh
+case "\$1" in
+    *Username*) printf '%s' "\$EXCEL_GIT_USER" ;;
+    *Password*) printf '%s' "\$EXCEL_GIT_PASS" ;;
+esac
+ASKPASS_EOF
+                            chmod +x .jenkins-git-askpass.sh
+                            export GIT_ASKPASS="\$(pwd)/.jenkins-git-askpass.sh"
+                            export GIT_TERMINAL_PROMPT=0
+                            git clone --depth 1 '${EXCEL_GIT_URL}' cfg/excel
                         """
                     }
                     sh 'bash deploy/scripts/gen-config.sh'
@@ -107,18 +141,24 @@ pipeline {
             steps {
                 script {
                     def servers = normalizedServers()
-                    // 用 Jenkins 凭据注入私钥，通过 ssh-agent 让 deploy.sh 的 ssh/scp 直接复用，
-                    // 不再依赖构建机预先配置的免密登录。
+                    // 用 Jenkins 凭据注入 SSH 私钥，通过 ssh-agent 让 deploy.sh 的 ssh/scp 直接复用。
+                    // BatchMode=yes 要求目标机公钥已在 known_hosts 中，下面先自动接受一次（首次部署时）。
                     withCredentials([sshUserPrivateKey(
-                        credentialsId: 'deploy-ssh-key',
+                        credentialsId: DEPLOY_CREDENTIALS_ID,
                         keyFileVariable: 'SSH_KEY',
                         usernameVariable: 'SSH_USER'
                     )]) {
                         sh """
                             set -e
+                            mkdir -p ~/.ssh && chmod 700 ~/.ssh
                             eval "\$(ssh-agent -s)"
                             trap 'ssh-agent -k >/dev/null 2>&1 || true' EXIT
                             ssh-add "\$SSH_KEY"
+                            # 预添加目标机 host key，避免 BatchMode=yes 下首次连接因 known_hosts 缺失而失败
+                            for host in \$(awk '{print \$2}' deploy/cicd/${params.ENV}/servers.conf | grep -v '^#'); do
+                                ssh-keyscan -H "\$host" >> ~/.ssh/known_hosts 2>/dev/null || true
+                            done
+                            chmod 644 ~/.ssh/known_hosts || true
                             bash deploy/cicd/deploy.sh --env '${params.ENV}' --version '${resolvedVersion}' --servers '${servers}' --user "\$SSH_USER"
                         """
                     }

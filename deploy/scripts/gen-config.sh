@@ -15,10 +15,13 @@ DATA_OUT="$ROOT/cfg/data"
 MODULE="server-cluster/share/tpl"
 TPL_DIR="$ROOT/deploy/tools/Luban/templates"
 
-if [[ ! -x "$LUBAN_BIN" ]]; then
-    echo "[gen-config] ERROR: Luban launcher not found or not executable: $LUBAN_BIN" >&2
+# Linux clone 下来的 .sh 可能没有 +x（git 默认不保留 Windows 上设置的 POSIX 位），
+# 这里在执行前补上，避免 [[ ! -x ]] 直接拒绝。
+if [[ ! -f "$LUBAN_BIN" ]]; then
+    echo "[gen-config] ERROR: Luban launcher not found: $LUBAN_BIN" >&2
     exit 1
 fi
+chmod +x "$LUBAN_BIN"
 if [[ ! -f "$CONF" ]]; then
     echo "[gen-config] ERROR: luban.conf not found: $CONF" >&2
     exit 1
