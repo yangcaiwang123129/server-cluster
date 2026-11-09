@@ -1,17 +1,16 @@
 def resolvedVersion = ''
+def resolvedServers = ''
 
 // ========== Jenkins 凭据（需在 Credentials 页面预先创建好） ==========
-// EXCEL_CREDENTIALS_ID：Username/Password 类型，用于 https://cnb.cool/nightcatgames/excelconfig 拉取配置表
-//   复用检出 server-cluster 已成功使用的 cnb 凭据
+// EXCEL_CREDENTIALS_ID：Username/Password 类型，复用检出 server-cluster 已成功使用的 cnb 凭据
 // DEPLOY_CREDENTIALS_ID：SSH Private Key 类型，用于 scp/ssh 到 servers.conf 里列的目标机
-//   目标机公钥需已加入 known_hosts（或用 StrictHostKeyChecking=no 降低安全）
 def EXCEL_GIT_URL = 'https://cnb.cool/nightcatgames/excelconfig.git'
 def EXCEL_CREDENTIALS_ID = 'cnb'
 def DEPLOY_CREDENTIALS_ID = 'deploy-ssh-key'
 
-// 归一化服务器列表：Extended Choice 返回空格分隔，这里统一兼容逗号和多余空格。
-def normalizedServers() {
-    return (params.SERVERS ?: '').trim().replace(',', ' ').replaceAll(/\s+/, ' ')
+// 归一化服务器列表：兼容 Extended Choice 返回空格分隔 / 用户手填逗号分隔 / 多余空格
+def normalizedServers(raw) {
+    return (raw ?: '').trim().replace(',', ' ').replaceAll(/\s+/, ' ')
 }
 
 pipeline {
@@ -24,35 +23,47 @@ pipeline {
     }
 
     parameters {
-        choice(name: 'ENV', choices: ['test', 'audit', 'release', 'prod'], description: '环境')
-        string(name: 'VERSION', defaultValue: '', description: '版本号，如 v1.0.0（TAG 为空时必填）')
-        string(name: 'BRANCH', defaultValue: 'test', description: '分支（TAG 为空时生效）')
-        string(name: 'TAG', defaultValue: '', description: 'Tag（非空时优先，按 tag 检出）')
+        // ========== 构建来源（二选一） ==========
+        choice(
+            name: 'BUILD_SOURCE',
+            choices: ['branch', 'tag'],
+            description: '构建来源：branch=从分支构建并配版本号；tag=按 tag 检出（版本号自动取 tag 名）'
+        )
 
-        // 使用 Extended Choice Parameter 的多选列表框，支持 Ctrl+鼠标点击多选
+        string(name: 'BRANCH',  defaultValue: 'master', description: '分支（BUILD_SOURCE=branch 时生效）')
+        string(name: 'TAG',     defaultValue: '',        description: 'Tag    （BUILD_SOURCE=tag 时生效，如 v1.0.0）')
+        string(name: 'VERSION', defaultValue: '',        description: '版本号 vX.Y.Z（BUILD_SOURCE=branch 时必填；tag 模式自动取 tag 名）')
+
+        // ========== 发布目标 ==========
+        choice(name: 'ENV', choices: ['test', 'audit', 'release', 'prod'], description: '部署环境')
+
+        // ========== 服务器 ==========
         extendedChoice(
             name: 'SERVERS',
-            description: '服务器（按住 Ctrl 或 Shift 多选）',
+            description: '服务器（按住 Ctrl/Shift 多选；空=该环境 servers.conf 全部）',
             type: 'PT_MULTI_SELECT',
-            value: 'gate-1,game-1,battle-1,social-1,login-1,admin-1',
+            value: '',
             multiSelectDelimiter: ' ',
             visibleItemCount: 7
         )
+
+        // ========== 执行控制 ==========
+        booleanParam(name: 'RUN_DEPLOY', defaultValue: true, description: '执行 Deploy；关闭则只 Config+Build，不发版')
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // 清空工作区，避免上一次构建的 dist 产物混入本次打包
                 deleteDir()
                 script {
-                    if (params.TAG?.trim()) {
+                    if (params.BUILD_SOURCE == 'tag') {
                         checkout([$class: 'GitSCM',
                                   branches: [[name: "refs/tags/${params.TAG.trim()}"]],
                                   userRemoteConfigs: scm.userRemoteConfigs])
                     } else {
+                        def branch = params.BRANCH.trim() ?: 'master'
                         checkout([$class: 'GitSCM',
-                                  branches: [[name: "*/${params.BRANCH?.trim() ?: 'test'}"]],
+                                  branches: [[name: "*/${branch}"]],
                                   userRemoteConfigs: scm.userRemoteConfigs])
                     }
                 }
@@ -62,15 +73,44 @@ pipeline {
         stage('Validate') {
             steps {
                 script {
-                    def tag = params.TAG?.trim() ?: ''
-                    def version = params.VERSION?.trim() ?: ''
-                    if (version) {
-                        resolvedVersion = version
-                    } else if (tag) {
+                    def source = params.BUILD_SOURCE
+                    def env    = params.ENV
+                    def tag    = params.TAG?.trim() ?: ''
+                    def ver    = params.VERSION?.trim() ?: ''
+
+                    // --- 版本号（严格校验） ---
+                    if (source == 'tag') {
+                        if (!tag) error('BUILD_SOURCE=tag 时 TAG 必填')
                         resolvedVersion = tag
                     } else {
-                        error('VERSION 不能为空（未指定 TAG 时必须填写 VERSION）')
+                        if (!ver) error('BUILD_SOURCE=branch 时 VERSION 必填')
+                        resolvedVersion = ver
                     }
+
+                    // --- 服务器列表（空 = 从 servers.conf 里解析该环境全部） ---
+                    def rawServers = normalizedServers(params.SERVERS)
+                    if (rawServers) {
+                        resolvedServers = rawServers
+                    } else {
+                        // 用 shell + awk 读 workspace 里的 servers.conf（不碰 controller 文件系统）
+                        def serversFromConf = sh(
+                            script: "awk 'NF && !/^#/ {print \$1}' deploy/cicd/${env}/servers.conf",
+                            returnStdout: true
+                        ).trim()
+                        resolvedServers = serversFromConf
+                    }
+                    if (!resolvedServers) error('SERVERS 为空，且 servers.conf 里也没找到服务器')
+
+                    // --- 运行计划 ---
+                    echo """
+                    === 运行计划 ===
+                    构建来源 : ${source}
+                    检出     : ${source == 'tag' ? "tag ${tag}" : "branch ${params.BRANCH}"}
+                    版本号   : ${resolvedVersion}
+                    环境     : ${env}
+                    服务器   : ${resolvedServers}
+                    部署     : ${params.RUN_DEPLOY ? '是' : '否（只打包）'}
+                    """
                 }
             }
         }
@@ -78,7 +118,6 @@ pipeline {
         stage('Config') {
             steps {
                 script {
-                    // 前置检查：dotnet（Luban 跑在 dotnet 上）、go、bash、git 必须齐备
                     sh '''
                         set +e
                         echo "=== tool check ==="
@@ -95,8 +134,6 @@ pipeline {
                         fi
                         set -e
                     '''
-                    // 让 gen-config.sh 自己 clone excelconfig + 按环境平铺 xlsx 到 cfg/excel/
-                    // prod/release 需传 --version，test/audit 传 --env 即可
                     def versionArg = (params.ENV in ['release', 'prod']) ? "--version '${resolvedVersion}'" : ''
                     withCredentials([usernamePassword(
                         credentialsId: EXCEL_CREDENTIALS_ID,
@@ -116,22 +153,15 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    // Extended Choice 多选返回值是分隔符拼接的字符串（此处已设为空格）
-                    def servers = normalizedServers()
-                    if (!servers) {
-                        error('SERVERS 不能为空，请至少选择一台服务器！')
-                    }
-                    sh "bash deploy/scripts/build.sh --env '${params.ENV}' --version '${resolvedVersion}' --servers '${servers}'"
+                    sh "bash deploy/scripts/build.sh --env '${params.ENV}' --version '${resolvedVersion}' --servers '${resolvedServers}'"
                 }
             }
         }
 
         stage('Deploy') {
+            when { expression { params.RUN_DEPLOY } }
             steps {
                 script {
-                    def servers = normalizedServers()
-                    // 用 Jenkins 凭据注入 SSH 私钥，通过 ssh-agent 让 deploy.sh 的 ssh/scp 直接复用。
-                    // BatchMode=yes 要求目标机公钥已在 known_hosts 中，下面先自动接受一次（首次部署时）。
                     withCredentials([sshUserPrivateKey(
                         credentialsId: DEPLOY_CREDENTIALS_ID,
                         keyFileVariable: 'SSH_KEY',
@@ -143,12 +173,14 @@ pipeline {
                             eval "\$(ssh-agent -s)"
                             trap 'ssh-agent -k >/dev/null 2>&1 || true' EXIT
                             ssh-add "\$SSH_KEY"
-                            # 预添加目标机 host key，避免 BatchMode=yes 下首次连接因 known_hosts 缺失而失败
-                            for host in \$(awk '{print \$2}' deploy/cicd/${params.ENV}/servers.conf | grep -v '^#'); do
-                                ssh-keyscan -H "\$host" >> ~/.ssh/known_hosts 2>/dev/null || true
+                            # known_hosts 存到 workspace 本地，首次用 ssh-keyscan 预加，不绕 host key 校验
+                            mkdir -p \$WORKSPACE/.ssh && chmod 700 \$WORKSPACE/.ssh
+                            touch \$WORKSPACE/.ssh/known_hosts && chmod 644 \$WORKSPACE/.ssh/known_hosts
+                            for host in \$(awk 'NF && !/^#/ {print \$2}' deploy/cicd/${params.ENV}/servers.conf | sort -u); do
+                                ssh-keyscan -H "\$host" 2>/dev/null >> \$WORKSPACE/.ssh/known_hosts || true
                             done
-                            chmod 644 ~/.ssh/known_hosts || true
-                            bash deploy/cicd/deploy.sh --env '${params.ENV}' --version '${resolvedVersion}' --servers '${servers}' --user "\$SSH_USER"
+                            export DEPLOY_SSH_OPTS="-o UserKnownHostsFile=\$WORKSPACE/.ssh/known_hosts"
+                            bash deploy/cicd/deploy.sh --env '${params.ENV}' --version '${resolvedVersion}' --servers '${resolvedServers}' --user "\$SSH_USER"
                         """
                     }
                 }

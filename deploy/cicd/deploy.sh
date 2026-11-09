@@ -7,7 +7,7 @@
 #
 # 可选：
 #   --user <用户>      默认 game（可被 servers.conf 第 3 列覆盖）
-#   --remote <目录>    默认 /data/game（可被 servers.conf 第 4 列覆盖）
+#   --remote <目录>    默认 /data/<env>/<server-id>（可被 servers.conf 第 4 列覆盖）
 #   --dry-run          只打印将执行的命令
 set -euo pipefail
 
@@ -72,7 +72,9 @@ while read -r id host user remote _; do
     in_scope "$id" || continue
 
     user="${user:-$USER_DEFAULT}"
-    remote="${remote:-$REMOTE_DEFAULT}"
+    # 默认远端目录：/data/<env>/<server-id>
+    # 同主机多服务各自独立，不同环境顶层隔离
+    remote="${remote:-/data/$ENV/$id}"
     pkg="$DIST/$id.tar.gz"
 
     if [[ ! -f "$pkg" ]]; then
@@ -82,8 +84,8 @@ while read -r id host user remote _; do
     fi
 
     echo "[分发] $id -> $user@$host:$remote"
-    run ssh -o BatchMode=yes "$user@$host" "mkdir -p '$remote'"
-    run scp -q -o BatchMode=yes "$pkg" "$user@$host:$remote/"
+    run ssh ${DEPLOY_SSH_OPTS:-} -o BatchMode=yes "$user@$host" "mkdir -p '$remote'"
+    run scp ${DEPLOY_SSH_OPTS:-} -o BatchMode=yes -q "$pkg" "$user@$host:$remote/"
 
     # 先停旧进程，再解包覆盖（保留 log/pid/data 运行期目录），最后拉起。
     # 远端命令用 POSIX 写法，兼容 sh/bash 登录 shell。
