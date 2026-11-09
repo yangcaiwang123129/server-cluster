@@ -95,8 +95,9 @@ pipeline {
                         fi
                         set -e
                     '''
-                    // 拉取配置表工程覆盖 cfg/excel，再生成 share/tpl 代码与 cfg/data JSON
-                    // 用 GIT_ASKPASS helper 安全传凭据，避免 URL 内嵌密码特殊字符导致 clone 失败
+                    // 让 gen-config.sh 自己 clone excelconfig + 按环境平铺 xlsx 到 cfg/excel/
+                    // prod/release 需传 --version，test/audit 传 --env 即可
+                    def versionArg = (params.ENV in ['release', 'prod']) ? "--version '${resolvedVersion}'" : ''
                     withCredentials([usernamePassword(
                         credentialsId: EXCEL_CREDENTIALS_ID,
                         usernameVariable: 'EXCEL_GIT_USER',
@@ -104,22 +105,10 @@ pipeline {
                     )]) {
                         sh """
                             set -e
-                            rm -rf cfg/excel
                             chmod +x deploy/scripts/*.sh deploy/tools/Luban/luban.sh 2>/dev/null || true
-                            cat > .jenkins-git-askpass.sh <<'ASKPASS_EOF'
-#!/bin/sh
-case "\$1" in
-    *Username*) printf '%s' "\$EXCEL_GIT_USER" ;;
-    *Password*) printf '%s' "\$EXCEL_GIT_PASS" ;;
-esac
-ASKPASS_EOF
-                            chmod +x .jenkins-git-askpass.sh
-                            export GIT_ASKPASS="\$(pwd)/.jenkins-git-askpass.sh"
-                            export GIT_TERMINAL_PROMPT=0
-                            git clone --depth 1 '${EXCEL_GIT_URL}' cfg/excel
+                            bash deploy/scripts/gen-config.sh --env '${params.ENV}' ${versionArg}
                         """
                     }
-                    sh 'bash deploy/scripts/gen-config.sh'
                 }
             }
         }
