@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     parameters {
-        choice(name: 'ENV', choices: ['audit', 'test', 'release', 'prod'], description: '环境')
-        string(name: 'VERSION', defaultValue: '', description: '版本号，如 v1.2.3')
-        string(name: 'BRANCH', defaultValue: 'main', description: '分支（TAG 为空时生效）')
+        choice(name: 'ENV', choices: ['test', 'audit', 'release', 'prod'], description: '环境')
+        string(name: 'VERSION', defaultValue: '', description: '版本号，如 v1.0.0')
+        string(name: 'BRANCH', defaultValue: 'test', description: '分支（TAG 为空时生效）')
         string(name: 'TAG', defaultValue: '', description: 'Tag（非空时优先，按 tag 检出）')
 
         // 使用 Extended Choice Parameter 的多选列表框，支持 Ctrl+鼠标点击多选
@@ -51,6 +51,43 @@ pipeline {
                 script {
                     def servers = params.SERVERS?.trim() ?: ''
                     sh 'bash deploy/cicd/deploy.sh --env "$ENV" --version "$VERSION" --servers "$servers"'
+                }
+            }
+        }
+
+        stage('Transfer') {
+            steps {
+                script {
+                    def version = params.VERSION?.trim()
+                    if (!version) {
+                        error("VERSION 不能为空，无法定位产物进行传输！")
+                    }
+
+                    // ====== 目标服务器配置（按需修改） ======
+                    def remoteHost = '172.16.0.12'          // 目标服务器 IP
+                    def remoteDir  = "/data/deploy/${params.ENV}"
+                    def localGlob  = "dist/${params.ENV}/${version}/*.tar.gz"
+                    // =======================================
+
+                    // 使用 Jenkins 凭据（SSH Username with private key）
+                    // 凭据 ID 设为 deploy-ssh-key，请先在 Jenkins 中创建
+                    withCredentials([sshUserPrivateKey(
+                        credentialsId: 'deploy-ssh-key',
+                        keyFileVariable: 'SSH_KEY',
+                        usernameVariable: 'SSH_USER'
+                    )]) {
+                        // 先确保远端目录存在
+                        sh """
+                            ssh -i "\$SSH_KEY" -o StrictHostKeyChecking=no \\
+                                \${SSH_USER}@${remoteHost} "mkdir -p ${remoteDir}"
+                        """
+                        // 传输产物
+                        sh """
+                            scp -i "\$SSH_KEY" -o StrictHostKeyChecking=no \\
+                                ${localGlob} \\
+                                \${SSH_USER}@${remoteHost}:${remoteDir}/
+                        """
+                    }
                 }
             }
         }
