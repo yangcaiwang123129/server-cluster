@@ -17,7 +17,7 @@ timezone = "Local"
         callTimeout = "3s"
 # HTTP 监听地址（due http 组件）
 [http]
-    addr = "106.53.0.18:7788"
+    addr = "0.0.0.0:7788"
 
 # CORS 跨域（开发环境全放行）
 [http.cors]

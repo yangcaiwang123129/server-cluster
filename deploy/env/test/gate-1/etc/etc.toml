@@ -81,7 +81,7 @@ timezone = "Local"
 
 [network.ws.server]
     # 服务器监听地址（WebSocket 客户端接入地址）
-    addr = "106.53.0.18:9000"
+    addr = "0.0.0.0:9000"
     # 客户端连接路径
     path = "/"
     # 服务器最大连接数

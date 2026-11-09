@@ -18,7 +18,7 @@ timezone = "Local"
 
 # HTTP 监听地址（due http 组件）
 [http]
-    addr = "106.53.0.18:8877"
+    addr = "0.0.0.0:8877"
 
 # Swagger 文档（由 swag 生成，due http 组件自动挂载到 /swagger）
 [http.swagger]

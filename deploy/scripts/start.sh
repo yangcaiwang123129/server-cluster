@@ -9,14 +9,14 @@ APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP="$(basename "$APP_DIR")"
 
 # 从目录结构推断运行模式：
-#   部署结构：/data/test/server/gate-1/start.sh → 祖父目录名 == "server"
+#   部署结构：/data/test/server/gate-1/start.sh → 父目录 basename == "server"
 #     → pid/log 集中到 /data/test/{pid,log}/
-#   本地运行：./dist/dev/gate-1/start.sh → 祖父目录名 != "server"
+#   本地运行：./dist/dev/gate-1/start.sh → 父目录 basename != "server"
 #     → pid/log 放包目录内（兼容本地调试）
-GRANDPARENT_NAME="$(basename "$(dirname "$(dirname "$APP_DIR")")")"
-if [[ "$GRANDPARENT_NAME" == "server" ]]; then
-    DEPLOY_ROOT="$(dirname "$(dirname "$APP_DIR")")"   # /data/test/server
-    ENV_ROOT="$(dirname "$DEPLOY_ROOT")"               # /data/test
+PARENT_NAME="$(basename "$(dirname "$APP_DIR")")"
+if [[ "$PARENT_NAME" == "server" ]]; then
+    DEPLOY_ROOT="$(dirname "$APP_DIR")"               # /data/test/server
+    ENV_ROOT="$(dirname "$DEPLOY_ROOT")"              # /data/test
     PID_DIR="$ENV_ROOT/pid"
     LOG_DIR="$ENV_ROOT/log"
 else

@@ -16,9 +16,9 @@ APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP="$(basename "$APP_DIR")"
 
 # 从目录结构推断运行模式（同 start.sh）
-GRANDPARENT_NAME="$(basename "$(dirname "$(dirname "$APP_DIR")")")"
-if [[ "$GRANDPARENT_NAME" == "server" ]]; then
-    DEPLOY_ROOT="$(dirname "$(dirname "$APP_DIR")")"
+PARENT_NAME="$(basename "$(dirname "$APP_DIR")")"
+if [[ "$PARENT_NAME" == "server" ]]; then
+    DEPLOY_ROOT="$(dirname "$APP_DIR")"
     ENV_ROOT="$(dirname "$DEPLOY_ROOT")"
     PID_DIR="$ENV_ROOT/pid"
     LOG_DIR="$ENV_ROOT/log"
