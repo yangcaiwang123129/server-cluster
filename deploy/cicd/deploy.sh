@@ -17,7 +17,7 @@ ENV=""
 VERSION=""
 SERVERS=""
 USER_DEFAULT="game"
-REMOTE_ROOT="/data/$ENV/server"
+REMOTE_ROOT=""
 DRY_RUN=0
 
 usage() {
@@ -33,7 +33,7 @@ while [[ $# -gt 0 ]]; do
         --version) VERSION="${2:-}"; shift 2 ;;
         --servers) SERVERS="${2:-}"; shift 2 ;;
         --user) USER_DEFAULT="${2:-}"; shift 2 ;;
-        --remote) REMOTE_DEFAULT="${2:-}"; shift 2 ;;
+        --remote) REMOTE_ROOT="${2:-}"; shift 2 ;;
         --dry-run) DRY_RUN=1; shift ;;
         -h | --help) usage ;;
         *) echo "未知参数: $1" >&2; usage ;;
@@ -41,6 +41,8 @@ while [[ $# -gt 0 ]]; do
 done
 
 [[ -n "$ENV" && -n "$VERSION" ]] || usage
+
+REMOTE_ROOT="${REMOTE_ROOT:-/data/$ENV/server}"
 
 CONF="$ROOT/deploy/cicd/$ENV/servers.conf"
 [[ -f "$CONF" ]] || { echo "[错误] 缺少主机清单：deploy/cicd/$ENV/servers.conf" >&2; exit 1; }
