@@ -1,6 +1,6 @@
 # 玩家逻辑服（audit / game-1）。
 
-pid = "./pid/game-1.pid"
+pid = "../../pid/game-1.pid"
 mode = "debug"
 timezone = "Asia/Shanghai"
 
@@ -18,7 +18,7 @@ timezone = "Asia/Shanghai"
     stackLevel = "error"
     callFullPath = true
     [log.file]
-        path = "./log/game-1.log"
+        path = "../../log/game-1.log"
         format = "text"
         maxAge = "7d"
         maxSize = 100
@@ -38,7 +38,7 @@ timezone = "Asia/Shanghai"
     addrs = ["10.10.1.10:6379"]
     db = 1
     username = ""
-    password = "game123"
+    password = "root123"
     maxRetries = 3
     prefix = "cluster:locate"
 
@@ -56,14 +56,14 @@ timezone = "Asia/Shanghai"
 
 [[db.mysql.instances]]
     name = "default"
-    dsn = "game:game123@tcp(10.10.1.10:3306)/game_audit?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s&readTimeout=10s&writeTimeout=10s"
+    dsn = "root:root123@tcp(10.10.1.10:3306)/game_audit?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s&readTimeout=10s&writeTimeout=10s"
     max_open_conns = 50
     max_idle_conns = 20
 
 # 打点记录库（game_record）：物品/装备/武器/技能/英雄 获得与消耗记录
 [[db.mysql.instances]]
     name = "record"
-    dsn = "game:game123@tcp(10.10.1.10:3306)/game_record?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s&readTimeout=10s&writeTimeout=10s"
+    dsn = "root:root123@tcp(10.10.1.10:3306)/game_record?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s&readTimeout=10s&writeTimeout=10s"
     max_open_conns = 50
     max_idle_conns = 20
 
@@ -71,7 +71,7 @@ timezone = "Asia/Shanghai"
     name = "default"
     addrs = ["10.10.1.10:6379"]
     username = ""
-    password = "game123"
+    password = "root123"
     db = 1
 
 [jwt]

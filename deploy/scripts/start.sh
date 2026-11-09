@@ -7,10 +7,27 @@ set -euo pipefail
 
 APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP="$(basename "$APP_DIR")"
-PID_FILE="$APP_DIR/$APP.pid"
-LOG_DIR="$APP_DIR/log"
 
-mkdir -p "$LOG_DIR" "$APP_DIR/pid"
+# 从目录结构推断运行模式：
+#   部署结构：/data/test/server/gate-1/start.sh → 祖父目录名 == "server"
+#     → pid/log 集中到 /data/test/{pid,log}/
+#   本地运行：./dist/dev/gate-1/start.sh → 祖父目录名 != "server"
+#     → pid/log 放包目录内（兼容本地调试）
+GRANDPARENT_NAME="$(basename "$(dirname "$(dirname "$APP_DIR")")")"
+if [[ "$GRANDPARENT_NAME" == "server" ]]; then
+    DEPLOY_ROOT="$(dirname "$(dirname "$APP_DIR")")"   # /data/test/server
+    ENV_ROOT="$(dirname "$DEPLOY_ROOT")"               # /data/test
+    PID_DIR="$ENV_ROOT/pid"
+    LOG_DIR="$ENV_ROOT/log"
+else
+    PID_DIR="$APP_DIR/pid"
+    LOG_DIR="$APP_DIR/log"
+fi
+
+PID_FILE="$PID_DIR/$APP.pid"
+LOG_FILE="$LOG_DIR/$APP.stdout.log"
+
+mkdir -p "$LOG_DIR" "$PID_DIR"
 
 is_windows() {
     case "$(uname -s)" in
@@ -37,7 +54,7 @@ fi
 cd "$APP_DIR"
 
 # 后台启动
-nohup "./$APP" >>"$LOG_DIR/stdout.log" 2>&1 &
+nohup "./$APP" >>"$LOG_FILE" 2>&1 &
 
 # 取真正的进程 PID
 sleep 0.5
@@ -52,8 +69,8 @@ if is_windows; then
 fi
 
 if [[ -z "$REAL_PID" ]] || ! pid_alive "$REAL_PID"; then
-    echo "[开服] ERROR: 进程启动后立即退出，$LOG_DIR/stdout.log 末尾：" >&2
-    tail -n 20 "$LOG_DIR/stdout.log" >&2 || true
+    echo "[开服] ERROR: 进程启动后立即退出，$LOG_FILE 末尾：" >&2
+    tail -n 20 "$LOG_FILE" >&2 || true
     exit 1
 fi
 

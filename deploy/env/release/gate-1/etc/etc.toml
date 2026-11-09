@@ -1,6 +1,6 @@
 # 网关服（release / gate-1）。部署包目录即工作目录，pid/log 均相对当前目录。
 
-pid = "./pid/gate-1.pid"
+pid = "../../pid/gate-1.pid"
 mode = "test"
 timezone = "Asia/Shanghai"
 
@@ -17,7 +17,7 @@ timezone = "Asia/Shanghai"
     stackLevel = "error"
     callFullPath = true
     [log.file]
-        path = "./log/gate-1.log"
+        path = "../../log/gate-1.log"
         format = "text"
         maxAge = "7d"
         maxSize = 100
@@ -34,7 +34,7 @@ timezone = "Asia/Shanghai"
     addrs = ["10.10.3.10:6379"]
     db = 3
     username = ""
-    password = "game123"
+    password = "root123"
     maxRetries = 3
     prefix = "cluster:locate"
 

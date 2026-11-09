@@ -14,8 +14,21 @@ set -euo pipefail
 
 APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP="$(basename "$APP_DIR")"
-PID_FILE="$APP_DIR/$APP.pid"
-LOG_FILE="$APP_DIR/log/stdout.log"
+
+# 从目录结构推断运行模式（同 start.sh）
+GRANDPARENT_NAME="$(basename "$(dirname "$(dirname "$APP_DIR")")")"
+if [[ "$GRANDPARENT_NAME" == "server" ]]; then
+    DEPLOY_ROOT="$(dirname "$(dirname "$APP_DIR")")"
+    ENV_ROOT="$(dirname "$DEPLOY_ROOT")"
+    PID_DIR="$ENV_ROOT/pid"
+    LOG_DIR="$ENV_ROOT/log"
+else
+    PID_DIR="$APP_DIR/pid"
+    LOG_DIR="$APP_DIR/log"
+fi
+
+PID_FILE="$PID_DIR/$APP.pid"
+LOG_FILE="$LOG_DIR/$APP.stdout.log"
 DONE_MARK="[shutdown] === DONE ==="
 SHUTDOWN_TIMEOUT="${SHUTDOWN_TIMEOUT:-20}"
 EXIT_TIMEOUT="${EXIT_TIMEOUT:-5}"

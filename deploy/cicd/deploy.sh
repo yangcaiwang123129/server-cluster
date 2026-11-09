@@ -17,7 +17,7 @@ ENV=""
 VERSION=""
 SERVERS=""
 USER_DEFAULT="game"
-REMOTE_DEFAULT="/data/game"
+REMOTE_ROOT="/data/$ENV/server"
 DRY_RUN=0
 
 usage() {
@@ -67,14 +67,11 @@ in_scope() {
 
 failed=0
 
-while read -r id host user remote _; do
+while read -r id host user _rest; do
     [[ -z "$id" || "$id" == "#"* ]] && continue
     in_scope "$id" || continue
 
     user="${user:-$USER_DEFAULT}"
-    # 默认远端目录：/data/<env>/<server-id>
-    # 同主机多服务各自独立，不同环境顶层隔离
-    remote="${remote:-/data/$ENV/$id}"
     pkg="$DIST/$id.tar.gz"
 
     if [[ ! -f "$pkg" ]]; then
@@ -83,16 +80,18 @@ while read -r id host user remote _; do
         continue
     fi
 
-    echo "[分发] $id -> $user@$host:$remote"
-    run ssh ${DEPLOY_SSH_OPTS:-} -o BatchMode=yes "$user@$host" "mkdir -p '$remote'"
-    run scp ${DEPLOY_SSH_OPTS:-} -o BatchMode=yes -q "$pkg" "$user@$host:$remote/"
+    echo "[分发] $id -> $user@$host:$REMOTE_ROOT"
+    run ssh ${DEPLOY_SSH_OPTS:-} -o BatchMode=yes "$user@$host" \
+        "mkdir -p '$REMOTE_ROOT' '/data/$ENV/pid' '/data/$ENV/log'"
+    run scp ${DEPLOY_SSH_OPTS:-} -o BatchMode=yes -q "$pkg" "$user@$host:$REMOTE_ROOT/"
 
-    # 先停旧进程，再解包覆盖（保留 log/pid/data 运行期目录），最后拉起。
-    # 远端命令用 POSIX 写法，兼容 sh/bash 登录 shell。
-    remote_cmd="cd '$remote' || exit 1
+    # 集中部署：所有服务包放 /data/<env>/server/，
+    # pid 集中 /data/<env>/pid/<id>.pid，日志集中 /data/<env>/log/<id>.stdout.log。
+    # stop.sh / start.sh 自动从目录结构推断，不需要额外传参。
+    remote_cmd="cd '$REMOTE_ROOT' || exit 1
 if [ -x '$id/stop.sh' ]; then './$id/stop.sh' || true; fi
 tar -xzf '$id.tar.gz' && bash './$id/start.sh'"
-    run ssh -o BatchMode=yes "$user@$host" "$remote_cmd" || {
+    run ssh ${DEPLOY_SSH_OPTS:-} -o BatchMode=yes "$user@$host" "$remote_cmd" || {
         echo "[错误] $id 远端部署失败（$host）" >&2
         failed=1
     }

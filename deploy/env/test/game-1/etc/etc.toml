@@ -2,7 +2,7 @@
 # due 自动加载 ./etc/etc.toml。
 
 # 进程号
-pid = ""
+pid = "../../pid/game-1.pid"
 # 开发模式。支持模式：debug、test、release
 mode = "debug"
 # 统一时区设置
@@ -26,7 +26,7 @@ timezone = "Local"
     timeFormat = "2006/01/02 15:04:05.000000"
     stackLevel = "error"
     [log.file]
-        path = "../../log/game.log"
+        path = "../../log/game-1.log"
         format = "text"
         maxAge = "7d"
         maxSize = 100

@@ -1,7 +1,7 @@
 # 管理后台服（纯 HTTP 服务）配置
 # due 自动加载 ./etc/etc.toml。
 
-pid = "../../pid/admin.pid"
+pid = "../../pid/admin-1.pid"
 mode = "debug"
 timezone = "Local"
 
@@ -18,7 +18,7 @@ timezone = "Local"
 
 # HTTP 监听地址（due http 组件）
 [http]
-    addr = "172.16.0.12:8877"
+    addr = "106.53.0.18:8877"
 
 # Swagger 文档（由 swag 生成，due http 组件自动挂载到 /swagger）
 [http.swagger]
@@ -32,7 +32,7 @@ timezone = "Local"
     timeFormat = "2006/01/02 15:04:05.000000"
     stackLevel = "error"
     [log.file]
-        path = "../../log/admin.log"
+        path = "../../log/admin-1.log"
         format = "text"
         maxAge = "7d"
         maxSize = 100
@@ -91,7 +91,7 @@ timezone = "Local"
 # 客户端模拟器默认参数（页面可覆盖）
 [sim]
     # 登录服地址
-    loginAddr = "http://172.16.0.12:8080"
+    loginAddr = "http://106.53.0.18:8080"
 
 # SSH 运维配置：key 是目标服务器 IP/Hostname，value 是连接参数。
 # 节点列表里 endpoint 匹配到这里的 host 时自动应用；endpoint 是内网 IP 也可按别名匹配。

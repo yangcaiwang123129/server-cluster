@@ -1,7 +1,7 @@
 # 登录服（mesh 集群）配置
 # due 自动加载 ./etc/etc.toml。
 
-pid = ""
+pid = "../../pid/login-1.pid"
 mode = "debug"
 timezone = "Local"
 
@@ -17,7 +17,7 @@ timezone = "Local"
         callTimeout = "3s"
 # HTTP 监听地址（due http 组件）
 [http]
-    addr = "172.16.0.12:7788"
+    addr = "106.53.0.18:7788"
 
 # CORS 跨域（开发环境全放行）
 [http.cors]
@@ -33,7 +33,7 @@ timezone = "Local"
     timeFormat = "2006/01/02 15:04:05.000000"
     stackLevel = "error"
     [log.file]
-        path = "../../.dev/log/login.log"
+        path = "../../log/login-1.log"
         format = "text"
         maxAge = "7d"
         maxSize = 100
@@ -97,4 +97,4 @@ timezone = "Local"
 
 # 网关地址：登录成功后下发给客户端连接（必须与 gate 的 network.ws.server.addr 一致）
 [gate]
-    addr = "172.16.0.12:9000"
+    addr = "106.53.0.18:9000"

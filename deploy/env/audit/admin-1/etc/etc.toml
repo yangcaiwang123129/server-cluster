@@ -1,6 +1,6 @@
 # 管理后台服（audit / admin-1）。
 
-pid = "./pid/admin-1.pid"
+pid = "../../pid/admin-1.pid"
 mode = "debug"
 timezone = "Asia/Shanghai"
 
@@ -26,7 +26,7 @@ timezone = "Asia/Shanghai"
     stackLevel = "error"
     callFullPath = true
     [log.file]
-        path = "./log/admin-1.log"
+        path = "../../log/admin-1.log"
         format = "text"
         maxAge = "7d"
         maxSize = 100
@@ -54,14 +54,14 @@ timezone = "Asia/Shanghai"
 
 [[db.mysql.instances]]
     name = "default"
-    dsn = "game:game123@tcp(10.10.1.10:3306)/game_audit?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s&readTimeout=10s&writeTimeout=10s"
+    dsn = "root:root123@tcp(10.10.1.10:3306)/game_audit?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s&readTimeout=10s&writeTimeout=10s"
     max_open_conns = 50
     max_idle_conns = 20
 
 # 打点记录库（game_record）：后台只读
 [[db.mysql.instances]]
     name = "record"
-    dsn = "game:game123@tcp(10.10.1.10:3306)/game_record?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s&readTimeout=10s&writeTimeout=10s"
+    dsn = "root:root123@tcp(10.10.1.10:3306)/game_record?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s&readTimeout=10s&writeTimeout=10s"
     max_open_conns = 50
     max_idle_conns = 20
 
@@ -69,7 +69,7 @@ timezone = "Asia/Shanghai"
     name = "default"
     addrs = ["10.10.1.10:6379"]
     username = ""
-    password = "game123"
+    password = "root123"
     db = 1
 
 [jwt]
