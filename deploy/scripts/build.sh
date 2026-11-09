@@ -57,6 +57,8 @@ mkdir -p "$DIST"
 export CGO_ENABLED=0
 export GOOS="${GOOS:-linux}"
 export GOARCH="${GOARCH:-amd64}"
+# 国内服务器访问 proxy.golang.org 常超时，默认用七牛云镜像；允许通过环境变量覆盖
+export GOPROXY="${GOPROXY:-https://goproxy.cn,https://proxy.golang.org,direct}"
 
 for server in $SERVERS; do
     server="${server//,/}"

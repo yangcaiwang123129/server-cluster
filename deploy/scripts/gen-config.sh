@@ -192,7 +192,8 @@ fi
 
 if command -v go >/dev/null 2>&1; then
     echo "[gen-config] go build..."
-    go build -buildvcs=false ./share/tpl/...
+    (cd "$ROOT" && GOPROXY="${GOPROXY:-https://goproxy.cn,https://proxy.golang.org,direct}" \
+        go build -buildvcs=false ./share/tpl/...)
 else
     echo "[gen-config] go not found, skip build check"
 fi

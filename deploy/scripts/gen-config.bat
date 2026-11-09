@@ -13,7 +13,7 @@ rem
 rem 说明：
 rem   bat 不处理凭据注入，直接用系统 git 配置（credential manager / .netrc / SSH key）。
 rem   如果 excelconfig 仓库是私有的，请确保本机 git 已登录。
-setlocal enabledelayedexpansion
+setlocal
 
 cd /d "%~dp0..\.."
 
@@ -79,7 +79,7 @@ if not exist "%EXCEL_DIR%" mkdir "%EXCEL_DIR%"
 
 if exist "%EXCEL_SRC%\.git" (
     echo [gen-config] excelconfig already cloned, pulling latest...
-    git -C "%EXCEL_SRC%" pull --ff-only --depth 1 >nul 2>nul
+    git -C "%EXCEL_SRC%" pull --ff-only --depth 1
     if errorlevel 1 (
         echo [gen-config] pull 失败，删了重 clone
         rmdir /s /q "%EXCEL_SRC%"
@@ -97,8 +97,9 @@ if not exist "%EXCEL_SRC%\.git" (
 )
 
 rem ---------- 2. 平铺复制 xlsx ----------
+rem 关键：Windows cmd 的 if / for /r 只接受反斜杠，ENV_PATH 必须全用 \
 set "ENV_PATH=%ENV%"
-if not "%VERSION%"=="" set "ENV_PATH=%ENV%/%VERSION%"
+if not "%VERSION%"=="" set "ENV_PATH=%ENV%\%VERSION%"
 
 set "SRC_DIR=%EXCEL_SRC%\%ENV_PATH%"
 if not exist "%SRC_DIR%" (
@@ -126,6 +127,10 @@ if not exist "%EXCEL_DIR%\__beans__.xlsx" (
 )
 
 rem ---------- 3. Luban 生成 ----------
+rem 兜底：某些 Windows 版本缺 ICU 组件，dotnet 会 FailFast；
+rem Luban 本身不依赖 locale，用 invariant 模式绕过去（与 luban.sh 保持一致）
+set DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+
 if not exist "cfg\data" mkdir "cfg\data"
 if not exist "share\tpl\data" mkdir "share\tpl\data"
 
