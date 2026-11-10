@@ -2,9 +2,11 @@ package logic
 
 import (
 	"context"
+	"server-cluster/share/consts"
 	"sort"
 
 	"github.com/dobyte/due/v2/log"
+	"github.com/dobyte/due/v2/utils/xconv"
 
 	"server-cluster/internal/cache"
 	"server-cluster/internal/record"
@@ -59,7 +61,18 @@ func (this *heroLogic) OnLeaveGame(ctx context.Context, playerID int64, _ *pb.Le
 func (this *heroLogic) Load(ctx context.Context, playerID int64) (*model.PlayerHero, error) {
 	return this.cache.GetOrInit(ctx, playerID,
 		func(id int64) *model.PlayerHero {
-			return &model.PlayerHero{PlayerID: id, Heroes: util.NewSafeMap[int32, model.HeroInfo]()}
+			playerHero := &model.PlayerHero{PlayerID: id, Heroes: util.NewSafeMap[int32, model.HeroInfo]()}
+			value := tpl.T().Global.Get(consts.CreatePlayerGiveHero).Value
+			cfgID := xconv.Int32(value)
+			if err := grantHeroBound(ctx, playerID, int64(cfgID)); err != nil {
+				return playerHero
+			}
+
+			heroInfo := newHeroInfo(cfgID)
+			heroInfo.Equipped = true
+			playerHero.AddHero(heroInfo)
+			record.Record(ctx, model.RecordModuleHero, playerID, model.RecordActionGain, cfgID, 1)
+			return playerHero
 		},
 		func(row *model.PlayerHero) {
 			if row.Heroes == nil {
