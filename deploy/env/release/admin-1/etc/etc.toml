@@ -12,7 +12,7 @@ timezone = "Asia/Shanghai"
         callTimeout = "3s"
 
 [http]
-    addr = "0.0.0.0:8081"
+    addr = "0.0.0.0:8877"
 
 [http.swagger]
     enable = true
