@@ -1,0 +1,10 @@
+# 统一文本文件，让 git 自动识别二进制/文本并规范化行尾
+* text=auto
+
+# Windows 批处理/脚本：必须 CRLF，cmd.exe 不识别纯 LF
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+*.ps1  text eol=crlf
+
+# Bash 脚本：保持 LF，Git Bash / Linux / CI 才不炸
+*.sh   text eol=lf
