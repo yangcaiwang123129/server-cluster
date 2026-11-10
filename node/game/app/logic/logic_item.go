@@ -222,8 +222,25 @@ func (this *itemLogic) ItemTransfer(ctx context.Context, playerID int64, req *pb
 }
 
 func (this *itemLogic) ItemAddEntry(ctx context.Context, playerID int64, req *pb.GmItemAddEntryReq) (*pb.ItemContainerListResp, error) {
-	if !tpl.T().Item.Has(req.GetCfgId()) {
+	cfg := tpl.T().Item.Get(req.GetCfgId())
+	if cfg == nil {
 		return &pb.ItemContainerListResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, "物品配置不存在")}, nil
+	}
+
+	count := req.GetCount()
+	if count <= 0 {
+		count = 1
+	}
+	// 货币类型物品不落背包容器，走 player 表货币列
+	if cfg.Type == tpl.ItemType_Currency {
+		if err := adjustCurrency(ctx, playerID, cfg.Id, int64(count)); err != nil {
+			if r := codedResult(err); r != nil {
+				return &pb.ItemContainerListResp{Result: r}, nil
+			}
+			return nil, err
+		}
+		record.Record(ctx, model.RecordModuleItem, playerID, model.RecordActionGain, cfg.Id, count)
+		return &pb.ItemContainerListResp{}, nil
 	}
 
 	pc, c, err := itemContainerOf(ctx, playerID, pb.ContainerType(req.GetContainerType()))
@@ -240,10 +257,6 @@ func (this *itemLogic) ItemAddEntry(ctx context.Context, playerID int64, req *pb
 		}
 	}
 
-	count := req.GetCount()
-	if count <= 0 {
-		count = 1
-	}
 	// 新增实例不按请求坐标落位：容器按"从左往右、从上到下"扫描首个能完整容纳的空闲位置自动插入，无空位返回空间不足
 	if err := c.AddEntryAuto(&model.ItemEntry{
 		ItemID:    svc.NextID(),
