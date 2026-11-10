@@ -24,11 +24,7 @@ func init() {
 
 // handleMailList 邮件列表。
 func handleMailList(ctx node.Context) {
-	req := &pb.MailListReq{}
-	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.MailListResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
-		return
-	}
+	// MailListReq 无字段，客户端不携带消息体，跳过 Parse
 	resp, err := logic.Mail().MailList(ctx.Context(), ctx.UID())
 	if err != nil {
 		_ = ctx.Response(&pb.MailListResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
@@ -54,11 +50,8 @@ func handleMailRead(ctx node.Context) {
 
 // handleMailReadAll 全部标记已读。
 func handleMailReadAll(ctx node.Context) {
+	// MailReadAllReq 无字段，客户端不携带消息体，跳过 Parse 直接用零值请求
 	req := &pb.MailReadAllReq{}
-	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.MailReadAllResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
-		return
-	}
 	resp, err := logic.Mail().MailReadAll(ctx.Context(), ctx.UID(), req)
 	if err != nil {
 		_ = ctx.Response(&pb.MailReadAllResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
@@ -84,11 +77,8 @@ func handleMailClaim(ctx node.Context) {
 
 // handleMailClaimAll 一键领取全部附件。
 func handleMailClaimAll(ctx node.Context) {
+	// MailClaimAllReq 无字段，客户端不携带消息体，跳过 Parse 直接用零值请求
 	req := &pb.MailClaimAllReq{}
-	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.MailClaimAllResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
-		return
-	}
 	resp, err := logic.Mail().MailClaimAll(ctx.Context(), ctx.UID(), req)
 	if err != nil {
 		_ = ctx.Response(&pb.MailClaimAllResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})
@@ -114,11 +104,8 @@ func handleMailDelete(ctx node.Context) {
 
 // handleMailDeleteClean 清理可删除邮件。
 func handleMailDeleteClean(ctx node.Context) {
+	// MailDeleteCleanReq 无字段，客户端不携带消息体，跳过 Parse 直接用零值请求
 	req := &pb.MailDeleteCleanReq{}
-	if err := ctx.Parse(req); err != nil {
-		_ = ctx.Response(&pb.MailDeleteCleanResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
-		return
-	}
 	resp, err := logic.Mail().MailDeleteClean(ctx.Context(), ctx.UID(), req)
 	if err != nil {
 		_ = ctx.Response(&pb.MailDeleteCleanResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INTERNAL_ERROR, err.Error())})

@@ -85,12 +85,8 @@ func handleEnterGame(ctx node.Context) {
 
 // handleLeaveGame 离开游戏：业务收尾完成后断开连接。
 func handleLeaveGame(ctx node.Context) {
+	// LeaveGameReq 无字段，客户端不携带消息体，跳过 Parse 直接用零值请求
 	req := &pb.LeaveGameReq{}
-	if err := ctx.Parse(req); err != nil {
-		log.Errorf("handler: leave game parse failed, uid=%d: %v", ctx.UID(), err)
-		_ = ctx.Response(&pb.LeaveGameResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
-		return
-	}
 	resp := &pb.LeaveGameResp{}
 	if err := logic.PlayerLogic().OnLeaveGame(ctx.Context(), ctx.UID(), req, resp); err != nil {
 		log.Errorf("handler: leave game logic failed, uid=%d: %v", ctx.UID(), err)

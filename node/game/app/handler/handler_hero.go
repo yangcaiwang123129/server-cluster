@@ -23,12 +23,7 @@ func init() {
 
 // handleHeroList 英雄列表。
 func handleHeroList(ctx node.Context) {
-	req := &pb.HeroListReq{}
-	if err := ctx.Parse(req); err != nil {
-		log.Errorf("handler: hero list parse failed, uid=%d: %v", ctx.UID(), err)
-		_ = ctx.Response(&pb.HeroListResp{Result: errs.BuildErrResult(pb.ErrCode_ERR_CODE_INVALID_PARAMS, err.Error())})
-		return
-	}
+	// HeroListReq 无字段，客户端不携带消息体，跳过 Parse 直接用零值请求
 	resp, err := logic.Hero().HeroList(ctx.Context(), ctx.UID())
 	if err != nil {
 		log.Errorf("handler: hero list logic failed, uid=%d: %v", ctx.UID(), err)
